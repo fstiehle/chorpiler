@@ -11,6 +11,14 @@
     "outDir": "lib"
   },
 
-  "include": ["src/**/*"],
+  "ts-node": {
+    "files": true
+  },
+  "files": [
+    "src/index.ts",
+    "src/types.d.ts"
+  ],
+
+  "include": ["src/**/*", "tests/**/*"],
   "exclude": ["node_modules"]
 }
