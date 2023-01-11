@@ -20,6 +20,14 @@ describe('BPMN 2 Choreography Parsing', function () {
       });
     });
 
+    it('parse correct call choreography and report missing support', function(done) {
+      fs.readFile(__dirname + '/bpmn/CallChoreography.bpmn', 
+      function(err, data) {
+        if (err) { console.error(err); done(err); }
+        expect(parser.fromXML(data)).to.eventually.be.rejected.notify(done);
+      });
+    });
+
     it('parse malformed model an report error', function(done) {
       fs.readFile(__dirname + '/bpmn/Malformed1.bpmn', 
       function(err, data) {
