@@ -1,15 +1,15 @@
 import { expect, use } from "chai";
 import * as fs from 'fs';
-import {Parser, ModdleParser} from "../src/Parser/Parser";
+import {INetParser, INetFastXMLParser} from "../src/Parser/Parser";
 import chaiAsPromised from 'chai-as-promised';
 
 use(chaiAsPromised);
 describe('BPMN 2 Choreography Parsing', function () {
-  describe('parse() with ModdleParser', function () {
-    let parser: Parser;
+  describe('parse() with FastXMLParser', function () {
+    let parser: INetParser;
 
     beforeEach(() => {
-      parser = new ModdleParser();
+      parser = new INetFastXMLParser();
     })
 
     it('parse correct event based XOR', function(done) {
