@@ -3,7 +3,6 @@ import { XMLParser, XMLValidator } from 'fast-xml-parser';
 import Participant from './Participant';
 import { EventLabel, GatewayLabel, GatewayType, TaskLabel, Transition } from './Transition';
 import Place from './Place';
-import { prototype } from 'mocha';
 
 export interface INetParser {
   fromXML(xml: Buffer): Promise<InteractionNet>;
@@ -49,15 +48,14 @@ export class INetFastXMLParser implements INetParser {
 
       this.iNet.id = choreography[Properties.id];
       this.parseParticipants(choreography[Elements.participants]);
-      this.translateTasks(choreography[Elements.tasks]);
       this.translateStartEvent(choreography[Elements.startEvent]);
-      this.translateEndEvent(choreography[Elements.endEvent]);
+      this.translateTasks(choreography[Elements.tasks]);
       this.translateXOR(choreography[Elements.exclusiveGateway]);
+      this.translateEndEvent(choreography[Elements.endEvent]);
 
       // connect flows last, and report error when a flow leads to an unknown transition, which means
       // we were not able to translate all elements
       this.connectFlows(choreography[Elements.flows]);
-      console.log(this.iNet);
       return this.iNet;
     }
 
@@ -73,8 +71,9 @@ export class INetFastXMLParser implements INetParser {
         throw new Error("Other than exactly one start event")
       }
       const start = starts[0];
-      const startPlace = new Place(start[Properties.id]);
       const startEvent = new Transition(start[Properties.id], new EventLabel());
+      const startPlace = new Place(start[Properties.id]);
+      startPlace.target = startEvent;
       startEvent.in.push(startPlace);
       this.iNet.places.set(start[Properties.id], startPlace);
       this.iNet.transitions.set(start[Properties.id], startEvent);
@@ -86,8 +85,9 @@ export class INetFastXMLParser implements INetParser {
         throw new Error("Other than exactly one end event")
       }
       const end = ends[0];
-      const endPlace = new Place(end[Properties.id]);
       const endEvent = new Transition(end[Properties.id], new EventLabel());
+      const endPlace = new Place(end[Properties.id]);
+      endPlace.source = endEvent;
       endEvent.out.push(endPlace);
       this.iNet.places.set(end[Properties.id], endPlace);
       this.iNet.transitions.set(end[Properties.id], endEvent);
@@ -103,22 +103,30 @@ export class INetFastXMLParser implements INetParser {
       }
     }
 
-    private translateXOR(xgateways: any) {
-      for (const xgateway of xgateways) {
-        for (const flow_id of xgateway[Elements.outs]) {
-          const id = xgateway[Properties.id] + "_" + flow_id;
-          const transition = new Transition(id, new GatewayLabel(GatewayType.Exclusive));
-          const place = new Place(flow_id);
+    private translateXOR(gateways: any) {
+      for (const gateway of gateways) {
+        const gatewayID = gateway[Properties.id];
+
+        // connect gateway outs
+        for (const flowID of gateway[Elements.outs]) {
+          const id = `${gatewayID}_${flowID}`;
+          const transition = new Transition(id, 
+            new GatewayLabel(GatewayType.Exclusive));
+          const place = new Place(flowID);
+          place.source = transition;
           transition.out.push(place);
-          this.iNet.places.set(flow_id, place);
+          this.iNet.places.set(flowID, place);
           this.iNet.transitions.set(id, transition);
         }
-        for (const flow_id of xgateway[Elements.ins]) {
-          const id = xgateway[Properties.id] + "_" + flow_id;
-          const transition = new Transition(id, new GatewayLabel(GatewayType.Exclusive));
-          const place = new Place(flow_id);
+        // connect gateway ins
+        for (const flowID of gateway[Elements.ins]) {
+          const id = `${gatewayID}_${flowID}`;
+          const transition = new Transition(id, 
+            new GatewayLabel(GatewayType.Exclusive));
+          const place = new Place(flowID);
+          place.target = transition;
           transition.in.push(place);
-          this.iNet.places.set(flow_id, place);
+          this.iNet.places.set(flowID, place);
           this.iNet.transitions.set(id, transition);
         }
       }
@@ -127,20 +135,24 @@ export class INetFastXMLParser implements INetParser {
     private connectFlows(flows: any) {
       for (const flow of flows) {
         const placeID = flow[Properties.id];
-        if (this.iNet.places.get(placeID)) {
-          // skip already connected flows
-          continue;
+        
+        // Be aware of already connected places
+        if (!this.iNet.places.has(placeID)) {
+          this.iNet.places.set(placeID, new Place(placeID));
         }
-
-        const source = this.iNet.transitions.get(flow[Properties.source]);
-        const target = this.iNet.transitions.get(flow[Properties.target]);
-        if (source == null || target == null) {
-          throw new Error("Unsupported Element referenced in flow " + placeID);
+        const place = this.iNet.places.get(placeID)!;
+        if (!place.source) {
+          const source = this.iNet.transitions.get(flow[Properties.source]);
+          if (!source) throw new Error(`Unsupported Element ${flow[Properties.source]} referenced in flow ${placeID}`);
+          place.source = source;
+          source.out.push(place);
         }
-        const place = new Place(placeID);
-        this.iNet.places.set(placeID, place);
-        source.out.push(this.iNet.places.get(placeID)!);
-        target.in.push(this.iNet.places.get(placeID)!);
+        if (!place.target) {
+          const target = this.iNet.transitions.get(flow[Properties.target]);
+          if (!target) throw new Error(`Unsupported Element ${flow[Properties.target]} referenced in flow ${placeID}`);
+          place.target = target;
+          target.in.push(place);
+        }
       }
     }
   }
@@ -162,7 +174,6 @@ export class INetFastXMLParser implements INetParser {
       const iNetTranslator = new INetFastXMLParser.INetTranslator();
       try {
         const iNet = iNetTranslator.translate(choreography);
-        console.log(iNet);
         return resolve(iNet);
       } catch (error) {
         console.error(error);
