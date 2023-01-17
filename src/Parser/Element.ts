@@ -1,23 +1,29 @@
 import Participant from "./Participant";
-import Place from "./Place";
 
-export enum GatewayType {
-  Exclusive
+export class Element {
+  id: string;
+  source = new Array<Element>();
+  target = new Array<Element>(); 
+  
+  constructor(id: string) {
+    this.id = id;
+  }
 }
 
-export class Transition {
-  id: string;
+export class Place extends Element { }
+
+export class Transition extends Element {
   label: Label;
-  in: Place[] = new Array<Place>;
-  out: Place[] = new Array<Place>;
 
   constructor(id: string, label: Label) {
-    this.id = id;
+    super(id);
     this.label = label;
   }
 }
 
 export interface Label { }
+
+export class EventLabel implements Label { }
 
 export class TaskLabel implements Label {
   sender: Participant
@@ -29,7 +35,9 @@ export class TaskLabel implements Label {
   }
 }
 
-export class EventLabel implements Label { }
+export enum GatewayType {
+  Exclusive
+}
 
 export class GatewayLabel implements Label {
   type: GatewayType;

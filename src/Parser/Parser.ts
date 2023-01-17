@@ -1,8 +1,7 @@
 import InteractionNet from './InteractionNet';
 import { XMLParser, XMLValidator } from 'fast-xml-parser';
 import Participant from './Participant';
-import { EventLabel, GatewayLabel, GatewayType, TaskLabel, Transition } from './Transition';
-import Place from './Place';
+import { Element, EventLabel, GatewayLabel, GatewayType, TaskLabel, Transition, Place } from './Element';
 
 export interface INetParser {
   fromXML(xml: Buffer): Promise<InteractionNet>;
@@ -37,123 +36,156 @@ export class INetFastXMLParser implements INetParser {
   });
 
   static INetTranslator = class {
-    iNet: InteractionNet;
-
-    constructor() {
-      this.iNet = new InteractionNet();
-    }
+    iNet = new InteractionNet();
 
     translate(choreography: any): InteractionNet {
-      // console.log(choreography);
-
       this.iNet.id = choreography[Properties.id];
-      this.parseParticipants(choreography[Elements.participants]);
-      this.translateStartEvent(choreography[Elements.startEvent]);
-      this.translateTasks(choreography[Elements.tasks]);
-      this.translateXOR(choreography[Elements.exclusiveGateway]);
-      this.translateEndEvent(choreography[Elements.endEvent]);
 
+      this
+      .parseParticipants(choreography[Elements.participants])
+      .translateStartEvent(choreography[Elements.startEvent])
+      .translateTasks(choreography[Elements.tasks])
+      .translateXOR(choreography[Elements.exclusiveGateway])
+      .translateEndEvent(choreography[Elements.endEvent])
       // connect flows last, and report error when a flow leads to an unknown transition, which means
       // we were not able to translate all elements
-      this.connectFlows(choreography[Elements.flows]);
+      .connectFlows(choreography[Elements.flows]);
       return this.iNet;
     }
 
-    private parseParticipants(participants: any) {
+    private parseParticipants(participants: any): this {
       for (const par of participants) {
         const newPar = new Participant(par[Properties.id]);
         this.iNet.participants.set(par[Properties.id], newPar);
       };
+      return this;
     }
 
-    private translateStartEvent(starts: any) {
+    private translateStartEvent(starts: any): this {
       if (starts.length !== 1) {
-        throw new Error("Other than exactly one start event")
+        throw new Error("Other than exactly one start event");
       }
       const start = starts[0];
       const startEvent = new Transition(start[Properties.id], new EventLabel());
-      const startPlace = new Place(start[Properties.id]);
-      startPlace.target = startEvent;
-      startEvent.in.push(startPlace);
-      this.iNet.places.set(start[Properties.id], startPlace);
-      this.iNet.transitions.set(start[Properties.id], startEvent);
-      this.iNet.initial = startEvent;
+      const startPlace = new Place("initial");
+      this.linkElements(startPlace, startEvent);
+      this.iNet.initial = startPlace;
+      this.addElement(startEvent);
+      this.addElement(startPlace);
+      return this;
     }
 
-    private translateEndEvent(ends: any) {
+    private translateEndEvent(ends: any): this {
       if (ends.length !== 1) {
-        throw new Error("Other than exactly one end event")
+        throw new Error("Other than exactly one end event");
       }
       const end = ends[0];
       const endEvent = new Transition(end[Properties.id], new EventLabel());
-      const endPlace = new Place(end[Properties.id]);
-      endPlace.source = endEvent;
-      endEvent.out.push(endPlace);
-      this.iNet.places.set(end[Properties.id], endPlace);
-      this.iNet.transitions.set(end[Properties.id], endEvent);
-      this.iNet.end = endEvent;
+      const endPlace = new Place("end");
+      this.linkElements(endEvent, endPlace);
+      this.addElement(endEvent);
+      this.addElement(endPlace);
+      this.iNet.end = endPlace;
+      return this;
     }
 
-    private translateTasks(tasks: any) {
+    private translateTasks(tasks: any): this {
       for (const task of tasks) {
         const from = this.iNet.participants.get(task[Elements.participantsRef][0]);
         const to = this.iNet.participants.get(task[Elements.participantsRef][1]);
-        const trans = new Transition(task[Properties.id], new TaskLabel(from!, to!));
-        this.iNet.transitions.set(trans.id, trans);
+        this.addElement(
+          new Transition(task[Properties.id], new TaskLabel(from!, to!))
+        );
       }
+      return this;
     }
 
-    private translateXOR(gateways: any) {
+    private translateXOR(gateways: any): this {
       for (const gateway of gateways) {
         const gatewayID = gateway[Properties.id];
+        const outs = gateway[Elements.outs];
+        const ins = gateway[Elements.ins];
+        const transitions = new Array<Transition>();
 
-        // connect gateway outs
-        for (const flowID of gateway[Elements.outs]) {
-          const id = `${gatewayID}_${flowID}`;
-          const transition = new Transition(id, 
-            new GatewayLabel(GatewayType.Exclusive));
-          const place = new Place(flowID);
-          place.source = transition;
-          transition.out.push(place);
-          this.iNet.places.set(flowID, place);
-          this.iNet.transitions.set(id, transition);
-        }
-        // connect gateway ins
-        for (const flowID of gateway[Elements.ins]) {
-          const id = `${gatewayID}_${flowID}`;
-          const transition = new Transition(id, 
-            new GatewayLabel(GatewayType.Exclusive));
-          const place = new Place(flowID);
-          place.target = transition;
-          transition.in.push(place);
-          this.iNet.places.set(flowID, place);
-          this.iNet.transitions.set(id, transition);
+        if (outs.length === 1 && outs.length < ins.length) {
+          // converging
+          // build transition for each incoming flow
+          for (const flowID of ins) {
+            const id = `${gatewayID}_${flowID}`;
+            const transition = new Transition(id, 
+              new GatewayLabel(GatewayType.Exclusive));
+            const place = new Place(flowID);
+            this.linkElements(place, transition);
+            transitions.push(transition);
+            this.addElement(place);
+          }
+          const place = new Place(outs[0]);
+          this.addElement(place);
+          for (const t of transitions) {
+            this.linkElements(t, place);
+            this.addElement(t);
+          }
+        } else if (ins.length === 1 && ins.length < outs.length) {
+          // diverging
+          // build transition for each outcoming flow
+          for (const flowID of outs) {
+            const id = `${gatewayID}_${flowID}`;
+            const transition = new Transition(id, 
+              new GatewayLabel(GatewayType.Exclusive));
+            const place = new Place(flowID);
+            this.linkElements(transition, place);
+            transitions.push(transition);
+            this.addElement(place);
+          }
+          const place = new Place(ins[0]);
+          this.addElement(place);
+          for (const t of transitions) {
+            this.linkElements(place, t);
+            this.addElement(t);
+          }
+        } else {
+          throw new Error("Neither converging nor diverging XOR Gateway");
         }
       }
+      return this;
     }
 
     private connectFlows(flows: any) {
+      if (this.iNet.initial == null) {
+        throw new Error("No start event translated");
+      }
+
       for (const flow of flows) {
-        const placeID = flow[Properties.id];
-        
+        const id = flow[Properties.id];
+
         // Be aware of already connected places
-        if (!this.iNet.places.has(placeID)) {
-          this.iNet.places.set(placeID, new Place(placeID));
+        let place = this.iNet.elements.get(id);
+        if (!place) {
+          place = this.addElement(new Place(id));
         }
-        const place = this.iNet.places.get(placeID)!;
-        if (!place.source) {
-          const source = this.iNet.transitions.get(flow[Properties.source]);
-          if (!source) throw new Error(`Unsupported Element ${flow[Properties.source]} referenced in flow ${placeID}`);
-          place.source = source;
-          source.out.push(place);
+        if (place.source.length === 0) {
+          const source = this.iNet.elements.get(flow[Properties.source]);
+          if (!source) throw new Error(
+            `Unsupported Element ${flow[Properties.source]} referenced in flow ${id}`);
+          this.linkElements(source, place);
         }
-        if (!place.target) {
-          const target = this.iNet.transitions.get(flow[Properties.target]);
-          if (!target) throw new Error(`Unsupported Element ${flow[Properties.target]} referenced in flow ${placeID}`);
-          place.target = target;
-          target.in.push(place);
+        if (place.target.length === 0) {
+          const target = this.iNet.elements.get(flow[Properties.target]);
+          if (!target) throw new Error(
+            `Unsupported Element ${flow[Properties.target]} referenced in flow ${id}`);
+          this.linkElements(place, target);
         }
       }
+    }
+
+    private linkElements(source: Element, target: Element) {
+      target.source.push(source);
+      source.target.push(target);
+    }
+
+    private addElement(el: Element): Element {
+      this.iNet.elements.set(el.id, el);
+      return this.iNet.elements.get(el.id)!;
     }
   }
 
