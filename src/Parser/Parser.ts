@@ -37,6 +37,7 @@ export class INetFastXMLParser implements INetParser {
 
   static INetTranslator = class {
     iNet = new InteractionNet();
+    referenceCounter = 0;
 
     translate(choreography: any): InteractionNet {
       this.iNet.id = choreography[Properties.id];
@@ -114,13 +115,11 @@ export class INetFastXMLParser implements INetParser {
             const id = `${gatewayID}_${flowID}`;
             const transition = new Transition(id, 
               new GatewayLabel(GatewayType.Exclusive));
-            const place = new Place(flowID);
+            const place = this.addElement(new Place(flowID));
             this.linkElements(place, transition);
             transitions.push(transition);
-            this.addElement(place);
           }
-          const place = new Place(outs[0]);
-          this.addElement(place);
+          const place = this.addElement(new Place(outs[0]));
           for (const t of transitions) {
             this.linkElements(t, place);
             this.addElement(t);
@@ -132,13 +131,11 @@ export class INetFastXMLParser implements INetParser {
             const id = `${gatewayID}_${flowID}`;
             const transition = new Transition(id, 
               new GatewayLabel(GatewayType.Exclusive));
-            const place = new Place(flowID);
+            const place = this.addElement(new Place(flowID));
             this.linkElements(transition, place);
             transitions.push(transition);
-            this.addElement(place);
           }
-          const place = new Place(ins[0]);
-          this.addElement(place);
+          const place = this.addElement(new Place(ins[0]));
           for (const t of transitions) {
             this.linkElements(place, t);
             this.addElement(t);
@@ -157,22 +154,18 @@ export class INetFastXMLParser implements INetParser {
 
       for (const flow of flows) {
         const id = flow[Properties.id];
-
         // Be aware of already connected places
-        let place = this.iNet.elements.get(id);
-        if (!place) {
-          place = this.addElement(new Place(id));
-        }
+        const place = this.addElement(new Place(id));
         if (place.source.length === 0) {
           const source = this.iNet.elements.get(flow[Properties.source]);
           if (!source) throw new Error(
-            `Unsupported Element ${flow[Properties.source]} referenced in flow ${id}`);
+            `Unsupported Element ${flow[Properties.source]} as source referenced in flow ${id}`);
           this.linkElements(source, place);
         }
         if (place.target.length === 0) {
           const target = this.iNet.elements.get(flow[Properties.target]);
           if (!target) throw new Error(
-            `Unsupported Element ${flow[Properties.target]} referenced in flow ${id}`);
+            `Unsupported Element ${flow[Properties.target]} as target referenced in flow ${id}`);
           this.linkElements(place, target);
         }
       }
@@ -184,7 +177,17 @@ export class INetFastXMLParser implements INetParser {
     }
 
     private addElement(el: Element): Element {
-      this.iNet.elements.set(el.id, el);
+      if (!this.iNet.elements.has(el.id)) {
+        this.iNet.elements.set(el.id, el);
+        if (el instanceof Transition 
+          && (el.label instanceof TaskLabel 
+            || el.label instanceof EventLabel)) {
+          const ref = this.referenceCounter;
+          el.transformationReference = ref;
+          this.iNet.transformatioReferences.set(el.id, ref);
+          this.referenceCounter++;
+        }
+      }
       return this.iNet.elements.get(el.id)!;
     }
   }

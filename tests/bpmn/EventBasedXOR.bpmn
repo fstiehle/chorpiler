@@ -38,17 +38,22 @@
     </bpmn2:choreographyTask>
     <bpmn2:sequenceFlow id="SequenceFlow_0esuuaj" sourceRef="ChoreographyTask_1m3qduh" targetRef="ChoreographyTask_175oxwe" />
     <bpmn2:endEvent id="EndEvent_1lv264w">
-      <bpmn2:incoming>SequenceFlow_0xamnn2</bpmn2:incoming>
-      <bpmn2:incoming>Flow_1uhdzct</bpmn2:incoming>
+      <bpmn2:incoming>Flow_16j5p8v</bpmn2:incoming>
     </bpmn2:endEvent>
-    <bpmn2:sequenceFlow id="SequenceFlow_0xamnn2" sourceRef="ChoreographyTask_175oxwe" targetRef="EndEvent_1lv264w" />
+    <bpmn2:sequenceFlow id="SequenceFlow_0xamnn2" sourceRef="ChoreographyTask_175oxwe" targetRef="Gateway_0x44u2n" />
     <bpmn2:exclusiveGateway id="Gateway_1td68h3" name="delivery?" default="Flow_0mkbrl0">
       <bpmn2:incoming>SequenceFlow_036yo13</bpmn2:incoming>
       <bpmn2:outgoing>Flow_0mkbrl0</bpmn2:outgoing>
       <bpmn2:outgoing>Flow_1uhdzct</bpmn2:outgoing>
     </bpmn2:exclusiveGateway>
     <bpmn2:sequenceFlow id="Flow_0mkbrl0" name="yes" sourceRef="Gateway_1td68h3" targetRef="ChoreographyTask_1m3qduh" />
-    <bpmn2:sequenceFlow id="Flow_1uhdzct" name="no" sourceRef="Gateway_1td68h3" targetRef="EndEvent_1lv264w" />
+    <bpmn2:sequenceFlow id="Flow_1uhdzct" name="no" sourceRef="Gateway_1td68h3" targetRef="Gateway_0x44u2n" />
+    <bpmn2:exclusiveGateway id="Gateway_0x44u2n">
+      <bpmn2:incoming>SequenceFlow_0xamnn2</bpmn2:incoming>
+      <bpmn2:incoming>Flow_1uhdzct</bpmn2:incoming>
+      <bpmn2:outgoing>Flow_16j5p8v</bpmn2:outgoing>
+    </bpmn2:exclusiveGateway>
+    <bpmn2:sequenceFlow id="Flow_16j5p8v" sourceRef="Gateway_0x44u2n" targetRef="EndEvent_1lv264w" />
   </bpmn2:choreography>
   <bpmndi:BPMNDiagram id="BPMNDiagram_1">
     <bpmndi:BPMNPlane id="BPMNPlane_Choreography_1" bpmnElement="PizzaDelivery">
@@ -95,11 +100,11 @@
         <di:waypoint x="759" y="368" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNShape id="EndEvent_1lv264w_di" bpmnElement="EndEvent_1lv264w">
-        <dc:Bounds x="912" y="350" width="36" height="36" />
+        <dc:Bounds x="972" y="350" width="36" height="36" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge id="SequenceFlow_0xamnn2_di" bpmnElement="SequenceFlow_0xamnn2">
         <di:waypoint x="861" y="368" />
-        <di:waypoint x="912" y="368" />
+        <di:waypoint x="895" y="368" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNShape id="Gateway_1td68h3_di" bpmnElement="Gateway_1td68h3" isMarkerVisible="true">
         <dc:Bounds x="485" y="343" width="50" height="50" />
@@ -117,11 +122,18 @@
       <bpmndi:BPMNEdge id="Flow_1uhdzct_di" bpmnElement="Flow_1uhdzct">
         <di:waypoint x="510" y="393" />
         <di:waypoint x="510" y="470" />
-        <di:waypoint x="930" y="470" />
-        <di:waypoint x="930" y="386" />
+        <di:waypoint x="920" y="470" />
+        <di:waypoint x="920" y="393" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="714" y="452" width="13" height="14" />
+          <dc:Bounds x="709" y="452" width="13" height="14" />
         </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="Gateway_0x44u2n_di" bpmnElement="Gateway_0x44u2n" isMarkerVisible="true">
+        <dc:Bounds x="895" y="343" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_16j5p8v_di" bpmnElement="Flow_16j5p8v">
+        <di:waypoint x="945" y="368" />
+        <di:waypoint x="972" y="368" />
       </bpmndi:BPMNEdge>
     </bpmndi:BPMNPlane>
     <bpmndi:BPMNLabelStyle id="BPMNLabelStyle_1">

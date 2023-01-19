@@ -14,6 +14,9 @@ export class Place extends Element { }
 
 export class Transition extends Element {
   label: Label;
+  
+  /** Refrence to the base model **/
+  transformationReference: number|null = null;
 
   constructor(id: string, label: Label) {
     super(id);
@@ -36,7 +39,7 @@ export class TaskLabel implements Label {
 }
 
 export enum GatewayType {
-  Exclusive
+  Exclusive = 0
 }
 
 export class GatewayLabel implements Label {
@@ -45,4 +48,4 @@ export class GatewayLabel implements Label {
   constructor(type: GatewayType) {
     this.type = type;
   }
- }
+}
