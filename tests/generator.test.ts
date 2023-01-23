@@ -20,16 +20,15 @@ describe('Smart Contract Generation', function () {
     });
 
     it('compile correct event based XOR', function() {
-
       readFile(__dirname + '/../src/Generator/templates/Conformance.sol')
       .then((template) => {
         readFile(__dirname + '/bpmn/EventBasedXOR.bpmn')
         .then((data) => {
           parser.fromXML(data).then((iNet) => {
             try {
-              console.log(generator.compile(iNet, template.toString()))
+              console.log(generator.compile(iNet, template.toString()));
             } catch (error) {
-              console.log(error)
+              console.log(error);
             }
           })
         })

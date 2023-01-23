@@ -92,10 +92,10 @@ export class SolidityMustache implements TemplateEngine {
 
     // places to marking ids
     const markings = new Map<string, number>();
-    let marking = 0;
+    let markingCounter = 0;
     // transitions to ids
-    let referenceCounter = 0;
     const references = new Map<string, number>();
+    let referenceCounter = 0;
 
     for (const element of iNet.elements.values()) {
       if (!(element instanceof Transition)) {
@@ -117,8 +117,8 @@ export class SolidityMustache implements TemplateEngine {
       for (const _in of element.source) {
         // console.log(_in);
         if (!markings.get(_in.id)) {
-          markings.set(_in.id, 2 ** marking);
-          marking++;
+          markings.set(_in.id, 2 ** markingCounter);
+          markingCounter++;
         }
         consume += markings.get(_in.id)!;
         // console.log(consume)
@@ -128,8 +128,8 @@ export class SolidityMustache implements TemplateEngine {
       for (const out of element.target) {
         // console.log(out);
         if (!markings.get(out.id)) {
-          markings.set(out.id, 2 ** marking);
-          marking++;
+          markings.set(out.id, 2 ** markingCounter);
+          markingCounter++;
         }
         produce += markings.get(out.id)!;
         // console.log(produce)

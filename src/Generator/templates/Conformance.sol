@@ -9,7 +9,7 @@ contract Conformance {
     participants = _participants;
   }
 
-  function enact(uint id) external pure returns (uint) {
+  function enact(uint id) external returns (uint) {
     {{#manualTransitions}}
     if ({{#initiator}}msg.sender == participants[{{{initiator}}}] && {{/initiator}}{{{id}}} == id && (tokenState & {{{consume}}} == {{{consume}}})) {
       tokenState &= ~uint({{{consume}}});
