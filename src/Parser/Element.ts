@@ -15,37 +15,33 @@ export class Place extends Element { }
 export class Transition extends Element {
   label: Label;
   
-  /** Refrence to the base model **/
-  transformationReference: number|null = null;
-
   constructor(id: string, label: Label) {
     super(id);
     this.label = label;
   }
 }
 
-export interface Label { }
+export class Label {
+  type: LabelType
+  constructor(type: LabelType) {
+    this.type = type;
+  }
+}
 
-export class EventLabel implements Label { }
+export enum LabelType {
+  Start = 0,
+  End = 1,
+  Task = 2,
+  ExclusiveGateway = 3
+}
 
-export class TaskLabel implements Label {
+export class TaskLabel extends Label {
   sender: Participant
   receiver: Participant
 
   constructor(sender: Participant, receiver: Participant) {
+    super(LabelType.Task);
     this.sender = sender;
     this.receiver = receiver;
-  }
-}
-
-export enum GatewayType {
-  Exclusive = 0
-}
-
-export class GatewayLabel implements Label {
-  type: GatewayType;
-
-  constructor(type: GatewayType) {
-    this.type = type;
   }
 }

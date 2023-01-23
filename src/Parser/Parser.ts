@@ -1,7 +1,7 @@
 import InteractionNet from './InteractionNet';
 import { XMLParser, XMLValidator } from 'fast-xml-parser';
 import Participant from './Participant';
-import { Element, EventLabel, GatewayLabel, GatewayType, TaskLabel, Transition, Place } from './Element';
+import { Element, TaskLabel, Transition, Place, LabelType, Label } from './Element';
 
 export interface INetParser {
   fromXML(xml: Buffer): Promise<InteractionNet>;
@@ -37,7 +37,6 @@ export class INetFastXMLParser implements INetParser {
 
   static INetTranslator = class {
     iNet = new InteractionNet();
-    referenceCounter = 0;
 
     translate(choreography: any): InteractionNet {
       this.iNet.id = choreography[Properties.id];
@@ -67,8 +66,8 @@ export class INetFastXMLParser implements INetParser {
         throw new Error("Other than exactly one start event");
       }
       const start = starts[0];
-      const startEvent = new Transition(start[Properties.id], new EventLabel());
-      const startPlace = new Place("initial");
+      const startEvent = new Transition(start[Properties.id], new Label(LabelType.Start));
+      const startPlace = new Place(LabelType[LabelType.Start]);
       this.linkElements(startPlace, startEvent);
       this.iNet.initial = startPlace;
       this.addElement(startEvent);
@@ -81,8 +80,8 @@ export class INetFastXMLParser implements INetParser {
         throw new Error("Other than exactly one end event");
       }
       const end = ends[0];
-      const endEvent = new Transition(end[Properties.id], new EventLabel());
-      const endPlace = new Place("end");
+      const endEvent = new Transition(end[Properties.id], new Label(LabelType.End));
+      const endPlace = new Place(LabelType[LabelType.End]);
       this.linkElements(endEvent, endPlace);
       this.addElement(endEvent);
       this.addElement(endPlace);
@@ -114,7 +113,7 @@ export class INetFastXMLParser implements INetParser {
           for (const flowID of ins) {
             const id = `${gatewayID}_${flowID}`;
             const transition = new Transition(id, 
-              new GatewayLabel(GatewayType.Exclusive));
+              new Label(LabelType.ExclusiveGateway));
             const place = this.addElement(new Place(flowID));
             this.linkElements(place, transition);
             transitions.push(transition);
@@ -130,7 +129,7 @@ export class INetFastXMLParser implements INetParser {
           for (const flowID of outs) {
             const id = `${gatewayID}_${flowID}`;
             const transition = new Transition(id, 
-              new GatewayLabel(GatewayType.Exclusive));
+              new Label(LabelType.ExclusiveGateway));
             const place = this.addElement(new Place(flowID));
             this.linkElements(transition, place);
             transitions.push(transition);
@@ -177,17 +176,8 @@ export class INetFastXMLParser implements INetParser {
     }
 
     private addElement(el: Element): Element {
-      if (!this.iNet.elements.has(el.id)) {
+      if (!this.iNet.elements.has(el.id))
         this.iNet.elements.set(el.id, el);
-        if (el instanceof Transition 
-          && (el.label instanceof TaskLabel 
-            || el.label instanceof EventLabel)) {
-          const ref = this.referenceCounter;
-          el.transformationReference = ref;
-          this.iNet.transformatioReferences.set(el.id, ref);
-          this.referenceCounter++;
-        }
-      }
       return this.iNet.elements.get(el.id)!;
     }
   }
