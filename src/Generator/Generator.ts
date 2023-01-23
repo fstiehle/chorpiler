@@ -165,7 +165,6 @@ export class SolidityMustache implements TemplateEngine {
     for (const target of el.target)
       deleteFromArray(target.source, el);
     iNet.elements.delete(el.id);
-    iNet.transformatioReferences.delete(el.id);
   }
 
   private linkM1(el: Element, elements: Element[]) {

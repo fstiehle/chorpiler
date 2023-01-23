@@ -1,4 +1,4 @@
-import { expect, use } from "chai";
+import { use } from "chai";
 import * as fs from 'fs';
 import {INetParser, INetFastXMLParser} from "../src/Parser/Parser";
 import chaiAsPromised from 'chai-as-promised';
@@ -9,7 +9,7 @@ const readFile = util.promisify(fs.readFile);
 
 use(chaiAsPromised);
 describe('Smart Contract Generation', function () {
-  
+
   describe('compile() with MustacheTemplateEngine', function () {
     let parser: INetParser;
     let generator: TemplateEngine; 
