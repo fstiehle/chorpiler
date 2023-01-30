@@ -2,7 +2,6 @@ import { expect, use } from "chai";
 import * as fs from 'fs';
 import {INetParser, INetFastXMLParser} from "../src/Parser/Parser";
 import chaiAsPromised from 'chai-as-promised';
-import { SolidityMustache, TemplateEngine } from "../src/Generator/Generator";
 
 use(chaiAsPromised);
 describe('BPMN 2 Choreography Parsing', function () {

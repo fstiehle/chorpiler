@@ -2,14 +2,15 @@
 pragma solidity ^0.8.9;
 
 contract Conformance {
-  uint tokenState = 1;
-  address[{{numberOfParticipants}}] private participants;
+  uint private tokenState = 1;
+  // TODO: better performance with mapping?
+  address[{{{numberOfParticipants}}}] private immutable participants;
 
-  constructor(address[{{numberOfParticipants}}] memory _participants) {
+  constructor(address[{{{numberOfParticipants}}}] memory _participants) {
     participants = _participants;
   }
 
-  function enact(uint id) external returns (uint) {
+  function enact(uint id) {{{enactmentVisibility}}} returns (uint) {
     {{#manualTransitions}}
     if ({{#initiator}}msg.sender == participants[{{{initiator}}}] && {{/initiator}}{{{id}}} == id && (tokenState & {{{consume}}} == {{{consume}}})) {
       tokenState &= ~uint({{{consume}}});

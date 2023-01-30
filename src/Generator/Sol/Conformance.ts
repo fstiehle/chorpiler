@@ -1,21 +1,27 @@
+/**
+ * Generates a conformance check solidity contract from an interaction petri net.
+ * A manual transition can be enacted when the conditions for it are met, i.e.,
+ * the task is enabled and the correct participant is calling.
+ * An Autonomous transition is performed by the smart contract automatically as soon as 
+ * the conditions are met. The conditions are checked after a manual transition is attempted.
+ */
 import Mustache from 'mustache';
-import { deleteFromArray } from '../helpers';
-import { Transition, Element, TaskLabel, LabelType } from '../Parser/Element';
-import InteractionNet from '../Parser/InteractionNet';
-import Participant from '../Parser/Participant';
+import { deleteFromArray } from '../../helpers';
+import { Transition, Element, TaskLabel, LabelType } from '../../Parser/Element';
+import InteractionNet from '../../Parser/InteractionNet';
+import Participant from '../../Parser/Participant';
+import { TemplateEngine } from '../TemplateEngine';
 
 const ManualEnactment = [
   LabelType.Task
 ]
-const AutomaticEnactment = [
-  LabelType.End
+const AutonomousEnactment = [
+  LabelType.End,
+  // TODO: Fix Bug, LabelType.ExclusiveGateway
 ]
 
-export interface TemplateEngine {
-  compile(iNet: InteractionNet, template: string): string
-}
-
 type SolidtiyContractTemplate = {
+  enactmentVisibility: string,
   numberOfParticipants: string,
   manualTransitions: Array<{
     id: string,
@@ -29,15 +35,16 @@ type SolidtiyContractTemplate = {
   }>
 }
 
-export class SolidityMustache implements TemplateEngine {
+export class SolidityConformance implements TemplateEngine {
 
-  compile(_iNet: InteractionNet, template: string): string {
+  compile(_iNet: InteractionNet, template: string, _options?: SolidtiyContractTemplate): string {
     const iNet: InteractionNet = {..._iNet}
     if (iNet.initial == null || iNet.end == null) {
       throw new Error("Invalid InteractionNet"); 
     }
-    const options: SolidtiyContractTemplate = {
-      numberOfParticipants: iNet.participants.size.toString(),
+    const options: SolidtiyContractTemplate = _options ? _options : {
+      enactmentVisibility: 'internal',
+      numberOfParticipants: "",
       manualTransitions: new Array<{
         id: string,
         initiator: string|null,
@@ -50,8 +57,9 @@ export class SolidityMustache implements TemplateEngine {
       }>()
     }
 
+    options.numberOfParticipants = iNet.participants.size.toString();
     const participants = [...iNet.participants.values()];
-    
+
     // remove start transition, as we assume the init of a contract
     // is equal firing the start transition
     this.deleteElement(iNet, iNet.initial);
@@ -101,7 +109,6 @@ export class SolidityMustache implements TemplateEngine {
       if (!(element instanceof Transition)) {
         continue;
       }
-      
       if (element instanceof Transition 
         && ManualEnactment.includes(element.label.type)
         && !references.get(element.id)) {
@@ -136,7 +143,7 @@ export class SolidityMustache implements TemplateEngine {
       }
 
       // automatically enacted elements don't need an ID
-      if (AutomaticEnactment.includes(element.label.type)) {
+      if (AutonomousEnactment.includes(element.label.type)) {
         options.autonomousTransitions.push({
           consume: consume.toString(), 
           produce: produce.toString()
@@ -145,12 +152,11 @@ export class SolidityMustache implements TemplateEngine {
         options.manualTransitions.push({
           id: references.get(element.id)!.toString(),
           initiator: element.label instanceof TaskLabel ? participants.indexOf(element.label.sender).toString(): null,
-          consume: consume.toString(), 
+          consume: consume.toString(),
           produce: produce.toString()
         });
       } else {
         console.warn("Unsupported Element, skip", element.id);
-        continue;
       }
     }
     //console.log(options);
@@ -169,15 +175,13 @@ export class SolidityMustache implements TemplateEngine {
 
   private linkM1(el: Element, elements: Element[]) {
     el.source.push(...elements);
-    for (const transition of elements) {
+    for (const transition of elements)
       transition.target.push(el);
-    }
   }
 
   private link1M(el: Element, elements: Element[]) {
-    for (const transition of elements) {
+    for (const transition of elements)
       transition.source.push(el);
-    } 
     el.target.push(...elements);
   }
 
@@ -193,3 +197,5 @@ export class SolidityMustache implements TemplateEngine {
     console.log();
   }
 }
+
+export { TemplateEngine };
