@@ -11,6 +11,10 @@ import { Transition, Element, TaskLabel, LabelType } from '../../Parser/Element'
 import InteractionNet from '../../Parser/InteractionNet';
 import Participant from '../../Parser/Participant';
 import { TemplateEngine } from '../TemplateEngine';
+import util from 'util';
+import * as fs from 'fs';
+
+const readFile = util.promisify(fs.readFile);
 
 const ManualEnactment = [
   LabelType.Task
@@ -20,7 +24,7 @@ const AutonomousEnactment = [
   // TODO: Fix Bug, LabelType.ExclusiveGateway
 ]
 
-type SolidtiyContractTemplate = {
+type Options = {
   enactmentVisibility: string,
   numberOfParticipants: string,
   manualTransitions: Array<{
@@ -37,12 +41,18 @@ type SolidtiyContractTemplate = {
 
 export class SolidityConformance implements TemplateEngine {
 
-  compile(_iNet: InteractionNet, template: string, _options?: SolidtiyContractTemplate): string {
+  async getTemplate(): Promise<string> {
+    return (await readFile(__dirname + './templates/Conformance.sol')).toString();
+  }
+
+  async compile(_iNet: InteractionNet, _template?: string, _options?: Options): Promise<string> {
     const iNet: InteractionNet = {..._iNet}
     if (iNet.initial == null || iNet.end == null) {
       throw new Error("Invalid InteractionNet"); 
     }
-    const options: SolidtiyContractTemplate = _options ? _options : {
+    const template: string = _template ? _template : await this.getTemplate();
+  
+    const options: Options = _options ? _options : {
       enactmentVisibility: 'internal',
       numberOfParticipants: "",
       manualTransitions: new Array<{
@@ -55,7 +65,7 @@ export class SolidityConformance implements TemplateEngine {
         consume: string,
         produce: string
       }>()
-    }
+    }  
 
     options.numberOfParticipants = iNet.participants.size.toString();
     const participants = [...iNet.participants.values()];
