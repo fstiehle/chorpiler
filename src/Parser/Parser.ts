@@ -35,7 +35,7 @@ export class INetFastXMLParser implements INetParser {
     }
   });
 
-  static INetTranslator = class {
+  private static INetTranslator = class {
     iNet = new InteractionNet();
 
     translate(choreography: any): InteractionNet {

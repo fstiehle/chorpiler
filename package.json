@@ -1,8 +1,9 @@
 {
-  "name": "chor-sol",
+  "name": "chorpiler",
   "version": "0.0.1",
   "description": "",
   "main": "lib/index.js",
+  "types": "lib/index.ds.ts",
   "files": [
     "lib/**/*"
   ],
