@@ -13,6 +13,7 @@ import Participant from '../../Parser/Participant';
 import TemplateEngine from '../TemplateEngine';
 import util from 'util';
 import * as fs from 'fs';
+import path from 'path';
 
 const readFile = util.promisify(fs.readFile);
 
@@ -42,7 +43,7 @@ type Options = {
 export class SolidityProcess implements TemplateEngine {
 
   async getTemplate(): Promise<string> {
-    return (await readFile(__dirname + './templates/Conformance.sol')).toString();
+    return (await readFile(path.join(__dirname, '..', 'templates/Process.sol'))).toString();
   }
 
   async compile(_iNet: InteractionNet, _template?: string, _options?: Options): Promise<string> {

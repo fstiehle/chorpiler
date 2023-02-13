@@ -3,6 +3,7 @@ import InteractionNet from "../../Parser/InteractionNet"
 import TemplateEngine from "../TemplateEngine"
 import util from 'util';
 import * as fs from 'fs';
+import path from "path";
 
 const readFile = util.promisify(fs.readFile);
 
@@ -16,7 +17,7 @@ type Options = {
 export class SolidityStateChannelRoot implements TemplateEngine {
 
   async getTemplate(): Promise<string> {
-    return (await readFile(__dirname + './templates/StateChannelRoot.sol')).toString();
+    return (await readFile(path.join(__dirname, '..', 'templates/StateChannelRoot.sol'))).toString();
   }
 
   async compile(iNet: InteractionNet, _template?: string, _options?: Options): Promise<string> {

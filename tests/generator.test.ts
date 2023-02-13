@@ -22,8 +22,24 @@ describe('Smart Contract Generation', function () {
       stateChannelRootGenerator = new SolidityStateChannelRoot();
     });
 
+    it('Using default template: compile correct event based XOR to Conformance Contract', function() {
+      readFile(__dirname + '/bpmn/EventBasedXOR.bpmn')
+      .then((data) => {
+        parser.fromXML(data).then((iNet) => {
+          try {
+            console.log(conformanceGenerator.compile(iNet));
+          } catch (error) {
+            console.log(error);
+          }
+        })
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+    });
+
     it('compile correct event based XOR to Conformance Contract', function() {
-      readFile(__dirname + '/../src/Generator/Sol/templates/Conformance.sol')
+      readFile('./src/Generator/templates/Process.sol')
       .then((template) => {
         readFile(__dirname + '/bpmn/EventBasedXOR.bpmn')
         .then((data) => {
@@ -42,7 +58,7 @@ describe('Smart Contract Generation', function () {
     });
 
     it('compile correct event based XOR to StateChannelRoot Contract', function() {
-      readFile(__dirname + '/../src/Generator/Sol/templates/StateChannelRoot.sol')
+      readFile('./src/Generator/templates/StateChannelRoot.sol')
       .then((template) => {
         readFile(__dirname + '/bpmn/EventBasedXOR.bpmn')
         .then((data) => {
