@@ -1,6 +1,6 @@
 {
   "name": "chorpiler",
-  "version": "0.1.2",
+  "version": "0.2.0",
   "description": "",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
@@ -10,7 +10,7 @@
   "scripts": {
     "test": "mocha",
     "build": "tsc && ncp src/generator/templates lib/generator/templates",
-    "prepare" : "npm run build"
+    "prepare": "npm run build"
   },
   "author": "Fabian Stiehle",
   "license": "ISC",
