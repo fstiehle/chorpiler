@@ -1,12 +1,12 @@
-import { SolidityProcess } from './Generator/Sol/ProcessContract';
-import { SolidityStateChannelRoot } from './Generator/Sol/StateChannelRoot';
+import SolidityEnactment from './Generator/target/Sol/Enactment';
+import { SolidityStateChannelRoot } from './Generator/target/Sol/StateChannelRoot';
 import { INetFastXMLParser } from './Parser/Parser';
 
 export default {
   Parser: INetFastXMLParser,
   Generator: {
     Sol: {
-      ProcessContract: SolidityProcess,
+      ProcessContract: SolidityEnactment,
       StateChannelRoot: SolidityStateChannelRoot
     }
   }

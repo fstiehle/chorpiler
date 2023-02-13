@@ -6,16 +6,11 @@
  * the conditions are met. The conditions are checked after a manual transition is attempted.
  */
 import Mustache from 'mustache';
-import { deleteFromArray } from '../../helpers';
-import { Transition, Element, TaskLabel, LabelType } from '../../Parser/Element';
-import InteractionNet from '../../Parser/InteractionNet';
-import Participant from '../../Parser/Participant';
-import TemplateEngine from '../TemplateEngine';
-import util from 'util';
-import * as fs from 'fs';
-import path from 'path';
-
-const readFile = util.promisify(fs.readFile);
+import { deleteFromArray } from '../helpers';
+import { Transition, Element, TaskLabel, LabelType } from '../Parser/Element';
+import InteractionNet from '../Parser/InteractionNet';
+import Participant from '../Parser/Participant';
+import TemplateEngine from './TemplateEngine';
 
 const ManualEnactment = [
   LabelType.Task
@@ -40,18 +35,15 @@ type Options = {
   }>
 }
 
-export class SolidityProcess implements TemplateEngine {
+export abstract class ProcessEnactment {
 
-  async getTemplate(): Promise<string> {
-    return (await readFile(path.join(__dirname, '..', 'templates/Process.sol'))).toString();
-  }
-
-  async compile(_iNet: InteractionNet, _template?: string, _options?: Options): Promise<string> {
+  static generate(_iNet: InteractionNet, _options?: any): 
+  { references: Map<string, number>; participants: Participant[]; options: Options; } 
+  {
     const iNet: InteractionNet = {..._iNet}
     if (iNet.initial == null || iNet.end == null) {
       throw new Error("Invalid InteractionNet"); 
     }
-    const template: string = _template ? _template : await this.getTemplate();
   
     const options: Options = _options ? _options : {
       enactmentVisibility: 'internal',
@@ -66,7 +58,7 @@ export class SolidityProcess implements TemplateEngine {
         consume: string,
         produce: string
       }>()
-    }  
+    } 
 
     options.numberOfParticipants = iNet.participants.size.toString();
     const participants = [...iNet.participants.values()];
@@ -172,11 +164,11 @@ export class SolidityProcess implements TemplateEngine {
     }
     //console.log(options);
     //console.log(markings);
-    this.printReadme(references, participants);
-    return Mustache.render(template, options);
+    //this.printReadme(references, participants);
+    return { references, participants, options };
   }
 
-  private deleteElement(iNet: InteractionNet, el: Element) {
+  private static deleteElement(iNet: InteractionNet, el: Element) {
     for (const source of el.source)
       deleteFromArray(source.target, el);
     for (const target of el.target)
@@ -184,19 +176,19 @@ export class SolidityProcess implements TemplateEngine {
     iNet.elements.delete(el.id);
   }
 
-  private linkM1(el: Element, elements: Element[]) {
+  private static linkM1(el: Element, elements: Element[]) {
     el.source.push(...elements);
     for (const transition of elements)
       transition.target.push(el);
   }
 
-  private link1M(el: Element, elements: Element[]) {
+  private static link1M(el: Element, elements: Element[]) {
     for (const transition of elements)
       transition.source.push(el);
     el.target.push(...elements);
   }
 
-  private printReadme(references: Map<string, number>, participants: Participant[]) {
+  static printReadme(references: Map<string, number>, participants: Participant[]) {
     console.log("# Readme");
     console.log("## Tasks are encoded as follows:");
     for (const [k, i] of references) 
