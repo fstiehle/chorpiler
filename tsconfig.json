@@ -1,12 +1,10 @@
 {
-  "$schema": "https://json.schemastore.org/tsconfig",
-  "display": "Node 18",
-
   "compilerOptions": {
     "strict": true,
+    "module": "CommonJS",
     "esModuleInterop": true,
     "declaration": true,
-    "target": "es2015",
+    "target": "ES6",
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
     "moduleResolution": "node",

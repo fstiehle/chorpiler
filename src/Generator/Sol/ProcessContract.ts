@@ -10,7 +10,7 @@ import { deleteFromArray } from '../../helpers';
 import { Transition, Element, TaskLabel, LabelType } from '../../Parser/Element';
 import InteractionNet from '../../Parser/InteractionNet';
 import Participant from '../../Parser/Participant';
-import { TemplateEngine } from '../TemplateEngine';
+import TemplateEngine from '../TemplateEngine';
 import util from 'util';
 import * as fs from 'fs';
 

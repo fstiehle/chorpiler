@@ -1,6 +1,6 @@
 import Mustache from "mustache";
 import InteractionNet from "../../Parser/InteractionNet"
-import { TemplateEngine } from "../TemplateEngine"
+import TemplateEngine from "../TemplateEngine"
 import util from 'util';
 import * as fs from 'fs';
 
