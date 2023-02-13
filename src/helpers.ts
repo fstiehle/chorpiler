@@ -4,4 +4,3 @@ export const deleteFromArray = (array: Array<any>, key: any) => {
     array.splice(index, 1);
   }
 }
-

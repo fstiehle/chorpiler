@@ -3,12 +3,13 @@
   "version": "0.0.1",
   "description": "",
   "main": "lib/index.js",
-  "types": "lib/index.ds.ts",
+  "types": "lib/index.d.ts",
   "files": [
     "lib/**/*"
   ],
   "scripts": {
-    "test": "mocha"
+    "test": "mocha",
+    "prepublish": "tsc"
   },
   "author": "Fabian Stiehle",
   "license": "ISC",

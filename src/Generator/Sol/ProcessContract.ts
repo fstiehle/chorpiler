@@ -39,7 +39,7 @@ type Options = {
   }>
 }
 
-export class SolidityConformance implements TemplateEngine {
+export class SolidityProcess implements TemplateEngine {
 
   async getTemplate(): Promise<string> {
     return (await readFile(__dirname + './templates/Conformance.sol')).toString();

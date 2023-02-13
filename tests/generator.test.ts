@@ -2,7 +2,7 @@ import { use } from "chai";
 import * as fs from 'fs';
 import {INetParser, INetFastXMLParser} from "../src/Parser/Parser";
 import chaiAsPromised from 'chai-as-promised';
-import { SolidityConformance, TemplateEngine } from "../src/Generator/Sol/Conformance";
+import { SolidityProcess, TemplateEngine } from "../src/Generator/Sol/ProcessContract";
 import util from 'util';
 import { SolidityStateChannelRoot } from "../src/Generator/Sol/StateChannelRoot";
 
@@ -18,7 +18,7 @@ describe('Smart Contract Generation', function () {
 
     beforeEach(() => {
       parser = new INetFastXMLParser();
-      conformanceGenerator = new SolidityConformance();
+      conformanceGenerator = new SolidityProcess();
       stateChannelRootGenerator = new SolidityStateChannelRoot();
     });
 
