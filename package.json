@@ -9,7 +9,8 @@
   ],
   "scripts": {
     "test": "mocha",
-    "build": "tsc && ncp src/generator/templates lib/generator/templates"
+    "build": "tsc && ncp src/generator/templates lib/generator/templates",
+    "prepare" : "npm run build"
   },
   "author": "Fabian Stiehle",
   "license": "ISC",
