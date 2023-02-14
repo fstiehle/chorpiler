@@ -4,7 +4,7 @@ pragma solidity ^0.8.9;
 contract Conformance {
   uint private tokenState = 1;
   // TODO: better performance with mapping?
-  address[{{{numberOfParticipants}}}] private immutable participants;
+  address[{{{numberOfParticipants}}}] private participants;
 
   constructor(address[{{{numberOfParticipants}}}] memory _participants) {
     participants = _participants;

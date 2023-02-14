@@ -22,7 +22,7 @@ export default class TypeScriptEnactment implements ProcessEnactment, TemplateEn
   }
 
   async getTemplate(): Promise<string> {
-    const f = await readFile(path.join(__dirname, '..', '..', 'templates/Enactment.ts'));
+    const f = await readFile(path.join(__dirname, '..', '..', 'templates/ProcessEnactment.ts'));
     return f.toString();
   }
 }

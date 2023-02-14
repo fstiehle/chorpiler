@@ -20,6 +20,6 @@ export default class SolidityEnactment implements ProcessEnactment, TemplateEngi
     return Mustache.render(template, process.options);
   }
   async getTemplate(): Promise<string> {
-    return (await readFile(path.join(__dirname, '..', '..', 'templates/Enactment.sol'))).toString();
+    return (await readFile(path.join(__dirname, '..', '..', 'templates/ProcessEnactment.sol'))).toString();
   }
 }
