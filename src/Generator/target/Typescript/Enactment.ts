@@ -14,10 +14,8 @@ export default class TypeScriptEnactment implements ProcessEnactment, TemplateEn
     if (iNet.initial == null || iNet.end == null) {
       throw new Error("Invalid InteractionNet"); 
     }
-  
 
   const template = _template ? _template : await this.getTemplate();
-
 
   const process = ProcessEnactment.generate(iNet, _options);
   return Mustache.render(template, process.options);
