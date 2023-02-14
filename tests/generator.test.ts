@@ -5,8 +5,8 @@ import chaiAsPromised from 'chai-as-promised';
 import util from 'util';
 import { SolidityStateChannelRoot } from "../src/Generator/target/Sol/StateChannelRoot";
 import TemplateEngine from "../src/Generator/TemplateEngine";
-import SolidityEnactment from "../src/Generator/target/Sol/Enactment";
-import TypescriptEnactment from "../src/Generator/target/Typescript/Enactment";
+import SolidityEnactment from "../src/Generator/target/Sol/ProcessEnactment";
+import TypescriptEnactment from "../src/Generator/target/Typescript/ProcessEnactment";
 
 const readFile = util.promisify(fs.readFile);
 

@@ -7,7 +7,7 @@ import path from "path";
 
 const readFile = util.promisify(fs.readFile);
 
-const CONFORMANCE_CONTRACT_LOCATION = "./Conformance.sol";
+const CONFORMANCE_CONTRACT_LOCATION = "./ProcessEnactment.sol";
 
 type Options = {
   conformanceContractLocation: string;
