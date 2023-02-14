@@ -2,7 +2,7 @@
 pragma solidity ^0.8.9;
 
 contract Conformance {
-  uint private tokenState = 1;
+  uint internal tokenState = 1;
   // TODO: better performance with mapping?
   address[{{{numberOfParticipants}}}] private participants;
 
