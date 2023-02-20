@@ -2,10 +2,8 @@
 pragma solidity ^0.8.9;
 
 import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
-import '{{{conformanceContractLocation}}}';
 
-contract StateChannelRoot is Conformance {
-
+contract ProcessChannel {
   using ECDSA for bytes32;
   // TODO: Can we optimise the packing of this struct?
   // Intuition: No, as it is only used in calldata
@@ -18,9 +16,10 @@ contract StateChannelRoot is Conformance {
     uint newTokenState;
     bytes[] signature;
   }
+  uint private tokenState = 1;
   uint private index = 0;
   // TODO: better performance with mapping?
-  address[{{{numberOfParticipants}}}] immutable private participants;
+  address[{{{numberOfParticipants}}}] private participants;
 
   /// Timestamps for the challenge-response dispute window
   uint private disputeMadeAtUNIX = 0;
@@ -60,7 +59,7 @@ contract StateChannelRoot is Conformance {
    * If a dispute window has elapsed, execution must continue through this function
    * @param id id of the activity to begin
    */
-  function continueAfterDispute(uint id) external returns (bool) {
+  function continueAfterDispute(uint id) external returns (uint) {
     require(disputeMadeAtUNIX + disputeWindowInUNIX < block.timestamp);
     return enact(id);
   }
@@ -83,5 +82,21 @@ contract StateChannelRoot is Conformance {
     index = _step.index;
     // set token state of conformance contract = _step.newTokenState;
     return true;
+  }
+
+  function enact(uint id) {{{enactmentVisibility}}} returns (uint) {
+    {{#manualTransitions}}
+    if ({{#initiator}}msg.sender == participants[{{{initiator}}}] && {{/initiator}}{{{id}}} == id && (tokenState & {{{consume}}} == {{{consume}}})) {
+      tokenState &= ~uint({{{consume}}});
+      tokenState |= {{{produce}}};
+    }
+    {{/manualTransitions}}
+    {{#autonomousTransitions}}
+    if (tokenState & {{{consume}}} == {{{consume}}}) {
+      tokenState &= ~uint({{{consume}}});
+      tokenState |= {{{produce}}};
+    }
+    {{/autonomousTransitions}}
+    return tokenState;
   }
 }

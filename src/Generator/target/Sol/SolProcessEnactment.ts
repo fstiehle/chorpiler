@@ -4,11 +4,11 @@ import TemplateEngine from "../../TemplateEngine"
 import util from 'util';
 import * as fs from 'fs';
 import path from "path";
-import { ProcessEnactment } from "../../ProcessEnactment";
+import ProcessGenerator from "../../ProcessGenerator";
 
 const readFile = util.promisify(fs.readFile);
 
-export default class SolidityEnactment implements ProcessEnactment, TemplateEngine {
+export default class SolidityProcessEnactment implements TemplateEngine {
   async compile(_iNet: InteractionNet, _template?: string, _options?: any): Promise<string> {
     const iNet: InteractionNet = {..._iNet}
     if (iNet.initial == null || iNet.end == null) {
@@ -16,7 +16,7 @@ export default class SolidityEnactment implements ProcessEnactment, TemplateEngi
     }
     const template: string = _template ? _template : await this.getTemplate();
 
-    const process = ProcessEnactment.generate(iNet, _options);
+    const process = ProcessGenerator.generate(iNet, _options);
     return Mustache.render(template, process.options);
   }
   async getTemplate(): Promise<string> {

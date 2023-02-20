@@ -5,12 +5,10 @@
  * An Autonomous transition is performed by the smart contract automatically as soon as 
  * the conditions are met. The conditions are checked after a manual transition is attempted.
  */
-import Mustache from 'mustache';
 import { deleteFromArray } from '../helpers';
 import { Transition, Element, TaskLabel, LabelType } from '../Parser/Element';
 import InteractionNet from '../Parser/InteractionNet';
 import Participant from '../Parser/Participant';
-import TemplateEngine from './TemplateEngine';
 
 const ManualEnactment = [
   LabelType.Task
@@ -35,7 +33,7 @@ type Options = {
   }>
 }
 
-export abstract class ProcessEnactment {
+export default class ProcessGenerator {
 
   static generate(_iNet: InteractionNet, _options?: any): 
   { references: Map<string, number>; participants: Participant[]; options: Options; } 
@@ -44,7 +42,7 @@ export abstract class ProcessEnactment {
     if (iNet.initial == null || iNet.end == null) {
       throw new Error("Invalid InteractionNet"); 
     }
-  
+
     const options: Options = _options ? _options : {
       enactmentVisibility: 'internal',
       numberOfParticipants: "",
@@ -200,5 +198,3 @@ export abstract class ProcessEnactment {
     console.log();
   }
 }
-
-export { TemplateEngine };

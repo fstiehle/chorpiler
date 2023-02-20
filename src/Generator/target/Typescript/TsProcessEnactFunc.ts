@@ -4,11 +4,11 @@ import TemplateEngine from "../../TemplateEngine"
 import util from 'util';
 import * as fs from 'fs';
 import path from "path";
-import { ProcessEnactment } from "../../ProcessEnactment";
+import ProcessGenerator from "../../ProcessGenerator";
 
 const readFile = util.promisify(fs.readFile);
 
-export default class TypeScriptEnactment implements ProcessEnactment, TemplateEngine {
+export default class TypeScriptEnactFunc implements TemplateEngine {
   async compile(_iNet: InteractionNet, _template?: string , _options?: any): Promise<string> {
     const iNet: InteractionNet = {..._iNet}
     if (iNet.initial == null || iNet.end == null) {
@@ -17,12 +17,12 @@ export default class TypeScriptEnactment implements ProcessEnactment, TemplateEn
 
   const template = _template ? _template : await this.getTemplate();
 
-  const process = ProcessEnactment.generate(iNet, _options);
+  const process = ProcessGenerator.generate(iNet, _options);
   return Mustache.render(template, process.options);
   }
 
   async getTemplate(): Promise<string> {
-    const f = await readFile(path.join(__dirname, '..', '..', 'templates/ProcessEnactment.ts'));
+    const f = await readFile(path.join(__dirname, '..', '..', 'templates/ProcessEnactFunc.ts'));
     return f.toString();
   }
 }

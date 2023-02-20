@@ -1,8 +1,8 @@
 //SPDX-License-Identifier: MIT
 pragma solidity ^0.8.9;
 
-contract Conformance {
-  uint internal tokenState = 1;
+contract ProcessEnactment {
+  uint private tokenState = 1;
   // TODO: better performance with mapping?
   address[{{{numberOfParticipants}}}] private participants;
 

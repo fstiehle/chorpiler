@@ -3,10 +3,11 @@ import * as fs from 'fs';
 import {INetParser, INetFastXMLParser} from "../src/Parser/Parser";
 import chaiAsPromised from 'chai-as-promised';
 import util from 'util';
-import { SolidityStateChannelRoot } from "../src/Generator/target/Sol/StateChannelRoot";
+import SolidityProcessChannel from "../src/Generator/target/Sol/SolProcessChannel";
+import SolidityProcessEnactment from "../src/Generator/target/Sol/SolProcessEnactment";
+import TypeScriptEnactFunc from "../src/Generator/target/Typescript/TsProcessEnactFunc";
+
 import TemplateEngine from "../src/Generator/TemplateEngine";
-import SolidityEnactment from "../src/Generator/target/Sol/ProcessEnactment";
-import TypescriptEnactment from "../src/Generator/target/Typescript/ProcessEnactment";
 
 const readFile = util.promisify(fs.readFile);
 
@@ -21,9 +22,9 @@ describe('Smart Contract Generation', function () {
 
     beforeEach(() => {
       parser = new INetFastXMLParser();
-      solGenerator = new SolidityEnactment();
-      tsGenerator = new TypescriptEnactment();
-      stateChannelRootGenerator = new SolidityStateChannelRoot();
+      solGenerator = new SolidityProcessEnactment();
+      tsGenerator = new TypeScriptEnactFunc();
+      stateChannelRootGenerator = new SolidityProcessChannel();
     });
 
     it('Using default template: compile correct event based XOR to Sol Contract', function() {
@@ -51,7 +52,7 @@ describe('Smart Contract Generation', function () {
     });
 
     it('compile correct event based XOR to Sol Contract', function() {
-      readFile('./src/Generator/templates/Process.sol')
+      readFile('./src/Generator/templates/ProcessEnactment.sol')
       .then((template) => {
         readFile(__dirname + '/bpmn/EventBasedXOR.bpmn')
         .then((data) => {
@@ -66,7 +67,7 @@ describe('Smart Contract Generation', function () {
     });
 
     it('compile correct event based XOR to StateChannelRoot Contract', function() {
-      readFile('./src/Generator/templates/StateChannelRoot.sol')
+      readFile('./src/Generator/templates/ProcessChannel.sol')
       .then((template) => {
         readFile(__dirname + '/bpmn/EventBasedXOR.bpmn')
         .then((data) => {
