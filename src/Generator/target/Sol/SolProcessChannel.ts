@@ -4,7 +4,7 @@ import TemplateEngine from "../../TemplateEngine"
 import util from 'util';
 import * as fs from 'fs';
 import path from "path";
-import ProcessGenerator from "../../ProcessGenerator";
+import ProcessGenerator, { Options } from "../../ProcessGenerator";
 
 const readFile = util.promisify(fs.readFile);
 

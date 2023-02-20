@@ -18,7 +18,7 @@ const AutonomousEnactment = [
   // TODO: Fix Bug, LabelType.ExclusiveGateway
 ]
 
-type Options = {
+export type Options = {
   enactmentVisibility: string,
   numberOfParticipants: string,
   manualTransitions: Array<{
