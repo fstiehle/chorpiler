@@ -12,7 +12,6 @@ contract ProcessChannel {
     uint from;
     uint caseID;
     uint taskID;
-    bytes16 salt;
     uint newTokenState;
     bytes[] signature;
   }
@@ -71,7 +70,7 @@ contract ProcessChannel {
     } 
     // Verify signatures
     bytes32 payload = keccak256(
-      abi.encode(_step.caseID, _step.from, _step.taskID, _step.newTokenState, _step.salt)
+      abi.encode(_step.caseID, _step.from, _step.taskID, _step.newTokenState)
     );
     for (uint256 i = 0; i < participants.length; i++) {
       if (_step.signature[i].length != 65) return false;

@@ -14,20 +14,21 @@ const readFile = util.promisify(fs.readFile);
 use(chaiAsPromised);
 describe('Smart Contract Generation', function () {
 
-  describe('compile() with MustacheTemplateEngine', function () {
-    let parser: INetParser;
-    let solGenerator: TemplateEngine; 
-    let tsGenerator: TemplateEngine; 
-    let stateChannelRootGenerator: TemplateEngine; 
+  let parser: INetParser;
+  let solGenerator: TemplateEngine; 
+  let tsGenerator: TemplateEngine; 
+  let stateChannelRootGenerator: TemplateEngine; 
 
-    beforeEach(() => {
-      parser = new INetFastXMLParser();
-      solGenerator = new SolidityProcessEnactment();
-      tsGenerator = new TypeScriptEnactFunc();
-      stateChannelRootGenerator = new SolidityProcessChannel();
-    });
+  beforeEach(() => {
+    parser = new INetFastXMLParser();
+    solGenerator = new SolidityProcessEnactment();
+    tsGenerator = new TypeScriptEnactFunc();
+    stateChannelRootGenerator = new SolidityProcessChannel();
+  });
 
-    it('Using default template: compile correct event based XOR to Sol Contract', function() {
+  describe('compile() using default template', function () {
+
+    it('Compile correct event based XOR to Sol Contract', function() {
       readFile(__dirname + '/bpmn/EventBasedXOR.bpmn')
       .then((data) => {
         parser.fromXML(data).then((iNet) => {
@@ -39,7 +40,7 @@ describe('Smart Contract Generation', function () {
       });
     });
 
-    it('Using default template: compile correct event based XOR to typescript', function() {
+    it('Compile correct event based XOR to typescript', function() {
       readFile(__dirname + '/bpmn/EventBasedXOR.bpmn')
       .then((data) => {
         parser.fromXML(data).then((iNet) => {
@@ -50,6 +51,34 @@ describe('Smart Contract Generation', function () {
         console.error(error);
       });
     });
+
+    it('Compile correct incident management case to StateChannel Contract', function() {
+      readFile(__dirname + '/bpmn/incident-management.bpmn')
+      .then((data) => {
+        parser.fromXML(data).then((iNet) => {
+          stateChannelRootGenerator.compile(iNet).then(r => console.log(r)).catch(error => console.log(error));
+        })
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+    });
+
+    it('Compile correct incident management case to Typescript Contract', function() {
+      readFile(__dirname + '/bpmn/incident-management.bpmn')
+      .then((data) => {
+        parser.fromXML(data).then((iNet) => {
+          tsGenerator.compile(iNet).then(r => console.log(r)).catch(error => console.log(error));
+        })
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+    });
+
+  });
+
+  describe('compile() using specified template', function () {
 
     it('compile correct event based XOR to Sol Contract', function() {
       readFile('./src/Generator/templates/ProcessEnactment.sol')
@@ -66,7 +95,7 @@ describe('Smart Contract Generation', function () {
       });
     });
 
-    it('compile correct event based XOR to StateChannelRoot Contract', function() {
+    it('compile correct event based XOR to StateChannel Contract', function() {
       readFile('./src/Generator/templates/ProcessChannel.sol')
       .then((template) => {
         readFile(__dirname + '/bpmn/EventBasedXOR.bpmn')
@@ -80,5 +109,6 @@ describe('Smart Contract Generation', function () {
         console.error(error);
       });
     });
+
   });
 });

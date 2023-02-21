@@ -1,17 +1,17 @@
-const enact = (tokenState: number[], taskID: number, participantID: number): number[] => {
+const enact = (tokenState: number, id: number, participantID: number): number => {
   {{#manualTransitions}}
-  if ({{#initiator}}participantID === {{{initiator}}} && {{/initiator}}{{{id}}} === taskID && tokenState[{{{consume}}}] === 1) {
-      tokenState[{{{consume}}}] = 0;
-      tokenState[{{{produce}}}] = 1;
-  }
-  {{/manualTransitions}}
-  {{#autonomousTransitions}}
-  if (tokenState[{{{consume}}}] === 1) {
-      tokenState[{{{consume}}}] = 0;
-      tokenState[{{{produce}}}] = 1;
-  }
-  {{/autonomousTransitions}}
-  return tokenState;
+    if ({{#initiator}}participantID === {{{initiator}}} && {{/initiator}}{{{id}}} == id && ((tokenState & {{{consume}}}) === {{{consume}}})) {
+      tokenState &= ~{{{consume}}};
+      tokenState |= {{{produce}}};
+    }
+    {{/manualTransitions}}
+    {{#autonomousTransitions}}
+    if ((tokenState & {{{consume}}}) === {{{consume}}}) {
+      tokenState &= ~{{{consume}}};
+      tokenState |= {{{produce}}};
+    }
+    {{/autonomousTransitions}}
+    return tokenState;
 }
 
 export default enact;
