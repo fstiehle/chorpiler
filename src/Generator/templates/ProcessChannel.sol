@@ -73,8 +73,8 @@ contract ProcessChannel {
       abi.encode(_step.caseID, _step.from, _step.taskID, _step.newTokenState)
     );
     for (uint256 i = 0; i < participants.length; i++) {
-      if (_step.signature[i].length != 65) return false;
-      if (payload.toEthSignedMessageHash().recover(_step.signature[i]) != participants[uint(i)]) {
+      if (_step.signatures[i].length != 65) return false;
+      if (payload.toEthSignedMessageHash().recover(_step.signatures[i]) != participants[uint(i)]) {
         return false;
       }
     }
