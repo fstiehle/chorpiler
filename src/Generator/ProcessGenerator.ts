@@ -187,14 +187,16 @@ export default class ProcessGenerator {
   }
 
   static printReadme(references: Map<string, number>, participants: Participant[]) {
-    console.log("# Readme");
-    console.log("## Tasks are encoded as follows:");
+    let s = "";
+    s += "# Readme\n";
+    s += "## Tasks are encoded as follows:\n";
     for (const [k, i] of references) 
-      console.log("-", k, "with ID", i); 
-    console.log();
-    console.log("## Participants are encoded as follows:");
+      s += `- ${k} with ID ${i}\n`; 
+    s += "\n"
+    s += "## Participants are encoded as follows:\n"
     for (const i in participants)
-      console.log("-", participants[i].id, "with ID", Number.parseInt(i)); 
-    console.log();
+      s += `- ${participants[i].id} with ID ${Number.parseInt(i)}\n`; 
+    s += "\n"
+    return s;
   }
 }

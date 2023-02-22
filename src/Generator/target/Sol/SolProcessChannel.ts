@@ -14,12 +14,13 @@ export default class SolidityProcessChannel implements TemplateEngine {
     return (await readFile(path.join(__dirname, '..', '..', 'templates/ProcessChannel.sol'))).toString();
   }
 
-  async compile(iNet: InteractionNet, _template?: string, _options?: Options): Promise<string> {
+  async compile(iNet: InteractionNet, _template?: string, _options?: Options): Promise<{target: string, encoding: string}> {
     if (iNet.initial == null || iNet.end == null) {
       throw new Error("Invalid InteractionNet"); 
     }
     const template: string = _template ? _template : await this.getTemplate();
+    const gen = ProcessGenerator.generate(iNet, _options);
 
-    return Mustache.render(template, ProcessGenerator.generate(iNet, _options).options);
+    return { target: Mustache.render(template, gen.options), encoding: ProcessGenerator.printReadme(gen.references, gen.participants) };
   }
 }

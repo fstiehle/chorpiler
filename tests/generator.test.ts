@@ -56,7 +56,7 @@ describe('Smart Contract Generation', function () {
       readFile(__dirname + '/bpmn/incident-management.bpmn')
       .then((data) => {
         parser.fromXML(data).then((iNet) => {
-          stateChannelRootGenerator.compile(iNet).then(r => console.log(r)).catch(error => console.log(error));
+          stateChannelRootGenerator.compile(iNet).then(r => console.log(r.encoding, r.target)).catch(error => console.log(error));
         })
       })
       .catch((error) => {
@@ -68,7 +68,7 @@ describe('Smart Contract Generation', function () {
       readFile(__dirname + '/bpmn/incident-management.bpmn')
       .then((data) => {
         parser.fromXML(data).then((iNet) => {
-          tsGenerator.compile(iNet).then(r => console.log(r)).catch(error => console.log(error));
+          tsGenerator.compile(iNet).then(r => console.log(r.encoding, r.target)).catch(error => console.log(error));
         })
       })
       .catch((error) => {

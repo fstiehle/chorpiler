@@ -13,16 +13,16 @@ contract ProcessChannel {
     uint caseID;
     uint taskID;
     uint newTokenState;
-    bytes[] signature;
+    bytes[] signatures;
   }
-  uint private tokenState = 1;
-  uint private index = 0;
+  uint public tokenState = 1;
+  uint public index = 0;
   // TODO: better performance with mapping?
-  address[{{{numberOfParticipants}}}] private participants;
+  address[{{{numberOfParticipants}}}] public participants;
 
   /// Timestamps for the challenge-response dispute window
-  uint private disputeMadeAtUNIX = 0;
-  uint private immutable disputeWindowInUNIX;
+  uint public disputeMadeAtUNIX = 0;
+  uint public immutable disputeWindowInUNIX;
 
   /**
    * @param _participants addresses for the roles 
