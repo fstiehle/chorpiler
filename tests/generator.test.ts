@@ -8,6 +8,7 @@ import SolidityProcessEnactment from "../src/Generator/target/Sol/SolProcessEnac
 import TypeScriptEnactFunc from "../src/Generator/target/Typescript/TsProcessEnactFunc";
 
 import TemplateEngine from "../src/Generator/TemplateEngine";
+import path from "path";
 
 const readFile = util.promisify(fs.readFile);
 
@@ -56,7 +57,13 @@ describe('Smart Contract Generation', function () {
       readFile(__dirname + '/bpmn/incident-management.bpmn')
       .then((data) => {
         parser.fromXML(data).then((iNet) => {
-          stateChannelRootGenerator.compile(iNet).then(r => console.log(r.encoding, r.target)).catch(error => console.log(error));
+          stateChannelRootGenerator.compile(iNet)
+          .then((gen) => {
+            console.log(gen.encoding);
+            fs.writeFile(path.join(__dirname, "gen/ProcessChannel.sol"), gen.target, { flag: 'w+' },
+              (err) => { if (err) { console.error(err); } });
+              console.log("ProcessChannel.sol generated.")
+          });
         })
       })
       .catch((error) => {
