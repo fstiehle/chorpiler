@@ -77,7 +77,7 @@ contract ProcessChannel {
    * If a dispute window has elapsed, execution must continue through this function
    * @param id id of the activity to begin
    */
-  function continueAfterDispute(uint id) {{{enactmentVisibility}}} external (uint) {
+  function continueAfterDispute(uint id) external (uint) {
     require(disputeMadeAtUNIX != 0 && disputeMadeAtUNIX + disputeWindowInUNIX < block.timestamp, "No elapsed dispute");
 
     {{#manualTransitions}}
