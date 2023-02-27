@@ -39,32 +39,23 @@ contract ProcessChannel {
    * @param _step Last unanimously signed step, or empty step if process is stuck in start event
    */
    function submit(Step calldata _step) external returns (bool) {
-    // stuck in start event
     if (0 == disputeMadeAtUNIX && 1 == tokenState) {
+      // stuck in start event
       disputeMadeAtUNIX = block.timestamp;
       return true;
     }
-    bool _check = handleStep(_step);
-    // new dispute with state submission
-    if (_check && 0 == disputeMadeAtUNIX) {
+    if (checkStep(_step) && (0 == disputeMadeAtUNIX || disputeMadeAtUNIX + disputeWindowInUNIX >= block.timestamp)) {
+      // new dispute with state submission
       disputeMadeAtUNIX = block.timestamp;
-      return true;
-    } else if (_check && disputeMadeAtUNIX + disputeWindowInUNIX > block.timestamp) {
+      index = _step.index;
+      tokenState = _step.newTokenState;
       return true;
     }
+
     return false;
   }
 
-  /**
-   * If a dispute window has elapsed, execution must continue through this function
-   * @param id id of the activity to begin
-   */
-  function continueAfterDispute(uint id) external returns (uint) {
-    require(disputeMadeAtUNIX + disputeWindowInUNIX < block.timestamp);
-    return enact(id);
-  }
-
-  function handleStep(Step calldata _step) private returns (bool) {
+  function checkStep(Step calldata _step) private view returns (bool) {
     // Check that step is higher than previously recorded steps
     if (index >= _step.index) {  
       return false;
@@ -79,12 +70,16 @@ contract ProcessChannel {
         return false;
       }
     }
-    index = _step.index;
-    // set token state of conformance contract = _step.newTokenState;
     return true;
   }
 
-  function enact(uint id) {{{enactmentVisibility}}} returns (uint) {
+  /**
+   * If a dispute window has elapsed, execution must continue through this function
+   * @param id id of the activity to begin
+   */
+  function continueAfterDispute(uint id) {{{enactmentVisibility}}} returns (uint) {
+    require(disputeMadeAtUNIX != 0 && disputeMadeAtUNIX + disputeWindowInUNIX < block.timestamp, "No elapsed dispute");
+
     {{#manualTransitions}}
     if ({{#initiator}}msg.sender == participants[{{{initiator}}}] && {{/initiator}}{{{id}}} == id && (tokenState & {{{consume}}} == {{{consume}}})) {
       tokenState &= ~uint({{{consume}}});
