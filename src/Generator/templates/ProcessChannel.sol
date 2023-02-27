@@ -38,21 +38,17 @@ contract ProcessChannel {
    * Trigger new dispute or submit new state to elapse current dispute state
    * @param _step Last unanimously signed step, or empty step if process is stuck in start event
    */
-   function submit(Step calldata _step) external returns (bool) {
+   function submit(Step calldata _step) external {
     if (0 == _step.signatures.length && 0 == disputeMadeAtUNIX && 1 == tokenState) {
       // stuck in start event
       disputeMadeAtUNIX = block.timestamp;
-      return true;
     }
     if (checkStep(_step) && (0 == disputeMadeAtUNIX || disputeMadeAtUNIX + disputeWindowInUNIX >= block.timestamp)) {
       // new dispute with state submission
       disputeMadeAtUNIX = block.timestamp;
       index = _step.index;
       tokenState = _step.newTokenState;
-      return true;
     }
-
-    return false;
   }
 
   function checkStep(Step calldata _step) private view returns (bool) {
@@ -77,21 +73,22 @@ contract ProcessChannel {
    * If a dispute window has elapsed, execution must continue through this function
    * @param id id of the activity to begin
    */
-  function continueAfterDispute(uint id) external returns (uint) {
+  function continueAfterDispute(uint id) external {
     require(disputeMadeAtUNIX != 0 && disputeMadeAtUNIX + disputeWindowInUNIX < block.timestamp, "No elapsed dispute");
-
     {{#manualTransitions}}
     if ({{#initiator}}msg.sender == participants[{{{initiator}}}] && {{/initiator}}{{{id}}} == id && (tokenState & {{{consume}}} == {{{consume}}})) {
-      tokenState &= ~uint({{{consume}}});
-      tokenState |= {{{produce}}};
+      tokenState &= ~uint({{{consume}}}) | {{{produce}}};
+      return;
     }
     {{/manualTransitions}}
-    {{#autonomousTransitions}}
-    if (tokenState & {{{consume}}} == {{{consume}}}) {
-      tokenState &= ~uint({{{consume}}});
-      tokenState |= {{{produce}}};
+    while (true) {
+      {{#autonomousTransitions}}
+      if (tokenState & {{{consume}}} == {{{consume}}}) {
+        tokenState &= ~uint({{{consume}}}) | {{{produce}}};
+        continue;
+      }
+      {{/autonomousTransitions}}
+      break;
     }
-    {{/autonomousTransitions}}
-    return tokenState;
   }
 }

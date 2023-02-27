@@ -2,7 +2,7 @@
 pragma solidity ^0.8.9;
 
 contract ProcessEnactment {
-  uint private tokenState = 1;
+  uint public tokenState = 1;
   // TODO: better performance with mapping?
   address[{{{numberOfParticipants}}}] private participants;
 
@@ -10,19 +10,21 @@ contract ProcessEnactment {
     participants = _participants;
   }
 
-  function enact(uint id) {{{enactmentVisibility}}} returns (uint) {
+  function enact(uint id) {{{enactmentVisibility}}} {
     {{#manualTransitions}}
     if ({{#initiator}}msg.sender == participants[{{{initiator}}}] && {{/initiator}}{{{id}}} == id && (tokenState & {{{consume}}} == {{{consume}}})) {
-      tokenState &= ~uint({{{consume}}});
-      tokenState |= {{{produce}}};
+      tokenState &= ~uint({{{consume}}}) | {{{produce}}};
+      return;
     }
     {{/manualTransitions}}
-    {{#autonomousTransitions}}
-    if (tokenState & {{{consume}}} == {{{consume}}}) {
-      tokenState &= ~uint({{{consume}}});
-      tokenState |= {{{produce}}};
+    while (true) {
+      {{#autonomousTransitions}}
+      if (tokenState & {{{consume}}} == {{{consume}}}) {
+        tokenState &= ~uint({{{consume}}}) | {{{produce}}};
+        continue;
+      }
+      {{/autonomousTransitions}}
+      break;
     }
-    {{/autonomousTransitions}}
-    return tokenState;
   }
 }
