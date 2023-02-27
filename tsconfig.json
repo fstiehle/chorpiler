@@ -15,8 +15,7 @@
     "files": true
   },
   "files": [
-    "src/index.ts",
-    "src/bpmn-moddle.d.ts"
+    "src/index.ts"
   ],
 
   "include": ["src/**/*"],
