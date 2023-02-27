@@ -39,7 +39,7 @@ contract ProcessChannel {
    * @param _step Last unanimously signed step, or empty step if process is stuck in start event
    */
    function submit(Step calldata _step) external returns (bool) {
-    if (0 == disputeMadeAtUNIX && 1 == tokenState) {
+    if (0 == _step.signatures.length && 0 == disputeMadeAtUNIX && 1 == tokenState) {
       // stuck in start event
       disputeMadeAtUNIX = block.timestamp;
       return true;
