@@ -41,6 +41,7 @@ contract ProcessChannel {
    function submit(Step calldata _step) external returns (bool) {
     // stuck in start event
     if (0 == disputeMadeAtUNIX && 1 == tokenState) {
+      disputeMadeAtUNIX = block.timestamp;
       return true;
     }
     bool _check = handleStep(_step);
