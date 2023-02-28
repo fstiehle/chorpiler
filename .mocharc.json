@@ -1,5 +1,4 @@
 {
   "extension": ["ts"],
-  "spec": "./tests/**/*.test.ts",
   "require": "ts-mocha"
 }

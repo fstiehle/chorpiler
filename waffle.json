@@ -1,6 +1,13 @@
 {
   "compilerType": "solcjs",
   "compilerVersion": "0.8.9",
-  "sourceDirectory": "./tests/gen",
-  "outputDirectory": "./test/gen"
+  "sourceDirectory": "./tests/contracts/gen",
+  "outputDirectory": "./tests/contracts/gen/artifcats/",
+  "typechainEnabled": true,
+  "compilerOptions": {
+    "optimizer": {
+      "enabled": true,
+      "runs": 100
+    }
+  }
 }

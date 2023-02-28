@@ -1,6 +1,6 @@
 import { expect, use } from "chai";
 import * as fs from 'fs';
-import {INetParser, INetFastXMLParser} from "../src/Parser/Parser";
+import {INetParser, INetFastXMLParser} from "../../src/Parser/Parser";
 import chaiAsPromised from 'chai-as-promised';
 
 use(chaiAsPromised);

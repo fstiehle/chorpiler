@@ -8,7 +8,7 @@
     "lib/**/*"
   ],
   "scripts": {
-    "test": "mocha && waffle",
+    "test": "mocha tests/units && waffle && mocha tests/contracts",
     "build": "tsc && ncp src/generator/templates lib/generator/templates",
     "prepublishOnly": "npm run build",
     "preversion": "npm run build"

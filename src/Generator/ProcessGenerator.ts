@@ -29,7 +29,8 @@ export type Options = {
   }>
   autonomousTransitions: Array<{
     consume: string,
-    produce: string
+    produce: string,
+    isEnd: boolean
   }>
 }
 
@@ -54,7 +55,8 @@ export default class ProcessGenerator {
       }>(), 
       autonomousTransitions: new Array<{
         consume: string,
-        produce: string
+        produce: string,
+        isEnd: boolean
       }>()
     } 
 
@@ -136,8 +138,13 @@ export default class ProcessGenerator {
       for (const out of element.target) {
         // console.log(out);
         if (!markings.get(out.id)) {
-          markings.set(out.id, 2 ** markingCounter);
-          markingCounter++;
+          if (element instanceof Transition && element.label.type === LabelType.End) {
+            // end element gets marking = 0
+            markings.set(out.id, 0);
+          } else {
+            markings.set(out.id, 2 ** markingCounter);
+            markingCounter++;
+          }
         }
         produce += markings.get(out.id)!;
         // console.log(produce)
@@ -147,7 +154,8 @@ export default class ProcessGenerator {
       if (AutonomousEnactment.includes(element.label.type)) {
         options.autonomousTransitions.push({
           consume: consume.toString(), 
-          produce: produce.toString()
+          produce: produce.toString(),
+          isEnd: element.label.type === LabelType.End ? true : false
         });
       } else if (ManualEnactment.includes(element.label.type)) {
         options.manualTransitions.push({

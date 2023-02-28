@@ -11,20 +11,36 @@ contract ProcessEnactment {
   }
 
   function enact(uint id) {{{enactmentVisibility}}} {
-    {{#manualTransitions}}
-    if ({{#initiator}}msg.sender == participants[{{{initiator}}}] && {{/initiator}}{{{id}}} == id && (tokenState & {{{consume}}} == {{{consume}}})) {
-      tokenState &= ~uint({{{consume}}}) | {{{produce}}};
-      return;
-    }
-    {{/manualTransitions}}
-    while (true) {
+    uint _disputeMadeAtUNIX = disputeMadeAtUNIX;
+    require(_disputeMadeAtUNIX != 0 && _disputeMadeAtUNIX + disputeWindowInUNIX < block.timestamp, "No elapsed dispute");
+
+    uint _tokenState = tokenState;
+
+    do {
+      {{#manualTransitions}}
+        if ({{#initiator}}msg.sender == participants[{{{initiator}}}] && {{/initiator}}{{{id}}} == id && (_tokenState & {{{consume}}} == {{{consume}}})) {
+          _tokenState &= ~uint({{{consume}}});
+          _tokenState |= {{{produce}}};
+          break;
+        }
+      {{/manualTransitions}}
+    } while (false);
+
+    while(true) {
       {{#autonomousTransitions}}
-      if (tokenState & {{{consume}}} == {{{consume}}}) {
-        tokenState &= ~uint({{{consume}}}) | {{{produce}}};
+      if (_tokenState & {{{consume}}} == {{{consume}}}) {
+        _tokenState &= ~uint({{{consume}}});
+        _tokenState |= {{{produce}}};
+        {{#isEnd}}
+        break; // is end
+        {{/isEnd}}
+        {{^isEnd}}
         continue;
+        {{/isEnd}}
       }
       {{/autonomousTransitions}}
       break;
     }
+    tokenState = _tokenState;
   }
 }

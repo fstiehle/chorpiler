@@ -15,7 +15,6 @@
   <bpmn2:choreography id="Choreography_1bp5o6k">
     <bpmn2:participant id="Participant_0hpgpwy" name="VIP customer" />
     <bpmn2:participant id="Participant_18ejhc5" name="KAM" />
-    <bpmn2:participant id="Participant_0oe1967" name="Key Account Manager" />
     <bpmn2:participant id="Participant_1yfcq7e" name="1st level support" />
     <bpmn2:participant id="Participant_07mlniv" name="2nd level support" />
     <bpmn2:participant id="Participant_0avg1dg" name="Developer" />

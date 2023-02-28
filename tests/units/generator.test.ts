@@ -1,13 +1,13 @@
 import { use } from "chai";
 import * as fs from 'fs';
-import {INetParser, INetFastXMLParser} from "../src/Parser/Parser";
+import {INetParser, INetFastXMLParser} from "../../src/Parser/Parser";
 import chaiAsPromised from 'chai-as-promised';
 import util from 'util';
-import SolidityProcessChannel from "../src/Generator/target/Sol/SolProcessChannel";
-import SolidityProcessEnactment from "../src/Generator/target/Sol/SolProcessEnactment";
-import TypeScriptEnactFunc from "../src/Generator/target/Typescript/TsProcessEnactFunc";
+import SolidityProcessChannel from "../../src/Generator/target/Sol/SolProcessChannel";
+import SolidityProcessEnactment from "../../src/Generator/target/Sol/SolProcessEnactment";
+import TypeScriptEnactFunc from "../../src/Generator/target/Typescript/TsProcessEnactFunc";
 
-import TemplateEngine from "../src/Generator/TemplateEngine";
+import TemplateEngine from "../../src/Generator/TemplateEngine";
 import path from "path";
 
 const readFile = util.promisify(fs.readFile);
@@ -33,7 +33,7 @@ describe('Smart Contract Generation', function () {
       readFile(__dirname + '/bpmn/EventBasedXOR.bpmn')
       .then((data) => {
         parser.fromXML(data).then((iNet) => {
-          solGenerator.compile(iNet).then(r => console.log(r)).catch(error => console.log(error));
+          solGenerator.compile(iNet).catch(error => console.log(error));
         })
       })
       .catch((error) => {
@@ -45,7 +45,7 @@ describe('Smart Contract Generation', function () {
       readFile(__dirname + '/bpmn/EventBasedXOR.bpmn')
       .then((data) => {
         parser.fromXML(data).then((iNet) => {
-          tsGenerator.compile(iNet).then(r => console.log(r)).catch(error => console.log(error));
+          tsGenerator.compile(iNet).catch(error => console.log(error));
         })
       })
       .catch((error) => {
@@ -59,10 +59,13 @@ describe('Smart Contract Generation', function () {
         parser.fromXML(data).then((iNet) => {
           stateChannelRootGenerator.compile(iNet)
           .then((gen) => {
-            console.log(gen.encoding);
-            fs.writeFile(path.join(__dirname, "gen/ProcessChannel.sol"), gen.target, { flag: 'w+' },
+            //console.log(gen.encoding);
+            fs.writeFile(path.join(__dirname, 
+              "..", "contracts/gen/incident-management/IM_ProcessChannel.sol"), 
+              gen.target.replace("contract ProcessChannel", "contract IM_ProcessChannel"), 
+              { flag: 'w+' },
               (err) => { if (err) { console.error(err); } });
-              console.log("ProcessChannel.sol generated.")
+              console.log("IM_ProcessChannel.sol generated.")
           });
         })
       })
@@ -75,7 +78,7 @@ describe('Smart Contract Generation', function () {
       readFile(__dirname + '/bpmn/incident-management.bpmn')
       .then((data) => {
         parser.fromXML(data).then((iNet) => {
-          tsGenerator.compile(iNet).then(r => console.log(r.encoding, r.target)).catch(error => console.log(error));
+          tsGenerator.compile(iNet).catch(error => console.log(error));
         })
       })
       .catch((error) => {
@@ -93,7 +96,7 @@ describe('Smart Contract Generation', function () {
         readFile(__dirname + '/bpmn/EventBasedXOR.bpmn')
         .then((data) => {
           parser.fromXML(data).then((iNet) => {
-            solGenerator.compile(iNet, template.toString()).then(r => console.log(r)).catch(error => console.log(error));
+            solGenerator.compile(iNet, template.toString()).catch(error => console.log(error));
           })
         })
       })
@@ -108,7 +111,7 @@ describe('Smart Contract Generation', function () {
         readFile(__dirname + '/bpmn/EventBasedXOR.bpmn')
         .then((data) => {
           parser.fromXML(data).then((iNet) => {
-            stateChannelRootGenerator.compile(iNet, template.toString()).then(r => console.log(r)).catch(error => console.log(error));
+            stateChannelRootGenerator.compile(iNet, template.toString()).catch(error => console.log(error));
           })
         })
       })

@@ -3,7 +3,7 @@ pragma solidity ^0.8.9;
 
 import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
 
-contract ProcessChannel {
+contract IM_ProcessChannel {
   using ECDSA for bytes32;
   // TODO: Can we optimise the packing of this struct?
   // Intuition: No, as it is only used in calldata
@@ -13,12 +13,12 @@ contract ProcessChannel {
     uint caseID;
     uint taskID;
     uint newTokenState;
-    bytes[{{{numberOfParticipants}}}] signatures;
+    bytes[5] signatures;
   }
   uint public tokenState = 1;
   uint public index = 0;
   // TODO: better performance with mapping?
-  address[{{{numberOfParticipants}}}] public participants;
+  address[5] public participants;
 
   /// Timestamps for the challenge-response dispute window
   uint public disputeMadeAtUNIX = 0;
@@ -29,7 +29,7 @@ contract ProcessChannel {
    * in the order (BulkBuyer, Manufacturer, Middleman, Supplier, SpecialCarrier)
    * @param _disputeWindowInUNIX time for the dispute window to remain open in UNIX.
    */
-  constructor(address[{{{numberOfParticipants}}}] memory _participants, uint _disputeWindowInUNIX) {
+  constructor(address[5] memory _participants, uint _disputeWindowInUNIX) {
     participants = _participants;
     disputeWindowInUNIX = _disputeWindowInUNIX;
   }
@@ -62,7 +62,7 @@ contract ProcessChannel {
       abi.encode(_step.index, _step.caseID, _step.from, _step.taskID, _step.newTokenState)
     );
 
-    for (uint i = 0; i < {{{numberOfParticipants}}}; i++) {
+    for (uint i = 0; i < 5; i++) {
       if (payload.toEthSignedMessageHash().recover(_step.signatures[i]) == participants[i]) {
         return false;
       }
@@ -81,28 +81,59 @@ contract ProcessChannel {
     uint _tokenState = tokenState;
 
     do {
-      {{#manualTransitions}}
-        if ({{#initiator}}msg.sender == participants[{{{initiator}}}] && {{/initiator}}{{{id}}} == id && (_tokenState & {{{consume}}} == {{{consume}}})) {
-          _tokenState &= ~uint({{{consume}}});
-          _tokenState |= {{{produce}}};
+        if (msg.sender == participants[0] && 0 == id && (_tokenState & 1 == 1)) {
+          _tokenState &= ~uint(1);
+          _tokenState |= 2;
           break;
         }
-      {{/manualTransitions}}
+        if (msg.sender == participants[1] && 1 == id && (_tokenState & 2 == 2)) {
+          _tokenState &= ~uint(2);
+          _tokenState |= 4;
+          break;
+        }
+        if (msg.sender == participants[1] && 2 == id && (_tokenState & 4 == 4)) {
+          _tokenState &= ~uint(4);
+          _tokenState |= 8;
+          break;
+        }
+        if (msg.sender == participants[1] && 3 == id && (_tokenState & 4 == 4)) {
+          _tokenState &= ~uint(4);
+          _tokenState |= 16;
+          break;
+        }
+        if (msg.sender == participants[2] && 4 == id && (_tokenState & 16 == 16)) {
+          _tokenState &= ~uint(16);
+          _tokenState |= 4;
+          break;
+        }
+        if (msg.sender == participants[2] && 5 == id && (_tokenState & 16 == 16)) {
+          _tokenState &= ~uint(16);
+          _tokenState |= 32;
+          break;
+        }
+        if (msg.sender == participants[3] && 6 == id && (_tokenState & 32 == 32)) {
+          _tokenState &= ~uint(32);
+          _tokenState |= 64;
+          break;
+        }
+        if (msg.sender == participants[4] && 7 == id && (_tokenState & 64 == 64)) {
+          _tokenState &= ~uint(64);
+          _tokenState |= 32;
+          break;
+        }
+        if (msg.sender == participants[3] && 8 == id && (_tokenState & 32 == 32)) {
+          _tokenState &= ~uint(32);
+          _tokenState |= 16;
+          break;
+        }
     } while (false);
 
     while(true) {
-      {{#autonomousTransitions}}
-      if (_tokenState & {{{consume}}} == {{{consume}}}) {
-        _tokenState &= ~uint({{{consume}}});
-        _tokenState |= {{{produce}}};
-        {{#isEnd}}
+      if (_tokenState & 8 == 8) {
+        _tokenState &= ~uint(8);
+        _tokenState |= 0;
         break; // is end
-        {{/isEnd}}
-        {{^isEnd}}
-        continue;
-        {{/isEnd}}
       }
-      {{/autonomousTransitions}}
       break;
     }
     tokenState = _tokenState;
