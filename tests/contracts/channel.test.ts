@@ -124,6 +124,6 @@ describe('Test Contract: Incident Management ProcessChannel', () => {
     expect(await (channels[0].disputeMadeAtUNIX()), "Dispute not succeesful").to.not.equal(0);
     expect(await (channels[0].index()), "Index not increased!").to.equal(1);
     expect(await (channels[0].tokenState()), "End of process not reached!").to.equal(0);
-});
+  });
   
 });

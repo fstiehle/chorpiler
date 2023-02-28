@@ -4,16 +4,14 @@ pragma solidity ^0.8.9;
 contract ProcessEnactment {
   uint public tokenState = 1;
   // TODO: better performance with mapping?
-  address[{{{numberOfParticipants}}}] private participants;
+  address[{{{numberOfParticipants}}}] public participants;
 
   constructor(address[{{{numberOfParticipants}}}] memory _participants) {
     participants = _participants;
   }
 
-  function enact(uint id) {{{enactmentVisibility}}} {
+  function enact(uint id) external {
     uint _disputeMadeAtUNIX = disputeMadeAtUNIX;
-    require(_disputeMadeAtUNIX != 0 && _disputeMadeAtUNIX + disputeWindowInUNIX < block.timestamp, "No elapsed dispute");
-
     uint _tokenState = tokenState;
 
     do {
@@ -26,7 +24,7 @@ contract ProcessEnactment {
       {{/manualTransitions}}
     } while (false);
 
-    while(true) {
+    while(_tokenState != 0) {
       {{#autonomousTransitions}}
       if (_tokenState & {{{consume}}} == {{{consume}}}) {
         _tokenState &= ~uint({{{consume}}});
@@ -41,6 +39,7 @@ contract ProcessEnactment {
       {{/autonomousTransitions}}
       break;
     }
+
     tokenState = _tokenState;
   }
 }

@@ -78,7 +78,16 @@ describe('Smart Contract Generation', function () {
       readFile(__dirname + '/bpmn/incident-management.bpmn')
       .then((data) => {
         parser.fromXML(data).then((iNet) => {
-          tsGenerator.compile(iNet).catch(error => console.log(error));
+          tsGenerator.compile(iNet)
+          .then((gen) => {
+            //console.log(gen.encoding);
+            fs.writeFile(path.join(__dirname, 
+              "..", "contracts/gen/incident-management/IM_ProcessChannel.ts"), 
+              gen.target, 
+              { flag: 'w+' },
+              (err) => { if (err) { console.error(err); } });
+              console.log("IM_ProcessChannel.ts generated.")
+          });
         })
       })
       .catch((error) => {
