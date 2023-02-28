@@ -91,9 +91,9 @@ contract IM_ProcessChannel {
           _tokenState |= 4;
           break;
         }
-        if (msg.sender == participants[1] && 2 == id && (_tokenState & 4 == 4)) {
-          _tokenState &= ~uint(4);
-          _tokenState |= 8;
+        if (msg.sender == participants[1] && 2 == id && (_tokenState & 8 == 8)) {
+          _tokenState &= ~uint(8);
+          _tokenState |= 0;
           break;
         }
         if (msg.sender == participants[1] && 3 == id && (_tokenState & 4 == 4)) {
@@ -101,41 +101,52 @@ contract IM_ProcessChannel {
           _tokenState |= 16;
           break;
         }
-        if (msg.sender == participants[2] && 4 == id && (_tokenState & 16 == 16)) {
-          _tokenState &= ~uint(16);
-          _tokenState |= 4;
+        if (msg.sender == participants[2] && 4 == id && (_tokenState & 32 == 32)) {
+          _tokenState &= ~uint(32);
+          _tokenState |= 8;
           break;
         }
         if (msg.sender == participants[2] && 5 == id && (_tokenState & 16 == 16)) {
           _tokenState &= ~uint(16);
-          _tokenState |= 32;
-          break;
-        }
-        if (msg.sender == participants[3] && 6 == id && (_tokenState & 32 == 32)) {
-          _tokenState &= ~uint(32);
           _tokenState |= 64;
           break;
         }
-        if (msg.sender == participants[4] && 7 == id && (_tokenState & 64 == 64)) {
+        if (msg.sender == participants[3] && 6 == id && (_tokenState & 64 == 64)) {
           _tokenState &= ~uint(64);
-          _tokenState |= 32;
+          _tokenState |= 128;
           break;
         }
-        if (msg.sender == participants[3] && 8 == id && (_tokenState & 32 == 32)) {
-          _tokenState &= ~uint(32);
-          _tokenState |= 16;
+        if (msg.sender == participants[4] && 7 == id && (_tokenState & 128 == 128)) {
+          _tokenState &= ~uint(128);
+          _tokenState |= 256;
+          break;
+        }
+        if (msg.sender == participants[3] && 8 == id && (_tokenState & 256 == 256)) {
+          _tokenState &= ~uint(256);
+          _tokenState |= 32;
           break;
         }
     } while (false);
 
-    while(true) {
-      if (_tokenState & 8 == 8) {
-        _tokenState &= ~uint(8);
-        _tokenState |= 0;
-        break; // is end
+    while(_tokenState != 0) {
+      if (_tokenState & 64 == 64) {
+        _tokenState &= ~uint(64);
+        _tokenState |= 256;
+        continue;
+      }
+      if (_tokenState & 16 == 16) {
+        _tokenState &= ~uint(16);
+        _tokenState |= 32;
+        continue;
+      }
+      if (_tokenState & 4 == 4) {
+        _tokenState &= ~uint(4);
+        _tokenState |= 8;
+        continue;
       }
       break;
     }
+
     tokenState = _tokenState;
   }
 

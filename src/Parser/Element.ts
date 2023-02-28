@@ -10,7 +10,14 @@ export class Element {
   }
 }
 
-export class Place extends Element { }
+export class Place extends Element { 
+  type: PlaceType|null = null;
+}
+
+export enum PlaceType {
+  Start = 0,
+  End = 1
+}
 
 export class Transition extends Element {
   label: Label;
@@ -31,8 +38,9 @@ export class Label {
 export enum LabelType {
   Start = 0,
   End = 1,
-  Task = 2,
-  ExclusiveGateway = 3
+  Autonomous = 2,
+  Task = 3,
+  ExclusiveGateway = 4,
 }
 
 export class TaskLabel extends Label {

@@ -1,7 +1,7 @@
 import InteractionNet from './InteractionNet';
 import { XMLParser, XMLValidator } from 'fast-xml-parser';
 import Participant from './Participant';
-import { Element, TaskLabel, Transition, Place, LabelType, Label } from './Element';
+import { Element, TaskLabel, Transition, Place, LabelType, Label, PlaceType } from './Element';
 
 export interface INetParser {
   fromXML(xml: Buffer): Promise<InteractionNet>;
@@ -67,7 +67,8 @@ export class INetFastXMLParser implements INetParser {
       }
       const start = starts[0];
       const startEvent = new Transition(start[Properties.id], new Label(LabelType.Start));
-      const startPlace = new Place(LabelType[LabelType.Start]);
+      const startPlace = new Place(PlaceType[PlaceType.Start]);
+      startPlace.type = PlaceType.Start;
       this.linkElements(startPlace, startEvent);
       this.iNet.initial = startPlace;
       this.addElement(startEvent);
@@ -81,7 +82,8 @@ export class INetFastXMLParser implements INetParser {
       }
       const end = ends[0];
       const endEvent = new Transition(end[Properties.id], new Label(LabelType.End));
-      const endPlace = new Place(LabelType[LabelType.End]);
+      const endPlace = new Place(PlaceType[PlaceType.End]);
+      endPlace.type = PlaceType.End;
       this.linkElements(endEvent, endPlace);
       this.addElement(endEvent);
       this.addElement(endPlace);

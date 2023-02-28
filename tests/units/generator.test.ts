@@ -33,7 +33,7 @@ describe('Smart Contract Generation', function () {
       readFile(__dirname + '/bpmn/EventBasedXOR.bpmn')
       .then((data) => {
         parser.fromXML(data).then((iNet) => {
-          solGenerator.compile(iNet).catch(error => console.log(error));
+          solGenerator.compile(iNet).then(gen => console.log(gen.target)).catch(error => console.log(error));
         })
       })
       .catch((error) => {

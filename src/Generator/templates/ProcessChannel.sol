@@ -90,7 +90,7 @@ contract ProcessChannel {
       {{/manualTransitions}}
     } while (false);
 
-    while(true) {
+    while(_tokenState != 0) {
       {{#autonomousTransitions}}
       if (_tokenState & {{{consume}}} == {{{consume}}}) {
         _tokenState &= ~uint({{{consume}}});
@@ -105,6 +105,7 @@ contract ProcessChannel {
       {{/autonomousTransitions}}
       break;
     }
+
     tokenState = _tokenState;
   }
 
