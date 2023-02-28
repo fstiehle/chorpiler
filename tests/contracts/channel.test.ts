@@ -42,7 +42,7 @@ describe('Test Contract: Incident Management ProcessChannel', () => {
   const provider = new MockProvider();
   const [par0, par1, par2, par3, par4] = provider.getWallets();
   const participants = [par0, par1, par2, par3, par4];
-  let channels = new Array<Contract>();
+  let channels: Contract[];
   let contract: Contract;
 
   beforeEach(async () => {
@@ -52,6 +52,7 @@ describe('Test Contract: Incident Management ProcessChannel', () => {
       [[par0.address, par1.address, par2.address, par3.address, par4.address], 0])
       ) as IM_ProcessChannel;
     
+    channels = new Array<Contract>();
     participants.forEach((wallet) => {
       channels.push(new Contract(contract.address, contract.interface, wallet));
     });
@@ -102,23 +103,27 @@ describe('Test Contract: Incident Management ProcessChannel', () => {
       console.log('Gas', 'Enact Task', trace[i][1], ":", cost);
     }
 
-    expect(Number.parseInt(await channels[0].tokenState()) === 128, "End of process not reached!");
+    expect(await (channels[0].tokenState()), "End of process not reached!").to.equal(0);
 
     console.log('Gas', 'Total:', total);
   });
 
   it('Submit final state', async () => {
 
+    expect(await (channels[0].disputeMadeAtUNIX()), "Dispute after deployment").to.equal(0);
+
     const state = new Proof();
     state.index = 1;
-    state.newTokenState = 128;
+    state.newTokenState = 0;
     await state.sign(participants);
 
     let tx = await (await channels[0].submit(state)).wait(1);
     const cost = tx.gasUsed.toNumber();
     console.log('Gas', 'Dispute:', cost);
 
-    expect(Number.parseInt(await channels[0].tokenState()) === 128, "End of process not reached!");
-  });
+    expect(await (channels[0].disputeMadeAtUNIX()), "Dispute not succeesful").to.not.equal(0);
+    expect(await (channels[0].index()), "Index not increased!").to.equal(1);
+    expect(await (channels[0].tokenState()), "End of process not reached!").to.equal(0);
+});
   
 });

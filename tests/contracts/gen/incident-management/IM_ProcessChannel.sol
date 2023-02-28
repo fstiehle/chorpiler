@@ -44,7 +44,7 @@ contract IM_ProcessChannel {
       // stuck in start event
       disputeMadeAtUNIX = block.timestamp;
     }
-    if (checkStep(_step) && (0 == _disputeMadeAtUNIX || _disputeMadeAtUNIX + _disputeMadeAtUNIX >= block.timestamp)) {
+    if (checkStep(_step) && (0 == _disputeMadeAtUNIX || _disputeMadeAtUNIX + disputeWindowInUNIX >= block.timestamp)) {
       // new dispute with state submission
       disputeMadeAtUNIX = block.timestamp;
       index = _step.index;
@@ -63,7 +63,7 @@ contract IM_ProcessChannel {
     );
 
     for (uint i = 0; i < 5; i++) {
-      if (payload.toEthSignedMessageHash().recover(_step.signatures[i]) == participants[i]) {
+      if (payload.toEthSignedMessageHash().recover(_step.signatures[i]) != participants[i]) {
         return false;
       }
     }
