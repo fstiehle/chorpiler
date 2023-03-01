@@ -58,13 +58,13 @@
       <bpmn2:messageFlowRef>MessageFlow_1rkbri8</bpmn2:messageFlowRef>
     </bpmn2:choreographyTask>
     <bpmn2:sequenceFlow id="Flow_07h24n2" sourceRef="Gateway_096llxv" targetRef="ChoreographyTask_0z1rm3g" />
-    <bpmn2:exclusiveGateway id="Gateway_1n94yb6">
+    <bpmn2:exclusiveGateway id="Gateway_1n94yb6" default="Flow_04u0pyx">
       <bpmn2:incoming>Flow_03kt3ds</bpmn2:incoming>
       <bpmn2:outgoing>Flow_04u0pyx</bpmn2:outgoing>
       <bpmn2:outgoing>Flow_1fxlg1f</bpmn2:outgoing>
     </bpmn2:exclusiveGateway>
     <bpmn2:sequenceFlow id="Flow_03kt3ds" sourceRef="ChoreographyTask_0z1rm3g" targetRef="Gateway_1n94yb6" />
-    <bpmn2:sequenceFlow id="Flow_0lqssbw" sourceRef="Gateway_096llxv" targetRef="Gateway_05g1mth" />
+    <bpmn2:sequenceFlow id="Flow_0lqssbw" name="KAM can handle it" sourceRef="Gateway_096llxv" targetRef="Gateway_05g1mth" />
     <bpmn2:choreographyTask id="ChoreographyTask_1qccz6z" name="Provide feedback" initiatingParticipantRef="Participant_1yfcq7e">
       <bpmn2:incoming>Flow_06lkq8z</bpmn2:incoming>
       <bpmn2:outgoing>Flow_1k2vn6o</bpmn2:outgoing>
@@ -80,8 +80,8 @@
       <bpmn2:messageFlowRef>MessageFlow_00fppdg</bpmn2:messageFlowRef>
     </bpmn2:choreographyTask>
     <bpmn2:sequenceFlow id="Flow_04u0pyx" sourceRef="Gateway_1n94yb6" targetRef="ChoreographyTask_1qslyew" />
-    <bpmn2:sequenceFlow id="Flow_1fxlg1f" sourceRef="Gateway_1n94yb6" targetRef="Gateway_1udu34d" />
-    <bpmn2:exclusiveGateway id="Gateway_0z91xzi">
+    <bpmn2:sequenceFlow id="Flow_1fxlg1f" name="1st level support can handle it" sourceRef="Gateway_1n94yb6" targetRef="Gateway_1udu34d" />
+    <bpmn2:exclusiveGateway id="Gateway_0z91xzi" default="Flow_1is6wof">
       <bpmn2:incoming>Flow_0gmipj0</bpmn2:incoming>
       <bpmn2:outgoing>Flow_1is6wof</bpmn2:outgoing>
       <bpmn2:outgoing>Flow_116rwwe</bpmn2:outgoing>
@@ -111,7 +111,7 @@
       <bpmn2:messageFlowRef>MessageFlow_10qzefv</bpmn2:messageFlowRef>
     </bpmn2:choreographyTask>
     <bpmn2:sequenceFlow id="Flow_1238zzq" sourceRef="ChoreographyTask_1ecmkkd" targetRef="Gateway_1udu34d" />
-    <bpmn2:sequenceFlow id="Flow_116rwwe" sourceRef="Gateway_0z91xzi" targetRef="Gateway_0w6aauf" />
+    <bpmn2:sequenceFlow id="Flow_116rwwe" name="2nd level support can handle it" sourceRef="Gateway_0z91xzi" targetRef="Gateway_0w6aauf" />
     <bpmn2:exclusiveGateway id="Gateway_0w6aauf">
       <bpmn2:incoming>Flow_116rwwe</bpmn2:incoming>
       <bpmn2:incoming>Flow_1j0zkal</bpmn2:incoming>
@@ -125,7 +125,7 @@
       <bpmn2:outgoing>Flow_06lkq8z</bpmn2:outgoing>
     </bpmn2:exclusiveGateway>
     <bpmn2:sequenceFlow id="Flow_06lkq8z" sourceRef="Gateway_1udu34d" targetRef="ChoreographyTask_1qccz6z" />
-    <bpmn2:exclusiveGateway id="Gateway_096llxv">
+    <bpmn2:exclusiveGateway id="Gateway_096llxv" default="Flow_07h24n2">
       <bpmn2:incoming>Flow_1uk3as6</bpmn2:incoming>
       <bpmn2:outgoing>Flow_07h24n2</bpmn2:outgoing>
       <bpmn2:outgoing>Flow_0lqssbw</bpmn2:outgoing>
@@ -207,6 +207,9 @@
       <bpmndi:BPMNEdge id="Flow_0lqssbw_di" bpmnElement="Flow_0lqssbw">
         <di:waypoint x="635" y="420" />
         <di:waypoint x="1565" y="420" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1065" y="402" width="90" height="14" />
+        </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNShape id="ChoreographyTask_1qccz6z_di" bpmnElement="ChoreographyTask_1qccz6z">
         <dc:Bounds x="1470" y="510" width="100" height="80" />
@@ -234,6 +237,9 @@
       <bpmndi:BPMNEdge id="Flow_1fxlg1f_di" bpmnElement="Flow_1fxlg1f">
         <di:waypoint x="815" y="550" />
         <di:waypoint x="1395" y="550" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1069" y="516" width="81" height="27" />
+        </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNShape id="Gateway_0z91xzi_di" bpmnElement="Gateway_0z91xzi" isMarkerVisible="true">
         <dc:Bounds x="945" y="615" width="50" height="50" />
@@ -286,6 +292,9 @@
       <bpmndi:BPMNEdge id="Flow_116rwwe_di" bpmnElement="Flow_116rwwe">
         <di:waypoint x="995" y="640" />
         <di:waypoint x="1225" y="640" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1068" y="606" width="84" height="27" />
+        </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNShape id="Gateway_0w6aauf_di" bpmnElement="Gateway_0w6aauf" isMarkerVisible="true">
         <dc:Bounds x="1225" y="615" width="50" height="50" />

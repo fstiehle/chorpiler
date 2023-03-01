@@ -30,6 +30,7 @@ export declare namespace IM_ProcessChannel {
     caseID: PromiseOrValue<BigNumberish>;
     taskID: PromiseOrValue<BigNumberish>;
     newTokenState: PromiseOrValue<BigNumberish>;
+    newCondState: PromiseOrValue<BigNumberish>;
     signatures: [
       PromiseOrValue<BytesLike>,
       PromiseOrValue<BytesLike>,
@@ -45,6 +46,7 @@ export declare namespace IM_ProcessChannel {
     BigNumber,
     BigNumber,
     BigNumber,
+    BigNumber,
     [string, string, string, string, string]
   ] & {
     index: BigNumber;
@@ -52,18 +54,19 @@ export declare namespace IM_ProcessChannel {
     caseID: BigNumber;
     taskID: BigNumber;
     newTokenState: BigNumber;
+    newCondState: BigNumber;
     signatures: [string, string, string, string, string];
   };
 }
 
 export interface IM_ProcessChannelInterface extends utils.Interface {
   functions: {
-    "continueAfterDispute(uint256)": FunctionFragment;
+    "continueAfterDispute(uint256,uint256)": FunctionFragment;
     "disputeMadeAtUNIX()": FunctionFragment;
     "disputeWindowInUNIX()": FunctionFragment;
     "index()": FunctionFragment;
     "participants(uint256)": FunctionFragment;
-    "submit((uint256,uint256,uint256,uint256,uint256,bytes[5]))": FunctionFragment;
+    "submit((uint256,uint256,uint256,uint256,uint256,uint256,bytes[5]))": FunctionFragment;
     "tokenState()": FunctionFragment;
   };
 
@@ -80,7 +83,7 @@ export interface IM_ProcessChannelInterface extends utils.Interface {
 
   encodeFunctionData(
     functionFragment: "continueAfterDispute",
-    values: [PromiseOrValue<BigNumberish>]
+    values: [PromiseOrValue<BigNumberish>, PromiseOrValue<BigNumberish>]
   ): string;
   encodeFunctionData(
     functionFragment: "disputeMadeAtUNIX",
@@ -156,6 +159,7 @@ export interface IM_ProcessChannel extends BaseContract {
   functions: {
     continueAfterDispute(
       id: PromiseOrValue<BigNumberish>,
+      cond: PromiseOrValue<BigNumberish>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<ContractTransaction>;
 
@@ -180,6 +184,7 @@ export interface IM_ProcessChannel extends BaseContract {
 
   continueAfterDispute(
     id: PromiseOrValue<BigNumberish>,
+    cond: PromiseOrValue<BigNumberish>,
     overrides?: Overrides & { from?: PromiseOrValue<string> }
   ): Promise<ContractTransaction>;
 
@@ -204,6 +209,7 @@ export interface IM_ProcessChannel extends BaseContract {
   callStatic: {
     continueAfterDispute(
       id: PromiseOrValue<BigNumberish>,
+      cond: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
     ): Promise<void>;
 
@@ -231,6 +237,7 @@ export interface IM_ProcessChannel extends BaseContract {
   estimateGas: {
     continueAfterDispute(
       id: PromiseOrValue<BigNumberish>,
+      cond: PromiseOrValue<BigNumberish>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<BigNumber>;
 
@@ -256,6 +263,7 @@ export interface IM_ProcessChannel extends BaseContract {
   populateTransaction: {
     continueAfterDispute(
       id: PromiseOrValue<BigNumberish>,
+      cond: PromiseOrValue<BigNumberish>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<PopulatedTransaction>;
 

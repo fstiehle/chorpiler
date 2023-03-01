@@ -19,7 +19,8 @@ export default class SolidityProcessEnactment implements TemplateEngine {
 
     const gen = ProcessGenerator.generate(iNet, _options);
 
-    return { target: Mustache.render(template, gen.options), encoding: ProcessGenerator.printReadme(gen.references, gen.participants) };
+    return { target: Mustache.render(template, gen.options), 
+      encoding: ProcessGenerator.printReadme(gen.taskIDs, gen.conditionIDs, gen.participants) };
   }
 
   async getTemplate(): Promise<string> {

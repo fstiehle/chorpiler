@@ -11,12 +11,13 @@ export class Element {
 }
 
 export class Place extends Element { 
-  type: PlaceType|null = null;
+  type: PlaceType = PlaceType.Flow;
 }
 
 export enum PlaceType {
-  Start = 0,
-  End = 1
+  Flow = 0,
+  Start = 1,
+  End = 2
 }
 
 export class Transition extends Element {
@@ -30,8 +31,21 @@ export class Transition extends Element {
 
 export class Label {
   type: LabelType
+  guards = new Map<string, Guard>();
+
   constructor(type: LabelType) {
     this.type = type;
+  }
+}
+
+export class Guard {
+  name: string;
+  default: boolean = false;
+
+  constructor(name: string, _default?: boolean) {
+    this.name = name;
+    if (_default != null)
+      this.default = _default;
   }
 }
 
@@ -40,7 +54,8 @@ export enum LabelType {
   End = 1,
   Autonomous = 2,
   Task = 3,
-  ExclusiveGateway = 4,
+  ExclusiveIncoming = 4,
+  ExclusiveOutgoing = 5,
 }
 
 export class TaskLabel extends Label {

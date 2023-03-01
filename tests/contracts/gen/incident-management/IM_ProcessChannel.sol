@@ -13,6 +13,7 @@ contract IM_ProcessChannel {
     uint caseID;
     uint taskID;
     uint newTokenState;
+    uint newCondState;
     bytes[5] signatures;
   }
   uint public tokenState = 1;
@@ -59,7 +60,7 @@ contract IM_ProcessChannel {
     } 
     // Verify signatures
     bytes32 payload = keccak256(
-      abi.encode(_step.index, _step.caseID, _step.from, _step.taskID, _step.newTokenState)
+      abi.encode(_step.index, _step.caseID, _step.from, _step.taskID, _step.newTokenState, _step.newCondState)
     );
 
     for (uint i = 0; i < 5; i++) {
@@ -74,7 +75,7 @@ contract IM_ProcessChannel {
    * If a dispute window has elapsed, execution must continue through this function
    * @param id id of the activity to begin
    */
-  function continueAfterDispute(uint id) external {
+  function continueAfterDispute(uint id, uint cond) external {
     uint _disputeMadeAtUNIX = disputeMadeAtUNIX;
     require(_disputeMadeAtUNIX != 0 && _disputeMadeAtUNIX + disputeWindowInUNIX < block.timestamp, "No elapsed dispute");
 
@@ -129,17 +130,17 @@ contract IM_ProcessChannel {
     } while (false);
 
     while(_tokenState != 0) {
-      if (_tokenState & 64 == 64) {
+      if ((cond & 1 == 1) && _tokenState & 64 == 64) {
         _tokenState &= ~uint(64);
         _tokenState |= 256;
         continue;
       }
-      if (_tokenState & 16 == 16) {
+      if ((cond & 2 == 2) && _tokenState & 16 == 16) {
         _tokenState &= ~uint(16);
         _tokenState |= 32;
         continue;
       }
-      if (_tokenState & 4 == 4) {
+      if ((cond & 4 == 4) && _tokenState & 4 == 4) {
         _tokenState &= ~uint(4);
         _tokenState |= 8;
         continue;

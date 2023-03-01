@@ -13,6 +13,7 @@ contract ProcessChannel {
     uint caseID;
     uint taskID;
     uint newTokenState;
+    uint newCondState;
     bytes[{{{numberOfParticipants}}}] signatures;
   }
   uint public tokenState = 1;
@@ -59,7 +60,7 @@ contract ProcessChannel {
     } 
     // Verify signatures
     bytes32 payload = keccak256(
-      abi.encode(_step.index, _step.caseID, _step.from, _step.taskID, _step.newTokenState)
+      abi.encode(_step.index, _step.caseID, _step.from, _step.taskID, _step.newTokenState, _step.newCondState)
     );
 
     for (uint i = 0; i < {{{numberOfParticipants}}}; i++) {
@@ -74,7 +75,7 @@ contract ProcessChannel {
    * If a dispute window has elapsed, execution must continue through this function
    * @param id id of the activity to begin
    */
-  function continueAfterDispute(uint id) external {
+  function continueAfterDispute(uint id, uint cond) external {
     uint _disputeMadeAtUNIX = disputeMadeAtUNIX;
     require(_disputeMadeAtUNIX != 0 && _disputeMadeAtUNIX + disputeWindowInUNIX < block.timestamp, "No elapsed dispute");
 
@@ -82,7 +83,7 @@ contract ProcessChannel {
 
     do {
       {{#manualTransitions}}
-        if ({{#initiator}}msg.sender == participants[{{{initiator}}}] && {{/initiator}}{{{id}}} == id && (_tokenState & {{{consume}}} == {{{consume}}})) {
+        if ({{#condition}}(cond & {{{condition}}} == {{{condition}}}) && {{/condition}}{{#initiator}}msg.sender == participants[{{{initiator}}}] && {{/initiator}}{{{id}}} == id && (_tokenState & {{{consume}}} == {{{consume}}})) {
           _tokenState &= ~uint({{{consume}}});
           _tokenState |= {{{produce}}};
           break;
@@ -92,7 +93,7 @@ contract ProcessChannel {
 
     while(_tokenState != 0) {
       {{#autonomousTransitions}}
-      if (_tokenState & {{{consume}}} == {{{consume}}}) {
+      if ({{#condition}}(cond & {{{condition}}} == {{{condition}}}) && {{/condition}}_tokenState & {{{consume}}} == {{{consume}}}) {
         _tokenState &= ~uint({{{consume}}});
         _tokenState |= {{{produce}}};
         {{#isEnd}}

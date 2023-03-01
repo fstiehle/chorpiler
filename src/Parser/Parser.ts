@@ -1,7 +1,7 @@
 import InteractionNet from './InteractionNet';
 import { XMLParser, XMLValidator } from 'fast-xml-parser';
 import Participant from './Participant';
-import { Element, TaskLabel, Transition, Place, LabelType, Label, PlaceType } from './Element';
+import { Element, TaskLabel, Transition, Place, LabelType, Label, PlaceType, ExclusiveGatewayLabel, Guard } from './Element';
 
 export interface INetParser {
   fromXML(xml: Buffer): Promise<InteractionNet>;
@@ -24,7 +24,9 @@ enum Elements {
 enum Properties {
   id = '@_id',
   source = '@_sourceRef',
-  target = '@_targetRef'
+  target = '@_targetRef',
+  name = '@_name',
+  default = '@_default'
 }
 
 export class INetFastXMLParser implements INetParser {
@@ -95,9 +97,7 @@ export class INetFastXMLParser implements INetParser {
       for (const task of tasks) {
         const from = this.iNet.participants.get(task[Elements.participantsRef][0]);
         const to = this.iNet.participants.get(task[Elements.participantsRef][1]);
-        this.addElement(
-          new Transition(task[Properties.id], new TaskLabel(from!, to!))
-        );
+        this.addElement(new Transition(task[Properties.id], new TaskLabel(from!, to!)));
       }
       return this;
     }
@@ -105,6 +105,7 @@ export class INetFastXMLParser implements INetParser {
     private translateXOR(gateways: any): this {
       for (const gateway of gateways) {
         const gatewayID = gateway[Properties.id];
+        const defaultFlowID = gateway[Properties.default];
         const outs = gateway[Elements.outs];
         const ins = gateway[Elements.ins];
         const transitions = new Array<Transition>();
@@ -115,7 +116,7 @@ export class INetFastXMLParser implements INetParser {
           for (const flowID of ins) {
             const id = `${gatewayID}_${flowID}`;
             const transition = new Transition(id, 
-              new Label(LabelType.ExclusiveGateway));
+              new Label(LabelType.ExclusiveIncoming));
             const place = this.addElement(new Place(flowID));
             this.linkElements(place, transition);
             transitions.push(transition);
@@ -131,7 +132,11 @@ export class INetFastXMLParser implements INetParser {
           for (const flowID of outs) {
             const id = `${gatewayID}_${flowID}`;
             const transition = new Transition(id, 
-              new Label(LabelType.ExclusiveGateway));
+              new Label(LabelType.ExclusiveOutgoing));        
+            // set default flow
+            if (flowID === defaultFlowID) {
+              transition.label.guards.set(flowID, new Guard("", true));
+            }
             const place = this.addElement(new Place(flowID));
             this.linkElements(transition, place);
             transitions.push(transition);
@@ -155,13 +160,31 @@ export class INetFastXMLParser implements INetParser {
 
       for (const flow of flows) {
         const id = flow[Properties.id];
-        // Be aware of already connected places
+        const name = flow[Properties.name];
+
         const place = this.addElement(new Place(id));
         if (place.source.length === 0) {
           const source = this.iNet.elements.get(flow[Properties.source]);
           if (!source) throw new Error(
             `Unsupported Element ${flow[Properties.source]} as source referenced in flow ${id}`);
           this.linkElements(source, place);
+        } else {
+          // look for guard information 
+          for (const sourceTransition of place.source) {
+            if (sourceTransition instanceof Transition
+              && sourceTransition.label.type === LabelType.ExclusiveOutgoing) {
+              // the flow leads to an outgoing exclusive gateway transition,
+              // we need to assign the condition of the flow to the transition
+              const guard = sourceTransition.label.guards.get(id);
+              if (guard != null) { 
+                // the guard of the default flow is already present,
+                // so we only set the name here
+                guard.name = name != null ? name : "no name";
+              } else {
+                sourceTransition.label.guards.set(id, new Guard(name != null ? name : "no name"));
+              }
+            }
+          }
         }
         if (place.target.length === 0) {
           const target = this.iNet.elements.get(flow[Properties.target]);
@@ -178,6 +201,7 @@ export class INetFastXMLParser implements INetParser {
     }
 
     private addElement(el: Element): Element {
+      // Be aware of already connected places
       if (!this.iNet.elements.has(el.id))
         this.iNet.elements.set(el.id, el);
       return this.iNet.elements.get(el.id)!;

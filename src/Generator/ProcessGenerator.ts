@@ -6,23 +6,28 @@
  * the conditions are met. The conditions are checked after a manual transition is attempted.
  */
 import { deleteFromArray } from '../helpers';
-import { Transition, Element, TaskLabel, LabelType, Place, PlaceType, Label } from '../Parser/Element';
+import { Transition, Element, TaskLabel, LabelType, Place, PlaceType } from '../Parser/Element';
 import InteractionNet from '../Parser/InteractionNet';
 import Participant from '../Parser/Participant';
 
 export type Options = {
-  enactmentVisibility: string,
+  // all string types, as number = 0 is interpreted as false value
+  // and may be not displayed by the template engine
   numberOfParticipants: string,
   manualTransitions: Array<{
     id: string,
     initiator: string|null,
     consume: string,
     produce: string,
+    // condition is a number as 0 = default condition, which doesn't
+    // have to appear
+    condition: number,
     isEnd: boolean
   }>
   autonomousTransitions: Array<{
     consume: string,
     produce: string,
+    condition: number,
     isEnd: boolean
   }>
 }
@@ -30,69 +35,85 @@ export type Options = {
 export default class ProcessGenerator {
 
   static generate(_iNet: InteractionNet, _options?: any): 
-  { references: Map<string, number>; participants: Participant[]; options: Options; } 
+  { taskIDs: Map<string, number>; conditionIDs: Map<string, number>, participants: Participant[]; options: Options; } 
   {
     const iNet: InteractionNet = {..._iNet}
     if (iNet.initial == null || iNet.end == null) {
       throw new Error("Invalid InteractionNet"); 
     }
-
     const options: Options = _options ? _options : {
-      enactmentVisibility: 'internal',
       numberOfParticipants: "",
-      manualTransitions: new Array<{
-        id: string,
-        initiator: string|null,
-        consume: string,
-        produce: string
-      }>(), 
-      autonomousTransitions: new Array<{
-        consume: string,
-        produce: string,
-        isEnd: boolean
-      }>()
-    } 
+      manualTransitions: new Array<Options["manualTransitions"]>(),
+      autonomousTransitions: Array<Options["autonomousTransitions"]>()
+    }
 
     options.numberOfParticipants = iNet.participants.size.toString();
     const participants = [...iNet.participants.values()];
 
     // remove silent transitions
     for (const element of iNet.elements.values()) {
-      if (this.isSilent(element)) {
+      if (this.isSilentTransition(element)) {
         const sourcePlace = element.source[0];
         const targetPlace = element.target[0];
-        //console.log(sourcePlace, targetPlace);
         // a previous place only connected to this transition but with other previous transitions
         if (sourcePlace.target.length === 1 && sourcePlace.source.length > 0) {
           this.linkNewSources(targetPlace, sourcePlace.source);
+          this.copyProperties(element as Transition, sourcePlace.source as Transition[]);
           this.deleteElement(iNet, element);
           this.deleteElement(iNet, sourcePlace);
         // target place only connected to this transition but with other target transitions
         } else if (targetPlace.source.length === 1 && targetPlace.target.length > 0) {
           this.linkNewTargets(sourcePlace, targetPlace.target);
+          this.copyProperties(element as Transition, targetPlace.target as Transition[]);
           this.deleteElement(iNet, element);
           this.deleteElement(iNet, targetPlace);
         }
-      }
+ç      }
     }
 
-    // places to marking ids
-    const markings = new Map<string, number>();
-    let markingCounter = 0;
+    // places to transition markings
+    const transitionMarkings = new Map<string, number>();
+    let transitionCounter = 0;
+    // guards to condition markings
+    let conditionCounter = 0;
     // transitions to ids
-    const references = new Map<string, number>();
-    let referenceCounter = 0;
+    const taskIDs = new Map<string, number>();
+    const conditionIDs = new Map<string, number>();
 
     for (const element of iNet.elements.values()) {
       if (!(element instanceof Transition)) {
         continue;
       }
       if (element instanceof Transition 
-        && !this.isSilent(element)
-        && !references.get(element.id)) {
-        references.set(element.id, referenceCounter);
-        referenceCounter++;
+        && !this.isSilentTransition(element)) {
+          taskIDs.set(element.id, taskIDs.size);
       }
+
+      // assign condition to transition
+      let condition = 0;
+      if (element.label.guards.size > 0) {
+        // filter out default flows
+        const conditions = [...element.label.guards].filter(([_, guard]) => {
+          return guard.default === false;
+        })
+
+        if (conditions.length > 0) {
+          const el = [...element.label.guards.entries()].pop()!;
+          let string = el[1].name + ` (${el[0]})`;
+
+          if (conditions.length > 1) {
+            element.label.guards.forEach((guard, id) => {
+              if (!guard.default)
+                string += `AND ${guard.name} (${id})`
+            });
+          }
+          condition = 2 ** conditionCounter;
+          conditionCounter++;
+          conditionIDs.set(string, conditionIDs.size);
+        }
+      }
+
+      // determine sequence flows
       // console.log("ID", references.get(element.id));
       let consume = 0;
       let produce = 0;
@@ -101,11 +122,11 @@ export default class ProcessGenerator {
       // console.log("INS____");
       for (const _in of element.source) {
         // console.log(_in);
-        if (!markings.get(_in.id)) {
-          markings.set(_in.id, 2 ** markingCounter);
-          markingCounter++;
+        if (!transitionMarkings.get(_in.id)) {
+          transitionMarkings.set(_in.id, 2 ** transitionCounter);
+          transitionCounter++;
         }
-        consume += markings.get(_in.id)!;
+        consume += transitionMarkings.get(_in.id)!;
         // console.log(consume)
       }
       // collect producing places
@@ -117,45 +138,50 @@ export default class ProcessGenerator {
         if (out instanceof Place && out.type == PlaceType.End) {
           // leads to end event
           isEnd = true;
-          markings.set(out.id, 0);
+          transitionMarkings.set(out.id, 0);
+          // we don"t need to increase the marking counter
+          // as 0 doesn't take away a spot
 
-        } else if (!markings.get(out.id)) {
-          markings.set(out.id, 2 ** markingCounter);
-          markingCounter++;
+        } else if (!transitionMarkings.get(out.id)) {
+          transitionMarkings.set(out.id, 2 ** transitionCounter);
+          transitionCounter++;
         }
-        produce += markings.get(out.id)!;
+        produce += transitionMarkings.get(out.id)!;
         // console.log(produce)
       }
 
-      // silent elements don't need an ID
-      if (this.isSilent(element)) {
+      if (this.isSilentTransition(element)) {
         options.autonomousTransitions.push({
           consume: consume.toString(), 
           produce: produce.toString(),
+          condition,
           isEnd
         });
-      } else {
+      }
+      else if (element.label instanceof TaskLabel) {
         options.manualTransitions.push({
-          id: references.get(element.id)!.toString(),
-          initiator: element.label instanceof TaskLabel ? participants.indexOf(element.label.sender).toString(): null,
+          id: taskIDs.get(element.id)!.toString(),
+          initiator: participants.indexOf(element.label.sender).toString(),
           consume: consume.toString(),
           produce: produce.toString(),
+          condition,
           isEnd
         });
       }
     }
     //console.log(options);
     //console.log(markings);
+    // console.log(conditionIDs);
     //this.printReadme(references, participants);
-    return { references, participants, options };
+    return { taskIDs, conditionIDs, participants, options };
   }
 
-  private static isSilent(el: Element) {
+  private static isSilentTransition(el: Element) {
     return el instanceof Transition &&
-    (el.label.type === LabelType.ExclusiveGateway
+    (el.label.type === LabelType.ExclusiveIncoming
+    || el.label.type === LabelType.ExclusiveOutgoing
     || el.label.type === LabelType.Start
-    || el.label.type === LabelType.End
-    );
+    || el.label.type === LabelType.End);
   }
 
   private static deleteElement(iNet: InteractionNet, el: Element) {
@@ -178,17 +204,35 @@ export default class ProcessGenerator {
       transition.source.push(el);
   }
 
-  static printReadme(references: Map<string, number>, participants: Participant[]) {
+  private static copyProperties(copyFrom: Transition, copyTo: Transition[]) {
+    // copy gateway guards
+    if (copyFrom.label.guards.size === 0) {
+      return;
+    }
+    for (const transition of copyTo) {
+      transition.label.guards = new Map([...copyFrom.label.guards, ...transition.label.guards]);
+    }
+  }
+
+  static printReadme(
+    tasks: Map<string, number>, 
+    conditions: Map<string, number>, 
+    participants: Participant[]) {
+
     let s = "";
     s += "# Readme\n";
-    s += "## Tasks are encoded as follows:\n";
-    for (const [k, i] of references) 
-      s += `- ${k} with ID ${i}\n`; 
-    s += "\n"
-    s += "## Participants are encoded as follows:\n"
+    s += "## Participants are encoded as follows:\n";
     for (const i in participants)
       s += `- ${participants[i].id} with ID ${Number.parseInt(i)}\n`; 
-    s += "\n"
+    s += "\n";
+    s += "## Tasks are encoded as follows:\n";
+    for (const [k, i] of tasks) 
+      s += `- ${k} with ID ${i}\n`; 
+    s += "\n";
+    s += "## Conditions are encoded as follows:\n";
+    for (const [k, i] of conditions) 
+      s += `- ${k} with ID ${i}\n`; 
+    s += "\n";
     return s;
   }
 }

@@ -21,6 +21,7 @@ export default class SolidityProcessChannel implements TemplateEngine {
     const template: string = _template ? _template : await this.getTemplate();
     const gen = ProcessGenerator.generate(iNet, _options);
 
-    return { target: Mustache.render(template, gen.options), encoding: ProcessGenerator.printReadme(gen.references, gen.participants) };
+    return { target: Mustache.render(template, gen.options), 
+      encoding: ProcessGenerator.printReadme(gen.taskIDs, gen.conditionIDs, gen.participants) };
   }
 }

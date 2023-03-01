@@ -1,7 +1,7 @@
-const enact = (tokenState: number, id: number, participantID: number): number => {
+const enact = (tokenState: number, id: number, cond: number, participantID: number): number => {
   do {
     {{#manualTransitions}}
-    if ({{#initiator}}participantID === {{{initiator}}} && {{/initiator}}{{{id}}} == id && ((tokenState & {{{consume}}}) === {{{consume}}})) {
+    if ({{#condition}}(cond & {{{condition}}} == {{{condition}}}) && {{/condition}}{{#initiator}}participantID === {{{initiator}}} && {{/initiator}}{{{id}}} == id && ((tokenState & {{{consume}}}) === {{{consume}}})) {
       tokenState &= ~{{{consume}}};
       tokenState |= {{{produce}}};
       break;
@@ -9,9 +9,9 @@ const enact = (tokenState: number, id: number, participantID: number): number =>
     {{/manualTransitions}}
   } while (false);
 
-  while(tokenState != 0) {
+  while(tokenState !== 0) {
     {{#autonomousTransitions}}
-    if ((tokenState & {{{consume}}}) === {{{consume}}}) {
+    if ({{#condition}}(cond & {{{condition}}} == {{{condition}}}) && {{/condition}}(tokenState & {{{consume}}}) === {{{consume}}}) {
       tokenState &= ~{{{consume}}};
       tokenState |= {{{produce}}};
       {{#isEnd}}

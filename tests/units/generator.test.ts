@@ -29,11 +29,28 @@ describe('Smart Contract Generation', function () {
 
   describe('compile() using default template', function () {
 
-    it('Compile correct event based XOR to Sol Contract', function() {
+    it('Compile correct event based XOR to Sol Contract 1', function() {
       readFile(__dirname + '/bpmn/EventBasedXOR.bpmn')
       .then((data) => {
         parser.fromXML(data).then((iNet) => {
-          solGenerator.compile(iNet).then(gen => console.log(gen.target)).catch(error => console.log(error));
+          solGenerator.compile(iNet).catch(error => console.log(error));
+        })
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+    });
+
+    it('Compile correct event based XOR to Sol Contract 2', function() {
+      readFile(__dirname + '/bpmn/EventBasedXOR_2.bpmn')
+      .then((data) => {
+        parser.fromXML(data).then((iNet) => {
+          solGenerator.compile(iNet)
+          .then((gen) => {
+            console.log(gen.target);
+            console.log(gen.encoding);
+          })
+          .catch(error => console.log(error));
         })
       })
       .catch((error) => {
@@ -59,7 +76,7 @@ describe('Smart Contract Generation', function () {
         parser.fromXML(data).then((iNet) => {
           stateChannelRootGenerator.compile(iNet)
           .then((gen) => {
-            //console.log(gen.encoding);
+            console.log(gen.encoding);
             fs.writeFile(path.join(__dirname, 
               "..", "contracts/gen/incident-management/IM_ProcessChannel.sol"), 
               gen.target.replace("contract ProcessChannel", "contract IM_ProcessChannel"), 

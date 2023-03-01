@@ -9,14 +9,15 @@ use(solidity);
 class Proof { 
   index = 0;
   from = 0;
-  caseID = 0 
-  taskID = 0
-  newTokenState = 0
+  caseID = 0;
+  taskID = 0;
+  newTokenState = 0;
+  newCondState = 0;
   signatures = new Array<string>(5);
 
   getSignable() {
-    const payload: any[] = [this.index, this.caseID, this.from, this.taskID, this.newTokenState];
-    const types = ['uint', 'uint', 'uint', 'uint', 'uint'];
+    const payload: any[] = [this.index, this.caseID, this.from, this.taskID, this.newTokenState, this.newCondState];
+    const types = ['uint', 'uint', 'uint', 'uint', 'uint', 'uint'];
     return {
       types: types,
       value: payload
@@ -67,15 +68,15 @@ describe('Test Contract: Incident Management ProcessChannel', () => {
     total += cost;
     
     const trace = [
-      [0, 0],
-      [1, 1],
-      [1, 3],
-      [2, 5],
-      [3, 6],
-      [4, 7],
-      [3, 8],
-      [2, 4],
-      [1, 2]
+      [0, 0, 0],
+      [1, 1, 0],
+      [1, 3, 0],
+      [2, 5, 0],
+      [3, 6, 0],
+      [4, 7, 0],
+      [3, 8, 0],
+      [2, 4, 0],
+      [1, 2, 0]
     ]
 
     const proof = {
@@ -84,6 +85,7 @@ describe('Test Contract: Incident Management ProcessChannel', () => {
       caseID: 0,
       taskID: 0,
       newTokenState: 0,
+      newCondState: 0,
       signatures: ["0x","0x", "0x", "0x", "0x"]
     }
 
@@ -92,12 +94,11 @@ describe('Test Contract: Incident Management ProcessChannel', () => {
     total += cost;
     console.log('Gas', 'Dispute:', cost);
 
-
     await provider.send("evm_increaseTime", [1]);
     await provider.send("evm_mine", []);
 
     for (let i = 0; i < trace.length; i++) {
-      tx = await (await channels[trace[i][0]].continueAfterDispute(trace[i][1])).wait(1);
+      tx = await (await channels[trace[i][0]].continueAfterDispute(trace[i][1], trace[i][2])).wait(1);
       cost = tx.gasUsed.toNumber();
       total += cost;
       console.log('Gas', 'Enact Task', trace[i][1], ":", cost);
@@ -125,5 +126,5 @@ describe('Test Contract: Incident Management ProcessChannel', () => {
     expect(await (channels[0].index()), "Index not increased!").to.equal(1);
     expect(await (channels[0].tokenState()), "End of process not reached!").to.equal(0);
   });
-  
+
 });

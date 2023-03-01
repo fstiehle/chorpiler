@@ -10,13 +10,12 @@ contract ProcessEnactment {
     participants = _participants;
   }
 
-  function enact(uint id) external {
-    uint _disputeMadeAtUNIX = disputeMadeAtUNIX;
+  function enact(uint id, uint cond) external {
     uint _tokenState = tokenState;
 
     do {
       {{#manualTransitions}}
-        if ({{#initiator}}msg.sender == participants[{{{initiator}}}] && {{/initiator}}{{{id}}} == id && (_tokenState & {{{consume}}} == {{{consume}}})) {
+        if ({{#condition}}(cond & {{{condition}}} == {{{condition}}}) && {{/condition}}{{#initiator}}msg.sender == participants[{{{initiator}}}] && {{/initiator}}{{{id}}} == id && (_tokenState & {{{consume}}} == {{{consume}}})) {
           _tokenState &= ~uint({{{consume}}});
           _tokenState |= {{{produce}}};
           break;
@@ -26,7 +25,7 @@ contract ProcessEnactment {
 
     while(_tokenState != 0) {
       {{#autonomousTransitions}}
-      if (_tokenState & {{{consume}}} == {{{consume}}}) {
+      if ({{#condition}}(cond & {{{condition}}} == {{{condition}}}) && {{/condition}}_tokenState & {{{consume}}} == {{{consume}}}) {
         _tokenState &= ~uint({{{consume}}});
         _tokenState |= {{{produce}}};
         {{#isEnd}}
