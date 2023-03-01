@@ -13,7 +13,7 @@ contract IM_ProcessChannel {
     uint caseID;
     uint taskID;
     uint newTokenState;
-    uint newCondState;
+    uint condState;
     bytes[5] signatures;
   }
   uint public tokenState = 1;
@@ -60,7 +60,7 @@ contract IM_ProcessChannel {
     } 
     // Verify signatures
     bytes32 payload = keccak256(
-      abi.encode(_step.index, _step.caseID, _step.from, _step.taskID, _step.newTokenState, _step.newCondState)
+      abi.encode(_step.index, _step.caseID, _step.from, _step.taskID, _step.newTokenState, _step.condState)
     );
 
     for (uint i = 0; i < 5; i++) {
