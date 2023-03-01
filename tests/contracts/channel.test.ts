@@ -105,7 +105,6 @@ describe('Test Contract: Incident Management ProcessChannel', () => {
     }
 
     expect(await (channels[0].tokenState()), "End of process not reached!").to.equal(0);
-
     console.log('Gas', 'Total:', total);
   });
 
