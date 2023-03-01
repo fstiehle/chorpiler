@@ -48,17 +48,17 @@ const enact = (tokenState: number, id: number, cond: number, participantID: numb
   } while (false);
 
   while(tokenState !== 0) {
-    if ((cond & 1) == 1 && (tokenState & 64) === 64) {
+    if (((cond & 1) == 1) && ((tokenState & 64) === 64)) {
       tokenState &= ~64;
       tokenState |= 256;
       continue;
     }
-    if ((cond & 2) == 2 && (tokenState & 16) === 16) {
+    if (((cond & 2) == 2) && ((tokenState & 16) === 16)) {
       tokenState &= ~16;
       tokenState |= 32;
       continue;
     }
-    if ((cond & 4) == 4 && (tokenState & 4) === 4) {
+    if (((cond & 4) == 4) && ((tokenState & 4) === 4)) {
       tokenState &= ~4;
       tokenState |= 8;
       continue;

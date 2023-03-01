@@ -130,17 +130,17 @@ contract IM_ProcessChannel {
     } while (false);
 
     while(_tokenState != 0) {
-      if ((cond & 1 == 1) && _tokenState & 64 == 64) {
+      if ((cond & 1 == 1) && (_tokenState & 64 == 64)) {
         _tokenState &= ~uint(64);
         _tokenState |= 256;
         continue;
       }
-      if ((cond & 2 == 2) && _tokenState & 16 == 16) {
+      if ((cond & 2 == 2) && (_tokenState & 16 == 16)) {
         _tokenState &= ~uint(16);
         _tokenState |= 32;
         continue;
       }
-      if ((cond & 4 == 4) && _tokenState & 4 == 4) {
+      if ((cond & 4 == 4) && (_tokenState & 4 == 4)) {
         _tokenState &= ~uint(4);
         _tokenState |= 8;
         continue;

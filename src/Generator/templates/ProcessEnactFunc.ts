@@ -11,7 +11,7 @@ const enact = (tokenState: number, id: number, cond: number, participantID: numb
 
   while(tokenState !== 0) {
     {{#autonomousTransitions}}
-    if ({{#condition}}(cond & {{{condition}}}) == {{{condition}}} && {{/condition}}(tokenState & {{{consume}}}) === {{{consume}}}) {
+    if (({{#condition}}(cond & {{{condition}}}) == {{{condition}}}) && {{/condition}}((tokenState & {{{consume}}}) === {{{consume}}})) {
       tokenState &= ~{{{consume}}};
       tokenState |= {{{produce}}};
       {{#isEnd}}
