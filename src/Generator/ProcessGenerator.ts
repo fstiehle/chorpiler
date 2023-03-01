@@ -68,7 +68,7 @@ export default class ProcessGenerator {
           this.deleteElement(iNet, element);
           this.deleteElement(iNet, targetPlace);
         }
-ç      }
+      }
     }
 
     // places to transition markings

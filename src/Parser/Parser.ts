@@ -1,7 +1,7 @@
 import InteractionNet from './InteractionNet';
 import { XMLParser, XMLValidator } from 'fast-xml-parser';
 import Participant from './Participant';
-import { Element, TaskLabel, Transition, Place, LabelType, Label, PlaceType, ExclusiveGatewayLabel, Guard } from './Element';
+import { Element, TaskLabel, Transition, Place, LabelType, Label, PlaceType, Guard } from './Element';
 
 export interface INetParser {
   fromXML(xml: Buffer): Promise<InteractionNet>;
