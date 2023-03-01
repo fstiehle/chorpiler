@@ -16,7 +16,14 @@ class Proof {
   signatures = new Array<string>(5);
 
   getSignable() {
-    const payload: any[] = [this.index, this.caseID, this.from, this.taskID, this.newTokenState, this.condState];
+    const payload: any[] = [
+      this.index, 
+      this.caseID, 
+      this.from, 
+      this.taskID, 
+      this.newTokenState, 
+      this.condState
+    ];
     const types = ['uint', 'uint', 'uint', 'uint', 'uint', 'uint'];
     return {
       types: types,
@@ -32,9 +39,7 @@ class Proof {
         ethers.utils.arrayify(
           ethers.utils.keccak256(
             encoder.encode(signablePart.types, signablePart.value)
-          )
-        )
-      );
+      )));
     }
   }
 }

@@ -93,7 +93,7 @@ contract ProcessChannel {
 
     while(_tokenState != 0) {
       {{#autonomousTransitions}}
-      if ({{#condition}}(cond & {{{condition}}} == {{{condition}}}) && {{/condition}}_tokenState & {{{consume}}} == {{{consume}}}) {
+      if ({{#condition}}(cond & {{{condition}}} == {{{condition}}}) && {{/condition}}(_tokenState & {{{consume}}} == {{{consume}}})) {
         _tokenState &= ~uint({{{consume}}});
         _tokenState |= {{{produce}}};
         {{#isEnd}}

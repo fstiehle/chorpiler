@@ -132,7 +132,7 @@ export class INetFastXMLParser implements INetParser {
           for (const flowID of outs) {
             const id = `${gatewayID}_${flowID}`;
             const transition = new Transition(id, 
-              new Label(LabelType.ExclusiveOutgoing));        
+              new Label(LabelType.ExclusiveOutgoing));
             // set default flow
             if (flowID === defaultFlowID) {
               transition.label.guards.set(flowID, new Guard("", true));
