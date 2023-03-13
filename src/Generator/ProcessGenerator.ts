@@ -52,22 +52,42 @@ export default class ProcessGenerator {
 
     // remove silent transitions
     for (const element of iNet.elements.values()) {
-      if (this.isSilentTransition(element)) {
-        const sourcePlace = element.source[0];
-        const targetPlace = element.target[0];
-        // a previous place only connected to this transition but with other previous transitions
-        if (sourcePlace.target.length === 1 && sourcePlace.source.length > 0) {
-          this.linkNewSources(targetPlace, sourcePlace.source);
-          this.copyProperties(element as Transition, sourcePlace.source as Transition[]);
-          this.deleteElement(iNet, element);
-          this.deleteElement(iNet, sourcePlace);
-        // target place only connected to this transition but with other target transitions
-        } else if (targetPlace.source.length === 1 && targetPlace.target.length > 0) {
-          this.linkNewTargets(sourcePlace, targetPlace.target);
-          this.copyProperties(element as Transition, targetPlace.target as Transition[]);
-          this.deleteElement(iNet, element);
-          this.deleteElement(iNet, targetPlace);
+      if (element.source.length === 1 && element.target.length === 1) {
+        const source = element.source[0];
+        const target = element.target[0];
+        if (this.isSilentTransition(element)) {
+          // a previous place only connected to this transition but with other previous transitions
+          if (source.target.length === 1 && source.source.length > 0) {
+            this.linkNewSources(target, source.source);
+            this.copyProperties(element as Transition, source.source as Transition[]);
+            this.deleteElement(iNet, element);
+            this.deleteElement(iNet, source);
+          // target place only connected to this transition but with other target transitions
+          } else if (target.source.length === 1 && target.target.length > 0) {
+            this.linkNewTargets(source, target.target);
+            this.copyProperties(element as Transition, target.target as Transition[]);
+            this.deleteElement(iNet, element);
+            this.deleteElement(iNet, target);
+          }
+        } else if (element instanceof Place 
+          && this.isSilentTransition(source) && this.isSilentTransition(target)) {
+            // two AND gateways (silent transitions) in sucession 
+            this.linkNewSources(source, target.source);
+            this.linkNewTargets(source, target.target);
+            this.copyProperties(target as Transition, [source as Transition]);
+            this.deleteElement(iNet, element);
+            this.deleteElement(iNet, target);
         }
+      } else if (element.source.length === 1 && element.target.length > 1
+        && this.isSilentTransition(element)) {
+          // XOR -> AND
+          const source = element.source[0];
+          for (const andPlace of element.target) {
+            this.linkNewTargets(andPlace, source.target);
+            this.linkNewSources(andPlace, source.source);
+          }
+          this.deleteElement(iNet, element);
+          this.deleteElement(iNet, source);
       }
     }
 
@@ -180,6 +200,8 @@ export default class ProcessGenerator {
     return el instanceof Transition &&
     (el.label.type === LabelType.ExclusiveIncoming
     || el.label.type === LabelType.ExclusiveOutgoing
+    || el.label.type === LabelType.ParallelConverging
+    || el.label.type === LabelType.ParallelDiverging
     || el.label.type === LabelType.Start
     || el.label.type === LabelType.End);
   }

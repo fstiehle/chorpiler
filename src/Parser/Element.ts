@@ -52,10 +52,11 @@ export class Guard {
 export enum LabelType {
   Start = 0,
   End = 1,
-  Autonomous = 2,
-  Task = 3,
-  ExclusiveIncoming = 4,
-  ExclusiveOutgoing = 5,
+  Task = 2,
+  ExclusiveIncoming = 3,
+  ExclusiveOutgoing = 4,
+  ParallelConverging = 5,
+  ParallelDiverging = 6,
 }
 
 export class TaskLabel extends Label {

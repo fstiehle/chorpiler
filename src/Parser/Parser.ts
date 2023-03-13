@@ -17,6 +17,7 @@ enum Elements {
   startEvent = 'bpmn2:startEvent',
   endEvent = 'bpmn2:endEvent',
   exclusiveGateway = 'bpmn2:exclusiveGateway',
+  parallelGateway = 'bpmn2:parallelGateway',
   outs = 'bpmn2:outgoing',
   ins = 'bpmn2:incoming'
 }
@@ -48,6 +49,7 @@ export class INetFastXMLParser implements INetParser {
       .translateStartEvent(choreography[Elements.startEvent])
       .translateTasks(choreography[Elements.tasks])
       .translateXOR(choreography[Elements.exclusiveGateway])
+      .translateAND(choreography[Elements.parallelGateway])
       .translateEndEvent(choreography[Elements.endEvent])
       // connect flows last, and report error when a flow leads to an unknown transition, which means
       // we were not able to translate all elements
@@ -94,6 +96,9 @@ export class INetFastXMLParser implements INetParser {
     }
 
     private translateTasks(tasks: any): this {
+      if (tasks == null) {
+        return this;
+      }
       for (const task of tasks) {
         const from = this.iNet.participants.get(task[Elements.participantsRef][0]);
         const to = this.iNet.participants.get(task[Elements.participantsRef][1]);
@@ -103,6 +108,9 @@ export class INetFastXMLParser implements INetParser {
     }
 
     private translateXOR(gateways: any): this {
+      if (gateways == null)
+        return this;
+
       for (const gateway of gateways) {
         const gatewayID = gateway[Properties.id];
         const defaultFlowID = gateway[Properties.default];
@@ -148,6 +156,32 @@ export class INetFastXMLParser implements INetParser {
           }
         } else {
           throw new Error("Neither converging nor diverging XOR Gateway");
+        }
+      }
+      return this;
+    }
+
+    private translateAND(gateways: any): this {
+      if (gateways == null)
+        return this;
+
+      for (const gateway of gateways) {
+        const gatewayID = gateway[Properties.id];
+        const outs = gateway[Elements.outs];
+        const ins = gateway[Elements.ins];
+
+        if (outs.length === 1 && outs.length < ins.length) {
+          // converging
+          this.addElement(new Transition(gatewayID, 
+            new Label(LabelType.ParallelConverging)));
+        }
+        else if (ins.length === 1 && ins.length < outs.length) {
+          // diverging
+          this.addElement(new Transition(gatewayID, 
+            new Label(LabelType.ParallelDiverging)));
+        }
+        else {
+          throw new Error("Neither converging nor diverging AND Gateway");
         }
       }
       return this;

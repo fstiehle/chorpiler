@@ -58,6 +58,23 @@ describe('Smart Contract Generation', function () {
       });
     });
 
+    it('Compile correct AND to Sol Contract', function() {
+      readFile(__dirname + '/bpmn/SimpleAND.bpmn')
+      .then((data) => {
+        parser.fromXML(data).then((iNet) => {
+          solGenerator.compile(iNet)
+          .then((gen) => {
+            console.log(gen.target);
+            console.log(gen.encoding);
+          })
+          .catch(error => console.log(error));
+        })
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+    });
+
     it('Compile correct event based XOR to typescript', function() {
       readFile(__dirname + '/bpmn/EventBasedXOR.bpmn')
       .then((data) => {
