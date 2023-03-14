@@ -60,9 +60,9 @@
   "evm": {
     "bytecode": {
       "functionDebugData": {
-        "@_2027": {
+        "@_2043": {
           "entryPoint": null,
-          "id": 2027,
+          "id": 2043,
           "parameterSlots": 1,
           "returnSlots": 0
         },
@@ -1073,21 +1073,21 @@
     },
     "deployedBytecode": {
       "functionDebugData": {
-        "@enact_2391": {
+        "@enact_2407": {
           "entryPoint": 194,
-          "id": 2391,
+          "id": 2407,
           "parameterSlots": 1,
           "returnSlots": 0
         },
-        "@participants_2015": {
+        "@participants_2031": {
           "entryPoint": 162,
-          "id": 2015,
+          "id": 2031,
           "parameterSlots": 0,
           "returnSlots": 0
         },
-        "@tokenState_2011": {
+        "@tokenState_2027": {
           "entryPoint": null,
-          "id": 2011,
+          "id": 2027,
           "parameterSlots": 0,
           "returnSlots": 0
         },

@@ -45,11 +45,20 @@ contract IM_ProcessChannel {
       // stuck in start event
       disputeMadeAtUNIX = block.timestamp;
     }
-    if (checkStep(_step) && (0 == _disputeMadeAtUNIX || _disputeMadeAtUNIX + disputeWindowInUNIX >= block.timestamp)) {
-      // new dispute with state submission
-      disputeMadeAtUNIX = block.timestamp;
-      index = _step.index;
-      tokenState = _step.newTokenState;
+    else {
+      bool check = checkStep(_step);
+      if (check) {
+        if (0 == _disputeMadeAtUNIX) {
+          // new dispute with state submission
+          disputeMadeAtUNIX = block.timestamp;
+          index = _step.index;
+          tokenState = _step.newTokenState;
+        } else if (_disputeMadeAtUNIX + disputeWindowInUNIX >= block.timestamp) {
+          // submission to existing dispute
+          index = _step.index;
+          tokenState = _step.newTokenState;
+        }
+      }
     }
   }
 
@@ -80,7 +89,7 @@ contract IM_ProcessChannel {
     require(_disputeMadeAtUNIX != 0 && _disputeMadeAtUNIX + disputeWindowInUNIX < block.timestamp, "No elapsed dispute");
 
     uint _tokenState = tokenState;
-
+    
     do {
         if (msg.sender == participants[0] && 0 == id && (_tokenState & 1 == 1)) {
           _tokenState &= ~uint(1);

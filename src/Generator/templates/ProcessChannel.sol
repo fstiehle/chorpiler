@@ -46,7 +46,7 @@ contract ProcessChannel {
       disputeMadeAtUNIX = block.timestamp;
     }
     else {
-      check = checkStep(_step);
+      bool check = checkStep(_step);
       if (check) {
         if (0 == _disputeMadeAtUNIX) {
           // new dispute with state submission
