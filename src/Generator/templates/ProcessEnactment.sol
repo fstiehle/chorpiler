@@ -10,7 +10,7 @@ contract ProcessEnactment {
     participants = _participants;
   }
 
-  function enact(uint id{{#hasConditions}}, uint cond{{/hasConditions}}) external {
+  function enact(uint id, uint cond) external {
     uint _tokenState = tokenState;
     
     {{#hasManualTransitions}}
