@@ -14,6 +14,9 @@ export type Options = {
   // all string types, as number = 0 is interpreted as false value
   // and may be not displayed by the template engine
   numberOfParticipants: string,
+  hasConditions: boolean,
+  hasManualTransitions: boolean,
+  hasAutonomousTransitions: boolean,
   manualTransitions: Array<{
     id: string,
     initiator: string|null,
@@ -41,13 +44,14 @@ export default class ProcessGenerator {
     if (iNet.initial == null || iNet.end == null) {
       throw new Error("Invalid InteractionNet"); 
     }
-    const options: Options = _options ? _options : {
-      numberOfParticipants: "",
-      manualTransitions: new Array<Options["manualTransitions"]>(),
-      autonomousTransitions: Array<Options["autonomousTransitions"]>()
-    }
+    const options: Options = _options ? _options : {}
 
     options.numberOfParticipants = iNet.participants.size.toString();
+    options.manualTransitions = new Array();
+    options.autonomousTransitions = new Array();
+    options.hasConditions = false; // overriden in case flow guards are encountered
+    options.hasManualTransitions = false;
+    options.hasAutonomousTransitions = false;
     const participants = [...iNet.participants.values()];
 
     // remove silent transitions
@@ -189,10 +193,17 @@ export default class ProcessGenerator {
         });
       }
     }
-    //console.log(options);
-    //console.log(markings);
-    // console.log(conditionIDs);
-    //this.printReadme(references, participants);
+    
+    if (options.manualTransitions.length > 0) {
+      options.hasManualTransitions = true;
+    }
+    if (options.autonomousTransitions.length > 0) {
+      options.hasAutonomousTransitions = true;
+    }
+    if (conditionIDs.size > 0) {
+      options.hasConditions = true;
+    }
+
     return { taskIDs, conditionIDs, participants, options };
   }
 
@@ -251,10 +262,12 @@ export default class ProcessGenerator {
     for (const [k, i] of tasks) 
       s += `- ${k} with ID ${i}\n`; 
     s += "\n";
-    s += "## Conditions are encoded as follows:\n";
-    for (const [k, i] of conditions) 
-      s += `- ${k} with ID ${i}\n`; 
-    s += "\n";
+    if (conditions.size > 0) {
+      s += "## Conditions are encoded as follows:\n";
+      for (const [k, i] of conditions) 
+        s += `- ${k} with ID ${i}\n`; 
+      s += "\n";
+    }
     return s;
   }
 }

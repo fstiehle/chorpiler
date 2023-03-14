@@ -45,11 +45,20 @@ contract ProcessChannel {
       // stuck in start event
       disputeMadeAtUNIX = block.timestamp;
     }
-    if (checkStep(_step) && (0 == _disputeMadeAtUNIX || _disputeMadeAtUNIX + disputeWindowInUNIX >= block.timestamp)) {
-      // new dispute with state submission
-      disputeMadeAtUNIX = block.timestamp;
-      index = _step.index;
-      tokenState = _step.newTokenState;
+    else {
+      check = checkStep(_step);
+      if (check) {
+        if (0 == _disputeMadeAtUNIX) {
+          // new dispute with state submission
+          disputeMadeAtUNIX = block.timestamp;
+          index = _step.index;
+          tokenState = _step.newTokenState;
+        } else if (_disputeMadeAtUNIX + disputeWindowInUNIX >= block.timestamp) {
+          // submission to existing dispute
+          index = _step.index;
+          tokenState = _step.newTokenState;
+        }
+      }
     }
   }
 
@@ -75,12 +84,13 @@ contract ProcessChannel {
    * If a dispute window has elapsed, execution must continue through this function
    * @param id id of the activity to begin
    */
-  function continueAfterDispute(uint id, uint cond) external {
+  function continueAfterDispute(uint id{{#hasConditions}}, uint cond{{/hasConditions}}) external {
     uint _disputeMadeAtUNIX = disputeMadeAtUNIX;
     require(_disputeMadeAtUNIX != 0 && _disputeMadeAtUNIX + disputeWindowInUNIX < block.timestamp, "No elapsed dispute");
 
     uint _tokenState = tokenState;
-
+    
+    {{#hasManualTransitions}}
     do {
       {{#manualTransitions}}
         if ({{#condition}}(cond & {{{condition}}} == {{{condition}}}) && {{/condition}}{{#initiator}}msg.sender == participants[{{{initiator}}}] && {{/initiator}}{{{id}}} == id && (_tokenState & {{{consume}}} == {{{consume}}})) {
@@ -90,7 +100,9 @@ contract ProcessChannel {
         }
       {{/manualTransitions}}
     } while (false);
+    {{/hasManualTransitions}}
 
+    {{#hasAutonomousTransitions}}
     while(_tokenState != 0) {
       {{#autonomousTransitions}}
       if ({{#condition}}(cond & {{{condition}}} == {{{condition}}}) && {{/condition}}(_tokenState & {{{consume}}} == {{{consume}}})) {
@@ -106,6 +118,7 @@ contract ProcessChannel {
       {{/autonomousTransitions}}
       break;
     }
+    {{/hasAutonomousTransitions}}
 
     tokenState = _tokenState;
   }

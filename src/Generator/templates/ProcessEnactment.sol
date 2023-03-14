@@ -10,9 +10,10 @@ contract ProcessEnactment {
     participants = _participants;
   }
 
-  function enact(uint id, uint cond) external {
+  function enact(uint id{{#hasConditions}}, uint cond{{/hasConditions}}) external {
     uint _tokenState = tokenState;
-
+    
+    {{#hasManualTransitions}}
     do {
       {{#manualTransitions}}
         if ({{#condition}}(cond & {{{condition}}} == {{{condition}}}) && {{/condition}}{{#initiator}}msg.sender == participants[{{{initiator}}}] && {{/initiator}}{{{id}}} == id && (_tokenState & {{{consume}}} == {{{consume}}})) {
@@ -22,7 +23,9 @@ contract ProcessEnactment {
         }
       {{/manualTransitions}}
     } while (false);
+    {{/hasManualTransitions}}
 
+    {{#hasAutonomousTransitions}}
     while(_tokenState != 0) {
       {{#autonomousTransitions}}
       if ({{#condition}}(cond & {{{condition}}} == {{{condition}}}) && {{/condition}}(_tokenState & {{{consume}}} == {{{consume}}})) {
@@ -38,6 +41,7 @@ contract ProcessEnactment {
       {{/autonomousTransitions}}
       break;
     }
+    {{/hasAutonomousTransitions}}
 
     tokenState = _tokenState;
   }
