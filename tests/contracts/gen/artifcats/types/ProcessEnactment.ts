@@ -25,7 +25,7 @@ import type {
 
 export interface ProcessEnactmentInterface extends utils.Interface {
   functions: {
-    "enact(uint256)": FunctionFragment;
+    "enact(uint256,uint256)": FunctionFragment;
     "participants(uint256)": FunctionFragment;
     "tokenState()": FunctionFragment;
   };
@@ -36,7 +36,7 @@ export interface ProcessEnactmentInterface extends utils.Interface {
 
   encodeFunctionData(
     functionFragment: "enact",
-    values: [PromiseOrValue<BigNumberish>]
+    values: [PromiseOrValue<BigNumberish>, PromiseOrValue<BigNumberish>]
   ): string;
   encodeFunctionData(
     functionFragment: "participants",
@@ -86,6 +86,7 @@ export interface ProcessEnactment extends BaseContract {
   functions: {
     enact(
       id: PromiseOrValue<BigNumberish>,
+      cond: PromiseOrValue<BigNumberish>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<ContractTransaction>;
 
@@ -99,6 +100,7 @@ export interface ProcessEnactment extends BaseContract {
 
   enact(
     id: PromiseOrValue<BigNumberish>,
+    cond: PromiseOrValue<BigNumberish>,
     overrides?: Overrides & { from?: PromiseOrValue<string> }
   ): Promise<ContractTransaction>;
 
@@ -112,6 +114,7 @@ export interface ProcessEnactment extends BaseContract {
   callStatic: {
     enact(
       id: PromiseOrValue<BigNumberish>,
+      cond: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
     ): Promise<void>;
 
@@ -128,6 +131,7 @@ export interface ProcessEnactment extends BaseContract {
   estimateGas: {
     enact(
       id: PromiseOrValue<BigNumberish>,
+      cond: PromiseOrValue<BigNumberish>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<BigNumber>;
 
@@ -142,6 +146,7 @@ export interface ProcessEnactment extends BaseContract {
   populateTransaction: {
     enact(
       id: PromiseOrValue<BigNumberish>,
+      cond: PromiseOrValue<BigNumberish>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<PopulatedTransaction>;
 

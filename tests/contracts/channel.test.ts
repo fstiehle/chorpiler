@@ -12,7 +12,7 @@ class Proof {
   caseID = 0;
   taskID = 0;
   newTokenState = 0;
-  condState = 0;
+  conditionState = 0;
   signatures = new Array<string>(5);
 
   getSignable() {
@@ -22,7 +22,7 @@ class Proof {
       this.from, 
       this.taskID, 
       this.newTokenState, 
-      this.condState
+      this.conditionState
     ];
     const types = ['uint', 'uint', 'uint', 'uint', 'uint', 'uint'];
     return {
@@ -90,7 +90,7 @@ describe('Test Contract: Incident Management ProcessChannel', () => {
       caseID: 0,
       taskID: 0,
       newTokenState: 0,
-      condState: 0,
+      conditionState: 0,
       signatures: ["0x","0x", "0x", "0x", "0x"]
     }
 

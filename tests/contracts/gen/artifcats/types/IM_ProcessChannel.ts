@@ -30,7 +30,7 @@ export declare namespace IM_ProcessChannel {
     caseID: PromiseOrValue<BigNumberish>;
     taskID: PromiseOrValue<BigNumberish>;
     newTokenState: PromiseOrValue<BigNumberish>;
-    condState: PromiseOrValue<BigNumberish>;
+    conditionState: PromiseOrValue<BigNumberish>;
     signatures: [
       PromiseOrValue<BytesLike>,
       PromiseOrValue<BytesLike>,
@@ -54,7 +54,7 @@ export declare namespace IM_ProcessChannel {
     caseID: BigNumber;
     taskID: BigNumber;
     newTokenState: BigNumber;
-    condState: BigNumber;
+    conditionState: BigNumber;
     signatures: [string, string, string, string, string];
   };
 }

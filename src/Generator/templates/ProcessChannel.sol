@@ -69,7 +69,7 @@ contract ProcessChannel {
     } 
     // Verify signatures
     bytes32 payload = keccak256(
-      abi.encode(_step.index, _step.caseID, _step.from, _step.taskID, _step.newTokenState, _step.condState)
+      abi.encode(_step.index, _step.caseID, _step.from, _step.taskID, _step.newTokenState, _step.conditionState)
     );
 
     for (uint i = 0; i < {{{numberOfParticipants}}}; i++) {
