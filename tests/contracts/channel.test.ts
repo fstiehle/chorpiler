@@ -124,9 +124,8 @@ describe('Test Contract: Incident Management ProcessChannel', () => {
 
     let tx = await (await channels[0].submit(state)).wait(1);
     const cost = tx.gasUsed.toNumber();
-    console.log('Gas', 'Dispute:', cost);
+    console.log('Gas', 'Final State:', cost);
 
-    expect(await (channels[0].disputeMadeAtUNIX()), "Dispute not succeesful").to.not.equal(0);
     expect(await (channels[0].index()), "Index not increased!").to.equal(1);
     expect(await (channels[0].tokenState()), "End of process not reached!").to.equal(0);
   });

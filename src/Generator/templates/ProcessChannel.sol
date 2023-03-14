@@ -49,12 +49,15 @@ contract ProcessChannel {
       bool check = checkStep(_step);
       if (check) {
         if (0 == _disputeMadeAtUNIX) {
-          // new dispute with state submission
-          disputeMadeAtUNIX = block.timestamp;
+          // new dispute or final state
+          if (_step.newTokenState != 0) {
+            // new dispute with state submission
+            disputeMadeAtUNIX = block.timestamp;
+          }
           index = _step.index;
           tokenState = _step.newTokenState;
-        } else if (_disputeMadeAtUNIX + disputeWindowInUNIX >= block.timestamp) {
-          // submission to existing dispute
+        } else if ((_disputeMadeAtUNIX + disputeWindowInUNIX >= block.timestamp)) {
+          // submission to existing dispute 
           index = _step.index;
           tokenState = _step.newTokenState;
         }
