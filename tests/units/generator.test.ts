@@ -97,6 +97,28 @@ describe('Smart Contract Generation', function () {
       });
     });
 
+    it('Compile correct supply chain case to TS', function() {
+      readFile(__dirname + '/bpmn/supply-chain.bpmn')
+      .then((data) => {
+        parser.fromXML(data).then((iNet) => {
+          tsGenerator.compile(iNet)
+          .then((gen) => {
+            console.log(gen.encoding);
+            fs.writeFile(path.join(__dirname, 
+              "..", "contracts/gen/supply-chain/SC_Enact.ts"), 
+              gen.target, 
+              { flag: 'w+' },
+              (err) => { if (err) { console.error(err); } });
+              console.log("SC_Enact.ts generated.")
+          })
+          .catch(error => console.log(error));
+        })
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+    });
+
     it('Compile correct event based XOR to typescript', function() {
       readFile(__dirname + '/bpmn/EventBasedXOR.bpmn')
       .then((data) => {
