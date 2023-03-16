@@ -24,7 +24,7 @@ class Proof {
       this.newTokenState, 
       this.conditionState
     ];
-    const types = ['uint', 'uint', 'uint', 'uint', 'uint', 'uint'];
+    const types = ['uint64', 'uint16', 'uint16', 'uint16', 'uint64', 'uint64'];
     return {
       types: types,
       value: payload
@@ -93,7 +93,7 @@ describe('Test Contract: Incident Management ProcessChannel', () => {
       conditionState: 0,
       signatures: ["0x","0x", "0x", "0x", "0x"]
     }
-
+    // dont need to sign as we simulate stuck in start event
     tx = await (await channels[0].submit(proof)).wait(1);
     cost = tx.gasUsed.toNumber();
     total += cost;

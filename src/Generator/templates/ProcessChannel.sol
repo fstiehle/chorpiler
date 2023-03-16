@@ -5,12 +5,10 @@ import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
 
 contract ProcessChannel {
   using ECDSA for bytes32;
-  // TODO: Can we optimise the packing of this struct?
-  // Intuition: No, as it is only used in calldata
   struct Step {
     uint index;
-    uint from;
     uint caseID;
+    uint from;
     uint taskID;
     uint newTokenState;
     uint conditionState;
@@ -18,12 +16,12 @@ contract ProcessChannel {
   }
   uint public tokenState = 1;
   uint public index = 0;
-  // TODO: better performance with mapping?
-  address[{{{numberOfParticipants}}}] public participants;
 
   /// Timestamps for the challenge-response dispute window
-  uint public disputeMadeAtUNIX = 0;
   uint public immutable disputeWindowInUNIX;
+  uint public disputeMadeAtUNIX = 0;
+
+  address[{{{numberOfParticipants}}}] public participants; 
 
   /**
    * @param _participants addresses for the roles 
@@ -41,13 +39,12 @@ contract ProcessChannel {
    */
    function submit(Step calldata _step) external {
     uint _disputeMadeAtUNIX = disputeMadeAtUNIX;
-    if (0 == _step.index && 0 == _disputeMadeAtUNIX && 1 == tokenState) {
+    if (0 == _step.index && 0 == _disputeMadeAtUNIX) {
       // stuck in start event
       disputeMadeAtUNIX = block.timestamp;
     }
     else {
-      bool check = checkStep(_step);
-      if (check) {
+      if (checkStep(_step)) {
         if (0 == _disputeMadeAtUNIX) {
           // new dispute or final state
           if (_step.newTokenState != 0) {
@@ -56,7 +53,7 @@ contract ProcessChannel {
           }
           index = _step.index;
           tokenState = _step.newTokenState;
-        } else if ((_disputeMadeAtUNIX + disputeWindowInUNIX >= block.timestamp)) {
+        } else if (_disputeMadeAtUNIX + disputeWindowInUNIX >= block.timestamp) {
           // submission to existing dispute 
           index = _step.index;
           tokenState = _step.newTokenState;
@@ -92,7 +89,7 @@ contract ProcessChannel {
     require(_disputeMadeAtUNIX != 0 && _disputeMadeAtUNIX + disputeWindowInUNIX < block.timestamp, "No elapsed dispute");
 
     uint _tokenState = tokenState;
-    
+
     {{#hasManualTransitions}}
     do {
       {{#manualTransitions}}

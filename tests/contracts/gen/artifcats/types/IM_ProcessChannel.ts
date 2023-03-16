@@ -26,8 +26,8 @@ import type {
 export declare namespace IM_ProcessChannel {
   export type StepStruct = {
     index: PromiseOrValue<BigNumberish>;
-    from: PromiseOrValue<BigNumberish>;
     caseID: PromiseOrValue<BigNumberish>;
+    from: PromiseOrValue<BigNumberish>;
     taskID: PromiseOrValue<BigNumberish>;
     newTokenState: PromiseOrValue<BigNumberish>;
     conditionState: PromiseOrValue<BigNumberish>;
@@ -50,8 +50,8 @@ export declare namespace IM_ProcessChannel {
     [string, string, string, string, string]
   ] & {
     index: BigNumber;
-    from: BigNumber;
     caseID: BigNumber;
+    from: BigNumber;
     taskID: BigNumber;
     newTokenState: BigNumber;
     conditionState: BigNumber;
