@@ -75,11 +75,11 @@ describe('Smart Contract Generation', function () {
       });
     });
 
-    it('Compile correct supply chain case to Sol Contract', function() {
+    it('Compile correct supply chain case to Channel Contract', function() {
       readFile(__dirname + '/bpmn/supply-chain.bpmn')
       .then((data) => {
         parser.fromXML(data).then((iNet) => {
-          solGenerator.compile(iNet)
+          stateChannelRootGenerator.compile(iNet)
           .then((gen) => {
             console.log(gen.encoding);
             fs.writeFile(path.join(__dirname, 

@@ -10,6 +10,7 @@
   "scripts": {
     "test": "mocha tests/units && waffle && mocha tests/contracts",
     "test/unit": "mocha tests/units",
+    "test/contracts": "mocha tests/contracts",
     "build": "tsc && ncp src/generator/templates lib/generator/templates",
     "prepublishOnly": "npm run build",
     "preversion": "npm run build"
