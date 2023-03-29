@@ -1,4 +1,5 @@
 const enact = (tokenState: number, id: number, cond: number, participantID: number): number => {
+  
   do {
     if (participantID === 0 && 0 == id && ((tokenState & 1) === 1)) {
       tokenState &= ~1;
@@ -50,9 +51,10 @@ const enact = (tokenState: number, id: number, cond: number, participantID: numb
       tokenState |= 0;
       break;
     }
+    return tokenState;
   } while (false);
 
-  while(tokenState !== 0) {
+  while(tokenState != 0) {
     if (((tokenState & 48) === 48)) {
       tokenState &= ~48;
       tokenState |= 64;

@@ -14,7 +14,7 @@ contract ProcessEnactment {
     uint _tokenState = tokenState;
     
     {{#hasManualTransitions}}
-    do {
+    while(true) {
       {{#manualTransitions}}
         if ({{#condition}}(cond & {{{condition}}} == {{{condition}}}) && {{/condition}}{{#initiator}}msg.sender == participants[{{{initiator}}}] && {{/initiator}}{{{id}}} == id && (_tokenState & {{{consume}}} == {{{consume}}})) {
           _tokenState &= ~uint({{{consume}}});
@@ -22,7 +22,8 @@ contract ProcessEnactment {
           break;
         }
       {{/manualTransitions}}
-    } while (false);
+      return _tokenState;
+    };
     {{/hasManualTransitions}}
 
     {{#hasAutonomousTransitions}}
