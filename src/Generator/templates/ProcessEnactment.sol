@@ -22,8 +22,8 @@ contract ProcessEnactment {
           break;
         }
       {{/manualTransitions}}
-      return _tokenState;
-    };
+      return;
+    }
     {{/hasManualTransitions}}
 
     {{#hasAutonomousTransitions}}
