@@ -31,7 +31,7 @@ const tsGenerator = new chorpiler.Generator.TS.Enactment();
 const solGenerator = new chorpiler.Generator.Sol.Enactment();
 ```
 
-Comple example usage to parse and generate. 
+Complete example usage to parse and generate. 
 ```js
 import * as fs from 'fs';
 import chorpiler from 'chorpiler';
