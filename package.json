@@ -11,7 +11,7 @@
     "test": "mocha tests/compiler && waffle && mocha tests/output",
     "test/compiler": "mocha tests/compiler",
     "test/output": "mocha tests/output",
-    "build": "tsc && ncp src/Generator/templates lib/generator/templates",
+    "build": "tsc && ncp ./src/Generator/templates ./lib/Generator/templates",
     "prepublishOnly": "npm run build",
     "preversion": "npm run build"
   },
