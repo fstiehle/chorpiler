@@ -75,18 +75,19 @@ If you have node isntalled a simple `npm install` is enough. To confirm, you can
 
 Two groups of tests exist:
 - **Testing the parser and compiler**: By running `npm run test/compiler`, tests are executed confirming that the parser and compiler produce outputs from a range of correct and supported process models without reporting errors and rejects malformed and unsupported BPMN elements with reporting errors. These tests are found in `tests/compiler`.
-- **Testing the generated output (incomplete):** By running `npm run test/output`, tests are executed confirming that the produced outputs are valid artefacts. Currently, only  channels are tested by deploying the generated smart contracts on a mock blockchain. Gas cost are also reported. These tests are found in `tests/output`.
+- **Testing the generated output (incomplete https://github.com/fstiehle/chorpiler/issues/3):** By running `npm run test/output`, tests are executed confirming that the produced outputs are valid artefacts. Currently, only  channels are tested by deploying the generated smart contracts on a mock blockchain. Gas cost are also reported. These tests are found in `tests/output`.
 
 `npm run test` runs both test groups.
 
-### TODO
-- [ ] https://github.com/fstiehle/chorpiler/issues/3
-
-# Theory
+## Architecture
 > [!NOTE]
-> Chorpiler is based and used in scientific work. More on this soon.
+> More on this soon.
 
-## Petri net generation
+## Theory
+> [!NOTE]
+> Chorpiler is based on---and used in---scientific work. More on this soon.
+
+### Petri net generation
 
 Our approach is based on the optimised translation technique presented in Garćıa-Bañuelos et al. [1]: a process model is converted into a Petri net, and
 this net is reduced according to well-established equivalence rules. In the smart contract, the process state is then encoded as a bit array. Our approach is based on interaction Petri nets, which are a special kind of labelled Petri nets. Interaction Petri nets have been proposed as the formal basis for BPMN choreographies [2]. As labels, they store the initiator and respondent information, which are essential for the channel construction. After conversion, we apply the same reduction rules as in [1]. 
