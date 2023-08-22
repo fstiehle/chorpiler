@@ -1,6 +1,6 @@
 
 # Chorpiler
-
+[![Node.js CI](https://github.com/fstiehle/chorpiler/actions/workflows/node.js.yml/badge.svg)](https://github.com/fstiehle/chorpiler/actions/workflows/node.js.yml)
 - A compiler for BPMN choreographies to generate efficient enactment components based on petri-net reductions.
 - Current targets supported: Solidity Smart Contracts, TypeScript.
 
