@@ -251,7 +251,7 @@ export class INetFastXMLParser implements INetParser {
       }
       if (rootElements[Elements.choreographies].length !== 1) {
         // we don't support call choreographies yet.
-        console.warn("More than one choreography found, others are ignored.")
+        console.warn("Warning: More than one choreography found, others are ignored.")
       }
       const choreography = rootElements[Elements.choreographies][0];
       // TODO: verify there is no element we don't support
@@ -261,7 +261,6 @@ export class INetFastXMLParser implements INetParser {
         const iNet = iNetTranslator.translate(choreography);
         return resolve(iNet);
       } catch (error) {
-        console.error(error);
         return reject(error);
       }
     })

@@ -8,9 +8,9 @@
     "lib/**/*"
   ],
   "scripts": {
-    "test": "mocha tests/units && waffle && mocha tests/contracts",
-    "test/unit": "mocha tests/units",
-    "test/contracts": "mocha tests/contracts",
+    "test": "mocha tests/compiler && waffle && mocha tests/output",
+    "test/compiler": "mocha tests/compiler",
+    "test/output": "mocha tests/output",
     "build": "tsc && ncp src/generator/templates lib/generator/templates",
     "prepublishOnly": "npm run build",
     "preversion": "npm run build"

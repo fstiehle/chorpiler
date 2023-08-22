@@ -1,10 +1,10 @@
 import {expect, use} from 'chai';
 import {Contract, ethers} from 'ethers';
 import {deployContract, MockProvider, solidity} from 'ethereum-waffle';
-import AIM_ProcessChannel from './gen/artifcats/IM_ProcessChannel.json';
-import ASC_ProcessChannel from './gen/artifcats/SC_ProcessChannel.json';
-import { IM_ProcessChannel } from './gen/artifcats/types/IM_ProcessChannel';
-import { SC_ProcessChannel } from './gen/artifcats/types/SC_ProcessChannel';
+import AIM_ProcessChannel from './generated/artifcats/IM_ProcessChannel.json';
+import ASC_ProcessChannel from './generated/artifcats/SC_ProcessChannel.json';
+import { IM_ProcessChannel } from './generated/artifcats/types/IM_ProcessChannel';
+import { SC_ProcessChannel } from './generated/artifcats/types/SC_ProcessChannel';
 
 use(solidity);
 
@@ -46,7 +46,7 @@ class Proof {
   }
 }
 
-describe('Test Contract: Incident Management ProcessChannel', () => {
+describe('Test Contract: incident management case ProcessChannel', () => {
   const provider = new MockProvider();
   const [par0, par1, par2, par3, par4] = provider.getWallets();
   const participants = [par0, par1, par2, par3, par4];
@@ -133,7 +133,7 @@ describe('Test Contract: Incident Management ProcessChannel', () => {
   });
 });
 
-describe('Test Contract: Supply Chain ProcessChannel', () => {
+describe('Test Contract: supply chain case ProcessChannel', () => {
   const provider = new MockProvider();
   const [par0, par1, par2, par3, par4] = provider.getWallets();
   const participants = [par0, par1, par2, par3, par4];
