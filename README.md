@@ -75,7 +75,7 @@ If you have node isntalled a simple `npm install` is enough. To confirm, you can
 
 Two groups of tests exist:
 - **Testing the parser and compiler**: By running `npm run test/compiler`, tests are executed confirming that the parser and compiler produce outputs from a range of correct and supported process models without reporting errors and rejects malformed and unsupported BPMN elements with reporting errors. These tests are found in `tests/compiler`.
-- **Testing the generated output (incomplete https://github.com/fstiehle/chorpiler/issues/3):** By running `npm run test/output`, tests are executed confirming that the produced outputs are valid artefacts. Currently, only  channels are tested by deploying the generated smart contracts on a mock blockchain. Gas cost are also reported. These tests are found in `tests/output`.
+- **Testing the generated output:** By running `npm run test/output`, tests are executed confirming that the produced outputs are valid artefacts. Currently, only  channels are tested by deploying the generated smart contracts on a mock blockchain (we plan to extend the testing setup, see https://github.com/fstiehle/chorpiler/issues/3). Gas cost are also reported. These tests are found in `tests/output`.
 
 `npm run test` runs both test groups.
 
