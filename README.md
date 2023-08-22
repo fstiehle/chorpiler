@@ -1,8 +1,8 @@
 
 # Chorpiler
 
-- A compiler for BPMN choreographies to generate enactment components based on petri-net reductions.
-- Current targets supported: Solidity, TypeScript.
+- A compiler for BPMN choreographies to generate efficient enactment components based on petri-net reductions.
+- Current targets supported: Solidity Smart Contracts, TypeScript.
 
 ## Overview
 
@@ -15,7 +15,7 @@
 
 ## Usage
 
-Install through npm.
+Install and use through [npm](https://www.npmjs.com/package/chorpiler).
 
 ```
 npm install chorpiler
@@ -68,6 +68,23 @@ fs.readFile("/yourBPMNXML.bpmn",
 });
 
 ```
+
+## Run & Tests
+
+If you have node isntalled a simple `npm install` is enough. To confirm, you can execute tests using `npm run test`. 
+
+Two groups of tests exist:
+- **Testing the parser and compiler**: By running `npm run test/compiler`, tests are executed confirming that the parser and compiler produce outputs from a range of correct and supported process models without reporting errors and rejects malformed and unsupported BPMN elements with reporting errors. These tests are found in `tests/compiler`.
+- **Testing the generated output (incomplete):** By running `npm run test/output`, tests are executed confirming that the produced outputs are valid artefacts. Currently, only  channels are tested by deploying the generated smart contracts on a mock blockchain. Gas cost are also reported. These tests are found in `tests/output`.
+
+`npm run test` runs both test groups.
+
+### TODO
+- [ ] https://github.com/fstiehle/chorpiler/issues/3
+
+# Theory
+> [!NOTE]
+> Chorpiler is based and used in scientific work. More on this soon.
 
 ## Petri net generation
 
