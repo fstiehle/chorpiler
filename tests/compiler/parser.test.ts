@@ -43,7 +43,7 @@ describe('Test BPMN choreography parsing', () => {
     });
 
     it('Parse model with call choreography and report missing support', () => {
-      return expect(readFile(__dirname + '/bpmn/call-choreography.bpmn')
+      return expect(readFile(path.join(BPMN_PATH, 'call-choreography.bpmn'))
         .then((data) => {
           return parser.fromXML(data);
       }))
@@ -51,7 +51,7 @@ describe('Test BPMN choreography parsing', () => {
     });
 
     it('Parse malformed model an report error', () => {
-      return expect(readFile(__dirname + '/bpmn/malformed.bpmn')
+      return expect(readFile(path.join(BPMN_PATH, 'malformed.bpmn'))
         .then((data) => {
           return parser.fromXML(data);
       }))
