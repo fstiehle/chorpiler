@@ -131,7 +131,7 @@ describe('Test Parsing and Generation', () => {
         path.join(BPMN_PATH, '/cases/incident-management.bpmn'), 
         parser, 
         solGenerator, 
-        path.join(OUTPUT_PATH, "/supply-chain/IM_ProcessExecution.sol"),
+        path.join(OUTPUT_PATH, "/incident-management/IM_ProcessExecution.sol"),
         "IM_"
       );
       
@@ -143,7 +143,7 @@ describe('Test Parsing and Generation', () => {
         path.join(BPMN_PATH, '/cases/incident-management.bpmn'), 
         parser, 
         stateChannelRootGenerator, 
-        path.join(OUTPUT_PATH, "/supply-chain/IM_ProcessChannel.sol"),
+        path.join(OUTPUT_PATH, "/incident-management/IM_ProcessChannel.sol"),
         "IM_"
       );
       
