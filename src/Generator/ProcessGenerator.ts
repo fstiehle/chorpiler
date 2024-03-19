@@ -194,15 +194,10 @@ export default class ProcessGenerator {
       }
     }
     
-    if (options.manualTransitions.length > 0) {
-      options.hasManualTransitions = true;
-    }
-    if (options.autonomousTransitions.length > 0) {
-      options.hasAutonomousTransitions = true;
-    }
-    if (conditionIDs.size > 0) {
-      options.hasConditions = true;
-    }
+
+    options.hasManualTransitions = options.manualTransitions.length > 0;
+    options.hasAutonomousTransitions = options.autonomousTransitions.length > 0;
+    options.hasConditions = conditionIDs.size > 0;
 
     return { taskIDs, conditionIDs, participants, options };
   }

@@ -11,10 +11,37 @@ import TemplateEngine from "../../src/Generator/TemplateEngine";
 import path from "path";
 
 const readFile = util.promisify(fs.readFile);
+const writeFile = util.promisify(fs.writeFile);
 use(chaiAsPromised);
 
+const BPMN_PATH = path.join(__dirname, 'bpmn');
+const OUTPUT_PATH = path.join(__dirname, ".." , 'generated');
+
+const parseCompile = async (bpmnPath: string, parser: INetParser, gen: TemplateEngine) => {
+  const data = await readFile(bpmnPath);
+  return parser.fromXML(data).then((iNet) => {
+    return gen.compile(iNet);
+  });
+}
+
+const testModel = (bpmnPath: string, parser: INetParser, generator: TemplateEngine) => {
+  return parseCompile(bpmnPath, parser, generator);
+}
+
+const testCase = async (bpmnPath: string, parser: INetParser, generator: TemplateEngine, outputPath: string, caseLabel: string) => {
+  const output = await parseCompile(bpmnPath, parser, generator);
+
+  return writeFile(
+    path.join(outputPath), 
+    // need to append a label to the contract name as otherwise waffle will error when compiling
+    // multiple contracts with the same name
+    output.target.replace("contract ", "contract " + caseLabel), 
+    { flag: 'w+' }
+  );
+}
+
 // Test Parsing and Generation works with all supported elements 
-describe('Test Parsing and Generation', function () {
+describe('Test Parsing and Generation', () => {
 
   let parser: INetParser;
   let solGenerator: TemplateEngine; 
@@ -28,139 +55,117 @@ describe('Test Parsing and Generation', function () {
     stateChannelRootGenerator = new SolidityProcessChannel();
   });
 
-  describe('Parse correct BPMN and generate artefacts using default templates', function () {
+  describe('Parse correct BPMN and generate artefacts using default templates', () => {
 
-    it('Compile model with XOR to Sol contract', function() {
-      return expect(readFile(__dirname + '/bpmn/XOR.bpmn')
-        .then((data) => {
-          parser.fromXML(data).then((iNet) => {
-            return solGenerator.compile(iNet);
-          })
-        })
-      ).to.eventually.be.fulfilled
+    it('Compile model with XOR to Sol contract', () => {
+      return testModel(path.join(BPMN_PATH, 'xor.bpmn'), parser, solGenerator);
     });
 
-    it('Compile model with XOR used to skip to the end event to Sol contract', function() {
-      return expect(readFile(__dirname + '/bpmn/XOR_skip.bpmn')
-        .then((data) => {
-          parser.fromXML(data).then((iNet) => {
-            return solGenerator.compile(iNet);
-          })
-        })
-      ).to.eventually.be.fulfilled;
+    it('Compile model with XOR that allows to skip to the end event to Sol contract', () => {
+      return testModel(path.join(BPMN_PATH, 'xor-skip.bpmn'), parser, solGenerator);
     });
 
-    it('Compile model with AND to sol contract', function() {
-      return expect(readFile(__dirname + '/bpmn/AND.bpmn')
-        .then((data) => {
-          parser.fromXML(data).then((iNet) => {
-            return solGenerator.compile(iNet);
-          })
-        })
-      ).to.be.eventually.fulfilled;
+    it('Compile model with AND to sol contract', () => {
+      return testModel(path.join(BPMN_PATH, 'and.bpmn'), parser, solGenerator);
     });
 
-    it('Compile model with XOR to TypeScript', function() {
-      return expect(readFile(__dirname + '/bpmn/XOR.bpmn')
-        .then((data) => {
-          parser.fromXML(data).then((iNet) => {
-            return tsGenerator.compile(iNet);
-          })
-        })
-      ).to.be.eventually.fulfilled;
+    it('Compile model with XOR to TypeScript', () => {
+      return testModel(path.join(BPMN_PATH, 'xor.bpmn'), parser, tsGenerator);
+    });
+
+    it('Compile model with XOR that allows to skip to the end event to TypeScript', () => {
+      return testModel(path.join(BPMN_PATH, 'xor-skip.bpmn'), parser, tsGenerator);
+    });
+
+    it('Compile model with AND to TypeScript', () => {
+      return testModel(path.join(BPMN_PATH, 'and.bpmn'), parser, tsGenerator);
     });
 
   });
 
-  describe('Parse and compile use cases', function () {
+  describe('Parse and compile supply chain case', () => {
 
-    it('Compile supply chain case to Sol channel contract', function() {
-      return expect(readFile(__dirname + '/bpmn/cases/supply-chain.bpmn')
-        .then((data) => {
-          parser.fromXML(data).then((iNet) => {
-            stateChannelRootGenerator.compile(iNet)
-            .then((gen) => {
-              // console.log(gen.encoding);
-              fs.writeFile(path.join(__dirname, 
-                "..", "output/generated/supply-chain/SC_ProcessChannel.sol"), 
-                gen.target.replace("contract ProcessChannel", "contract SC_ProcessChannel"), 
-                { flag: 'w+' },
-                (err) => { if (err) { throw err; } });
-            })
-          })
-        })
-      ).be.eventually.fulfilled;
+    before(() => {
+      if (!fs.existsSync(path.join(OUTPUT_PATH, "supply-chain"))) {
+        fs.mkdirSync(path.join(OUTPUT_PATH, "supply-chain"));
+      }
+    })
+
+    it('to Sol Contract', async () => {
+
+      return testCase(
+        path.join(BPMN_PATH, '/cases/supply-chain.bpmn'), 
+        parser, 
+        solGenerator, 
+        path.join(OUTPUT_PATH, "/supply-chain/SC_ProcessExecution.sol"),
+        "SC_"
+      );
+      
     });
 
-    it('Compile supply chain case to TypeScript', function() {
-      return expect(readFile(__dirname + '/bpmn/cases/supply-chain.bpmn')
-        .then((data) => {
-          parser.fromXML(data).then((iNet) => {
-            tsGenerator.compile(iNet)
-            .then((gen) => {
-              // console.log(gen.encoding);
-              fs.writeFile(path.join(__dirname, 
-                "..", "output/generated/supply-chain/SC_Enact.ts"), 
-                gen.target, 
-                { flag: 'w+' },
-                (err) => { if (err) { throw err; } });
-            })
-          })
-        })
-      ).to.be.eventually.fulfilled;
+    it('to State Channel Root', async () => {
+
+      return testCase(
+        path.join(BPMN_PATH, '/cases/supply-chain.bpmn'), 
+        parser, 
+        stateChannelRootGenerator, 
+        path.join(OUTPUT_PATH, "/supply-chain/SC_ProcessChannel.sol"),
+        "SC_"
+      );
+      
     });
 
-    it('Compile incident management case to Sol channel contract', function() {
-      return expect(readFile(__dirname + '/bpmn/cases/incident-management.bpmn')
-        .then((data) => {
-          parser.fromXML(data).then((iNet) => {
-            stateChannelRootGenerator.compile(iNet)
-            .then((gen) => {
-              // console.log(gen.encoding);
-              fs.writeFile(path.join(__dirname, 
-                "..", "output/generated/incident-management/IM_ProcessChannel.sol"), 
-                gen.target.replace("contract ProcessChannel", "contract IM_ProcessChannel"), 
-                { flag: 'w+' },
-                (err) => { if (err) { throw err } });
-            });
-          })
-        })
-      ).to.be.eventually.fulfilled;
+  });
+
+  describe('Parse and compile incident management case', () => {
+
+    before(() => {
+      if (!fs.existsSync(path.join(OUTPUT_PATH, "incident-management"))) {
+        fs.mkdirSync(path.join(OUTPUT_PATH, "incident-management"));
+      }
+    })
+
+    it('to Sol Contract', async () => {
+
+      return testCase(
+        path.join(BPMN_PATH, '/cases/incident-management.bpmn'), 
+        parser, 
+        solGenerator, 
+        path.join(OUTPUT_PATH, "/supply-chain/IM_ProcessExecution.sol"),
+        "IM_"
+      );
+      
     });
 
-    it('Compile incident management case to TypeScript', function() {
-      return expect(readFile(__dirname + '/bpmn/cases/incident-management.bpmn')
-        .then((data) => {
-          parser.fromXML(data).then((iNet) => {
-            tsGenerator.compile(iNet)
-            .then((gen) => {
-              //console.log(gen.encoding);
-              fs.writeFile(path.join(__dirname, 
-                "..", "output/generated/incident-management/IM_ProcessChannel.ts"), 
-                gen.target, 
-                { flag: 'w+' },
-                (err) => { if (err) { throw err; } });
-            });
-          })
-        })
-      ).to.be.eventually.fulfilled;
+    it('to State Channel Root', async () => {
+
+      return testCase(
+        path.join(BPMN_PATH, '/cases/incident-management.bpmn'), 
+        parser, 
+        stateChannelRootGenerator, 
+        path.join(OUTPUT_PATH, "/supply-chain/IM_ProcessChannel.sol"),
+        "IM_"
+      );
+      
     });
-  })
 
-  describe('Parse and generate using specified template', function () {
+  });
 
-    it('compile XOR to Sol contract', function() {
-      return expect(readFile('./src/Generator/templates/ProcessEnactment.sol')
+  describe('Parse and generate using specified template', () => {
+
+    it('compile XOR to Sol contract', () => {
+      return expect(readFile(path.join(__dirname, "..", "..", "src/Generator/templates/ProcessEnactment.sol"))
         .then((template) => {
-          readFile(__dirname + '/bpmn/XOR.bpmn')
-          .then((data) => {
-            parser.fromXML(data).then((iNet) => {
-              return solGenerator.compile(iNet, template.toString());
-            })
+          return readFile(path.join(BPMN_PATH, 'xor.bpmn'))
+            .then((data) => {
+              return parser.fromXML(data).then((iNet) => {
+                return solGenerator.compile(iNet, template.toString());
+              })
           })
-        })
-      ).to.be.eventually.fulfilled;
+      }))
+      .to.eventually.contain.keys("target", "encoding");
     });
 
   });
+
 });

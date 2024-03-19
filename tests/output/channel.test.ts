@@ -1,10 +1,10 @@
 import {expect, use} from 'chai';
 import {Contract, ethers} from 'ethers';
 import {deployContract, MockProvider, solidity} from 'ethereum-waffle';
-import AIM_ProcessChannel from './generated/artifcats/IM_ProcessChannel.json';
-import ASC_ProcessChannel from './generated/artifcats/SC_ProcessChannel.json';
-import { IM_ProcessChannel } from './generated/artifcats/types/IM_ProcessChannel';
-import { SC_ProcessChannel } from './generated/artifcats/types/SC_ProcessChannel';
+import AIM_ProcessChannel from './../generated/artifcats/IM_ProcessChannel.json';
+import ASC_ProcessChannel from './../generated/artifcats/SC_ProcessChannel.json';
+import { IM_ProcessChannel } from './../generated/artifcats/types/IM_ProcessChannel';
+import { SC_ProcessChannel } from './../generated/artifcats/types/SC_ProcessChannel';
 
 use(solidity);
 

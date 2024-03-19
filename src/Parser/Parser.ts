@@ -102,7 +102,7 @@ export class INetFastXMLParser implements INetParser {
       for (const task of tasks) {
         const from = this.iNet.participants.get(task[Elements.participantsRef][0]);
         const to = this.iNet.participants.get(task[Elements.participantsRef][1]);
-        this.addElement(new Transition(task[Properties.id], new TaskLabel(from!, to!)));
+        this.addElement(new Transition(task[Properties.id], new TaskLabel(from!, to!, task[Properties.name])));
       }
       return this;
     }

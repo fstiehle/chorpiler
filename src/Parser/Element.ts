@@ -62,10 +62,12 @@ export enum LabelType {
 export class TaskLabel extends Label {
   sender: Participant
   receiver: Participant
+  name: String;
 
-  constructor(sender: Participant, receiver: Participant) {
+  constructor(sender: Participant, receiver: Participant, name: String) {
     super(LabelType.Task);
     this.sender = sender;
     this.receiver = receiver;
+    this.name = name;
   }
 }

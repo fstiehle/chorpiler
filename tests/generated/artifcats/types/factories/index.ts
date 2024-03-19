@@ -2,6 +2,6 @@
 /* tslint:disable */
 /* eslint-disable */
 export { IM_ProcessChannel__factory } from "./IM_ProcessChannel__factory";
-export { ProcessChannel__factory } from "./ProcessChannel__factory";
-export { ProcessEnactment__factory } from "./ProcessEnactment__factory";
+export { IM_ProcessEnactment__factory } from "./IM_ProcessEnactment__factory";
 export { SC_ProcessChannel__factory } from "./SC_ProcessChannel__factory";
+export { SC_ProcessEnactment__factory } from "./SC_ProcessEnactment__factory";

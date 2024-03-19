@@ -23,7 +23,7 @@ import type {
   PromiseOrValue,
 } from "./common";
 
-export interface ProcessEnactmentInterface extends utils.Interface {
+export interface IM_ProcessEnactmentInterface extends utils.Interface {
   functions: {
     "enact(uint256,uint256)": FunctionFragment;
     "participants(uint256)": FunctionFragment;
@@ -57,12 +57,12 @@ export interface ProcessEnactmentInterface extends utils.Interface {
   events: {};
 }
 
-export interface ProcessEnactment extends BaseContract {
+export interface IM_ProcessEnactment extends BaseContract {
   connect(signerOrProvider: Signer | Provider | string): this;
   attach(addressOrName: string): this;
   deployed(): Promise<this>;
 
-  interface: ProcessEnactmentInterface;
+  interface: IM_ProcessEnactmentInterface;
 
   queryFilter<TEvent extends TypedEvent>(
     event: TypedEventFilter<TEvent>,
