@@ -23,11 +23,6 @@ const parseCompile = async (bpmnPath: string, parser: INetParser, gen: TemplateE
     return gen.compile(iNet);
   });
 }
-
-const testModel = (bpmnPath: string, parser: INetParser, generator: TemplateEngine) => {
-  return parseCompile(bpmnPath, parser, generator);
-}
-
 const testCase = async (bpmnPath: string, parser: INetParser, generator: TemplateEngine, outputPath: string, caseLabel: string) => {
   const output = await parseCompile(bpmnPath, parser, generator);
 
@@ -58,27 +53,27 @@ describe('Test Parsing and Generation', () => {
   describe('Parse correct BPMN and generate artefacts using default templates', () => {
 
     it('Compile model with XOR to Sol contract', () => {
-      return testModel(path.join(BPMN_PATH, 'xor.bpmn'), parser, solGenerator);
+      return parseCompile(path.join(BPMN_PATH, 'xor.bpmn'), parser, solGenerator);
     });
 
     it('Compile model with XOR that allows to skip to the end event to Sol contract', () => {
-      return testModel(path.join(BPMN_PATH, 'xor-skip.bpmn'), parser, solGenerator);
+      return parseCompile(path.join(BPMN_PATH, 'xor-skip.bpmn'), parser, solGenerator);
     });
 
     it('Compile model with AND to sol contract', () => {
-      return testModel(path.join(BPMN_PATH, 'and.bpmn'), parser, solGenerator);
+      return parseCompile(path.join(BPMN_PATH, 'and.bpmn'), parser, solGenerator);
     });
 
     it('Compile model with XOR to TypeScript', () => {
-      return testModel(path.join(BPMN_PATH, 'xor.bpmn'), parser, tsGenerator);
+      return parseCompile(path.join(BPMN_PATH, 'xor.bpmn'), parser, tsGenerator);
     });
 
     it('Compile model with XOR that allows to skip to the end event to TypeScript', () => {
-      return testModel(path.join(BPMN_PATH, 'xor-skip.bpmn'), parser, tsGenerator);
+      return parseCompile(path.join(BPMN_PATH, 'xor-skip.bpmn'), parser, tsGenerator);
     });
 
     it('Compile model with AND to TypeScript', () => {
-      return testModel(path.join(BPMN_PATH, 'and.bpmn'), parser, tsGenerator);
+      return parseCompile(path.join(BPMN_PATH, 'and.bpmn'), parser, tsGenerator);
     });
 
   });
