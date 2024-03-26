@@ -4,7 +4,7 @@ import TemplateEngine from "../../TemplateEngine"
 import util from 'util';
 import * as fs from 'fs';
 import path from "path";
-import ProcessGenerator, { Options } from "../../ProcessGenerator";
+import ProcessGenerator, { ProcessEncoding, Options } from "../../ProcessGenerator";
 
 const readFile = util.promisify(fs.readFile);
 
@@ -14,7 +14,7 @@ export default class SolidityProcessChannel implements TemplateEngine {
     return (await readFile(path.join(__dirname, '..', '..', 'templates/ProcessChannel.sol'))).toString();
   }
 
-  async compile(iNet: InteractionNet, _template?: string, _options?: Options): Promise<{target: string, encoding: string}> {
+  async compile(iNet: InteractionNet, _template?: string, _options?: Options): Promise<{target: string, encoding: ProcessEncoding}> {
     if (iNet.initial == null || iNet.end == null) {
       throw new Error("Invalid InteractionNet"); 
     }
@@ -22,6 +22,6 @@ export default class SolidityProcessChannel implements TemplateEngine {
     const gen = ProcessGenerator.generate(iNet, _options);
 
     return { target: Mustache.render(template, gen.options), 
-      encoding: ProcessGenerator.printReadme(gen.taskIDs, gen.conditionIDs, gen.participants) };
+      encoding: ProcessGenerator.encoding(gen.taskIDs, gen.conditionIDs, gen.participants) };
   }
 }

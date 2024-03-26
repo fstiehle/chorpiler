@@ -39,12 +39,13 @@ export class Label {
 }
 
 export class Guard {
-  name: string;
   default: boolean = false;
 
-  constructor(name: string, _default?: boolean) {
-    this.name = name;
-    if (_default != null)
+  constructor(
+    public name: string,
+    _default?: boolean) {
+    
+      if (_default != null)
       this.default = _default;
   }
 }

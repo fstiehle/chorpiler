@@ -49,9 +49,6 @@ export default class ProcessGenerator {
     options.numberOfParticipants = iNet.participants.size.toString();
     options.manualTransitions = new Array();
     options.autonomousTransitions = new Array();
-    options.hasConditions = false; // overriden in case flow guards are encountered
-    options.hasManualTransitions = false;
-    options.hasAutonomousTransitions = false;
     const participants = [...iNet.participants.values()];
 
     // remove silent transitions
@@ -242,27 +239,34 @@ export default class ProcessGenerator {
     }
   }
 
-  static printReadme(
+  static encoding(
     tasks: Map<string, number>, 
     conditions: Map<string, number>, 
-    participants: Participant[]) {
+    participants: Participant[]): ProcessEncoding {
 
-    let s = "";
-    s += "# Readme\n";
-    s += "## Participants are encoded as follows:\n";
-    for (const i in participants)
-      s += `- ${participants[i].id} with ID ${Number.parseInt(i)}\n`; 
-    s += "\n";
-    s += "## Tasks are encoded as follows:\n";
-    for (const [k, i] of tasks) 
-      s += `- ${k} with ID ${i}\n`; 
-    s += "\n";
-    if (conditions.size > 0) {
-      s += "## Conditions are encoded as follows:\n";
-      for (const [k, i] of conditions) 
-        s += `- ${k} with ID ${i}\n`; 
-      s += "\n";
-    }
-    return s;
+      const parMap = new Map<string, number>();
+      for (let i = 0; participants.length > i; ++i)
+        parMap.set(participants[i].id, i);
+
+      return {
+        tasks,
+        conditions,
+        participants: parMap
+      }
   }
+}
+
+export class ProcessEncoding {
+  constructor(
+    public tasks: Map<string, number>,
+    public conditions: Map<string, number>,
+    public participants: Map<string, number>) {}
+
+    static toJSON(encoding: ProcessEncoding) {
+      return {
+        tasks: Object.fromEntries(encoding.tasks),
+        conditions: Object.fromEntries(encoding.conditions),
+        participants: Object.fromEntries(encoding.participants),
+      }
+    }
 }

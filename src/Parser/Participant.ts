@@ -1,7 +1,6 @@
 export default class Participant {
-  id: string;
-
-  constructor(id: string) {
-    this.id = id;
-  }
+  constructor(
+    public id: string, 
+    public name: string
+  ) { }
 }

@@ -4,11 +4,10 @@ import * as fs from 'fs';
 import {INetParser, INetFastXMLParser} from "../../src/Parser/Parser";
 import chaiAsPromised from 'chai-as-promised';
 import path from "path";
+import { BPMN_PATH } from "../config";
 
 const readFile = util.promisify(fs.readFile);
 use(chaiAsPromised);
-
-const BPMN_PATH = path.join(__dirname, 'bpmn');
 
 // Test Parsing works with all supported elements 
 // and parser reports unsupported elements

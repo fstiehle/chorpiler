@@ -4,12 +4,12 @@ import TemplateEngine from "../../TemplateEngine"
 import util from 'util';
 import * as fs from 'fs';
 import path from "path";
-import ProcessGenerator from "../../ProcessGenerator";
+import ProcessGenerator, { ProcessEncoding } from "../../ProcessGenerator";
 
 const readFile = util.promisify(fs.readFile);
 
 export default class TypeScriptEnactFunc implements TemplateEngine {
-  async compile(_iNet: InteractionNet, _template?: string , _options?: any): Promise<{target: string, encoding: string}> {
+  async compile(_iNet: InteractionNet, _template?: string , _options?: any): Promise<{target: string, encoding: ProcessEncoding}> {
     const iNet: InteractionNet = {..._iNet}
     if (iNet.initial == null || iNet.end == null) {
       throw new Error("Invalid InteractionNet"); 
@@ -20,7 +20,7 @@ export default class TypeScriptEnactFunc implements TemplateEngine {
     const gen = ProcessGenerator.generate(iNet, _options);
     
     return { target: Mustache.render(template, gen.options), 
-      encoding: ProcessGenerator.printReadme(gen.taskIDs, gen.conditionIDs, gen.participants) };
+      encoding: ProcessGenerator.encoding(gen.taskIDs, gen.conditionIDs, gen.participants) };
   }
 
   async getTemplate(): Promise<string> {

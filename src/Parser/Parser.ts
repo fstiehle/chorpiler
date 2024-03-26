@@ -59,7 +59,7 @@ export class INetFastXMLParser implements INetParser {
 
     private parseParticipants(participants: any): this {
       for (const par of participants) {
-        const newPar = new Participant(par[Properties.id]);
+        const newPar = new Participant(par[Properties.id], par[Properties.name]);
         this.iNet.participants.set(par[Properties.id], newPar);
       };
       return this;

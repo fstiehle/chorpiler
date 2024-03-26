@@ -3,7 +3,6 @@ pragma solidity ^0.8.9;
 
 contract IM_ProcessEnactment {
   uint public tokenState = 1;
-  // TODO: better performance with mapping?
   address[5] public participants;
 
   constructor(address[5] memory _participants) {
@@ -12,7 +11,7 @@ contract IM_ProcessEnactment {
 
   function enact(uint id, uint cond) external {
     uint _tokenState = tokenState;
-    
+
     while(true) {
         if (msg.sender == participants[0] && 0 == id && (_tokenState & 1 == 1)) {
           _tokenState &= ~uint(1);

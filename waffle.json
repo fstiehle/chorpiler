@@ -1,8 +1,8 @@
 {
   "compilerType": "solcjs",
   "compilerVersion": "0.8.9",
-  "sourceDirectory": "./tests/generated",
-  "outputDirectory": "./tests/generated/artifcats/",
+  "sourceDirectory": "./tests/data/generated",
+  "outputDirectory": "./tests/data/generated/artifcats/",
   "typechainEnabled": true,
   "compilerOptions": {
     "optimizer": { 

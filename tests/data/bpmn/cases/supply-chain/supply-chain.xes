@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<log xes.version="1.0">
+	<global scope="event">
+		<string key="concept:name" value="default activity"/>
+		<string key="sourceRef" value="CryptoKitty"/>
+		<string key="targetRef" value="CryptoKitty"/>
+	</global>
+	<trace>
+		<event>
+			<string key="concept:name" value="default activity"/>
+      <string key="sourceRef" value="CryptoKitty"/>
+      <string key="targetRef" value="CryptoKitty"/>
+		</event>
+		<event>
+			<string key="concept:name" value="default activity"/>
+      <string key="sourceRef" value="CryptoKitty"/>
+      <string key="targetRef" value="CryptoKitty"/>
+		</event>
+	</trace>
+</log>

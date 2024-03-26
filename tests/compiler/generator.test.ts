@@ -9,13 +9,12 @@ import TypeScriptEnactFunc from "../../src/Generator/target/Typescript/TsProcess
 
 import TemplateEngine from "../../src/Generator/TemplateEngine";
 import path from "path";
+import { BPMN_PATH, OUTPUT_PATH } from "../config";
+import { ProcessEncoding } from "../../src/Generator/ProcessGenerator";
 
 const readFile = util.promisify(fs.readFile);
 const writeFile = util.promisify(fs.writeFile);
 use(chaiAsPromised);
-
-const BPMN_PATH = path.join(__dirname, 'bpmn');
-const OUTPUT_PATH = path.join(__dirname, ".." , 'generated');
 
 const parseCompile = async (bpmnPath: string, parser: INetParser, gen: TemplateEngine) => {
   const data = await readFile(bpmnPath);
@@ -25,6 +24,12 @@ const parseCompile = async (bpmnPath: string, parser: INetParser, gen: TemplateE
 }
 const testCase = async (bpmnPath: string, parser: INetParser, generator: TemplateEngine, outputPath: string, caseLabel: string) => {
   const output = await parseCompile(bpmnPath, parser, generator);
+
+  await writeFile(
+    path.join(outputPath.replace(".sol", "_encoding.json")), 
+    JSON.stringify(ProcessEncoding.toJSON(output.encoding)), 
+    { flag: 'w+' }
+  );
 
   return writeFile(
     path.join(outputPath), 
@@ -89,7 +94,7 @@ describe('Test Parsing and Generation', () => {
     it('to Sol Contract', async () => {
 
       return testCase(
-        path.join(BPMN_PATH, '/cases/supply-chain.bpmn'), 
+        path.join(BPMN_PATH, '/cases/supply-chain/supply-chain.bpmn'), 
         parser, 
         solGenerator, 
         path.join(OUTPUT_PATH, "/supply-chain/SC_ProcessExecution.sol"),
@@ -101,7 +106,7 @@ describe('Test Parsing and Generation', () => {
     it('to State Channel Root', async () => {
 
       return testCase(
-        path.join(BPMN_PATH, '/cases/supply-chain.bpmn'), 
+        path.join(BPMN_PATH, '/cases/supply-chain/supply-chain.bpmn'), 
         parser, 
         stateChannelRootGenerator, 
         path.join(OUTPUT_PATH, "/supply-chain/SC_ProcessChannel.sol"),
@@ -123,7 +128,7 @@ describe('Test Parsing and Generation', () => {
     it('to Sol Contract', async () => {
 
       return testCase(
-        path.join(BPMN_PATH, '/cases/incident-management.bpmn'), 
+        path.join(BPMN_PATH, '/cases/incident-management/incident-management.bpmn'), 
         parser, 
         solGenerator, 
         path.join(OUTPUT_PATH, "/incident-management/IM_ProcessExecution.sol"),
@@ -135,7 +140,7 @@ describe('Test Parsing and Generation', () => {
     it('to State Channel Root', async () => {
 
       return testCase(
-        path.join(BPMN_PATH, '/cases/incident-management.bpmn'), 
+        path.join(BPMN_PATH, '/cases/incident-management/incident-management.bpmn'), 
         parser, 
         stateChannelRootGenerator, 
         path.join(OUTPUT_PATH, "/incident-management/IM_ProcessChannel.sol"),
