@@ -9,7 +9,6 @@ import path from "path";
 import { BPMN_PATH } from "../config";
 import { XESFastXMLParser } from "../../src/util/ParseXES";
 import { EventLog, Trace } from "../../src/util/EventLog";
-import { ethers } from 'ethers';
 import {deployContract, MockProvider, solidity} from 'ethereum-waffle';
 import { ProcessEncoding } from "../../src/Generator/ProcessEncoding";
 
@@ -61,7 +60,6 @@ describe('Test Execution of Cases', () => {
     });
 
     it('Replay Conforming Traces', async () => {
-
       for (const trace of eventLog.traces) {
         await replayTrace(trace, participants, processEncoding);
         expect(
@@ -71,7 +69,7 @@ describe('Test Execution of Cases', () => {
       }
     })
 
-    it('Replay Non-Conforming Trace', () => {
+    it('Replay Non-Conforming Traces', () => {
       //console.log(EventLog.genNonConformingLog(eventLog, processEncoding, 60));
     })
   })

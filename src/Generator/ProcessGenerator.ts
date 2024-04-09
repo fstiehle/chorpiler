@@ -5,7 +5,7 @@
  * An Autonomous transition is performed by the smart contract automatically as soon as 
  * the conditions are met. The conditions are checked after a manual transition is attempted.
  */
-import { deleteFromArray } from '../helpers';
+import { deleteFromArray } from '../util/helpers';
 import { Transition, Element, TaskLabel, LabelType, Place, PlaceType } from '../Parser/Element';
 import InteractionNet from '../Parser/InteractionNet';
 import Participant from '../Parser/Participant';
