@@ -30,72 +30,62 @@ const parser = new XESFastXMLParser();
 describe('Test Execution of Cases', () => {
 
   describe('Supply Chain Case', () => {
-
     let eventLog: EventLog;
     const processEncoding = ProcessEncoding.fromJSON(encodingSC);
-
-    const wallets = new MockProvider().getWallets();
-    const participantWallets = new Map<String, ethers.Wallet>;
-    let initialisingWallet: ethers.Wallet;
+    const participants = new Map<String, SC_ProcessEnactment>;
     let contract: SC_ProcessEnactment;
     let totalGas = 0;
 
     before(async () => {
       const data = await readFile(path.join(BPMN_PATH, 'cases', 'supply-chain', 'supply-chain.xes'));
       eventLog = await parser.fromXML(data);
-
-      for (const [id, num] of processEncoding.participants) {
-        participantWallets.set(id, wallets[num]);
-      }
-
-      // make the first participant the initialiser
-      initialisingWallet = participantWallets.values().next().value; 
     })
 
     beforeEach(async () => {
+      const wallets = new MockProvider().getWallets().slice(0, processEncoding.participants.size);
+
       contract = (await deployContract(
-        initialisingWallet, 
+        wallets[0], 
         ASC_ProcessSmartContract, 
-        [[...[...participantWallets.values()].map(v => v.address)]])
+        [[...[...wallets.values()].map(v => v.address)]])
         ) as SC_ProcessEnactment;
 
         let tx = await contract.deployTransaction.wait(1);
         let cost = tx.gasUsed.toNumber();
         console.log('Gas', 'Deployment:', cost);
         totalGas += cost;
+
+        for (const [id, num] of processEncoding.participants) {
+          participants.set(id, contract.connect(wallets[num]));
+        }
     });
 
-    it('Replay Conforming Traces', () => {
+    it('Replay Conforming Traces', async () => {
 
       for (const trace of eventLog.traces) {
-        replayTrace(trace, participantWallets, processEncoding, contract);
+        await replayTrace(trace, participants, processEncoding);
         expect(
-          contract.connect(initialisingWallet).tokenState(), 
+          contract.tokenState(), 
           "End of process not reached!"
         ).to.eventually.equal(0);
       }
     })
 
     it('Replay Non-Conforming Trace', () => {
-      console.log(EventLog.genNonConformingLog(eventLog, processEncoding, 60));
+      //console.log(EventLog.genNonConformingLog(eventLog, processEncoding, 60));
     })
   })
-
 })
 
-const replayTrace = (trace: Trace, 
-  participantWallets: Map<String, ethers.Wallet>, 
-  processEncoding: ProcessEncoding, 
-  contract: SC_ProcessEnactment) => {
+const replayTrace = async (trace: Trace, 
+  contracts: Map<String, SC_ProcessEnactment>, 
+  processEncoding: ProcessEncoding) => {
   for (const event of trace) {
-    const participant = participantWallets.get(event.source);
+    const contract = contracts.get(event.source);
     const taskID = processEncoding.tasks.get(event.name);
-    assert(participant && taskID,
+    assert(contract !== undefined && taskID !== undefined,
       `model log mismatch with source '${event.source}' event '${event.name}'`);
 
-    expect(contract
-      .connect(participant)
-      .enact(taskID)
-    ).to.eventually.be.fulfilled;
+    await contract.enact(taskID);
   }
 }
