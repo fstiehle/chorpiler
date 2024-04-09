@@ -9,6 +9,7 @@ import { deleteFromArray } from '../helpers';
 import { Transition, Element, TaskLabel, LabelType, Place, PlaceType } from '../Parser/Element';
 import InteractionNet from '../Parser/InteractionNet';
 import Participant from '../Parser/Participant';
+import { ProcessEncoding } from './ProcessEncoding';
 
 export type Options = {
   // all string types, as number = 0 is interpreted as false value
@@ -254,19 +255,4 @@ export default class ProcessGenerator {
         participants: parMap
       }
   }
-}
-
-export class ProcessEncoding {
-  constructor(
-    public tasks: Map<string, number>,
-    public conditions: Map<string, number>,
-    public participants: Map<string, number>) {}
-
-    static toJSON(encoding: ProcessEncoding) {
-      return {
-        tasks: Object.fromEntries(encoding.tasks),
-        conditions: Object.fromEntries(encoding.conditions),
-        participants: Object.fromEntries(encoding.participants),
-      }
-    }
 }

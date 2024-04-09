@@ -10,7 +10,7 @@ import TypeScriptEnactFunc from "../../src/Generator/target/Typescript/TsProcess
 import TemplateEngine from "../../src/Generator/TemplateEngine";
 import path from "path";
 import { BPMN_PATH, OUTPUT_PATH } from "../config";
-import { ProcessEncoding } from "../../src/Generator/ProcessGenerator";
+import { ProcessEncoding } from "../../src/Generator/ProcessEncoding";
 
 const readFile = util.promisify(fs.readFile);
 const writeFile = util.promisify(fs.writeFile);

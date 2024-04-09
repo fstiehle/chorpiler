@@ -4,7 +4,8 @@ import TemplateEngine from "../../TemplateEngine"
 import util from 'util';
 import * as fs from 'fs';
 import path from "path";
-import ProcessGenerator, { ProcessEncoding, Options } from "../../ProcessGenerator";
+import ProcessGenerator, { Options } from "../../ProcessGenerator";
+import { ProcessEncoding } from '../../ProcessEncoding';
 
 const readFile = util.promisify(fs.readFile);
 

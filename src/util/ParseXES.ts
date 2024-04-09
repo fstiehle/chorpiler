@@ -1,5 +1,5 @@
 import { XMLParser, XMLValidator } from 'fast-xml-parser';
-import { EventLog, Event } from './EventLog';
+import { EventLog, Event, Trace } from './EventLog';
 import assert from 'assert';
 
 export interface IXESParser {
@@ -24,13 +24,15 @@ export class XESFastXMLParser {
       try {
         const parsed = this.parser.parse(xml.toString());
         const log = parsed['log'];
-        const events = new Array<Event>();
+        const traces = new Array<Trace>()
 
         if (log.length > 1) {
           console.warn("More than one log, others are ignored...")
         }
 
         for (const trace of log[0]['trace']) {
+          const events = new Array<Event>();
+
           for (const event of trace['event']) {
             let name = null;
             let from = null;
@@ -57,9 +59,10 @@ export class XESFastXMLParser {
             events.push(new Event(name, from, to));
           }
 
+          traces.push(new Trace(events))
         }
 
-        return resolve(new EventLog(events));
+        return resolve(new EventLog(traces));
       } catch (error) {
         return reject(error);
       }

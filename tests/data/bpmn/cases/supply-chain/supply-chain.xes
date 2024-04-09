@@ -17,4 +17,21 @@
       <string key="targetRef" value="CryptoKitty"/>
 		</event>
 	</trace>
+	<trace>
+		<event>
+			<string key="concept:name" value="default activity"/>
+      <string key="sourceRef" value="CryptoKitty"/>
+      <string key="targetRef" value="CryptoKitty"/>
+		</event>
+		<event>
+			<string key="concept:name" value="default activity"/>
+      <string key="sourceRef" value="CryptoKitty"/>
+      <string key="targetRef" value="CryptoKitty"/>
+		</event>
+		<event>
+			<string key="concept:name" value="default activity"/>
+      <string key="sourceRef" value="CryptoKitty"/>
+      <string key="targetRef" value="CryptoKitty"/>
+		</event>
+	</trace>
 </log>

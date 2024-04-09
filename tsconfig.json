@@ -15,7 +15,7 @@
     "files": true
   },
   "files": [
-    "src/index.ts"
+    "src/index.ts", "./src/Generator/ProcessEncoding.ts"
   ],
 
   "include": ["src/**/*"],
