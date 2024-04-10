@@ -1,5 +1,5 @@
 import SolDefaultContractGenerator from './Generator/target/Sol/DefaultContractGenerator';
-import SolStateChannelSCGenerator from './Generator/target/Sol/StateChannelContractGenerator';
+import SolStateChannelContractGenerator from './Generator/target/Sol/StateChannelContractGenerator';
 import TypeScriptGenerator from './Generator/target/Typescript/DefaultFuncGenerator';
 import { INetFastXMLParser } from './Parser/FastXMLParser';
 import { EventLog, Trace, Event } from './util/EventLog';
@@ -10,7 +10,7 @@ export default {
   generators: {
     sol: {
       DefaultContractGenerator: SolDefaultContractGenerator,
-      StateChannelContractGenerator: SolStateChannelSCGenerator
+      StateChannelContractGenerator: SolStateChannelContractGenerator
     },
     ts: {
        DefaultFunctionGenerator: TypeScriptGenerator

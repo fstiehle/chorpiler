@@ -1,6 +1,4 @@
-import 'mocha';
 import { assert } from 'chai';
-
 import chorpiler from '../src/index';
 
 describe('NPM Package', () => {
@@ -13,19 +11,26 @@ describe('NPM Package', () => {
     assert.property(chorpiler, 'generators');
     assert.property(chorpiler, 'utils');
   });
-});
 
-describe('Parser', () => {
-  it('should conform to parser interface', () => {
-    const parser = new chorpiler.Parser()
-    assert.isObject(parser);
-    assert.isFunction(parser.fromXML);
+  describe('Parser', () => {
+    it('should conform to parser interface', () => {
+      const parser = new chorpiler.Parser()
+      assert.isObject(parser);
+      assert.isFunction(parser.fromXML);
+    });
   });
-});
 
-describe('generators', () => {
-  it('should have sol property', () => {
-    const gens = chorpiler.generators;
-    assert.property(gens, 'sol');
+  describe('generators', () => {
+    it('should have sol property', () => {
+      const gens = chorpiler.generators;
+      assert.property(gens, 'sol');
+      assert.property(gens.sol, 'DefaultContractGenerator');
+      assert.property(gens.sol, 'StateChannelContractGenerator');
+    });
+
+    it('should conform to template engine interface', () => {
+      assert.isFunction(new chorpiler.generators.sol.DefaultContractGenerator().compile)
+      assert.isFunction(new chorpiler.generators.sol.StateChannelContractGenerator().compile)
+    });
   });
 });
