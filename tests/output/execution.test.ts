@@ -5,19 +5,20 @@ import { expect, use } from "chai";
 import { readFileSync } from 'fs';
 import path from "path";
 import { BPMN_PATH } from "../config";
-import { XESFastXMLParser } from "../../src/util/ParseXES";
 import { EventLog } from "../../src/util/EventLog";
 import { Contract, ContractFactory } from 'ethers';
 import { MockProvider, solidity} from 'ethereum-waffle';
 import { ProcessEncoding } from "../../src/Generator/ProcessEncoding";
+import { XESFastXMLParser } from "../../src/util/XESFastXMLParser";
 
-import AIM_ProcessSmartContract from './../data/generated/artifcats/IM_ProcessEnactment.json';
-import ASC_ProcessSmartContract from './../data/generated/artifcats/SC_ProcessEnactment.json';
-import { IM_ProcessEnactment } from './../data/generated/artifcats/types/IM_ProcessEnactment';
-import { SC_ProcessEnactment } from './../data/generated/artifcats/types/SC_ProcessEnactment';
+import AIM_ProcessSmartContract from './../data/generated/artifcats/IM_ProcessExecution.json';
+import ASC_ProcessSmartContract from './../data/generated/artifcats/SC_ProcessExecution.json';
+import { IM_ProcessExecution } from './../data/generated/artifcats/types/IM_ProcessExecution';
+import { SC_ProcessExecution } from './../data/generated/artifcats/types/SC_ProcessExecution';
 
 import encodingSC from './../data/generated/supply-chain/SC_ProcessExecution_encoding.json';
 import assert from "assert";
+
 use(solidity);
 
 const NR_NON_CONFORMING_TRACES = 10;
@@ -88,7 +89,7 @@ const testCase = (
 
       it(`Replay Non-Conforming Trace ${i}`, async () => {
         const r = await deploy(factory, processEncoding);
-        const contracts = r.contracts as Map<string, SC_ProcessEnactment>;
+        const contracts = r.contracts;
         const contract = [...contracts.values()][0];
 
         let eventsRejected = 0;

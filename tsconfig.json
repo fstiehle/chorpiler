@@ -15,7 +15,7 @@
     "files": true
   },
   "files": [
-    "src/index.ts", "./src/Generator/ProcessEncoding.ts"
+    "src/index.ts", "./src/Generator/ProcessEncoding.ts", "src/Parser/FastXMLParser.ts", "./src/util/Props.ts"
   ],
 
   "include": ["src/**/*"],

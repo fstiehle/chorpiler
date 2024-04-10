@@ -1,7 +1,7 @@
 //SPDX-License-Identifier: MIT
 pragma solidity ^0.8.9;
 
-contract ProcessEnactment {
+contract ProcessExecution {
   uint public tokenState = 1;
   address[{{{numberOfParticipants}}}] public participants;
 

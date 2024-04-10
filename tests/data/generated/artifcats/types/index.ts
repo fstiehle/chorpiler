@@ -2,11 +2,11 @@
 /* tslint:disable */
 /* eslint-disable */
 export type { IM_ProcessChannel } from "./IM_ProcessChannel";
-export type { IM_ProcessEnactment } from "./IM_ProcessEnactment";
+export type { IM_ProcessExecution } from "./IM_ProcessExecution";
 export type { SC_ProcessChannel } from "./SC_ProcessChannel";
-export type { SC_ProcessEnactment } from "./SC_ProcessEnactment";
+export type { SC_ProcessExecution } from "./SC_ProcessExecution";
 export * as factories from "./factories";
 export { IM_ProcessChannel__factory } from "./factories/IM_ProcessChannel__factory";
-export { IM_ProcessEnactment__factory } from "./factories/IM_ProcessEnactment__factory";
+export { IM_ProcessExecution__factory } from "./factories/IM_ProcessExecution__factory";
 export { SC_ProcessChannel__factory } from "./factories/SC_ProcessChannel__factory";
-export { SC_ProcessEnactment__factory } from "./factories/SC_ProcessEnactment__factory";
+export { SC_ProcessExecution__factory } from "./factories/SC_ProcessExecution__factory";

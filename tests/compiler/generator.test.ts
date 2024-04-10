@@ -1,16 +1,16 @@
 import { expect, use } from "chai";
 import * as fs from 'fs';
-import {INetParser, INetFastXMLParser} from "../../src/Parser/Parser";
+import {INetParser} from "../../src/Parser/Parser";
 import chaiAsPromised from 'chai-as-promised';
 import util from 'util';
-import SolidityProcessChannel from "../../src/Generator/target/Sol/SolProcessChannel";
-import SolidityProcessEnactment from "../../src/Generator/target/Sol/SolProcessEnactment";
-import TypeScriptEnactFunc from "../../src/Generator/target/Typescript/TsProcessEnactFunc";
-
 import TemplateEngine from "../../src/Generator/TemplateEngine";
 import path from "path";
 import { BPMN_PATH, OUTPUT_PATH } from "../config";
 import { ProcessEncoding } from "../../src/Generator/ProcessEncoding";
+import { INetFastXMLParser } from "../../src/Parser/FastXMLParser";
+import SolDefaultContractGenerator from "../../src/Generator/target/Sol/DefaultContractGenerator";
+import TypeScriptGenerator from "../../src/Generator/target/Typescript/DefaultFuncGenerator";
+import SolStateChannelContractGenerator from "../../src/Generator/target/Sol/StateChannelContractGenerator";
 
 const readFile = util.promisify(fs.readFile);
 const writeFile = util.promisify(fs.writeFile);
@@ -50,9 +50,9 @@ describe('Test Parsing and Generation', () => {
 
   beforeEach(() => {
     parser = new INetFastXMLParser();
-    solGenerator = new SolidityProcessEnactment();
-    tsGenerator = new TypeScriptEnactFunc();
-    stateChannelRootGenerator = new SolidityProcessChannel();
+    solGenerator = new SolDefaultContractGenerator();
+    tsGenerator = new TypeScriptGenerator();
+    stateChannelRootGenerator = new SolStateChannelContractGenerator();
   });
 
   describe('Parse correct BPMN and generate artefacts using default templates', () => {
@@ -154,7 +154,7 @@ describe('Test Parsing and Generation', () => {
   describe('Parse and generate using specified template', () => {
 
     it('compile XOR to Sol contract', () => {
-      return expect(readFile(path.join(__dirname, "..", "..", "src/Generator/templates/ProcessEnactment.sol"))
+      return expect(readFile(path.join(__dirname, "..", "..", "src/Generator/templates/ProcessExecution.sol"))
         .then((template) => {
           return readFile(path.join(BPMN_PATH, 'xor.bpmn'))
             .then((data) => {

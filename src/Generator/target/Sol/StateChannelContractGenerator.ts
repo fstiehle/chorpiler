@@ -9,7 +9,7 @@ import { ProcessEncoding } from '../../ProcessEncoding';
 
 const readFile = util.promisify(fs.readFile);
 
-export default class SolidityProcessChannel implements TemplateEngine {
+export default class SolStateChannelContractGenerator implements TemplateEngine {
 
   async getTemplate(): Promise<string> {
     return (await readFile(path.join(__dirname, '..', '..', 'templates/ProcessChannel.sol'))).toString();

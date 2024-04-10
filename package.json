@@ -8,7 +8,7 @@
     "lib/**/*"
   ],
   "scripts": {
-    "test": "mocha tests/compiler && waffle && mocha tests/output",
+    "test": "mocha tests/index.test.ts && mocha tests/compiler && waffle && mocha tests/output",
     "test/compiler": "mocha tests/compiler",
     "test/output": "mocha tests/output",
     "build": "tsc && ncp ./src/Generator/templates ./lib/Generator/templates",

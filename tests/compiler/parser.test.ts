@@ -1,10 +1,11 @@
 import { expect, use } from "chai";
 import util from 'util';
 import * as fs from 'fs';
-import {INetParser, INetFastXMLParser} from "../../src/Parser/Parser";
+import {INetParser} from "../../src/Parser/Parser";
 import chaiAsPromised from 'chai-as-promised';
 import path from "path";
 import { BPMN_PATH } from "../config";
+import { INetFastXMLParser } from "../../src/Parser/FastXMLParser";
 
 const readFile = util.promisify(fs.readFile);
 use(chaiAsPromised);
