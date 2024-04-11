@@ -21,8 +21,10 @@ npm install chorpiler
 ```
 
 Chorpiler offers two types of output that implement the process model: 
-(i) a smart contract that can be used directly to execute the process, and that performs conformance checks on each task.
-(ii) a state channel smart contract (see an example usage of channels in [fstiehle/leafhopper](https://www.github.com/fstiehle/leafhopper). For usage, see below example.
+(i) a smart contract that can be used directly to execute the process, and performs conformance checks on each task.
+(ii) a state channel smart contract (see an example usage of channels in [fstiehle/leafhopper](https://www.github.com/fstiehle/leafhopper)).
+
+See below example.
 
 ```js
 import chorpiler from 'chorpiler';
@@ -72,7 +74,7 @@ For usage see also the tests defined in `tests/compiler`. For usage of the resul
 
 ## Run & Tests
 
-If you have node isntalled a simple `npm install` is enough. To confirm, you can execute tests using `npm run test`. 
+If you have node installed, a simple `npm install` is enough. To confirm, you can execute tests using `npm run test`. 
 
 Two groups of tests exist:
 - **Testing the parser and compiler**: By running `npm run test/compiler`, tests are executed confirming that the parser and compiler produce outputs from a range of correct and supported process models without reporting errors and rejects malformed and unsupported BPMN elements with reporting errors. These tests are found in `tests/compiler`.
