@@ -1,7 +1,7 @@
-import Participant from "./Participant";
+import { Participant } from "./Participant";
 import { Element, Place } from "./Element";
 
-export default class InteractionNet {
+export class InteractionNet {
   id: string = "";
   participants = new Map<string, Participant>();
   elements = new Map<string, Element>();

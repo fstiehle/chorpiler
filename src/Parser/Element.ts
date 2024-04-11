@@ -1,4 +1,4 @@
-import Participant from "./Participant";
+import { Participant } from "./Participant";
 
 export class Element {
   id: string;
