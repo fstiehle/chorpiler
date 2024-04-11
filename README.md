@@ -1,4 +1,3 @@
-// TODO!
 # Chorpiler
 [![Node.js CI](https://github.com/fstiehle/chorpiler/actions/workflows/node.js.yml/badge.svg)](https://github.com/fstiehle/chorpiler/actions/workflows/node.js.yml)
 - A compiler to transform BPMN 2.0 choreographies to efficient smart contract components, based on petri-net reductions.
