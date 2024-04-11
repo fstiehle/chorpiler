@@ -23,7 +23,7 @@ describe('NPM Package', () => {
       }
     }
     class test2 implements TemplateEngine {
-      compile(iNet: InteractionNet, template?: string | undefined, option?: any): Promise<{ target: string; encoding: ProcessEncoding; }> {
+      compile(iNet: InteractionNet, template?: string): Promise<{ target: string; encoding: ProcessEncoding; }> {
         throw new Error('Method not implemented.');
       }
       getTemplate(): Promise<string> {

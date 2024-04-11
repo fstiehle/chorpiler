@@ -15,7 +15,7 @@ export default class SolStateChannelContractGenerator implements TemplateEngine 
     return (await readFile(path.join(__dirname, '..', '..', 'templates/ProcessChannel.sol'))).toString();
   }
 
-  async compile(iNet: InteractionNet, _template?: string, _options?: TemplateOptions): Promise<{target: string, encoding: ProcessEncoding}> {
+  async compile(iNet: InteractionNet, _template?: string): Promise<{target: string, encoding: ProcessEncoding}> {
     if (iNet.initial == null || iNet.end == null) {
       throw new Error("Invalid InteractionNet"); 
     }

@@ -11,7 +11,7 @@ const readFile = util.promisify(fs.readFile);
 
 export default class TypeScriptGenerator implements TemplateEngine {
   
-  async compile(_iNet: InteractionNet, _template?: string , _options?: any): Promise<{target: string, encoding: ProcessEncoding}> {
+  async compile(_iNet: InteractionNet, _template?: string): Promise<{target: string, encoding: ProcessEncoding}> {
     const iNet: InteractionNet = {..._iNet}
     if (iNet.initial == null || iNet.end == null) {
       throw new Error("Invalid InteractionNet"); 
