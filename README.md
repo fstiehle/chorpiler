@@ -1,8 +1,8 @@
-
+// TODO!
 # Chorpiler
 [![Node.js CI](https://github.com/fstiehle/chorpiler/actions/workflows/node.js.yml/badge.svg)](https://github.com/fstiehle/chorpiler/actions/workflows/node.js.yml)
-- A compiler for BPMN choreographies to generate efficient enactment components based on petri-net reductions.
-- Current targets supported: Solidity Smart Contracts, TypeScript.
+- A compiler to transform BPMN 2.0 choreographies to efficient smart contract components, based on petri-net reductions.
+- Current targets supported: Solidity Smart Contracts
 
 ## Overview
 
@@ -21,53 +21,55 @@ Install and use through [npm](https://www.npmjs.com/package/chorpiler).
 npm install chorpiler
 ```
 
-Chorpiler offers three types of output, Process Enactment and Process Channel. Process Channel (more info on channels soon) is only available for Solidity. For usage, see below example.
+Chorpiler offers two types of output that implement the process model: 
+(i) a smart contract that can be used directly to execute the process, and that performs conformance checks on each task.
+(ii) a state channel smart contract (see an example usage of channels in [fstiehle/leafhopper](https://www.github.com/fstiehle/leafhopper). For usage, see below example.
+
 ```js
 import chorpiler from 'chorpiler';
 
 const parser = new chorpiler.Parser();
-const pcGenerator = new chorpiler.Generator.Sol.ProcessChannel();
-const tsGenerator = new chorpiler.Generator.TS.Enactment();
-const solGenerator = new chorpiler.Generator.Sol.Enactment();
+
+// to generate a smart contract implementing the process
+const contractGenerator = new chorpiler
+  .generators.sol.DefaultContractGenerator();
+
+// (advanced) to generate a state channel  contract
+const stateChannelGenerator = new chorpiler
+  .generators.sol.StateChannelContractGenerator();
 ```
 
 Complete example usage to parse and generate. 
 ```js
 import * as fs from 'fs';
-import chorpiler from 'chorpiler';
+import chorpiler, { ProcessEncoding } from 'chorpiler';
 
-fs.readFile("/yourBPMNXML.bpmn",
-  async (err, data) => {
-    if (err) { console.error(err); }
-    const iNet = await parser.fromXML(data);
+const parser = new chorpiler.Parser();
 
-    pcGenerator.compile(iNet)
-    .then((gen) => {
-      console.log(gen.encoding);
-      fs.writeFile("/generated/ProcessChannel.sol", gen.target, { flag: 'w+' },
-      (err) => { if (err) { console.error(err); } });
-      console.log("ProcessChannel.sol generated.");
-    })
-    .catch(err => console.error(err));
+const contractGenerator = new chorpiler
+  .generators.sol.DefaultContractGenerator();
 
-    tsGenerator.compile(iNet)
-    .then((gen) => {
-      fs.writeFile("/generated/Enact.ts", gen.target, { flag: 'w+' },
-      (err) => { if (err) { console.error(err); } });
-      console.log("Enact.ts generated.");
-    })
-    .catch(err => console.error(err));
+const bpmnXML = fs.readFileSync("yourBPMNXML.bpmn");   
+// parse BPMN file into petri net
+const iNet = await parser.fromXML(bpmnXML);
 
-    solGenerator.compile(iNet)
-    .then((gen) => {
-      fs.writeFile("generated/ProcessEnactment.sol", gen.target, { flag: 'w+' },
-      (err) => { if (err) { console.error(err); } });
-      console.log("ProcessEnactment.sol generated.");
-    })
-    .catch(err => console.error(err));
-});
-
+// compile to smart contract
+contractGenerator.compile(iNet)
+.then((gen) => {
+  fs.writeFileSync(
+    "Process.sol", 
+    gen.target, 
+    { flag: 'w+' }
+  );
+  console.log("Process.sol generated.");
+  // log encoding of participants and tasks, 
+  // can also be written to a .json file
+  console.log(ProcessEncoding.toJSON(gen.encoding));
+})
+.catch(err => console.error(err));
 ```
+
+For usage see also the tests defined in `tests/compiler`. For usage of the resulting smart contracts also see `tests/output`.
 
 ## Run & Tests
 
@@ -75,7 +77,7 @@ If you have node isntalled a simple `npm install` is enough. To confirm, you can
 
 Two groups of tests exist:
 - **Testing the parser and compiler**: By running `npm run test/compiler`, tests are executed confirming that the parser and compiler produce outputs from a range of correct and supported process models without reporting errors and rejects malformed and unsupported BPMN elements with reporting errors. These tests are found in `tests/compiler`.
-- **Testing the generated output:** By running `npm run test/output`, tests are executed confirming that the produced outputs are valid artefacts. Currently, only  channels are tested by deploying the generated smart contracts on a mock blockchain (we plan to extend the testing setup, see https://github.com/fstiehle/chorpiler/issues/3). Gas cost are also reported. These tests are found in `tests/output`.
+- **Testing the generated output:** By running `npm run test/output`, tests are executed confirming that the produced outputs are valid artefacts, by replaying conforming logs (which must lead to a valid execution) and non-conforming logs (which must be rejected). Gas cost are also reported for the conforming logs. These tests are found in `tests/output`.
 
 `npm run test` runs both test groups.
 
@@ -84,8 +86,6 @@ Two groups of tests exist:
 > More on this soon.
 
 ## Theory
-> [!NOTE]
-> Chorpiler is based on---and used in---scientific work. More on this soon.
 
 ### Petri net generation
 
