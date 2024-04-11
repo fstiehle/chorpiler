@@ -7,8 +7,8 @@
  */
 import { deleteFromArray } from '../util/helpers';
 import { Transition, Element, TaskLabel, LabelType, Place, PlaceType } from '../Parser/Element';
-import InteractionNet from '../Parser/InteractionNet';
-import Participant from '../Parser/Participant';
+import { InteractionNet } from '../Parser/InteractionNet';
+import { Participant } from '../Parser/Participant';
 import { ProcessEncoding } from './ProcessEncoding';
 
 export type Options = {
@@ -36,7 +36,7 @@ export type Options = {
   }>
 }
 
-export default class ProcessGenerator {
+export class ProcessGenerator {
 
   static generate(_iNet: InteractionNet, _options?: any): 
   { taskIDs: Map<string, number>; conditionIDs: Map<string, number>, participants: Participant[]; options: Options; } 

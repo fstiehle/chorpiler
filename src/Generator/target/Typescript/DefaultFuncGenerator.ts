@@ -1,10 +1,10 @@
 import Mustache from "mustache";
-import InteractionNet from "../../../Parser/InteractionNet"
-import TemplateEngine from "../../TemplateEngine"
+import { InteractionNet } from "../../../Parser/InteractionNet"
+import { TemplateEngine } from "../../TemplateEngine"
 import util from 'util';
 import * as fs from 'fs';
 import path from "path";
-import ProcessGenerator from "../../ProcessGenerator";
+import { ProcessGenerator } from "../../ProcessGenerator";
 import { ProcessEncoding } from '../../ProcessEncoding';
 
 const readFile = util.promisify(fs.readFile);

@@ -1,5 +1,6 @@
 import { assert } from 'chai';
-import chorpiler, { ProcessEncoding } from '../src/index';
+// also test some imports
+import chorpiler, { ProcessEncoding, InteractionNet, INetParser, TemplateEngine } from '../src/index';
 import * as fs from 'fs';
 import path from 'path';
 import { BPMN_PATH } from './config';
@@ -13,6 +14,22 @@ describe('NPM Package', () => {
     assert.property(chorpiler, 'Parser');
     assert.property(chorpiler, 'generators');
     assert.property(chorpiler, 'utils');
+  });
+
+  it('should allow importing interfaces', () => {
+    class test implements INetParser {
+      fromXML(xml: Buffer): Promise<InteractionNet> {
+        throw new Error('Method not implemented.');
+      }
+    }
+    class test2 implements TemplateEngine {
+      compile(iNet: InteractionNet, template?: string | undefined, option?: any): Promise<{ target: string; encoding: ProcessEncoding; }> {
+        throw new Error('Method not implemented.');
+      }
+      getTemplate(): Promise<string> {
+        throw new Error('Method not implemented.');
+      }
+    }
   });
 
   describe('Parser', () => {

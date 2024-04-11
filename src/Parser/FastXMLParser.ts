@@ -1,6 +1,6 @@
-import InteractionNet from './InteractionNet';
+import { InteractionNet } from './InteractionNet';
 import { XMLParser } from 'fast-xml-parser';
-import Participant from './Participant';
+import { Participant } from './Participant';
 import { Element, TaskLabel, Transition, Place, LabelType, Label, PlaceType, Guard } from './Element';
 import { INetParser } from './Parser';
 

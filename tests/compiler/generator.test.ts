@@ -3,7 +3,7 @@ import * as fs from 'fs';
 import {INetParser} from "../../src/Parser/Parser";
 import chaiAsPromised from 'chai-as-promised';
 import util from 'util';
-import TemplateEngine from "../../src/Generator/TemplateEngine";
+import { TemplateEngine }  from "../../src/Generator/TemplateEngine";
 import path from "path";
 import { BPMN_PATH, OUTPUT_PATH } from "../config";
 import { ProcessEncoding } from "../../src/Generator/ProcessEncoding";
