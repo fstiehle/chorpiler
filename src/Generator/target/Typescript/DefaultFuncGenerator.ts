@@ -19,10 +19,10 @@ export default class TypeScriptGenerator implements TemplateEngine {
 
     const template = _template ? _template : await this.getTemplate();
 
-    const gen = ProcessGenerator.generate(iNet, _options);
+    const gen = ProcessGenerator.generate(iNet);
     
     return { target: Mustache.render(template, gen.options), 
-      encoding: ProcessGenerator.encoding(gen.taskIDs, gen.conditionIDs, gen.participants) };
+      encoding: gen.encoding };
   }
 
   async getTemplate(): Promise<string> {
