@@ -1,22 +1,36 @@
-import SolidityEnactment from './Generator/target/Sol/SolProcessEnactment';
-import SolidityProcessChannel from './Generator/target/Sol/SolProcessChannel';
-import TypeScriptEnactment from './Generator/target/Typescript/TsProcessEnactFunc';
-import { INetFastXMLParser } from './Parser/Parser';
-import TemplateEngine from './Generator/TemplateEngine';
-import ProcessGenerator from './Generator/ProcessGenerator';
+import SolDefaultContractGenerator from './Generator/target/Sol/DefaultContractGenerator';
+import SolStateChannelContractGenerator from './Generator/target/Sol/StateChannelContractGenerator';
+import TypeScriptGenerator from './Generator/target/Typescript/DefaultFuncGenerator';
+import { INetFastXMLParser } from './Parser/FastXMLParser';
+import { EventLog, Trace, Event } from './util/EventLog';
+import { XESFastXMLParser } from './util/XESFastXMLParser';
 
 export default {
   Parser: INetFastXMLParser,
-  Generator: {
-    ProcessGenerator: ProcessGenerator,
-    Sol: {
-      Enactment: SolidityEnactment,
-      ProcessChannel: SolidityProcessChannel
+  generators: {
+    sol: {
+      DefaultContractGenerator: SolDefaultContractGenerator,
+      StateChannelContractGenerator: SolStateChannelContractGenerator
     },
-    TS: {
-      Enactment: TypeScriptEnactment
+    ts: {
+       DefaultFunctionGenerator: TypeScriptGenerator
     }
+  },
+  utils: {
+    EventLog,
+    Trace,
+    Event,
+    XESParser: XESFastXMLParser
   }
 }
 
-export { TemplateEngine };
+export * from './Generator/ProcessEncoding';
+export * from './Generator/ProcessGenerator'
+export * from './Generator/TemplateEngine'
+
+export * from './Parser/Element'
+export * from './Parser/InteractionNet'
+export * from './Parser/Parser'
+export * from './Parser/InteractionNet'
+
+export * from './util/XESParser'

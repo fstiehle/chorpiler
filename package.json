@@ -1,6 +1,6 @@
 {
   "name": "chorpiler",
-  "version": "0.9.1",
+  "version": "0.10.0",
   "description": "",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
@@ -8,7 +8,7 @@
     "lib/**/*"
   ],
   "scripts": {
-    "test": "mocha tests/compiler && waffle && mocha tests/output",
+    "test": "mocha tests/index.test.ts && mocha tests/compiler && waffle && mocha tests/output",
     "test/compiler": "mocha tests/compiler",
     "test/output": "mocha tests/output",
     "build": "tsc && ncp ./src/Generator/templates ./lib/Generator/templates",
@@ -32,8 +32,10 @@
   },
   "dependencies": {
     "@types/mustache": "^4.2.5",
+    "@types/seed-random": "^2.2.4",
     "fast-xml-parser": "^4.3.4",
     "mustache": "^4.2.0",
+    "seed-random": "^2.2.0",
     "ts-mocha": "^10.0.0"
   }
 }

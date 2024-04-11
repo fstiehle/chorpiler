@@ -39,12 +39,13 @@ export class Label {
 }
 
 export class Guard {
-  name: string;
   default: boolean = false;
 
-  constructor(name: string, _default?: boolean) {
-    this.name = name;
-    if (_default != null)
+  constructor(
+    public name: string,
+    _default?: boolean) {
+    
+      if (_default != null)
       this.default = _default;
   }
 }
@@ -62,10 +63,12 @@ export enum LabelType {
 export class TaskLabel extends Label {
   sender: Participant
   receiver: Participant
+  name: String;
 
-  constructor(sender: Participant, receiver: Participant) {
+  constructor(sender: Participant, receiver: Participant, name: String) {
     super(LabelType.Task);
     this.sender = sender;
     this.receiver = receiver;
+    this.name = name;
   }
 }

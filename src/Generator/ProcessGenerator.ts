@@ -5,10 +5,11 @@
  * An Autonomous transition is performed by the smart contract automatically as soon as 
  * the conditions are met. The conditions are checked after a manual transition is attempted.
  */
-import { deleteFromArray } from '../helpers';
+import { deleteFromArray } from '../util/helpers';
 import { Transition, Element, TaskLabel, LabelType, Place, PlaceType } from '../Parser/Element';
 import InteractionNet from '../Parser/InteractionNet';
 import Participant from '../Parser/Participant';
+import { ProcessEncoding } from './ProcessEncoding';
 
 export type Options = {
   // all string types, as number = 0 is interpreted as false value
@@ -49,9 +50,6 @@ export default class ProcessGenerator {
     options.numberOfParticipants = iNet.participants.size.toString();
     options.manualTransitions = new Array();
     options.autonomousTransitions = new Array();
-    options.hasConditions = false; // overriden in case flow guards are encountered
-    options.hasManualTransitions = false;
-    options.hasAutonomousTransitions = false;
     const participants = [...iNet.participants.values()];
 
     // remove silent transitions
@@ -194,15 +192,10 @@ export default class ProcessGenerator {
       }
     }
     
-    if (options.manualTransitions.length > 0) {
-      options.hasManualTransitions = true;
-    }
-    if (options.autonomousTransitions.length > 0) {
-      options.hasAutonomousTransitions = true;
-    }
-    if (conditionIDs.size > 0) {
-      options.hasConditions = true;
-    }
+
+    options.hasManualTransitions = options.manualTransitions.length > 0;
+    options.hasAutonomousTransitions = options.autonomousTransitions.length > 0;
+    options.hasConditions = conditionIDs.size > 0;
 
     return { taskIDs, conditionIDs, participants, options };
   }
@@ -247,27 +240,19 @@ export default class ProcessGenerator {
     }
   }
 
-  static printReadme(
+  static encoding(
     tasks: Map<string, number>, 
     conditions: Map<string, number>, 
-    participants: Participant[]) {
+    participants: Participant[]): ProcessEncoding {
 
-    let s = "";
-    s += "# Readme\n";
-    s += "## Participants are encoded as follows:\n";
-    for (const i in participants)
-      s += `- ${participants[i].id} with ID ${Number.parseInt(i)}\n`; 
-    s += "\n";
-    s += "## Tasks are encoded as follows:\n";
-    for (const [k, i] of tasks) 
-      s += `- ${k} with ID ${i}\n`; 
-    s += "\n";
-    if (conditions.size > 0) {
-      s += "## Conditions are encoded as follows:\n";
-      for (const [k, i] of conditions) 
-        s += `- ${k} with ID ${i}\n`; 
-      s += "\n";
-    }
-    return s;
+      const parMap = new Map<string, number>();
+      for (let i = 0; participants.length > i; ++i)
+        parMap.set(participants[i].id, i);
+
+      return {
+        tasks,
+        conditions,
+        participants: parMap
+      }
   }
 }
