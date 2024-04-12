@@ -8,17 +8,21 @@
 import { deleteFromArray } from '../util/helpers';
 import { Transition, Element, TaskLabel, LabelType, Place, PlaceType } from '../Parser/Element';
 import { InteractionNet } from '../Parser/InteractionNet';
-import { Participant } from '../Parser/Participant';
 import { ProcessEncoding } from './ProcessEncoding';
 
-export type Options = {
-  // all string types, as number = 0 is interpreted as false value
-  // and may be not displayed by the template engine
-  numberOfParticipants: string,
-  hasConditions: boolean,
-  hasManualTransitions: boolean,
-  hasAutonomousTransitions: boolean,
-  manualTransitions: Array<{
+export class TemplateOptions {
+  // note: number = 0 is interpreted as false value
+  // and may not be displayed by the template engine, 
+  // thus, prefer string type
+  numberOfParticipants = "0";
+  participants = new Array<{
+    id: string, // ID in form 0...n assigned by generator
+    modelID: string, // ID as in model
+    name: string,
+    address: string
+  }>();
+
+  manualTransitions = new Array<{
     id: string,
     initiator: string|null,
     consume: string,
@@ -27,30 +31,43 @@ export type Options = {
     // have to appear
     condition: number,
     isEnd: boolean
-  }>
-  autonomousTransitions: Array<{
+  }>();
+
+  autonomousTransitions = Array<{
     consume: string,
     produce: string,
     condition: number,
     isEnd: boolean
-  }>
+  }>();
+
+  hasConditions = false;
+  hasManualTransitions = false;
+  hasAutonomousTransitions = false;
 }
 
 export class ProcessGenerator {
 
-  static generate(_iNet: InteractionNet, _options?: any): 
-  { taskIDs: Map<string, number>; conditionIDs: Map<string, number>, participants: Participant[]; options: Options; } 
+  static generate(_iNet: InteractionNet): { encoding: ProcessEncoding; options: TemplateOptions; } 
   {
     const iNet: InteractionNet = {..._iNet}
     if (iNet.initial == null || iNet.end == null) {
       throw new Error("Invalid InteractionNet"); 
     }
-    const options: Options = _options ? _options : {}
+    const options = new TemplateOptions();
 
+    // create participant options and IDs
     options.numberOfParticipants = iNet.participants.size.toString();
-    options.manualTransitions = new Array();
-    options.autonomousTransitions = new Array();
-    const participants = [...iNet.participants.values()];
+    const participantIDs = new Map<string, number>()
+    for (let i = 0; i < iNet.participants.size; i++) {
+      const par = [...iNet.participants.values()][i];
+      participantIDs.set(par.id, i);
+      options.participants.push({
+        id: i.toString(),
+        modelID: par.id,
+        name: par.name,
+        address: "[template]"
+      })
+    }
 
     // remove silent transitions
     for (const element of iNet.elements.values()) {
@@ -183,7 +200,7 @@ export class ProcessGenerator {
       else if (element.label instanceof TaskLabel) {
         options.manualTransitions.push({
           id: taskIDs.get(element.id)!.toString(),
-          initiator: participants.indexOf(element.label.sender).toString(),
+          initiator: participantIDs.get(element.label.sender.id)!.toString(),
           consume: consume.toString(),
           produce: produce.toString(),
           condition,
@@ -192,12 +209,11 @@ export class ProcessGenerator {
       }
     }
     
-
     options.hasManualTransitions = options.manualTransitions.length > 0;
     options.hasAutonomousTransitions = options.autonomousTransitions.length > 0;
     options.hasConditions = conditionIDs.size > 0;
 
-    return { taskIDs, conditionIDs, participants, options };
+    return { encoding: new ProcessEncoding(taskIDs, conditionIDs, participantIDs), options };
   }
 
   private static isSilentTransition(el: Element) {
@@ -238,21 +254,5 @@ export class ProcessGenerator {
     for (const transition of copyTo) {
       transition.label.guards = new Map([...copyFrom.label.guards, ...transition.label.guards]);
     }
-  }
-
-  static encoding(
-    tasks: Map<string, number>, 
-    conditions: Map<string, number>, 
-    participants: Participant[]): ProcessEncoding {
-
-      const parMap = new Map<string, number>();
-      for (let i = 0; participants.length > i; ++i)
-        parMap.set(participants[i].id, i);
-
-      return {
-        tasks,
-        conditions,
-        participants: parMap
-      }
   }
 }

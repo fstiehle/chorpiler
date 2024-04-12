@@ -22,7 +22,6 @@ import assert from "assert";
 use(solidity);
 
 const NR_NON_CONFORMING_TRACES = 10;
-
 const parser = new XESFastXMLParser();
 
 describe('Test Execution of Cases', () => {
@@ -111,6 +110,25 @@ const testCase = (
         expect(eventsRejected > 0 || !(await contract.tokenState()).eq(0));
       });
     });
+
+    describe('some manual tests', () => {
+      it("should reject tx from wrong participant", async () => {
+        const r = await deploy(factory, processEncoding);
+        const contracts = r.contracts;
+        const contract = [...contracts.values()][0];
+        const firstEvent = eventLog.traces.at(0)!.events.at(0)!;
+        const taskID = processEncoding.tasks.get(firstEvent.name);
+        let wrongParticipant = "";
+        processEncoding.participants.forEach((_, id) => {
+          if (id !== firstEvent.source) return wrongParticipant = id;
+        })
+
+        const preTokenState = await contract.tokenState();
+        await (await contracts.get(wrongParticipant)!.enact(taskID)).wait(1);
+        expect(await contract.tokenState()).to.equal(preTokenState);
+      })
+    })
+
   });
 }
 
