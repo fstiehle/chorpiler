@@ -107,7 +107,7 @@ const testCase = (
 
         // Expect that tokenState has at least NOT changed once (one non-conforming event)
         // or end event has not been reached (if only an event was removed, but no non-conforming was added)
-        expect(eventsRejected > 0 || !(await contract.tokenState()).eq(0));
+        assert(eventsRejected > 0 || !(await contract.tokenState()).eq(0));
       });
     });
 
