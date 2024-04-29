@@ -3,7 +3,7 @@ import { ProcessEncoding } from "../Generator/ProcessEncoding";
 import seed from 'seed-random';
 
 export class Event {
-  constructor(public name: string, public source: string, public target: string) {}
+  constructor(public name: string, public source: string, public target: string, public cond: number = 0) {}
 }
 
 export class EventLog implements IterableIterator<Trace>{
@@ -55,14 +55,18 @@ export class EventLog implements IterableIterator<Trace>{
       return [...process.tasks.keys()][seedRandMax(process.tasks.size)];
     }
 
+    const randomCondition = () => {
+      return [...process.conditions.values()][seedRandMax(process.conditions.size)];
+    }
+
     const seedRand = seed(_seed);
     const seedRandMax = (max: number) => Math.floor(seedRand() * max);
 
     const generatedLog = new EventLog(new Array<Trace>());
-    
+
     let conformingNr = 0;
     for (let i = 0; i < to_generate; i++) {
-   
+
       // Pick a random conforming trace as basis
       // (!) make a deep copy 
       let genEvents = [...log.traces[seedRandMax(log.traces.length)].events];
@@ -78,7 +82,7 @@ export class EventLog implements IterableIterator<Trace>{
             genEvents.splice(
               seedRandMax(genEvents.length), 
               0, 
-              new Event(randomEventName(), randomParticipantName(), randomParticipantName())
+              new Event(randomEventName(), randomParticipantName(), randomParticipantName(), randomCondition())
             );
             break;
           }

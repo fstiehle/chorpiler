@@ -33,6 +33,7 @@ export class XESFastXMLParser {
             let name = null;
             let from = null;
             let to = null;
+            let cond = 0;
 
             for (const stringEntry of event['string']) {
 
@@ -51,8 +52,19 @@ export class XESFastXMLParser {
 
             }
 
+            if ('int' in event) {
+              for (const intEntry of event['int']) {
+
+                if (intEntry[Props.key] === 'condition') {
+                  cond = intEntry[Props.val];
+                  continue;
+                }
+
+              }
+            }
+
             assert(name && from && to);
-            events.push(new Event(name, from, to));
+            events.push(new Event(name, from, to, cond));
           }
 
           traces.push(new Trace(events));

@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<log xes.version="1.0">
+	<global scope="event">
+		<string key="concept:name" value="Choreography Task ID"/>
+		<string key="sourceRef" value="Participant ID"/>
+		<string key="targetRef" value="Participant ID"/>
+	</global>
+	<trace>
+		<event>
+			<string key="concept:name" value="ChoreographyTask_1586fdc"/>
+			<string key="sourceRef" value="Participant_0hpgpwy"/>
+			<string key="targetRef" value="Participant_18ejhc5"/>
+			<string key="label" value="Customer Has a Problem"/>
+		</event>
+		<event>
+			<string key="concept:name" value="ChoreographyTask_1y1xlzg"/>
+      <string key="sourceRef" value="Participant_18ejhc5"/>
+      <string key="targetRef" value="Participant_0hpgpwy"/>
+			<int key="condition" value="4"/>
+			<string key="label" value="Get problem description"/>
+		</event>
+		<event>
+			<string key="concept:name" value="ChoreographyTask_0uo8k5k"/>
+      <string key="sourceRef" value="Participant_18ejhc5"/>
+      <string key="targetRef" value="Participant_0hpgpwy"/>
+			<string key="label" value="Explain solution"/>
+		</event>
+	</trace>
+	<trace>
+		<event>
+			<string key="concept:name" value="ChoreographyTask_1586fdc"/>
+			<string key="sourceRef" value="Participant_0hpgpwy"/>
+			<string key="targetRef" value="Participant_18ejhc5"/>
+			<string key="label" value="Customer Has a Problem"/>
+		</event>
+		<event>
+			<string key="concept:name" value="ChoreographyTask_1y1xlzg"/>
+      <string key="sourceRef" value="Participant_18ejhc5"/>
+      <string key="targetRef" value="Participant_0hpgpwy"/>
+			<string key="label" value="Get problem description"/>
+		</event>
+		<event>
+			<string key="concept:name" value="ChoreographyTask_0z1rm3g"/>
+      <string key="sourceRef" value="Participant_18ejhc5"/>
+      <string key="targetRef" value="Participant_1yfcq7e"/>
+			<int key="condition" value="1"/>
+			<string key="label" value="Ask 1st level support"/>
+		</event>
+		<event>
+			<string key="concept:name" value="ChoreographyTask_1qccz6z"/>
+      <string key="sourceRef" value="Participant_1yfcq7e"/>
+      <string key="targetRef" value="Participant_18ejhc5"/>
+			<string key="label" value="Provide feedback"/>
+		</event>
+		<event>
+			<string key="concept:name" value="ChoreographyTask_0uo8k5k"/>
+      <string key="sourceRef" value="Participant_18ejhc5"/>
+      <string key="targetRef" value="Participant_0hpgpwy"/>
+			<string key="label" value="Explain solution"/>
+		</event>
+	</trace>
+	<trace>
+		<event>
+			<string key="concept:name" value="ChoreographyTask_1586fdc"/>
+			<string key="sourceRef" value="Participant_0hpgpwy"/>
+			<string key="targetRef" value="Participant_18ejhc5"/>
+			<string key="label" value="Customer Has a Problem"/>
+		</event>
+		<event>
+			<string key="concept:name" value="ChoreographyTask_1y1xlzg"/>
+      <string key="sourceRef" value="Participant_18ejhc5"/>
+      <string key="targetRef" value="Participant_0hpgpwy"/>
+			<string key="label" value="Get problem description"/>
+		</event>
+		<event>
+			<string key="concept:name" value="ChoreographyTask_0z1rm3g"/>
+      <string key="sourceRef" value="Participant_18ejhc5"/>
+      <string key="targetRef" value="Participant_1yfcq7e"/>
+			<string key="label" value="Ask 1st level support"/>
+		</event>
+		<event>
+			<string key="concept:name" value="ChoreographyTask_1qslyew"/>
+      <string key="sourceRef" value="Participant_1yfcq7e"/>
+      <string key="targetRef" value="Participant_07mlniv"/>
+			<int key="condition" value="2"/>
+			<string key="label" value="Ask 2nd level support"/>
+		</event>
+		<event>
+			<string key="concept:name" value="ChoreographyTask_1ecmkkd"/>
+      <string key="sourceRef" value="Participant_07mlniv"/>
+      <string key="targetRef" value="Participant_1yfcq7e"/>
+			<string key="label" value="Provide feedback"/>
+		</event>
+		<event>
+			<string key="concept:name" value="ChoreographyTask_1qccz6z"/>
+      <string key="sourceRef" value="Participant_1yfcq7e"/>
+      <string key="targetRef" value="Participant_18ejhc5"/>
+			<string key="label" value="Provide feedback"/>
+		</event>
+		<event>
+			<string key="concept:name" value="ChoreographyTask_0uo8k5k"/>
+      <string key="sourceRef" value="Participant_18ejhc5"/>
+      <string key="targetRef" value="Participant_0hpgpwy"/>
+			<string key="label" value="Explain solution"/>
+		</event>
+	</trace>
+
+	<trace>
+		<event>
+			<string key="concept:name" value="ChoreographyTask_1586fdc"/>
+			<string key="sourceRef" value="Participant_0hpgpwy"/>
+			<string key="targetRef" value="Participant_18ejhc5"/>
+			<string key="label" value="Customer Has a Problem"/>
+		</event>
+		<event>
+			<string key="concept:name" value="ChoreographyTask_1y1xlzg"/>
+      <string key="sourceRef" value="Participant_18ejhc5"/>
+      <string key="targetRef" value="Participant_0hpgpwy"/>
+			<string key="label" value="Get problem description"/>
+		</event>
+		<event>
+			<string key="concept:name" value="ChoreographyTask_0z1rm3g"/>
+      <string key="sourceRef" value="Participant_18ejhc5"/>
+      <string key="targetRef" value="Participant_1yfcq7e"/>
+			<string key="label" value="Ask 1st level support"/>
+		</event>
+		<event>
+			<string key="concept:name" value="ChoreographyTask_1qslyew"/>
+      <string key="sourceRef" value="Participant_1yfcq7e"/>
+      <string key="targetRef" value="Participant_07mlniv"/>
+			<string key="label" value="Ask 2nd level support"/>
+		</event>
+		<event>
+			<string key="concept:name" value="ChoreographyTask_15fmbmw"/>
+      <string key="sourceRef" value="Participant_07mlniv"/>
+      <string key="targetRef" value="Participant_0avg1dg"/>
+			<string key="label" value="Ask developer"/>
+		</event>
+		<event>
+			<string key="concept:name" value="ChoreographyTask_15tec1l"/>
+      <string key="sourceRef" value="Participant_0avg1dg"/>
+      <string key="targetRef" value="Participant_07mlniv"/>
+			<string key="label" value="Provide feedback"/>
+		</event>
+		<event>
+			<string key="concept:name" value="ChoreographyTask_1ecmkkd"/>
+      <string key="sourceRef" value="Participant_07mlniv"/>
+      <string key="targetRef" value="Participant_1yfcq7e"/>
+			<string key="label" value="Provide feedback"/>
+		</event>
+		<event>
+			<string key="concept:name" value="ChoreographyTask_1qccz6z"/>
+      <string key="sourceRef" value="Participant_1yfcq7e"/>
+      <string key="targetRef" value="Participant_18ejhc5"/>
+			<string key="label" value="Provide feedback"/>
+		</event>
+		<event>
+			<string key="concept:name" value="ChoreographyTask_0uo8k5k"/>
+      <string key="sourceRef" value="Participant_18ejhc5"/>
+      <string key="targetRef" value="Participant_0hpgpwy"/>
+			<string key="label" value="Explain solution"/>
+		</event>
+	</trace>
+</log>
