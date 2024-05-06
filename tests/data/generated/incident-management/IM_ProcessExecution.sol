@@ -13,47 +13,47 @@ contract IM_ProcessExecution {
     uint _tokenState = tokenState;
 
     while(true) {
-        if (msg.sender == participants[0] && 0 == id && (_tokenState & 1 == 1)) {
+        if (0 == id && (_tokenState & 1 == 1) && msg.sender == participants[0]) {
           _tokenState &= ~uint(1);
           _tokenState |= 2;
           break;
         }
-        if (msg.sender == participants[1] && 1 == id && (_tokenState & 2 == 2)) {
+        if (1 == id && (_tokenState & 2 == 2) && msg.sender == participants[1]) {
           _tokenState &= ~uint(2);
           _tokenState |= 4;
           break;
         }
-        if (msg.sender == participants[1] && 2 == id && (_tokenState & 8 == 8)) {
+        if (2 == id && (_tokenState & 8 == 8) && msg.sender == participants[1]) {
           _tokenState &= ~uint(8);
           _tokenState |= 0;
           break;
         }
-        if (msg.sender == participants[1] && 3 == id && (_tokenState & 4 == 4)) {
+        if (3 == id && (_tokenState & 4 == 4) && msg.sender == participants[1]) {
           _tokenState &= ~uint(4);
           _tokenState |= 16;
           break;
         }
-        if (msg.sender == participants[2] && 4 == id && (_tokenState & 32 == 32)) {
+        if (4 == id && (_tokenState & 32 == 32) && msg.sender == participants[2]) {
           _tokenState &= ~uint(32);
           _tokenState |= 8;
           break;
         }
-        if (msg.sender == participants[2] && 5 == id && (_tokenState & 16 == 16)) {
+        if (5 == id && (_tokenState & 16 == 16) && msg.sender == participants[2]) {
           _tokenState &= ~uint(16);
           _tokenState |= 64;
           break;
         }
-        if (msg.sender == participants[3] && 6 == id && (_tokenState & 64 == 64)) {
+        if (6 == id && (_tokenState & 64 == 64) && msg.sender == participants[3]) {
           _tokenState &= ~uint(64);
           _tokenState |= 128;
           break;
         }
-        if (msg.sender == participants[4] && 7 == id && (_tokenState & 128 == 128)) {
+        if (7 == id && (_tokenState & 128 == 128) && msg.sender == participants[4]) {
           _tokenState &= ~uint(128);
           _tokenState |= 256;
           break;
         }
-        if (msg.sender == participants[3] && 8 == id && (_tokenState & 256 == 256)) {
+        if (8 == id && (_tokenState & 256 == 256) && msg.sender == participants[3]) {
           _tokenState &= ~uint(256);
           _tokenState |= 32;
           break;

@@ -31,9 +31,9 @@ const parser = new XESFastXMLParser();
   const eventLogIM = await parser.fromXML(
     readFileSync(path.join(BPMN_PATH, 'cases', 'incident-management', 'incident-management.xes')));
 
-describe('Test Execution of Cases', () => {
+  describe('Test Execution of Cases', () => {
 
-    describe.skip('Supply Chain Case', () => {
+    describe('Supply Chain Case', () => {
 
       testCase(
         eventLogSC, 

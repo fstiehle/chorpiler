@@ -15,7 +15,7 @@ contract ProcessExecution {
     {{#hasManualTransitions}}
     while(true) {
       {{#manualTransitions}}
-        if ({{#condition}}(cond & {{{condition}}} == {{{condition}}}) && {{/condition}}{{#initiator}}msg.sender == participants[{{{initiator}}}] && {{/initiator}}{{{id}}} == id && (_tokenState & {{{consume}}} == {{{consume}}})) {
+        if ({{#condition}}(cond & {{{condition}}} == {{{condition}}}) && {{/condition}}{{{id}}} == id && (_tokenState & {{{consume}}} == {{{consume}}}){{#initiator}} && msg.sender == participants[{{{initiator}}}]{{/initiator}}) {
           _tokenState &= ~uint({{{consume}}});
           _tokenState |= {{{produce}}};
           break;
