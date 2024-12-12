@@ -70,7 +70,7 @@ describe('Test Parsing and Generation', () => {
     });
 
     it('Compile model with XOR to TypeScript', () => {
-      return parseCompile(path.join(BPMN_PATH, 'xor.bpmn'), parser, tsGenerator);
+      return console.log(parseCompile(path.join(BPMN_PATH, 'xor.bpmn'), parser, tsGenerator));
     });
 
     it('Compile model with XOR that allows to skip to the end event to TypeScript', () => {

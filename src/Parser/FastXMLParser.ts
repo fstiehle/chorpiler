@@ -109,7 +109,6 @@ export class INetFastXMLParser implements INetParser {
 
       for (const gateway of gateways) {
         const gatewayID = gateway[Properties.id];
-        const defaultFlowID = gateway[Properties.default];
         const outs = gateway[Elements.outs];
         const ins = gateway[Elements.ins];
         const transitions = new Array<Transition>();
@@ -132,6 +131,10 @@ export class INetFastXMLParser implements INetParser {
           }
         } else if (ins.length === 1 && ins.length < outs.length) {
           // diverging
+          const defaultFlowID = gateway[Properties.default];
+          if (!defaultFlowID) {
+            throw new Error("XOR without an outgoing default flow");
+          }
           // build transition for each outcoming flow
           for (const flowID of outs) {
             const id = `${gatewayID}_${flowID}`;

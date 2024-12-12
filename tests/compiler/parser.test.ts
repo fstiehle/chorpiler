@@ -58,5 +58,13 @@ describe('Test BPMN choreography parsing', () => {
       .to.be.eventually.rejected;
     });
 
+    it('Parse model with XOR with missing default sequence flow and report error', () => {
+      return expect(readFile(path.join(BPMN_PATH, 'xor-nodefault.bpmn'))
+        .then((data) => {
+          return parser.fromXML(data);
+      }))
+      .to.be.eventually.rejected;
+    });
+
   });
 });
