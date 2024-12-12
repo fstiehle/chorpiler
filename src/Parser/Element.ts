@@ -40,13 +40,16 @@ export class Label {
 
 export class Guard {
   default: boolean = false;
+  condition: string = "";
+  // condition expression language, e.g., 'Solidity'
+  language: string = "";
 
   constructor(
     public name: string,
     _default?: boolean) {
     
       if (_default != null)
-      this.default = _default;
+        this.default = _default;
   }
 }
 

@@ -14,6 +14,7 @@ enum Elements {
   startEvent = 'bpmn2:startEvent',
   endEvent = 'bpmn2:endEvent',
   exclusiveGateway = 'bpmn2:exclusiveGateway',
+  conditionExp = 'bpmn:conditionExpression',
   parallelGateway = 'bpmn2:parallelGateway',
   outs = 'bpmn2:outgoing',
   ins = 'bpmn2:incoming'
@@ -23,7 +24,8 @@ enum Properties {
   source = '@_sourceRef',
   target = '@_targetRef',
   name = '@_name',
-  default = '@_default'
+  default = '@_default',
+  language = "@_language", 
 }
 
 export class INetFastXMLParser implements INetParser {
@@ -205,16 +207,27 @@ export class INetFastXMLParser implements INetParser {
           // look for guard information 
           for (const sourceTransition of place.source) {
             if (sourceTransition instanceof Transition
-              && sourceTransition.label.type === LabelType.ExclusiveOutgoing) {
+            && sourceTransition.label.type === LabelType.ExclusiveOutgoing) {
               // the flow leads to an outgoing exclusive gateway transition,
               // we need to assign the condition of the flow to the transition
               const guard = sourceTransition.label.guards.get(id);
-              if (guard != null) {
+              if (guard != null && guard.default) {
                 // the guard of the default flow is already present,
-                // so we only set the name here
+                // so we only set additional info
                 guard.name = name != null ? name : "no name";
               } else {
-                sourceTransition.label.guards.set(id, new Guard(name != null ? name : "no name"));
+                // if it is not a default flow it needs to have an expression present
+                if (!flow[Elements.conditionExp] || flow[Elements.conditionExp].length !== 1) {
+                  throw new Error(`XOR outgoing flow (${id}) without or malformed condition expression`);
+                }
+                const condition = flow[Elements.conditionExp][0];
+                const lang = condition[Properties.language];
+                const expression = condition['#text'];
+                if (!expression || !lang) {
+                  throw new Error(
+                    `XOR outgoing flow (${id}) without proper (language and expression) condition expression`);
+                }
+                sourceTransition.label.guards.set(id, new Guard(name != null ? name : "no name", expression, lang));
               }
             }
           }

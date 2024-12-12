@@ -46,8 +46,10 @@
       <bpmn2:outgoing>Flow_0mkbrl0</bpmn2:outgoing>
       <bpmn2:outgoing>Flow_1uhdzct</bpmn2:outgoing>
     </bpmn2:exclusiveGateway>
-    <bpmn2:sequenceFlow id="Flow_0mkbrl0" name="yes" sourceRef="Gateway_1td68h3" targetRef="ChoreographyTask_1m3qduh" />
-    <bpmn2:sequenceFlow id="Flow_1uhdzct" name="no" sourceRef="Gateway_1td68h3" targetRef="Gateway_0x44u2n" />
+    <bpmn2:sequenceFlow id="Flow_0mkbrl0" name="yes" sourceRef="Gateway_1td68h3" targetRef="ChoreographyTask_1m3qduh"/>
+    <bpmn2:sequenceFlow id="Flow_1uhdzct" name="no" sourceRef="Gateway_1td68h3" targetRef="Gateway_0x44u2n">
+     <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression" language="Solidity">items==true</bpmn:conditionExpression>
+    </bpmn2:sequenceFlow>
     <bpmn2:exclusiveGateway id="Gateway_0x44u2n">
       <bpmn2:incoming>SequenceFlow_0xamnn2</bpmn2:incoming>
       <bpmn2:incoming>Flow_1uhdzct</bpmn2:incoming>
