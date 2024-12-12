@@ -11,7 +11,7 @@ const readFile = util.promisify(fs.readFile);
 
 export default class TypeScriptGenerator implements TemplateEngine {
   
-  async compile(_iNet: InteractionNet, _template?: string , _options?: any): Promise<{target: string, encoding: ProcessEncoding}> {
+  async compile(_iNet: InteractionNet, _template?: string): Promise<{target: string, encoding: ProcessEncoding}> {
     const iNet: InteractionNet = {..._iNet}
     if (iNet.initial == null || iNet.end == null) {
       throw new Error("Invalid InteractionNet"); 
@@ -19,10 +19,10 @@ export default class TypeScriptGenerator implements TemplateEngine {
 
     const template = _template ? _template : await this.getTemplate();
 
-    const gen = ProcessGenerator.generate(iNet, _options);
+    const gen = ProcessGenerator.generate(iNet);
     
     return { target: Mustache.render(template, gen.options), 
-      encoding: ProcessGenerator.encoding(gen.taskIDs, gen.conditionIDs, gen.participants) };
+      encoding: gen.encoding };
   }
 
   async getTemplate(): Promise<string> {
