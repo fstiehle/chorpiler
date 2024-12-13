@@ -3,7 +3,7 @@ pragma solidity ^0.8.9;
 
 import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
 
-contract ProcessChannel {
+contract PIZZA_ProcessChannel {
   using ECDSA for bytes32;
   struct Step {
     uint index;
@@ -12,7 +12,7 @@ contract ProcessChannel {
     uint taskID;
     uint newTokenState;
     uint conditionState;
-    bytes[{{{numberOfParticipants}}}] signatures;
+    bytes[3] signatures;
   }
   uint public tokenState = 1;
   uint public index = 0;
@@ -21,14 +21,14 @@ contract ProcessChannel {
   uint public immutable disputeWindowInUNIX;
   uint public disputeMadeAtUNIX = 0;
 
-  address[{{{numberOfParticipants}}}] public participants; 
+  address[3] public participants; 
 
   /**
    * @param _participants addresses for the roles 
    * in the order (BulkBuyer, Manufacturer, Middleman, Supplier, SpecialCarrier)
    * @param _disputeWindowInUNIX time for the dispute window to remain open in UNIX.
    */
-  constructor(address[{{{numberOfParticipants}}}] memory _participants, uint _disputeWindowInUNIX) {
+  constructor(address[3] memory _participants, uint _disputeWindowInUNIX) {
     participants = _participants;
     disputeWindowInUNIX = _disputeWindowInUNIX;
   }
@@ -72,7 +72,7 @@ contract ProcessChannel {
       abi.encode(_step.index, _step.caseID, _step.from, _step.taskID, _step.newTokenState, _step.conditionState)
     );
 
-    for (uint i = 0; i < {{{numberOfParticipants}}}; i++) {
+    for (uint i = 0; i < 3; i++) {
       if (payload.toEthSignedMessageHash().recover(_step.signatures[i]) != participants[i]) {
         return false;
       }
@@ -84,42 +84,44 @@ contract ProcessChannel {
    * If a dispute window has elapsed, execution must continue through this function
    * @param id id of the activity to begin
    */
-  function continueAfterDispute(uint id{{#hasConditions}}, uint cond{{/hasConditions}}) external {
+  function continueAfterDispute(uint id, uint cond) external {
     uint _disputeMadeAtUNIX = disputeMadeAtUNIX;
     require(_disputeMadeAtUNIX != 0 && _disputeMadeAtUNIX + disputeWindowInUNIX < block.timestamp, "No elapsed dispute");
 
     uint _tokenState = tokenState;
 
-    {{#hasManualTransitions}}
     while(true) {
-      {{#manualTransitions}}
-      if ({{#condition}}(cond & {{{condition}}} == {{{condition}}}) && {{/condition}}{{{id}}} == id && (_tokenState & {{{consume}}} == {{{consume}}}){{#initiator}} && msg.sender == participants[{{{initiator}}}]{{/initiator}}) {
-        _tokenState &= ~uint({{{consume}}});
-        _tokenState |= {{{produce}}};
+      if (0 == id && (_tokenState & 1 == 1) && msg.sender == participants[0]) {
+        _tokenState &= ~uint(1);
+        _tokenState |= 2;
         break;
       }
-      {{/manualTransitions}}
+      if ((cond & items==true == items==true) && 1 == id && (_tokenState & 2 == 2) && msg.sender == participants[0]) {
+        _tokenState &= ~uint(2);
+        _tokenState |= 4;
+        break;
+      }
+      if (2 == id && (_tokenState & 4 == 4) && msg.sender == participants[0]) {
+        _tokenState &= ~uint(4);
+        _tokenState |= 8;
+        break;
+      }
+      if (3 == id && (_tokenState & 8 == 8) && msg.sender == participants[0]) {
+        _tokenState &= ~uint(8);
+        _tokenState |= 0;
+        break;
+      }
       return;
     }
-    {{/hasManualTransitions}}
 
-    {{#hasAutonomousTransitions}}
     while(_tokenState != 0) {
-      {{#autonomousTransitions}}
-      if ({{#condition}}(cond & {{{condition}}} == {{{condition}}}) && {{/condition}}(_tokenState & {{{consume}}} == {{{consume}}})) {
-        _tokenState &= ~uint({{{consume}}});
-        _tokenState |= {{{produce}}};
-        {{#isEnd}}
-        break; // is end
-        {{/isEnd}}
-        {{^isEnd}}
+      if ((_tokenState & 2 == 2)) {
+        _tokenState &= ~uint(2);
+        _tokenState |= 8;
         continue;
-        {{/isEnd}}
       }
-      {{/autonomousTransitions}}
       break;
     }
-    {{/hasAutonomousTransitions}}
 
     tokenState = _tokenState;
   }

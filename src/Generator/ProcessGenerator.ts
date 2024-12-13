@@ -27,16 +27,14 @@ export class TemplateOptions {
     initiator: string|null,
     consume: string,
     produce: string,
-    // condition is a number as 0 = default condition, which doesn't
-    // have to appear
-    condition: number,
+    condition: string,
     isEnd: boolean
   }>();
 
   autonomousTransitions = Array<{
     consume: string,
     produce: string,
-    condition: number,
+    condition: string,
     isEnd: boolean
   }>();
 
@@ -113,11 +111,9 @@ export class ProcessGenerator {
     // places to transition markings
     const transitionMarkings = new Map<string, number>();
     let transitionCounter = 0;
-    // guards to condition markings
-    let conditionCounter = 0;
     // transitions to ids
     const taskIDs = new Map<string, number>();
-    const conditionIDs = new Map<string, number>();
+    const conditionIDs = new Map<string, string>();
 
     for (const element of iNet.elements.values()) {
       if (!(element instanceof Transition)) {
@@ -128,8 +124,8 @@ export class ProcessGenerator {
           taskIDs.set(element.id, taskIDs.size);
       }
 
-      // assign condition to transition
-      let condition = 0;
+      // build condition for transition
+      let condition = "";
       if (element.label.guards.size > 0) {
         // filter out default flows
         const conditions = [...element.label.guards].filter(([_, guard]) => {
@@ -139,16 +135,19 @@ export class ProcessGenerator {
         if (conditions.length > 0) {
           const el = [...element.label.guards.entries()].pop()!;
           let string = el[1].name + ` (${el[0]})`;
+          console.log(el[1])
+          condition = el[1].condition;
 
           if (conditions.length > 1) {
+            condition = `(${condition}`;
             element.label.guards.forEach((guard, id) => {
               if (!guard.default)
                 string += `AND ${guard.name} (${id})`
+                condition += `&& ${guard.condition}`
             });
+            condition = `${condition})`;
           }
-          condition = 2 ** conditionCounter;
-          conditionCounter++;
-          conditionIDs.set(string, conditionIDs.size);
+          conditionIDs.set(string, condition);
         }
       }
 

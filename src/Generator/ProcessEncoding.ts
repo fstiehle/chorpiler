@@ -9,7 +9,7 @@
 export class ProcessEncoding {
   constructor(
     public tasks: Map<string, number>,
-    public conditions: Map<string, number>,
+    public conditions: Map<string, string>,
     public participants: Map<string, number>) { }
 
   static toJSON(encoding: ProcessEncoding) {
@@ -25,7 +25,7 @@ export class ProcessEncoding {
       [k: string]: number;
     };
     conditions: {
-      [k: string]: number;
+      [k: string]: string;
     };
     participants: {
       [k: string]: number;

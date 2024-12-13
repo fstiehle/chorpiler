@@ -228,7 +228,7 @@ export class INetFastXMLParser implements INetParser {
                     `XOR outgoing flow (${id}) without proper (language and expression) condition expression`);
                 }
                 const guard = new Guard(name != null ? name : "no name", false);
-                guard.condition = condition;
+                guard.condition = expression;
                 guard.language = lang;
                 sourceTransition.label.guards.set(id, guard);
               }

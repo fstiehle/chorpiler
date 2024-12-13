@@ -57,10 +57,6 @@ describe('Test Parsing and Generation', () => {
 
   describe('Parse correct BPMN and generate artefacts using default templates', () => {
 
-    it('Compile model with XOR to Sol contract', () => {
-      return parseCompile(path.join(BPMN_PATH, 'xor.bpmn'), parser, solGenerator);
-    });
-
     it('Compile model with XOR that allows to skip to the end event to Sol contract', () => {
       return parseCompile(path.join(BPMN_PATH, 'xor-skip.bpmn'), parser, solGenerator);
     });
@@ -79,6 +75,44 @@ describe('Test Parsing and Generation', () => {
 
     it('Compile model with AND to TypeScript', () => {
       return parseCompile(path.join(BPMN_PATH, 'and.bpmn'), parser, tsGenerator);
+    });
+
+    it('Compile model with XOR to Sol contract', () => {
+      return parseCompile(path.join(BPMN_PATH, 'xor.bpmn'), parser, solGenerator);
+    });
+
+  });
+
+  describe('Parse and compile pizza case', () => {
+
+    before(() => {
+      if (!fs.existsSync(path.join(OUTPUT_PATH, "pizza"))) {
+        fs.mkdirSync(path.join(OUTPUT_PATH, "pizza"));
+      }
+    })
+
+    it('to Sol Contract', async () => {
+
+      return testCase(
+        path.join(BPMN_PATH, 'xor.bpmn'), 
+        parser, 
+        solGenerator, 
+        path.join(OUTPUT_PATH, "/pizza/PIZZA_ProcessExecution.sol"),
+        "PIZZA_"
+      );
+      
+    });
+
+    it('to State Channel Root', async () => {
+
+      return testCase(
+        path.join(BPMN_PATH, 'xor.bpmn'), 
+        parser, 
+        stateChannelRootGenerator, 
+        path.join(OUTPUT_PATH, "/pizza/PIZZA_ProcessChannel.sol"),
+        "PIZZA_"
+      );
+      
     });
 
   });
