@@ -13,7 +13,7 @@ use(chaiAsPromised);
 // Test Parsing works with all supported elements 
 // and parser reports unsupported elements
 describe('Test BPMN choreography parsing', () => {
-  
+
   describe('Parse with FastXMLParser', () => {
     let parser: INetParser;
 
