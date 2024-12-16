@@ -217,8 +217,8 @@ export class ProcessGenerator {
 
   private static isSilentTransition(el: Element) {
     return el instanceof Transition &&
-    (el.label.type === LabelType.ExclusiveIncoming
-    || el.label.type === LabelType.ExclusiveOutgoing
+    (el.label.type === LabelType.DataExclusiveIncoming
+    || el.label.type === LabelType.DataExclusiveOutgoing
     || el.label.type === LabelType.ParallelConverging
     || el.label.type === LabelType.ParallelDiverging
     || el.label.type === LabelType.Start
