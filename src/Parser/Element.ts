@@ -11,7 +11,10 @@ export class Element {
 }
 
 export class Place extends Element { 
-  type: PlaceType = PlaceType.Flow;
+  constructor(id: string, public type: PlaceType = PlaceType.Flow) {
+    super(id);
+    this.type = type;
+  }
 }
 
 export enum PlaceType {
@@ -29,6 +32,7 @@ export class Transition extends Element {
   }
 }
 
+// Transitions can have labels
 export class Label {
   type: LabelType
   guards = new Map<string, Guard>();
@@ -38,6 +42,7 @@ export class Label {
   }
 }
 
+// Labels can have guards
 export class Guard {
   default: boolean = false;
   condition: string = "";
@@ -57,10 +62,12 @@ export enum LabelType {
   Start = 0,
   End = 1,
   Task = 2,
-  ExclusiveIncoming = 3,
-  ExclusiveOutgoing = 4,
+  DataExclusiveIncoming = 3,
+  DataExclusiveOutgoing = 4,
   ParallelConverging = 5,
   ParallelDiverging = 6,
+  EventExclusiveIncoming = 5,
+  EventExclusiveOutgoing = 6,
 }
 
 export class TaskLabel extends Label {

@@ -14,8 +14,9 @@ enum Elements {
   startEvent = 'bpmn2:startEvent',
   endEvent = 'bpmn2:endEvent',
   exclusiveGateway = 'bpmn2:exclusiveGateway',
-  conditionExp = 'bpmn:conditionExpression',
+  conditionExpression = 'bpmn:conditionExpression',
   parallelGateway = 'bpmn2:parallelGateway',
+  eventGateway = 'bpmn2:eventBasedGateway',
   outs = 'bpmn2:outgoing',
   ins = 'bpmn2:incoming'
 }
@@ -26,6 +27,10 @@ enum Properties {
   name = '@_name',
   default = '@_default',
   language = "@_language", 
+}
+enum ExclusiveGatewayType {
+  Data,
+  Event
 }
 
 export class INetFastXMLParser implements INetParser {
@@ -41,13 +46,15 @@ export class INetFastXMLParser implements INetParser {
 
     translate(choreography: any): InteractionNet {
       this.iNet.id = choreography[Properties.id];
+      //console.log(choreography);
 
       this
         .parseParticipants(choreography[Elements.participants])
         .translateStartEvent(choreography[Elements.startEvent])
         .translateTasks(choreography[Elements.tasks])
-        .translateXOR(choreography[Elements.exclusiveGateway])
-        .translateAND(choreography[Elements.parallelGateway])
+        .translateDataGateway(choreography[Elements.exclusiveGateway])
+        .translateEventGateway(choreography[Elements.eventGateway])
+        .translateParallelGateway(choreography[Elements.parallelGateway])
         .translateEndEvent(choreography[Elements.endEvent])
         // connect flows last, and report error when a flow leads to an unknown transition, which means
         // we were not able to translate all elements
@@ -105,7 +112,17 @@ export class INetFastXMLParser implements INetParser {
       return this;
     }
 
-    private translateXOR(gateways: any): this {
+    private translateDataGateway(gateways: any) {
+      this.translateExclusiveGateway(gateways, ExclusiveGatewayType.Data);
+      return this;
+    }
+
+    private translateEventGateway(gateways: any) {
+      this.translateExclusiveGateway(gateways, ExclusiveGatewayType.Event);
+      return this;
+    }
+
+    private translateExclusiveGateway(gateways: any, type: ExclusiveGatewayType): this {
       if (gateways == null)
         return this;
 
@@ -115,13 +132,18 @@ export class INetFastXMLParser implements INetParser {
         const ins = gateway[Elements.ins];
         const transitions = new Array<Transition>();
 
+        if (type === ExclusiveGatewayType.Event && outs.length < 2) {
+          throw new Error("Event Gateway needs at least two outgoing flows");
+          // TODO: Check that the outgoings lead to events
+        }
+
         if (outs.length === 1 && outs.length < ins.length) {
           // converging
           // build transition for each incoming flow
           for (const flowID of ins) {
             const id = `${gatewayID}_${flowID}`;
             const transition = new Transition(id,
-              new Label(LabelType.ExclusiveIncoming));
+              new Label((type === ExclusiveGatewayType.Data) ? LabelType.DataExclusiveIncoming : LabelType.EventExclusiveIncoming));
             const place = this.addElement(new Place(flowID));
             this.linkElements(place, transition);
             transitions.push(transition);
@@ -133,17 +155,18 @@ export class INetFastXMLParser implements INetParser {
           }
         } else if (ins.length === 1 && ins.length < outs.length) {
           // diverging
-          const defaultFlowID = gateway[Properties.default];
-          if (!defaultFlowID) {
-            throw new Error("XOR without an outgoing default flow");
+          if (type === ExclusiveGatewayType.Data) {
+            if (!gateway[Properties.default]) {
+              throw new Error("XOR without an outgoing default flow");
+            }
           }
           // build transition for each outcoming flow
           for (const flowID of outs) {
             const id = `${gatewayID}_${flowID}`;
             const transition = new Transition(id,
-              new Label(LabelType.ExclusiveOutgoing));
+              new Label((type === ExclusiveGatewayType.Data) ? LabelType.DataExclusiveOutgoing : LabelType.EventExclusiveOutgoing));
             // set default flow
-            if (flowID === defaultFlowID) {
+            if (type === ExclusiveGatewayType.Data && flowID === gateway[Properties.default]) {
               transition.label.guards.set(flowID, new Guard("", true));
             }
             const place = this.addElement(new Place(flowID));
@@ -156,13 +179,13 @@ export class INetFastXMLParser implements INetParser {
             this.addElement(t);
           }
         } else {
-          throw new Error("Neither converging nor diverging XOR Gateway");
+          throw new Error("Neither converging nor diverging Exclusive (Data or Event) Gateway");
         }
       }
       return this;
     }
 
-    private translateAND(gateways: any): this {
+    private translateParallelGateway(gateways: any): this {
       if (gateways == null)
         return this;
 
@@ -207,7 +230,7 @@ export class INetFastXMLParser implements INetParser {
           // look for guard information 
           for (const sourceTransition of place.source) {
             if (sourceTransition instanceof Transition
-            && sourceTransition.label.type === LabelType.ExclusiveOutgoing) {
+            && sourceTransition.label.type === LabelType.DataExclusiveOutgoing) {
               // the flow leads to an outgoing exclusive gateway transition,
               // we need to assign the condition of the flow to the transition
               const guard = sourceTransition.label.guards.get(id);
@@ -217,10 +240,10 @@ export class INetFastXMLParser implements INetParser {
                 guard.name = name != null ? name : "no name";
               } else {
                 // if it is not a default flow it needs to have an expression present
-                if (!flow[Elements.conditionExp] || flow[Elements.conditionExp].length !== 1) {
+                if (!flow[Elements.conditionExpression] || flow[Elements.conditionExpression].length !== 1) {
                   throw new Error(`XOR outgoing flow (${id}) without or malformed condition expression`);
                 }
-                const condition = flow[Elements.conditionExp][0];
+                const condition = flow[Elements.conditionExpression][0];
                 const lang = condition[Properties.language];
                 const expression = condition['#text'];
                 if (!expression || !lang) {
@@ -273,6 +296,7 @@ export class INetFastXMLParser implements INetParser {
       const iNetTranslator = new INetFastXMLParser.INetTranslator();
       try {
         const iNet = iNetTranslator.translate(choreography);
+        console.log(iNet)
         return resolve(iNet);
       } catch (error) {
         return reject(error);
