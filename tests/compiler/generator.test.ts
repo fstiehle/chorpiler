@@ -57,11 +57,15 @@ describe('Test Parsing and Generation', () => {
 
   describe('Parse correct BPMN and generate artefacts using default templates', () => {
 
+    it('Compile model with simple seq flow to Sol contract', async () => {
+      return parseCompile(path.join(BPMN_PATH, 'seq-flow.bpmn'), parser, solGenerator);
+    });
+
     it('Compile model with XOR that allows to skip to the end event to Sol contract', () => {
       return parseCompile(path.join(BPMN_PATH, 'xor-skip.bpmn'), parser, solGenerator);
     });
 
-    it('Compile model with AND to sol contract', () => {
+    it('Compile model with AND to Sol contract', () => {
       return parseCompile(path.join(BPMN_PATH, 'and.bpmn'), parser, solGenerator);
     });
 
@@ -79,6 +83,14 @@ describe('Test Parsing and Generation', () => {
 
     it('Compile model with XOR to Sol contract', () => {
       return parseCompile(path.join(BPMN_PATH, 'xor.bpmn'), parser, solGenerator);
+    });
+
+    it('Compile model with long (7 consecutive) seq flows to Sol contract', async () => {
+      return console.log(await parseCompile(path.join(BPMN_PATH, 'seq-flow-7.bpmn'), parser, solGenerator));
+    });
+
+    it('Compile model with taks not appearing in sequence in the XML file to Sol contract', async () => {
+      return console.log(await parseCompile(path.join(BPMN_PATH, 'pharmacy-more-simplified.bpmn'), parser, solGenerator));
     });
 
   });

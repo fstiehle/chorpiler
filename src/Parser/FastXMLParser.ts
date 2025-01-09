@@ -296,7 +296,7 @@ export class INetFastXMLParser implements INetParser {
       const iNetTranslator = new INetFastXMLParser.INetTranslator();
       try {
         const iNet = iNetTranslator.translate(choreography);
-        console.log(iNet)
+        //console.log(iNet)
         return resolve(iNet);
       } catch (error) {
         return reject(error);

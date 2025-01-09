@@ -67,50 +67,15 @@ export class ProcessGenerator {
       })
     }
 
-    // remove silent transitions
-    for (const element of iNet.elements.values()) {
-      if (element.source.length === 1 && element.target.length === 1) {
-        const source = element.source[0];
-        const target = element.target[0];
-        if (this.isSilentTransition(element)) {
-          // a previous place only connected to this transition but with other previous transitions
-          if (source.target.length === 1 && source.source.length > 0) {
-            this.linkNewSources(target, source.source);
-            this.copyProperties(element as Transition, source.source as Transition[]);
-            this.deleteElement(iNet, element);
-            this.deleteElement(iNet, source);
-          // target place only connected to this transition but with other target transitions
-          } else if (target.source.length === 1 && target.target.length > 0) {
-            this.linkNewTargets(source, target.target);
-            this.copyProperties(element as Transition, target.target as Transition[]);
-            this.deleteElement(iNet, element);
-            this.deleteElement(iNet, target);
-          }
-        } else if (element instanceof Place 
-          && this.isSilentTransition(source) && this.isSilentTransition(target)) {
-            // two AND gateways (silent transitions) in sucession 
-            this.linkNewSources(source, target.source);
-            this.linkNewTargets(source, target.target);
-            this.copyProperties(target as Transition, [source as Transition]);
-            this.deleteElement(iNet, element);
-            this.deleteElement(iNet, target);
-        }
-      } else if (element.source.length === 1 && element.target.length > 1
-        && this.isSilentTransition(element)) {
-          // XOR -> AND
-          const source = element.source[0];
-          for (const andPlace of element.target) {
-            this.linkNewTargets(andPlace, source.target);
-            this.linkNewSources(andPlace, source.source);
-          }
-          this.deleteElement(iNet, element);
-          this.deleteElement(iNet, source);
-      }
-    }
+    // optimisation step by removing silent transitions
+    this.removeSilentTransitions(iNet);
 
     // places to transition markings
     const transitionMarkings = new Map<string, number>();
-    let transitionCounter = 0;
+    let transitionCounter = 1;
+    // add start and end event
+    transitionMarkings.set(iNet.initial.id, 1);
+    transitionMarkings.set(iNet.end.id, 0);
     // transitions to ids
     const taskIDs = new Map<string, number>();
     const conditionIDs = new Map<string, string>();
@@ -135,7 +100,7 @@ export class ProcessGenerator {
         if (conditions.length > 0) {
           const el = [...element.label.guards.entries()].pop()!;
           let string = el[1].name + ` (${el[0]})`;
-          console.log(el[1])
+          //console.log(el[1])
           condition = el[1].condition;
 
           if (conditions.length > 1) {
@@ -176,7 +141,6 @@ export class ProcessGenerator {
         if (out instanceof Place && out.type == PlaceType.End) {
           // leads to end event
           isEnd = true;
-          transitionMarkings.set(out.id, 0);
           // we don"t need to increase the marking counter
           // as 0 doesn't take away a spot
 
@@ -213,6 +177,48 @@ export class ProcessGenerator {
     options.hasConditions = conditionIDs.size > 0;
 
     return { encoding: new ProcessEncoding(taskIDs, conditionIDs, participantIDs), options };
+  }
+
+  private static removeSilentTransitions(iNet: InteractionNet) {
+    for (const element of iNet.elements.values()) {
+      if (element.source.length === 1 && element.target.length === 1) {
+        const source = element.source[0];
+        const target = element.target[0];
+        if (this.isSilentTransition(element)) {
+          // a previous place only connected to this transition but with other previous transitions
+          if (source.target.length === 1 && source.source.length > 0) {
+            this.linkNewSources(target, source.source);
+            this.copyProperties(element as Transition, source.source as Transition[]);
+            this.deleteElement(iNet, element);
+            this.deleteElement(iNet, source);
+            // target place only connected to this transition but with other target transitions
+          } else if (target.source.length === 1 && target.target.length > 0) {
+            this.linkNewTargets(source, target.target);
+            this.copyProperties(element as Transition, target.target as Transition[]);
+            this.deleteElement(iNet, element);
+            this.deleteElement(iNet, target);
+          }
+        } else if (element instanceof Place
+          && this.isSilentTransition(source) && this.isSilentTransition(target)) {
+          // two AND gateways (silent transitions) in sucession 
+          this.linkNewSources(source, target.source);
+          this.linkNewTargets(source, target.target);
+          this.copyProperties(target as Transition, [source as Transition]);
+          this.deleteElement(iNet, element);
+          this.deleteElement(iNet, target);
+        }
+      } else if (element.source.length === 1 && element.target.length > 1
+        && this.isSilentTransition(element)) {
+        // XOR -> AND
+        const source = element.source[0];
+        for (const andPlace of element.target) {
+          this.linkNewTargets(andPlace, source.target);
+          this.linkNewSources(andPlace, source.source);
+        }
+        this.deleteElement(iNet, element);
+        this.deleteElement(iNet, source);
+      }
+    }
   }
 
   private static isSilentTransition(el: Element) {

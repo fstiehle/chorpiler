@@ -4,6 +4,7 @@ pragma solidity ^0.8.9;
 contract PIZZA_ProcessExecution {
   uint public tokenState = 1;
   address[3] public participants;
+  // case instance variables here
 
   constructor(address[3] memory _participants) {
     participants = _participants;
