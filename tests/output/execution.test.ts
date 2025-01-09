@@ -13,9 +13,11 @@ import { XESFastXMLParser } from "../../src/util/XESFastXMLParser";
 
 import AIM_ProcessSmartContract from './../data/generated/artifcats/IM_ProcessExecution.json';
 import ASC_ProcessSmartContract from './../data/generated/artifcats/SC_ProcessExecution.json';
+import APH_ProcessSmartContract from './../data/generated/artifcats/PH_ProcessExecution.json';
 
 import encodingSC from './../data/generated/supply-chain/SC_ProcessExecution_encoding.json';
 import encodingIM from './../data/generated/incident-management/IM_ProcessExecution_encoding.json';
+import encodingPH from './../data/generated/out-of-order/PH_ProcessExecution_encoding.json';
 import assert from "assert";
 
 use(solidity);
@@ -30,6 +32,9 @@ const parser = new XESFastXMLParser();
 
   const eventLogIM = await parser.fromXML(
     readFileSync(path.join(BPMN_PATH, 'cases', 'incident-management', 'incident-management.xes')));
+
+  const eventLogPH = await parser.fromXML(
+    readFileSync(path.join(BPMN_PATH, 'cases', 'out-of-order', 'out-of-order-xml.xes')));
 
   describe('Test Execution of Cases', () => {
 
@@ -48,6 +53,15 @@ const parser = new XESFastXMLParser();
         eventLogIM, 
         ProcessEncoding.fromJSON(encodingIM),
         new ContractFactory(AIM_ProcessSmartContract.abi, AIM_ProcessSmartContract.bytecode)
+      );
+    });
+
+    describe('Out of Order Case', () => {
+
+      testCase(
+        eventLogPH, 
+        ProcessEncoding.fromJSON(encodingPH),
+        new ContractFactory(APH_ProcessSmartContract.abi, APH_ProcessSmartContract.bytecode)
       );
     });
   });

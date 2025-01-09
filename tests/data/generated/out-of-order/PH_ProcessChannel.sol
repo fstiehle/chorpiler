@@ -3,7 +3,7 @@ pragma solidity ^0.8.9;
 
 import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
 
-contract PIZZA_ProcessChannel {
+contract PH_ProcessChannel {
   using ECDSA for bytes32;
   struct Step {
     uint index;
@@ -12,7 +12,7 @@ contract PIZZA_ProcessChannel {
     uint taskID;
     uint newTokenState;
     uint conditionState;
-    bytes[3] signatures;
+    bytes[5] signatures;
   }
   uint public tokenState = 1;
   uint public index = 0;
@@ -21,14 +21,14 @@ contract PIZZA_ProcessChannel {
   uint public immutable disputeWindowInUNIX;
   uint public disputeMadeAtUNIX = 0;
 
-  address[3] public participants; 
+  address[5] public participants; 
 
   /**
    * @param _participants addresses for the roles 
    * in the order (BulkBuyer, Manufacturer, Middleman, Supplier, SpecialCarrier)
    * @param _disputeWindowInUNIX time for the dispute window to remain open in UNIX.
    */
-  constructor(address[3] memory _participants, uint _disputeWindowInUNIX) {
+  constructor(address[5] memory _participants, uint _disputeWindowInUNIX) {
     participants = _participants;
     disputeWindowInUNIX = _disputeWindowInUNIX;
   }
@@ -72,7 +72,7 @@ contract PIZZA_ProcessChannel {
       abi.encode(_step.index, _step.caseID, _step.from, _step.taskID, _step.newTokenState, _step.conditionState)
     );
 
-    for (uint i = 0; i < 3; i++) {
+    for (uint i = 0; i < 5; i++) {
       if (payload.toEthSignedMessageHash().recover(_step.signatures[i]) != participants[i]) {
         return false;
       }
@@ -84,44 +84,51 @@ contract PIZZA_ProcessChannel {
    * If a dispute window has elapsed, execution must continue through this function
    * @param id id of the activity to begin
    */
-  function continueAfterDispute(uint id, uint cond) external {
+  function continueAfterDispute(uint id) external {
     uint _disputeMadeAtUNIX = disputeMadeAtUNIX;
     require(_disputeMadeAtUNIX != 0 && _disputeMadeAtUNIX + disputeWindowInUNIX < block.timestamp, "No elapsed dispute");
 
     uint _tokenState = tokenState;
 
     while(true) {
-      if (0 == id && (_tokenState & 1 == 1) && msg.sender == participants[0]) {
-        _tokenState &= ~uint(1);
-        _tokenState |= 2;
-        break;
-      }
-      if ((cond & items==true == items==true) && 1 == id && (_tokenState & 2 == 2) && msg.sender == participants[0]) {
+      if (0 == id && (_tokenState & 2 == 2) && msg.sender == participants[3]) {
         _tokenState &= ~uint(2);
         _tokenState |= 4;
         break;
       }
-      if (2 == id && (_tokenState & 4 == 4) && msg.sender == participants[0]) {
+      if (1 == id && (_tokenState & 8 == 8) && msg.sender == participants[4]) {
+        _tokenState &= ~uint(8);
+        _tokenState |= 0;
+        break;
+      }
+      if (2 == id && (_tokenState & 4 == 4) && msg.sender == participants[4]) {
         _tokenState &= ~uint(4);
+        _tokenState |= 16;
+        break;
+      }
+      if (3 == id && (_tokenState & 1 == 1) && msg.sender == participants[0]) {
+        _tokenState &= ~uint(1);
+        _tokenState |= 2;
+        break;
+      }
+      if (4 == id && (_tokenState & 32 == 32) && msg.sender == participants[1]) {
+        _tokenState &= ~uint(32);
+        _tokenState |= 64;
+        break;
+      }
+      if (5 == id && (_tokenState & 64 == 64) && msg.sender == participants[4]) {
+        _tokenState &= ~uint(64);
         _tokenState |= 8;
         break;
       }
-      if (3 == id && (_tokenState & 8 == 8) && msg.sender == participants[0]) {
-        _tokenState &= ~uint(8);
-        _tokenState |= 0;
+      if (6 == id && (_tokenState & 16 == 16) && msg.sender == participants[2]) {
+        _tokenState &= ~uint(16);
+        _tokenState |= 32;
         break;
       }
       return;
     }
 
-    while(_tokenState != 0) {
-      if ((_tokenState & 2 == 2)) {
-        _tokenState &= ~uint(2);
-        _tokenState |= 8;
-        continue;
-      }
-      break;
-    }
 
     tokenState = _tokenState;
   }

@@ -23,7 +23,7 @@ import type {
   PromiseOrValue,
 } from "./common";
 
-export declare namespace IM_ProcessChannel {
+export declare namespace PH_ProcessChannel {
   export type StepStruct = {
     index: PromiseOrValue<BigNumberish>;
     caseID: PromiseOrValue<BigNumberish>;
@@ -59,7 +59,7 @@ export declare namespace IM_ProcessChannel {
   };
 }
 
-export interface IM_ProcessChannelInterface extends utils.Interface {
+export interface PH_ProcessChannelInterface extends utils.Interface {
   functions: {
     "continueAfterDispute(uint256)": FunctionFragment;
     "disputeMadeAtUNIX()": FunctionFragment;
@@ -100,7 +100,7 @@ export interface IM_ProcessChannelInterface extends utils.Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "submit",
-    values: [IM_ProcessChannel.StepStruct]
+    values: [PH_ProcessChannel.StepStruct]
   ): string;
   encodeFunctionData(
     functionFragment: "tokenState",
@@ -130,12 +130,12 @@ export interface IM_ProcessChannelInterface extends utils.Interface {
   events: {};
 }
 
-export interface IM_ProcessChannel extends BaseContract {
+export interface PH_ProcessChannel extends BaseContract {
   connect(signerOrProvider: Signer | Provider | string): this;
   attach(addressOrName: string): this;
   deployed(): Promise<this>;
 
-  interface: IM_ProcessChannelInterface;
+  interface: PH_ProcessChannelInterface;
 
   queryFilter<TEvent extends TypedEvent>(
     event: TypedEventFilter<TEvent>,
@@ -174,7 +174,7 @@ export interface IM_ProcessChannel extends BaseContract {
     ): Promise<[string]>;
 
     submit(
-      _step: IM_ProcessChannel.StepStruct,
+      _step: PH_ProcessChannel.StepStruct,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<ContractTransaction>;
 
@@ -198,7 +198,7 @@ export interface IM_ProcessChannel extends BaseContract {
   ): Promise<string>;
 
   submit(
-    _step: IM_ProcessChannel.StepStruct,
+    _step: PH_ProcessChannel.StepStruct,
     overrides?: Overrides & { from?: PromiseOrValue<string> }
   ): Promise<ContractTransaction>;
 
@@ -222,7 +222,7 @@ export interface IM_ProcessChannel extends BaseContract {
     ): Promise<string>;
 
     submit(
-      _step: IM_ProcessChannel.StepStruct,
+      _step: PH_ProcessChannel.StepStruct,
       overrides?: CallOverrides
     ): Promise<void>;
 
@@ -249,7 +249,7 @@ export interface IM_ProcessChannel extends BaseContract {
     ): Promise<BigNumber>;
 
     submit(
-      _step: IM_ProcessChannel.StepStruct,
+      _step: PH_ProcessChannel.StepStruct,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<BigNumber>;
 
@@ -276,7 +276,7 @@ export interface IM_ProcessChannel extends BaseContract {
     ): Promise<PopulatedTransaction>;
 
     submit(
-      _step: IM_ProcessChannel.StepStruct,
+      _step: PH_ProcessChannel.StepStruct,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<PopulatedTransaction>;
 

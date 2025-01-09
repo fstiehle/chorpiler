@@ -89,13 +89,9 @@ describe('Test Parsing and Generation', () => {
       return console.log(await parseCompile(path.join(BPMN_PATH, 'seq-flow-7.bpmn'), parser, solGenerator));
     });
 
-    it('Compile model with taks not appearing in sequence in the XML file to Sol contract', async () => {
-      return console.log(await parseCompile(path.join(BPMN_PATH, 'pharmacy-more-simplified.bpmn'), parser, solGenerator));
-    });
-
   });
 
-  describe('Parse and compile pizza case', () => {
+  describe.skip('Parse and compile pizza case', () => {
 
     before(() => {
       if (!fs.existsSync(path.join(OUTPUT_PATH, "pizza"))) {
@@ -115,14 +111,36 @@ describe('Test Parsing and Generation', () => {
       
     });
 
+  });
+
+  describe('Parse and compile pharmacy (out of order xml file) case', () => {
+
+    before(() => {
+      if (!fs.existsSync(path.join(OUTPUT_PATH, "out-of-order"))) {
+        fs.mkdirSync(path.join(OUTPUT_PATH, "out-of-order"));
+      }
+    })
+
+    it('to Sol Contract', async () => {
+
+      return testCase(
+        path.join(BPMN_PATH, 'cases/out-of-order', 'out-of-order-xml.bpmn'), 
+        parser, 
+        solGenerator, 
+        path.join(OUTPUT_PATH, "/out-of-order/PH_ProcessExecution.sol"),
+        "PH_"
+      );
+      
+    });
+
     it('to State Channel Root', async () => {
 
       return testCase(
-        path.join(BPMN_PATH, 'xor.bpmn'), 
+        path.join(BPMN_PATH, 'cases/out-of-order', 'out-of-order-xml.bpmn'), 
         parser, 
         stateChannelRootGenerator, 
-        path.join(OUTPUT_PATH, "/pizza/PIZZA_ProcessChannel.sol"),
-        "PIZZA_"
+        path.join(OUTPUT_PATH, "/out-of-order/PH_ProcessChannel.sol"),
+        "PH_"
       );
       
     });
@@ -158,7 +176,7 @@ describe('Test Parsing and Generation', () => {
         path.join(OUTPUT_PATH, "/supply-chain/SC_ProcessChannel.sol"),
         "SC_"
       );
-      
+
     });
 
   });

@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<log xes.version="1.0">
+	<global scope="event">
+		<string key="concept:name" value="Choreography Task ID"/>
+		<string key="sourceRef" value="Participant ID"/>
+		<string key="targetRef" value="Participant ID"/>
+	</global>
+	<trace>
+		<event>
+			<string key="concept:name" value="ChoreographyTask_1mgomgq"/>
+			<string key="sourceRef" value="Participant_1x26dag"/>
+			<string key="targetRef" value="Participant_0l7yq0p"/>
+		</event>
+		<event>
+			<string key="concept:name" value="ChoreographyTask_0lvyk79"/>
+			<string key="sourceRef" value="Participant_0l7yq0p"/>
+			<string key="targetRef" value="Participant_1hgr7uo"/>
+		</event>
+		<event>
+			<string key="concept:name" value="ChoreographyTask_0hi5qrq"/>
+			<string key="sourceRef" value="Participant_1hgr7uo"/>
+			<string key="targetRef" value="Participant_1mwdmng"/>
+		</event>
+		<event>
+			<string key="concept:name" value="ChoreographyTask_0gppzdf"/>
+			<string key="sourceRef" value="Participant_1mwdmng"/>
+			<string key="targetRef" value="Participant_0cm7kml"/>
+		</event>
+		<event>
+			<string key="concept:name" value="ChoreographyTask_0qvwzvz"/>
+			<string key="sourceRef" value="Participant_0cm7kml"/>
+			<string key="targetRef" value="Participant_1hgr7uo"/>
+		</event>
+		<event>
+			<string key="concept:name" value="ChoreographyTask_1gwk89f"/>
+			<string key="sourceRef" value="Participant_1hgr7uo"/>
+			<string key="targetRef" value="Participant_0l7yq0p"/>
+		</event>
+		<event>
+			<string key="concept:name" value="ChoreographyTask_1eeg831"/>
+			<string key="sourceRef" value="Participant_1hgr7uo"/>
+			<string key="targetRef" value="Participant_0l7yq0p"/>
+		</event>
+	</trace>
+</log>
