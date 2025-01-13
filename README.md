@@ -9,8 +9,9 @@
 |--------------------|------------|
 | Choreography tasks | ✔          |
 | Events             | Start, End |
-| Gateways           | XOR, AND   |
+| Gateways           | XOR, EVENT, AND |
 | Looping behaviour  | ✔          |
+| Uncontrolled Flow merge  | ✔          |
 
 ## Usage
 
