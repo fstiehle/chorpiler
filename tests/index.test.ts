@@ -22,13 +22,12 @@ describe('NPM Package', () => {
         throw new Error('Method not implemented.');
       }
     }
-    class test2 implements TemplateEngine {
-      compile(iNet: InteractionNet, template?: string): Promise<{ target: string; encoding: ProcessEncoding; }> {
-        throw new Error('Method not implemented.');
-      }
-      getTemplate(): Promise<string> {
-        throw new Error('Method not implemented.');
-      }
+    class test2 extends TemplateEngine {
+      constructor(
+          _iNet: InteractionNet, 
+          _caseVariables?: Map<string, string>) {
+          super(_iNet, "", _caseVariables);
+        }
     }
   });
 
@@ -49,8 +48,8 @@ describe('NPM Package', () => {
     });
 
     it('should conform to template engine interface', () => {
-      assert.isFunction(new chorpiler.generators.sol.DefaultContractGenerator().compile)
-      assert.isFunction(new chorpiler.generators.sol.StateChannelContractGenerator().compile)
+      assert.isFunction(chorpiler.generators.sol.DefaultContractGenerator.prototype.compile)
+      assert.isFunction(chorpiler.generators.sol.StateChannelContractGenerator.prototype.compile)
     });
   });
 });

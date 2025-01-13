@@ -5,7 +5,7 @@ contract ProcessExecution {
   uint public tokenState = 1;
   address[{{{numberOfParticipants}}}] public participants;
   {{#caseVariables}}
-  {{{#caseVariables}}}
+  {{{caseVariables}}}
   {{/caseVariables}}
 
   constructor(address[{{{numberOfParticipants}}}] memory _participants) {

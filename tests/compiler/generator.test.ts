@@ -100,9 +100,11 @@ describe('Test Parsing and Generation', () => {
     it('to Sol Contract', async () => {
 
       const data = await readFile(path.join(BPMN_PATH, 'xor.bpmn'));
+      const contract =  new SolDefaultContractGenerator(await parser.fromXML(data));
+      contract.addCaseVariable("items", "bool public items = false;");
 
       return compileCase(
-        new SolDefaultContractGenerator(await parser.fromXML(data)),
+        contract,
         path.join(OUTPUT_PATH, "/pizza/PIZZA_ProcessExecution.sol"),
         "PIZZA_"
       );

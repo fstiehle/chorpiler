@@ -5,5 +5,6 @@ export { IM_ProcessChannel__factory } from "./IM_ProcessChannel__factory";
 export { IM_ProcessExecution__factory } from "./IM_ProcessExecution__factory";
 export { PH_ProcessChannel__factory } from "./PH_ProcessChannel__factory";
 export { PH_ProcessExecution__factory } from "./PH_ProcessExecution__factory";
+export { PIZZA_ProcessExecution__factory } from "./PIZZA_ProcessExecution__factory";
 export { SC_ProcessChannel__factory } from "./SC_ProcessChannel__factory";
 export { SC_ProcessExecution__factory } from "./SC_ProcessExecution__factory";
