@@ -11,7 +11,7 @@
 | Events             | Start, End |
 | Gateways           | XOR, EVENT, AND |
 | Looping behaviour  | ✔          |
-| Uncontrolled Flow merge  | ✔          |
+| Uncontrolled flow merge  | ✔          |
 
 ## Usage
 
