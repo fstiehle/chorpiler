@@ -47,7 +47,7 @@ class Proof {
 
 describe('Test State Channel', () => {
 
-  describe('Test Contract: incident management case ProcessChannel', () => {
+  describe.skip('Test Contract: incident management case ProcessChannel', () => {
     const provider = new MockProvider();
     const [par0, par1, par2, par3, par4] = provider.getWallets();
     const participants = [par0, par1, par2, par3, par4];

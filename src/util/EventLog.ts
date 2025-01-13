@@ -3,7 +3,7 @@ import { ProcessEncoding } from "../Generator/ProcessEncoding";
 import seed from 'seed-random';
 
 export class Event {
-  constructor(public name: string, public source: string, public target: string, public cond: number = 0) {}
+  constructor(public name: string, public source: string, public target: string) {}
 }
 
 export class EventLog implements IterableIterator<Trace>{
@@ -55,10 +55,6 @@ export class EventLog implements IterableIterator<Trace>{
       return [...process.tasks.keys()][seedRandMax(process.tasks.size)];
     }
 
-    const randomCondition = () => {
-      return [...process.conditions.values()][seedRandMax(process.conditions.size)];
-    }
-
     const seedRand = seed(_seed);
     const seedRandMax = (max: number) => Math.floor(seedRand() * max);
 
@@ -82,7 +78,7 @@ export class EventLog implements IterableIterator<Trace>{
             genEvents.splice(
               seedRandMax(genEvents.length), 
               0, 
-              new Event(randomEventName(), randomParticipantName(), randomParticipantName(), randomCondition())
+              new Event(randomEventName(), randomParticipantName(), randomParticipantName())
             );
             break;
           }

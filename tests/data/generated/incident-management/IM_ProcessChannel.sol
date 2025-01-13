@@ -101,8 +101,8 @@ contract IM_ProcessChannel {
         _tokenState |= 4;
         break;
       }
-      if (2 == id && (_tokenState & 12 == 12) && msg.sender == participants[1]) {
-        _tokenState &= ~uint(12);
+      if (2 == id && (_tokenState & 8 == 8) && msg.sender == participants[1]) {
+        _tokenState &= ~uint(8);
         _tokenState |= 0;
         break;
       }
@@ -111,8 +111,8 @@ contract IM_ProcessChannel {
         _tokenState |= 16;
         break;
       }
-      if (4 == id && (_tokenState & 48 == 48) && msg.sender == participants[2]) {
-        _tokenState &= ~uint(48);
+      if (4 == id && (_tokenState & 32 == 32) && msg.sender == participants[2]) {
+        _tokenState &= ~uint(32);
         _tokenState |= 8;
         break;
       }
@@ -131,14 +131,32 @@ contract IM_ProcessChannel {
         _tokenState |= 256;
         break;
       }
-      if (8 == id && (_tokenState & 320 == 320) && msg.sender == participants[3]) {
-        _tokenState &= ~uint(320);
+      if (8 == id && (_tokenState & 256 == 256) && msg.sender == participants[3]) {
+        _tokenState &= ~uint(256);
         _tokenState |= 32;
         break;
       }
       return;
     }
 
+    while(_tokenState != 0) {
+      if ((_tokenState & 4 == 4)) {
+        _tokenState &= ~uint(4);
+        _tokenState |= 8;
+        continue;
+      }
+      if ((_tokenState & 16 == 16)) {
+        _tokenState &= ~uint(16);
+        _tokenState |= 32;
+        continue;
+      }
+      if ((_tokenState & 64 == 64)) {
+        _tokenState &= ~uint(64);
+        _tokenState |= 256;
+        continue;
+      }
+      break;
+    }
 
     tokenState = _tokenState;
   }

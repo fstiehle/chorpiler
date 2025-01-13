@@ -20,7 +20,8 @@ export class Place extends Element {
 export enum PlaceType {
   Flow = 0,
   Start = 1,
-  End = 2
+  End = 2,
+  UncontrolledMerge = 3
 }
 
 export class Transition extends Element {
@@ -58,6 +59,7 @@ export class Guard {
   }
 }
 
+// TODO: Non allignend naming incoming/outgoing vs. diverging/converging
 export enum LabelType {
   Start = 0,
   End = 1,
@@ -66,8 +68,8 @@ export enum LabelType {
   DataExclusiveOutgoing = 4,
   ParallelConverging = 5,
   ParallelDiverging = 6,
-  EventExclusiveIncoming = 5,
-  EventExclusiveOutgoing = 6,
+  EventExclusiveIncoming = 7,
+  EventExclusiveOutgoing = 8,
 }
 
 export class TaskLabel extends Label {

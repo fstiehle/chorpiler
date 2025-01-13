@@ -9,8 +9,8 @@
   ],
   "scripts": {
     "test": "mocha tests/index.test.ts && mocha tests/compiler && waffle && mocha tests/output",
-    "dev": "mocha tests/compiler -g 'incident management case' && waffle && mocha tests/output -g 'incident management case'",
-    "debug": "mocha tests/compiler -g 'debug' --inspect",
+    "dev": "mocha tests/compiler -g 'Incident Management Case' && waffle && mocha tests/output -g 'Incident Management Case'",
+    "debug": "mocha tests/compiler -g 'uncontrolled merge' --inspect",
     "test/compiler": "mocha tests/compiler",
     "test/output": "mocha tests/output",
     "build": "tsc && ncp ./src/Generator/templates ./lib/Generator/templates",

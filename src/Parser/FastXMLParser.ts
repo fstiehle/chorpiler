@@ -3,6 +3,8 @@ import { XMLParser } from 'fast-xml-parser';
 import { Participant } from './Participant';
 import { Element, TaskLabel, Transition, Place, LabelType, Label, PlaceType, Guard } from './Element';
 import { INetParser } from './Parser';
+import { deleteFromArray } from '../util/helpers';
+import assert from 'assert';
 
 enum Elements {
   rootElements = 'bpmn2:definitions',
@@ -108,6 +110,14 @@ export class INetFastXMLParser implements INetParser {
         const from = this.iNet.participants.get(task[Elements.participantsRef][0]);
         const to = this.iNet.participants.get(task[Elements.participantsRef][1]);
         this.addElement(new Transition(task[Properties.id], new TaskLabel(from!, to!, task[Properties.name])));
+      
+        // check for an uncontrolled flow merge, i.e., more than one incoming sequence flows
+        // if present, we merge them later when the flows are connected.
+        if (task[Elements.ins].length > 1) {
+          for (const _in of task[Elements.ins]) {
+            this.addElement(new Place(_in, PlaceType.UncontrolledMerge));
+          }
+        }
       }
       return this;
     }
@@ -220,49 +230,59 @@ export class INetFastXMLParser implements INetParser {
         const id = flow[Properties.id];
         const name = flow[Properties.name];
 
-        const place = this.addElement(new Place(id));
+        const place = this.addElement(new Place(id)) as Place;
+
         if (place.source.length === 0) {
           const source = this.iNet.elements.get(flow[Properties.source]);
           if (!source) throw new Error(
             `Unsupported Element ${flow[Properties.source]} as source referenced in flow ${id}`);
           this.linkElements(source, place);
-        } else {
-          // look for guard information 
-          for (const sourceTransition of place.source) {
-            if (sourceTransition instanceof Transition
-            && sourceTransition.label.type === LabelType.DataExclusiveOutgoing) {
-              // the flow leads to an outgoing exclusive gateway transition,
-              // we need to assign the condition of the flow to the transition
-              const guard = sourceTransition.label.guards.get(id);
-              if (guard != null && guard.default) {
-                // the guard of the default flow is already present,
-                // so we only set additional info
-                guard.name = name != null ? name : "no name";
-              } else {
-                // if it is not a default flow it needs to have an expression present
-                if (!flow[Elements.conditionExpression] || flow[Elements.conditionExpression].length !== 1) {
-                  throw new Error(`XOR outgoing flow (${id}) without or malformed condition expression`);
-                }
-                const condition = flow[Elements.conditionExpression][0];
-                const lang = condition[Properties.language];
-                const expression = condition['#text'];
-                if (!expression || !lang) {
-                  throw new Error(
-                    `XOR outgoing flow (${id}) without proper (language and expression) condition expression`);
-                }
-                const guard = new Guard(name != null ? name : "no name", false);
-                guard.condition = expression;
-                guard.language = lang;
-                sourceTransition.label.guards.set(id, guard);
-              }
-            }
-          }
         }
+
         if (place.target.length === 0) {
           const target = this.iNet.elements.get(flow[Properties.target]);
           if (!target) throw new Error(
             `Unsupported Element ${flow[Properties.target]} as target referenced in flow ${id}`);
           this.linkElements(place, target);
+        }
+
+        // look for guard information 
+        for (const sourceTransition of place.source) {
+          if (sourceTransition instanceof Transition
+          && sourceTransition.label.type === LabelType.DataExclusiveOutgoing) {
+            // the flow leads to an outgoing exclusive gateway transition,
+            // we need to assign the condition of the flow to the transition
+            const guard = sourceTransition.label.guards.get(id);
+            if (guard != null && guard.default) {
+              // the guard of the default flow is already present,
+              // so we only set additional info
+              guard.name = name != null ? name : "no name";
+            } else {
+              // if it is not a default flow it needs to have an expression present
+              if (!flow[Elements.conditionExpression] || flow[Elements.conditionExpression].length !== 1) {
+                throw new Error(`XOR outgoing flow (${id}) without or malformed condition expression`);
+              }
+              const condition = flow[Elements.conditionExpression][0];
+              const lang = condition[Properties.language];
+              const expression = condition['#text'];
+              if (!expression || !lang) {
+                throw new Error(
+                  `XOR outgoing flow (${id}) without proper (language and expression) condition expression`);
+              }
+              const guard = new Guard(name != null ? name : "no name", false);
+              guard.condition = expression;
+              guard.language = lang;
+              sourceTransition.label.guards.set(id, guard);
+            }
+          }
+        }
+
+        // merge uncontrolled flow merge, i.e., more than one incoming sequence flow into a task
+        // we merge the places to create the equivalent of an XOR, 
+        // which is closer to the standard, than an AND merge behaviour, 
+        // which is what we would create by default.
+        if (place.type === PlaceType.UncontrolledMerge) {
+          this.mergePlace(place);
         }
       }
     }
@@ -272,11 +292,31 @@ export class INetFastXMLParser implements INetParser {
       source.target.push(target);
     }
 
+    private unlinkElement(el: Element) {
+      for (const source of el.source)
+        deleteFromArray(source.target, el);
+      for (const target of el.target)
+        deleteFromArray(target.source, el);
+    }
+
     private addElement(el: Element): Element {
       // Be aware of already connected places
       if (!this.iNet.elements.has(el.id))
         this.iNet.elements.set(el.id, el);
       return this.iNet.elements.get(el.id)!;
+    }
+
+    private mergePlace(place: Place) {
+      assert(place.source.length === 1 && place.target.length === 1);
+      const source = place.source[0];
+      const target = place.target[0];
+
+      const mergedPlace = this.addElement(new Place("merged_" + target.id)) as Place;
+      if (mergedPlace.target.length === 0) this.linkElements(mergedPlace, target);
+      this.linkElements(source, mergedPlace);
+      this.unlinkElement(place);
+      this.iNet.elements.delete(place.id);
+      return mergedPlace;
     }
   };
 

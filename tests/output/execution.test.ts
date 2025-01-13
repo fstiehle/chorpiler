@@ -22,7 +22,7 @@ import assert from "assert";
 
 use(solidity);
 
-const NR_NON_CONFORMING_TRACES = 10;
+const NR_NON_CONFORMING_TRACES = 0;
 const parser = new XESFastXMLParser();
 
 (async () => {
@@ -84,6 +84,7 @@ const testCase = (
         const r = await deploy(factory, processEncoding);
         const contracts = r.contracts;
         let totalGasCost = r.tx.gasUsed.toNumber();
+
         console.log('Gas', 'Deployment', ':', totalGasCost);
         const contract = [...contracts.values()][0];
 
@@ -92,17 +93,14 @@ const testCase = (
           const taskID = processEncoding.tasks.get(event.name);
           assert(participant !== undefined && taskID !== undefined,
             `source '${event.source}' event '${event.name}' not found`);
+          console.debug(`source '${event.source}' event '${event.name}'`)
 
           const preTokenState = await contract.tokenState();
-          let tx;
-          if (processEncoding.conditions.size > 0) {
-            tx = await (await participant.enact(taskID, event.cond)).wait(1);
-          } else {
-            tx = await (await participant.enact(taskID)).wait(1);
-          }
+          const tx = await (await participant.enact(taskID)).wait(1);
+          console.debug('Gas', 'Enact Task', event.name, ":", tx.gasUsed.toNumber());
+
           // Expect that tokenState has changed!
           expect(await contract.tokenState()).to.not.equal(preTokenState);
-          // console.debug('Gas', 'Enact Task', event.name, ":", tx.gasUsed.toNumber());
           totalGasCost += tx.gasUsed.toNumber();
         }
         expect(
@@ -112,7 +110,7 @@ const testCase = (
         console.log('Gas', 'Total', ':', totalGasCost);
       });
     });
-  
+
     const badLog = EventLog.genNonConformingLog(eventLog, processEncoding, NR_NON_CONFORMING_TRACES);
 
     // Requires a foreach to work: https://github.com/mochajs/mocha/issues/3074
@@ -130,14 +128,12 @@ const testCase = (
           const taskID = processEncoding.tasks.get(event.name);
           assert(participant !== undefined && taskID !== undefined,
             `source '${event.source}' event '${event.name}' not found`);
+          console.log(participant !== undefined && taskID !== undefined,
+              `source '${event.source}' event '${event.name}' not found`);
 
           const preTokenState = await contract.tokenState();
-          let tx;
-          if (processEncoding.conditions.size > 0) {
-            tx = await (await participant.enact(taskID, event.cond)).wait(1);
-          } else {
-            tx = await (await participant.enact(taskID)).wait(1);
-          }
+          const tx = await (await participant.enact(taskID)).wait(1);
+
 
           if ((await contract.tokenState()).eq(preTokenState)) eventsRejected++;
         }
@@ -161,15 +157,10 @@ const testCase = (
     })
 
     const preTokenState = await contract.tokenState();
-    if (processEncoding.conditions.size > 0) {
-      await (await contracts.get(wrongParticipant)!.enact(taskID, firstEvent.cond)).wait(1);
-    } else {
-      await (await contracts.get(wrongParticipant)!.enact(taskID)).wait(1);
-    }
+    await (await contracts.get(wrongParticipant)!.enact(taskID)).wait(1);
 
     expect(await contract.tokenState()).to.equal(preTokenState);
   })
-
 }
 
 const deploy = async (factory: ContractFactory, processEncoding: ProcessEncoding) => {
@@ -180,7 +171,7 @@ const deploy = async (factory: ContractFactory, processEncoding: ProcessEncoding
   const contract = await factory
     .connect(wallets[0])
     .deploy([...[...wallets.values()].map(v => v.address)])
-  
+
   const tx = await contract.deployTransaction.wait(1)
 
   const contracts = new Map<string, Contract>();

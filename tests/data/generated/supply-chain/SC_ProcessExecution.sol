@@ -12,6 +12,15 @@ contract SC_ProcessExecution {
 
   function enact(uint id) external {
     uint _tokenState = tokenState;
+    
+    while(_tokenState != 0) {
+      if (4 == id && (_tokenState & 48 == 48)) {
+        _tokenState &= ~uint(48);
+        _tokenState |= 64;
+        continue;
+      }
+      break;
+    }
 
     while(true) {
       if (0 == id && (_tokenState & 1 == 1) && msg.sender == participants[0]) {
@@ -66,16 +75,6 @@ contract SC_ProcessExecution {
       }
       return;
     }
-
-    while(_tokenState != 0) {
-      if ((_tokenState & 48 == 48)) {
-        _tokenState &= ~uint(48);
-        _tokenState |= 64;
-        continue;
-      }
-      break;
-    }
-
     tokenState = _tokenState;
   }
 }

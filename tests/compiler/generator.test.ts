@@ -89,6 +89,10 @@ describe('Test Parsing and Generation', () => {
       return console.log(await parseCompile(path.join(BPMN_PATH, 'seq-flow-7.bpmn'), parser, solGenerator));
     });
 
+    it('Compile model with uncontrolled merge of seq flows to Sol contract', async () => {
+      return console.log(await parseCompile(path.join(BPMN_PATH, 'uncontrolled-flow.bpmn'), parser, solGenerator));
+    });
+
   });
 
   describe.skip('Parse and compile pizza case', () => {
@@ -181,7 +185,7 @@ describe('Test Parsing and Generation', () => {
 
   });
 
-  describe('Parse and compile incident management case', () => {
+  describe('Parse and compile Incident Management Case', () => {
 
     before(() => {
       if (!fs.existsSync(path.join(OUTPUT_PATH, "incident-management"))) {

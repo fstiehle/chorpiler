@@ -32,6 +32,7 @@ export class TemplateOptions {
   }>();
 
   autonomousTransitions = Array<{
+    id: string|null,
     consume: string,
     produce: string,
     condition: string,
@@ -83,6 +84,9 @@ export class ProcessGenerator {
     for (const element of iNet.elements.values()) {
       if (!(element instanceof Transition)) {
         continue;
+      }
+      if (element.source.length === 0 && element.target.length === 0) {
+        throw new Error(`Unconnected transition in interaction net ${element.id}`);
       }
       if (element instanceof Transition 
         && !this.isSilentTransition(element)) {
@@ -153,7 +157,14 @@ export class ProcessGenerator {
       }
 
       if (this.isSilentTransition(element)) {
+        let id: string|null = null;
+        if (element.target.length === 1 && element.target[0].target.length === 1 && this.isEventTransition(element.target[0].target[0])) {
+          // Check if silent transition leads to an event that may be triggered 
+          // if yes, assign event ID to autonomous transition
+          id = taskIDs.get(element.target[0].target[0].id)!.toString();
+        }
         options.autonomousTransitions.push({
+          id,
           consume: consume.toString(), 
           produce: produce.toString(),
           condition,
@@ -225,10 +236,17 @@ export class ProcessGenerator {
     return el instanceof Transition &&
     (el.label.type === LabelType.DataExclusiveIncoming
     || el.label.type === LabelType.DataExclusiveOutgoing
+    || el.label.type === LabelType.EventExclusiveIncoming
+    || el.label.type === LabelType.EventExclusiveOutgoing
     || el.label.type === LabelType.ParallelConverging
     || el.label.type === LabelType.ParallelDiverging
     || el.label.type === LabelType.Start
     || el.label.type === LabelType.End);
+  }
+
+  private static isEventTransition(el: Element) {
+    return el instanceof Transition &&
+    (el.label.type === LabelType.Task);
   }
 
   private static deleteElement(iNet: InteractionNet, el: Element) {
