@@ -9,42 +9,9 @@ import { deleteFromArray } from '../util/helpers';
 import { Transition, Element, TaskLabel, LabelType, Place, PlaceType } from '../Parser/Element';
 import { InteractionNet } from '../Parser/InteractionNet';
 import { ProcessEncoding } from './ProcessEncoding';
+import { TemplateOptions } from './TemplateOptions';
 
-export class TemplateOptions {
-  // note: number = 0 is interpreted as false value
-  // and may not be displayed by the template engine, 
-  // thus, prefer string type
-  numberOfParticipants = "0";
-  participants = new Array<{
-    id: string, // ID in form 0...n assigned by generator
-    modelID: string, // ID as in model
-    name: string,
-    address: string
-  }>();
-
-  manualTransitions = new Array<{
-    id: string,
-    initiator: string|null,
-    consume: string,
-    produce: string,
-    condition: string,
-    isEnd: boolean
-  }>();
-
-  autonomousTransitions = Array<{
-    id: string|null,
-    consume: string,
-    produce: string,
-    condition: string,
-    isEnd: boolean
-  }>();
-
-  hasConditions = false;
-  hasManualTransitions = false;
-  hasAutonomousTransitions = false;
-}
-
-export class ProcessGenerator {
+export class ProcessEncoder {
 
   static generate(_iNet: InteractionNet): { encoding: ProcessEncoding; options: TemplateOptions; } 
   {
@@ -158,7 +125,8 @@ export class ProcessGenerator {
 
       if (this.isSilentTransition(element)) {
         let id: string|null = null;
-        if (element.target.length === 1 && element.target[0].target.length === 1 && this.isEventTransition(element.target[0].target[0])) {
+        if (element.target.length === 1 && element.target[0].target.length === 1 
+          && this.isEventTransition(element.target[0].target[0])) {
           // Check if silent transition leads to an event that may be triggered 
           // if yes, assign event ID to autonomous transition
           id = taskIDs.get(element.target[0].target[0].id)!.toString();

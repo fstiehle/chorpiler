@@ -4,7 +4,6 @@ pragma solidity ^0.8.9;
 contract PH_ProcessExecution {
   uint public tokenState = 1;
   address[5] public participants;
-  // case instance variables here
 
   constructor(address[5] memory _participants) {
     participants = _participants;
@@ -52,6 +51,7 @@ contract PH_ProcessExecution {
       }
       return;
     }
+
     tokenState = _tokenState;
   }
 }

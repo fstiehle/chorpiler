@@ -57,21 +57,18 @@ describe('NPM Package', () => {
 
 describe('readme code', () => {
   it('should run', async () => {
+
     const parser = new chorpiler.Parser();
-
-    const contractGenerator = new chorpiler
-      .generators.sol.DefaultContractGenerator();
-
-    const stateChannelGenerator = new chorpiler
-      .generators.sol.StateChannelContractGenerator();
 
     const bpmnXML = fs.readFileSync(path.join(BPMN_PATH, 'xor.bpmn'));   
     // parse BPMN file into petri net
     const iNet = await parser.fromXML(bpmnXML);
 
+    const contractGenerator = new chorpiler
+    .generators.sol.DefaultContractGenerator(iNet);
+
     // compile to smart contract
-    return contractGenerator.compile(iNet)
-    .then((gen) => {
+    return contractGenerator.compile().then((gen) => {
       fs.writeFileSync(
         "Process.sol", 
         gen.target, 

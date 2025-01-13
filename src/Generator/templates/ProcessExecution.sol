@@ -4,7 +4,9 @@ pragma solidity ^0.8.9;
 contract ProcessExecution {
   uint public tokenState = 1;
   address[{{{numberOfParticipants}}}] public participants;
-  // case instance variables here
+  {{#caseVariables}}
+  {{{#caseVariables}}}
+  {{/caseVariables}}
 
   constructor(address[{{{numberOfParticipants}}}] memory _participants) {
     participants = _participants;

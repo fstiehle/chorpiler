@@ -26,20 +26,6 @@ Chorpiler offers two types of output that implement the process model:
 
 See below example.
 
-```js
-import chorpiler from 'chorpiler';
-
-const parser = new chorpiler.Parser();
-
-// to generate a smart contract implementing the process
-const contractGenerator = new chorpiler
-  .generators.sol.DefaultContractGenerator();
-
-// (advanced) to generate a state channel  contract
-const stateChannelGenerator = new chorpiler
-  .generators.sol.StateChannelContractGenerator();
-```
-
 Complete example usage to parse and generate. 
 ```js
 import * as fs from 'fs';
@@ -47,16 +33,15 @@ import chorpiler, { ProcessEncoding } from 'chorpiler';
 
 const parser = new chorpiler.Parser();
 
-const contractGenerator = new chorpiler
-  .generators.sol.DefaultContractGenerator();
-
 const bpmnXML = fs.readFileSync("yourBPMNXML.bpmn");   
 // parse BPMN file into petri net
 const iNet = await parser.fromXML(bpmnXML);
 
+const contractGenerator = new chorpiler
+  .generators.sol.DefaultContractGenerator(iNet);
+
 // compile to smart contract
-contractGenerator.compile(iNet)
-.then((gen) => {
+contractGenerator.compile().then((gen) => {
   fs.writeFileSync(
     "Process.sol", 
     gen.target, 

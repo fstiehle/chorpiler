@@ -9,21 +9,14 @@ import { BPMN_PATH, OUTPUT_PATH } from "../config";
 import { ProcessEncoding } from "../../src/Generator/ProcessEncoding";
 import { INetFastXMLParser } from "../../src/Parser/FastXMLParser";
 import SolDefaultContractGenerator from "../../src/Generator/target/Sol/DefaultContractGenerator";
-import TypeScriptGenerator from "../../src/Generator/target/Typescript/DefaultFuncGenerator";
 import SolStateChannelContractGenerator from "../../src/Generator/target/Sol/StateChannelContractGenerator";
 
 const readFile = util.promisify(fs.readFile);
 const writeFile = util.promisify(fs.writeFile);
 use(chaiAsPromised);
 
-const parseCompile = async (bpmnPath: string, parser: INetParser, gen: TemplateEngine) => {
-  const data = await readFile(bpmnPath);
-  return parser.fromXML(data).then((iNet) => {
-    return gen.compile(iNet);
-  });
-}
-const testCase = async (bpmnPath: string, parser: INetParser, generator: TemplateEngine, outputPath: string, caseLabel: string) => {
-  const output = await parseCompile(bpmnPath, parser, generator);
+const compileCase = async (generator: TemplateEngine, outputPath: string, caseLabel: string) => {
+  const output = await generator.compile();
 
   await writeFile(
     path.join(outputPath.replace(".sol", "_encoding.json")), 
@@ -44,58 +37,59 @@ const testCase = async (bpmnPath: string, parser: INetParser, generator: Templat
 describe('Test Parsing and Generation', () => {
 
   let parser: INetParser;
-  let solGenerator: TemplateEngine; 
-  let tsGenerator: TemplateEngine; 
-  let stateChannelRootGenerator: TemplateEngine; 
 
   beforeEach(() => {
     parser = new INetFastXMLParser();
-    solGenerator = new SolDefaultContractGenerator();
-    tsGenerator = new TypeScriptGenerator();
-    stateChannelRootGenerator = new SolStateChannelContractGenerator();
+    
   });
 
-  describe('Parse correct BPMN and generate artefacts using default templates', () => {
+  describe('Parse correct BPMN and generate Sol Contracts', () => {
 
-    it('Compile model with simple seq flow to Sol contract', async () => {
-      return parseCompile(path.join(BPMN_PATH, 'seq-flow.bpmn'), parser, solGenerator);
+    it('Compile model with simple seq flow ', () => {
+      return readFile(path.join(BPMN_PATH, 'seq-flow.bpmn')).then(async (data) => {
+        const iNet = await parser.fromXML(data);
+        return await new SolDefaultContractGenerator(iNet).compile();
+      })
     });
 
     it('Compile model with XOR that allows to skip to the end event to Sol contract', () => {
-      return parseCompile(path.join(BPMN_PATH, 'xor-skip.bpmn'), parser, solGenerator);
+      return readFile(path.join(BPMN_PATH, 'xor-skip.bpmn')).then(async (data) => {
+        const iNet = await parser.fromXML(data);
+        return await new SolDefaultContractGenerator(iNet).compile();
+      })
     });
 
     it('Compile model with AND to Sol contract', () => {
-      return parseCompile(path.join(BPMN_PATH, 'and.bpmn'), parser, solGenerator);
-    });
-
-    it('Compile model with XOR to TypeScript', () => {
-      return console.log(parseCompile(path.join(BPMN_PATH, 'xor.bpmn'), parser, tsGenerator));
-    });
-
-    it('Compile model with XOR that allows to skip to the end event to TypeScript', () => {
-      return parseCompile(path.join(BPMN_PATH, 'xor-skip.bpmn'), parser, tsGenerator);
-    });
-
-    it('Compile model with AND to TypeScript', () => {
-      return parseCompile(path.join(BPMN_PATH, 'and.bpmn'), parser, tsGenerator);
+      return readFile(path.join(BPMN_PATH, 'and.bpmn')).then(async (data) => {
+        const iNet = await parser.fromXML(data);
+        return await new SolDefaultContractGenerator(iNet).compile();
+      })
     });
 
     it('Compile model with XOR to Sol contract', () => {
-      return parseCompile(path.join(BPMN_PATH, 'xor.bpmn'), parser, solGenerator);
+      return readFile(path.join(BPMN_PATH, 'xor.bpmn')).then(async (data) => {
+        const iNet = await parser.fromXML(data);
+        return await new SolDefaultContractGenerator(iNet).compile();
+      })
     });
 
-    it('Compile model with long (7 consecutive) seq flows to Sol contract', async () => {
-      return console.log(await parseCompile(path.join(BPMN_PATH, 'seq-flow-7.bpmn'), parser, solGenerator));
+    it('Compile model with long (7 consecutive) seq flows to Sol contract', () => {
+      return readFile(path.join(BPMN_PATH, 'seq-flow-7.bpmn')).then(async (data) => {
+        const iNet = await parser.fromXML(data);
+        return await new SolDefaultContractGenerator(iNet).compile();
+      })
     });
 
-    it('Compile model with uncontrolled merge of seq flows to Sol contract', async () => {
-      return console.log(await parseCompile(path.join(BPMN_PATH, 'uncontrolled-flow.bpmn'), parser, solGenerator));
+    it('Compile model with uncontrolled merge of seq flows to Sol contract', () => {
+      return readFile(path.join(BPMN_PATH, 'uncontrolled-flow.bpmn')).then(async (data) => {
+        const iNet = await parser.fromXML(data);
+        return await new SolDefaultContractGenerator(iNet).compile();
+      })
     });
 
   });
 
-  describe.skip('Parse and compile pizza case', () => {
+  describe('Parse and compile pizza case', () => {
 
     before(() => {
       if (!fs.existsSync(path.join(OUTPUT_PATH, "pizza"))) {
@@ -105,10 +99,10 @@ describe('Test Parsing and Generation', () => {
 
     it('to Sol Contract', async () => {
 
-      return testCase(
-        path.join(BPMN_PATH, 'xor.bpmn'), 
-        parser, 
-        solGenerator, 
+      const data = await readFile(path.join(BPMN_PATH, 'xor.bpmn'));
+
+      return compileCase(
+        new SolDefaultContractGenerator(await parser.fromXML(data)),
         path.join(OUTPUT_PATH, "/pizza/PIZZA_ProcessExecution.sol"),
         "PIZZA_"
       );
@@ -127,10 +121,10 @@ describe('Test Parsing and Generation', () => {
 
     it('to Sol Contract', async () => {
 
-      return testCase(
-        path.join(BPMN_PATH, 'cases/out-of-order', 'out-of-order-xml.bpmn'), 
-        parser, 
-        solGenerator, 
+      const data = await readFile(path.join(BPMN_PATH, '/cases/out-of-order/out-of-order-xml.bpmn'));
+
+      return compileCase(
+        new SolDefaultContractGenerator(await parser.fromXML(data)),
         path.join(OUTPUT_PATH, "/out-of-order/PH_ProcessExecution.sol"),
         "PH_"
       );
@@ -139,10 +133,10 @@ describe('Test Parsing and Generation', () => {
 
     it('to State Channel Root', async () => {
 
-      return testCase(
-        path.join(BPMN_PATH, 'cases/out-of-order', 'out-of-order-xml.bpmn'), 
-        parser, 
-        stateChannelRootGenerator, 
+      const data = await readFile(path.join(BPMN_PATH, '/cases/out-of-order/out-of-order-xml.bpmn'));
+
+      return compileCase(
+        new SolStateChannelContractGenerator(await parser.fromXML(data)),
         path.join(OUTPUT_PATH, "/out-of-order/PH_ProcessChannel.sol"),
         "PH_"
       );
@@ -161,10 +155,10 @@ describe('Test Parsing and Generation', () => {
 
     it('to Sol Contract', async () => {
 
-      return testCase(
-        path.join(BPMN_PATH, '/cases/supply-chain/supply-chain.bpmn'), 
-        parser, 
-        solGenerator, 
+      const data = await readFile(path.join(BPMN_PATH, '/cases/supply-chain/supply-chain.bpmn'));
+
+      return compileCase(
+        new SolDefaultContractGenerator(await parser.fromXML(data)), 
         path.join(OUTPUT_PATH, "/supply-chain/SC_ProcessExecution.sol"),
         "SC_"
       );
@@ -173,10 +167,10 @@ describe('Test Parsing and Generation', () => {
 
     it('to State Channel Root', async () => {
 
-      return testCase(
-        path.join(BPMN_PATH, '/cases/supply-chain/supply-chain.bpmn'), 
-        parser, 
-        stateChannelRootGenerator, 
+      const data = await readFile(path.join(BPMN_PATH, '/cases/supply-chain/supply-chain.bpmn'));
+
+      return compileCase(
+        new SolStateChannelContractGenerator(await parser.fromXML(data)), 
         path.join(OUTPUT_PATH, "/supply-chain/SC_ProcessChannel.sol"),
         "SC_"
       );
@@ -195,10 +189,10 @@ describe('Test Parsing and Generation', () => {
 
     it('to Sol Contract', async () => {
 
-      return testCase(
-        path.join(BPMN_PATH, '/cases/incident-management/incident-management.bpmn'), 
-        parser, 
-        solGenerator, 
+      const data = await readFile(path.join(BPMN_PATH, '/cases/incident-management/incident-management.bpmn'));
+
+      return compileCase(
+        new SolDefaultContractGenerator(await parser.fromXML(data)),
         path.join(OUTPUT_PATH, "/incident-management/IM_ProcessExecution.sol"),
         "IM_"
       );
@@ -207,31 +201,14 @@ describe('Test Parsing and Generation', () => {
 
     it('to State Channel Root', async () => {
 
-      return testCase(
-        path.join(BPMN_PATH, '/cases/incident-management/incident-management.bpmn'), 
-        parser, 
-        stateChannelRootGenerator, 
+      const data = await readFile(path.join(BPMN_PATH, '/cases/incident-management/incident-management.bpmn'));
+
+      return compileCase(
+        new SolStateChannelContractGenerator(await parser.fromXML(data)),
         path.join(OUTPUT_PATH, "/incident-management/IM_ProcessChannel.sol"),
         "IM_"
       );
       
-    });
-
-  });
-
-  describe('Parse and generate using specified template', () => {
-
-    it('compile XOR to Sol contract', () => {
-      return expect(readFile(path.join(__dirname, "..", "..", "src/Generator/templates/ProcessExecution.sol"))
-        .then((template) => {
-          return readFile(path.join(BPMN_PATH, 'xor.bpmn'))
-            .then((data) => {
-              return parser.fromXML(data).then((iNet) => {
-                return solGenerator.compile(iNet, template.toString());
-              })
-          })
-      }))
-      .to.eventually.contain.keys("target", "encoding");
     });
 
   });

@@ -325,7 +325,7 @@ export class INetFastXMLParser implements INetParser {
       const parsed = this.parser.parse(xml.toString());
       const rootElements = parsed[Elements.rootElements][0];
       if (!(Elements.choreographies in rootElements)) {
-        return reject("No choreography found");
+        return reject(new Error("No choreography found"));
       }
       if (rootElements[Elements.choreographies].length !== 1) {
         // we don't support call choreographies yet.
