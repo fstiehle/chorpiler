@@ -5,12 +5,18 @@ contract ProcessExecution {
   uint public tokenState = 1;
   address[{{{numberOfParticipants}}}] public participants;
   {{#caseVariables}}
-  {{{caseVariables}}}
+  {{{expression}}}
   {{/caseVariables}}
 
   constructor(address[{{{numberOfParticipants}}}] memory _participants) {
     participants = _participants;
   }
+
+  {{#caseVariables}}
+  function set{{{name}}}({{{type}}} _{{{name}}}) external {
+    {{{name}}} = _{{{name}}};
+  }
+  {{/caseVariables}}
 
   function enact(uint id) external {
     uint _tokenState = tokenState;

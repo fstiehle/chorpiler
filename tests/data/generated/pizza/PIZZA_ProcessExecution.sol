@@ -10,6 +10,10 @@ contract PIZZA_ProcessExecution {
     participants = _participants;
   }
 
+  function setitems(bool _items) external {
+    items = _items;
+  }
+
   function enact(uint id) external {
     uint _tokenState = tokenState;
     

@@ -3,7 +3,24 @@ import { ProcessEncoding } from "../Generator/ProcessEncoding";
 import seed from 'seed-random';
 
 export class Event {
-  constructor(public name: string, public source: string, public target: string) {}
+  public target: string|null = null;
+  public dataChange: InstanceDataChange[]|null = null;
+
+  constructor(
+    public name: string, 
+    public source: string, 
+    _target?: string,
+    _dataChange?: InstanceDataChange[]) {
+    
+    if (_dataChange)
+      this.dataChange = _dataChange;
+    if (_target)
+      this.target = _target;
+  }
+}
+
+export class InstanceDataChange {
+  constructor(public variable: string, public val: boolean) { }
 }
 
 export class EventLog implements IterableIterator<Trace>{

@@ -8,21 +8,30 @@ import * as fs from 'fs';
 const readFile = util.promisify(fs.readFile);
 
 export interface ITemplateEngine {
-  addCaseVariable(variableName: string, expression: string): void;
+  addCaseVariable(variable: CaseVariable): void;
   deleteCaseVariable(variableName: string): boolean;
-  getCaseVariable(variableName: string): string | undefined;
+  getCaseVariable(variableName: string): CaseVariable | undefined;
   compile(): Promise<{target: string, encoding: ProcessEncoding}>
   setTemplatePath(path: string): void;
   getTemplate(): Promise<string>
 }
 
+export class CaseVariable {
+  constructor(
+    public name: string,
+    public type: string,
+    public expression: string,
+    public setters: boolean
+  ) {}
+}
+
 export abstract class TemplateEngine implements ITemplateEngine {
-  caseVariables: Map<string, string> = new Map();
+  caseVariables: Map<string, CaseVariable> = new Map();
 
   constructor(
     private iNet: InteractionNet, 
     private templatePath: string, 
-    _caseVariables?: Map<string, string>) {
+    _caseVariables?: Map<string, CaseVariable>) {
       
       if (_caseVariables != null)
         this.caseVariables = _caseVariables;
@@ -42,8 +51,8 @@ export abstract class TemplateEngine implements ITemplateEngine {
       encoding: gen.encoding };
   }
 
-  addCaseVariable(variableName: string, expression: string) {
-    this.caseVariables.set(variableName, expression);
+  addCaseVariable(variable: CaseVariable) {
+    this.caseVariables.set(variable.name, variable);
   }
   deleteCaseVariable(variableName: string) {
     return this.caseVariables.delete(variableName);

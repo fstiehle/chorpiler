@@ -3,10 +3,6 @@
 	<global scope="event">
 		<string key="concept:name" value="Choreography Task ID"/>
 		<string key="sourceRef" value="Participant ID"/>
-		<string key="targetRef" value="Participant ID"/>
-	</global>
-	<global scope="instanceData">
-		<boolean key="variable:name" value="true"/>
 	</global>
 	<trace>
 		<event>
@@ -41,9 +37,11 @@
 			<string key="targetRef" value="Participant_0mgz9si"/>
 			<string key="label" value="order pizza"/>
 		</event>
-		<instanceData>
+		<event>
+			<string key="concept:name" value="InstanceDataChange"/>
+			<string key="sourceRef" value="Participant_06qakjv"/>
 			<boolean key="items" value="true"/>
-		</instanceData>
+		</event>
 		<event>
 			<string key="concept:name" value="ChoreographyTask_1797ws1"/>
 			<string key="sourceRef" value="Participant_0537iz2"/>

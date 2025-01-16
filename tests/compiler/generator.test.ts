@@ -3,7 +3,7 @@ import * as fs from 'fs';
 import {INetParser} from "../../src/Parser/Parser";
 import chaiAsPromised from 'chai-as-promised';
 import util from 'util';
-import { TemplateEngine }  from "../../src/Generator/TemplateEngine";
+import { CaseVariable, TemplateEngine }  from "../../src/Generator/TemplateEngine";
 import path from "path";
 import { BPMN_PATH, OUTPUT_PATH } from "../config";
 import { ProcessEncoding } from "../../src/Generator/ProcessEncoding";
@@ -101,7 +101,7 @@ describe('Test Parsing and Generation', () => {
 
       const data = await readFile(path.join(BPMN_PATH, '/cases/pizza/pizza.bpmn'));
       const contract =  new SolDefaultContractGenerator(await parser.fromXML(data));
-      contract.addCaseVariable("items", "bool public items = false;");
+      contract.addCaseVariable(new CaseVariable("items", "bool", "bool public items = false;", true));
 
       return compileCase(
         contract,

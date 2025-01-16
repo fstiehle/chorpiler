@@ -28,11 +28,17 @@ export interface PIZZA_ProcessExecutionInterface extends utils.Interface {
     "enact(uint256)": FunctionFragment;
     "items()": FunctionFragment;
     "participants(uint256)": FunctionFragment;
+    "setitems(bool)": FunctionFragment;
     "tokenState()": FunctionFragment;
   };
 
   getFunction(
-    nameOrSignatureOrTopic: "enact" | "items" | "participants" | "tokenState"
+    nameOrSignatureOrTopic:
+      | "enact"
+      | "items"
+      | "participants"
+      | "setitems"
+      | "tokenState"
   ): FunctionFragment;
 
   encodeFunctionData(
@@ -45,6 +51,10 @@ export interface PIZZA_ProcessExecutionInterface extends utils.Interface {
     values: [PromiseOrValue<BigNumberish>]
   ): string;
   encodeFunctionData(
+    functionFragment: "setitems",
+    values: [PromiseOrValue<boolean>]
+  ): string;
+  encodeFunctionData(
     functionFragment: "tokenState",
     values?: undefined
   ): string;
@@ -55,6 +65,7 @@ export interface PIZZA_ProcessExecutionInterface extends utils.Interface {
     functionFragment: "participants",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(functionFragment: "setitems", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "tokenState", data: BytesLike): Result;
 
   events: {};
@@ -99,6 +110,11 @@ export interface PIZZA_ProcessExecution extends BaseContract {
       overrides?: CallOverrides
     ): Promise<[string]>;
 
+    setitems(
+      _items: PromiseOrValue<boolean>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<ContractTransaction>;
+
     tokenState(overrides?: CallOverrides): Promise<[BigNumber]>;
   };
 
@@ -114,6 +130,11 @@ export interface PIZZA_ProcessExecution extends BaseContract {
     overrides?: CallOverrides
   ): Promise<string>;
 
+  setitems(
+    _items: PromiseOrValue<boolean>,
+    overrides?: Overrides & { from?: PromiseOrValue<string> }
+  ): Promise<ContractTransaction>;
+
   tokenState(overrides?: CallOverrides): Promise<BigNumber>;
 
   callStatic: {
@@ -128,6 +149,11 @@ export interface PIZZA_ProcessExecution extends BaseContract {
       arg0: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
     ): Promise<string>;
+
+    setitems(
+      _items: PromiseOrValue<boolean>,
+      overrides?: CallOverrides
+    ): Promise<void>;
 
     tokenState(overrides?: CallOverrides): Promise<BigNumber>;
   };
@@ -147,6 +173,11 @@ export interface PIZZA_ProcessExecution extends BaseContract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
+    setitems(
+      _items: PromiseOrValue<boolean>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<BigNumber>;
+
     tokenState(overrides?: CallOverrides): Promise<BigNumber>;
   };
 
@@ -161,6 +192,11 @@ export interface PIZZA_ProcessExecution extends BaseContract {
     participants(
       arg0: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    setitems(
+      _items: PromiseOrValue<boolean>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<PopulatedTransaction>;
 
     tokenState(overrides?: CallOverrides): Promise<PopulatedTransaction>;

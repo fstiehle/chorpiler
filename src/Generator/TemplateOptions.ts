@@ -4,8 +4,12 @@ export class TemplateOptions {
   // and may not be displayed by the template engine, 
   // thus, prefer string type
   numberOfParticipants = "0";
-  caseVariables = new Array<string>();
-
+  caseVariables = new Array<{
+    name: string,
+    type: string,
+    expression: string,
+    setters: boolean
+  }>();
   participants = new Array<{
     id: string; // ID in form 0...n assigned by generator
     modelID: string; // ID as in model

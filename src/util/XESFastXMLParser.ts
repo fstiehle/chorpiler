@@ -1,5 +1,5 @@
 import { XMLParser } from 'fast-xml-parser';
-import { EventLog, Event, Trace } from './EventLog';
+import { EventLog, Event, Trace, InstanceDataChange } from './EventLog';
 import assert from 'assert';
 
 enum Props {
@@ -51,19 +51,24 @@ export class XESFastXMLParser {
 
             }
 
-            /* if ('int' in event) {
-              for (const intEntry of event['int']) {
-
-                if (intEntry[Props.key] === 'condition') {
-                  cond = intEntry[Props.val];
-                  continue;
-                }
-
+            // parse instance data
+            // TODO: so far we just assume bool and int equals instance data
+            const data = new Array<InstanceDataChange>();
+            if ('boolean' in event) {
+              for (const entry of event['boolean']) {
+                assert(entry[Props.key] && entry[Props.val]);
+                data.push(new InstanceDataChange(entry[Props.key], entry[Props.val]));
               }
-            } */
+            }
+            if ('int' in event) {
+              for (const entry of event['int']) {
+                assert(entry[Props.key] && entry[Props.val]);
+                data.push(new InstanceDataChange(entry[Props.key], entry[Props.val]));
+              }
+            }
 
-            assert(name && from && to);
-            events.push(new Event(name, from, to));
+            assert(name && from);
+            events.push(new Event(name, from, to, data));
           }
 
           traces.push(new Trace(events));

@@ -103,19 +103,30 @@ const testCase = (
         const contract = [...contracts.values()][0];
 
         for (const event of trace) {
+          // Implement data change, allow data change also if event name not found
           const participant = contracts.get(event.source);
           const taskID = processEncoding.tasks.get(event.name);
-          assert(participant !== undefined && taskID !== undefined,
-            `source '${event.source}' event '${event.name}' not found`);
-          console.debug(`source '${event.source}' event '${event.name}'`)
+          assert(participant !== undefined, `source (participant) '${event.source}' for event '${event.name}' not found`);
+          //console.debug(`source '${event.source}' event '${event.name}'`)
 
-          const preTokenState = await contract.tokenState();
-          const tx = await (await participant.enact(taskID)).wait(1);
-          console.debug('Gas', 'Enact Task', event.name, ":", tx.gasUsed.toNumber());
+          if (taskID !== undefined) {
+            const preTokenState = await contract.tokenState();
+            const tx = await (await participant.enact(taskID)).wait(1);
+            console.debug('Gas', 'Enact Task', event.name, ":", tx.gasUsed.toNumber());
+  
+            // Expect that tokenState has changed!
+            expect(await contract.tokenState()).to.not.equal(preTokenState);
+            totalGasCost += tx.gasUsed.toNumber();
+          }
 
-          // Expect that tokenState has changed!
-          expect(await contract.tokenState()).to.not.equal(preTokenState);
-          totalGasCost += tx.gasUsed.toNumber();
+          // data changes
+          if (event.dataChange) {
+            for (const el of event.dataChange) {
+              const tx = await (await contract["set" + el.variable](el.val)).wait(1);
+              console.debug('Gas', 'Write', event.name, el.variable, el.val, ":", tx.gasUsed.toNumber());
+              totalGasCost += tx.gasUsed.toNumber();
+            }
+          }
         }
         expect(
           await contract.tokenState(),
