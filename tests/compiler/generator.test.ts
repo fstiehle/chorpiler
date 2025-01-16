@@ -89,7 +89,7 @@ describe('Test Parsing and Generation', () => {
 
   });
 
-  describe('Parse and compile pizza case', () => {
+  describe('Parse and compile Pizza Case', () => {
 
     before(() => {
       if (!fs.existsSync(path.join(OUTPUT_PATH, "pizza"))) {
@@ -99,7 +99,7 @@ describe('Test Parsing and Generation', () => {
 
     it('to Sol Contract', async () => {
 
-      const data = await readFile(path.join(BPMN_PATH, 'xor.bpmn'));
+      const data = await readFile(path.join(BPMN_PATH, '/cases/pizza/pizza.bpmn'));
       const contract =  new SolDefaultContractGenerator(await parser.fromXML(data));
       contract.addCaseVariable("items", "bool public items = false;");
 
@@ -108,7 +108,7 @@ describe('Test Parsing and Generation', () => {
         path.join(OUTPUT_PATH, "/pizza/PIZZA_ProcessExecution.sol"),
         "PIZZA_"
       );
-      
+
     });
 
   });

@@ -14,7 +14,7 @@ contract PIZZA_ProcessExecution {
     uint _tokenState = tokenState;
     
     while(_tokenState != 0) {
-      if (3 == id && (_tokenState & 2 == 2)) {
+      if (items==true && 3 == id && (_tokenState & 2 == 2)) {
         _tokenState &= ~uint(2);
         _tokenState |= 8;
         continue;
@@ -28,17 +28,17 @@ contract PIZZA_ProcessExecution {
         _tokenState |= 2;
         break;
       }
-      if (items==true && 1 == id && (_tokenState & 2 == 2) && msg.sender == participants[0]) {
+      if (1 == id && (_tokenState & 2 == 2) && msg.sender == participants[1]) {
         _tokenState &= ~uint(2);
         _tokenState |= 4;
         break;
       }
-      if (2 == id && (_tokenState & 4 == 4) && msg.sender == participants[0]) {
+      if (2 == id && (_tokenState & 4 == 4) && msg.sender == participants[1]) {
         _tokenState &= ~uint(4);
         _tokenState |= 8;
         break;
       }
-      if (3 == id && (_tokenState & 8 == 8) && msg.sender == participants[0]) {
+      if (3 == id && (_tokenState & 8 == 8) && msg.sender == participants[2]) {
         _tokenState &= ~uint(8);
         _tokenState |= 0;
         break;

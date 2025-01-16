@@ -9,7 +9,7 @@
   ],
   "scripts": {
     "test": "mocha tests/index.test.ts && mocha tests/compiler && waffle && mocha tests/output",
-    "dev": "mocha tests/compiler -g 'Incident Management Case' && waffle && mocha tests/output -g 'Incident Management Case'",
+    "dev": "mocha tests/compiler -g 'Pizza Case' && waffle && mocha tests/output -g 'Pizza Case'",
     "debug": "mocha tests/compiler -g 'uncontrolled merge' --inspect",
     "test/compiler": "mocha tests/compiler",
     "test/output": "mocha tests/output",

@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<log xes.version="1.0">
+	<global scope="event">
+		<string key="concept:name" value="Choreography Task ID"/>
+		<string key="sourceRef" value="Participant ID"/>
+		<string key="targetRef" value="Participant ID"/>
+	</global>
+	<global scope="instanceData">
+		<boolean key="variable:name" value="true"/>
+	</global>
+	<trace>
+		<event>
+			<string key="concept:name" value="ChoreographyTask_0hy9n0g"/>
+			<string key="sourceRef" value="Participant_06qakjv"/>
+			<string key="targetRef" value="Participant_0mgz9si"/>
+			<string key="label" value="order pizza"/>
+		</event>
+		<event>
+			<string key="concept:name" value="ChoreographyTask_1b2vkz9"/>
+			<string key="sourceRef" value="Participant_0mgz9si"/>
+			<string key="targetRef" value="Participant_06qakjv"/>
+			<string key="label" value="Confirm ETA"/>
+		</event>
+		<event>
+			<string key="concept:name" value="ChoreographyTask_1jrfmx8"/>
+			<string key="sourceRef" value="Participant_0mgz9si"/>
+			<string key="targetRef" value="Participant_06qakjv"/>
+			<string key="label" value="Announce Delivery"/>
+		</event>
+		<event>
+			<string key="concept:name" value="ChoreographyTask_1797ws1"/>
+			<string key="sourceRef" value="Participant_0537iz2"/>
+			<string key="targetRef" value="Participant_06qakjv"/>
+			<string key="label" value="Deliver Pizza"/>
+		</event>
+	</trace>
+	<trace>
+		<event>
+			<string key="concept:name" value="ChoreographyTask_0hy9n0g"/>
+			<string key="sourceRef" value="Participant_06qakjv"/>
+			<string key="targetRef" value="Participant_0mgz9si"/>
+			<string key="label" value="order pizza"/>
+		</event>
+		<instanceData>
+			<boolean key="items" value="true"/>
+		</instanceData>
+		<event>
+			<string key="concept:name" value="ChoreographyTask_1797ws1"/>
+			<string key="sourceRef" value="Participant_0537iz2"/>
+			<string key="targetRef" value="Participant_06qakjv"/>
+			<string key="label" value="Deliver Pizza"/>
+		</event>
+	</trace>
+</log>

@@ -4,7 +4,7 @@ export class Element {
   id: string;
   source = new Array<Element>();
   target = new Array<Element>(); 
-  
+
   constructor(id: string) {
     this.id = id;
   }
@@ -26,7 +26,7 @@ export enum PlaceType {
 
 export class Transition extends Element {
   label: Label;
-  
+
   constructor(id: string, label: Label) {
     super(id);
     this.label = label;

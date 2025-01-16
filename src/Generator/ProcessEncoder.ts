@@ -202,7 +202,7 @@ export class ProcessEncoder {
 
   private static isSilentTransition(el: Element) {
     return el instanceof Transition &&
-    (el.label.type === LabelType.DataExclusiveIncoming
+    (  el.label.type === LabelType.DataExclusiveIncoming
     || el.label.type === LabelType.DataExclusiveOutgoing
     || el.label.type === LabelType.EventExclusiveIncoming
     || el.label.type === LabelType.EventExclusiveOutgoing

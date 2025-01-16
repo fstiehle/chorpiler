@@ -14,10 +14,12 @@ import { XESFastXMLParser } from "../../src/util/XESFastXMLParser";
 import AIM_ProcessSmartContract from './../data/generated/artifcats/IM_ProcessExecution.json';
 import ASC_ProcessSmartContract from './../data/generated/artifcats/SC_ProcessExecution.json';
 import APH_ProcessSmartContract from './../data/generated/artifcats/PH_ProcessExecution.json';
+import APIZZA_ProcessSmartContract from './../data/generated/artifcats/PIZZA_ProcessExecution.json';
 
 import encodingSC from './../data/generated/supply-chain/SC_ProcessExecution_encoding.json';
 import encodingIM from './../data/generated/incident-management/IM_ProcessExecution_encoding.json';
 import encodingPH from './../data/generated/out-of-order/PH_ProcessExecution_encoding.json';
+import encodingPIZZA from './../data/generated/pizza/PIZZA_ProcessExecution_encoding.json';
 import assert from "assert";
 
 use(solidity);
@@ -35,6 +37,9 @@ const parser = new XESFastXMLParser();
 
   const eventLogPH = await parser.fromXML(
     readFileSync(path.join(BPMN_PATH, 'cases', 'out-of-order', 'out-of-order-xml.xes')));
+
+  const eventLogPIZZA = await parser.fromXML(
+    readFileSync(path.join(BPMN_PATH, 'cases', 'pizza', 'pizza.xes')));
 
   describe('Test Execution of Cases', () => {
 
@@ -62,6 +67,15 @@ const parser = new XESFastXMLParser();
         eventLogPH, 
         ProcessEncoding.fromJSON(encodingPH),
         new ContractFactory(APH_ProcessSmartContract.abi, APH_ProcessSmartContract.bytecode)
+      );
+    });
+
+    describe('Pizza Case', () => {
+
+      testCase(
+        eventLogPIZZA, 
+        ProcessEncoding.fromJSON(encodingPIZZA),
+        new ContractFactory(APIZZA_ProcessSmartContract.abi, APIZZA_ProcessSmartContract.bytecode)
       );
     });
   });

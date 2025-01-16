@@ -16,7 +16,7 @@ enum Elements {
   startEvent = 'bpmn2:startEvent',
   endEvent = 'bpmn2:endEvent',
   exclusiveGateway = 'bpmn2:exclusiveGateway',
-  conditionExpression = 'bpmn:conditionExpression',
+  conditionExpression = 'bpmn2:conditionExpression',
   parallelGateway = 'bpmn2:parallelGateway',
   eventGateway = 'bpmn2:eventBasedGateway',
   outs = 'bpmn2:outgoing',
@@ -235,14 +235,14 @@ export class INetFastXMLParser implements INetParser {
         if (place.source.length === 0) {
           const source = this.iNet.elements.get(flow[Properties.source]);
           if (!source) throw new Error(
-            `Unsupported Element ${flow[Properties.source]} as source referenced in flow ${id}`);
+            `Unsupported Element ${flow[Properties.source]} as source, referenced in flow ${id}`);
           this.linkElements(source, place);
         }
 
         if (place.target.length === 0) {
           const target = this.iNet.elements.get(flow[Properties.target]);
           if (!target) throw new Error(
-            `Unsupported Element ${flow[Properties.target]} as target referenced in flow ${id}`);
+            `Unsupported Element ${flow[Properties.target]} as target, referenced in flow ${id}`);
           this.linkElements(place, target);
         }
 
@@ -258,16 +258,17 @@ export class INetFastXMLParser implements INetParser {
               // so we only set additional info
               guard.name = name != null ? name : "no name";
             } else {
+              console.log(flow)
               // if it is not a default flow it needs to have an expression present
               if (!flow[Elements.conditionExpression] || flow[Elements.conditionExpression].length !== 1) {
-                throw new Error(`XOR outgoing flow (${id}) without or malformed condition expression`);
+                throw new Error(`XOR outgoing flow (${id}) without or malformed condition script expression`);
               }
               const condition = flow[Elements.conditionExpression][0];
               const lang = condition[Properties.language];
               const expression = condition['#text'];
               if (!expression || !lang) {
                 throw new Error(
-                  `XOR outgoing flow (${id}) without proper (language and expression) condition expression`);
+                  `XOR outgoing flow (${id}) without proper (language and expression) script condition expression`);
               }
               const guard = new Guard(name != null ? name : "no name", false);
               guard.condition = expression;
