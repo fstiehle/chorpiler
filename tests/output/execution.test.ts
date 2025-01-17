@@ -159,7 +159,6 @@ const testCase = (
           const preTokenState = await contract.tokenState();
           const tx = await (await participant.enact(taskID)).wait(1);
 
-
           if ((await contract.tokenState()).eq(preTokenState)) eventsRejected++;
         }
 
