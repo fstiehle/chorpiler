@@ -74,17 +74,16 @@ export class INetFastXMLParser implements INetParser {
         .translateParallelGateway(choreography[Elements.parallelGateway])
         .translateEndEvent(choreography[Elements.endEvent])
         // connect flows last, and report error when a flow leads to an unknown transition, which means
-        // we were not able to translate all elements
+        // we were not able to translate all elements before
         .connectFlows(choreography[Elements.flows]);
       return this.iNet;
     }
 
-    private parseParticipants(participants: any): this {
+    private parseParticipants(participants: any) {
       for (const par of participants) {
         const newPar = new Participant(par[Properties.id], par[Properties.name]);
         this.iNet.participants.set(par[Properties.id], newPar);
       };
-      return this;
     }
 
     private parseInitiatorRespondents(task: any): { initiator: Participant, respondents: Participant[] } {
@@ -323,7 +322,7 @@ export class INetFastXMLParser implements INetParser {
 
         // merge uncontrolled flow merge, i.e., more than one incoming sequence flow into a task
         // we merge the places to create the equivalent of an XOR, 
-        // which is closer to the standard, than an AND merge behaviour, 
+        // which is closer to the standard than an AND merge behaviour, 
         // which is what we would create by default.
         if (place.type === PlaceType.UncontrolledMerge) {
           this.mergePlace(place);
@@ -350,12 +349,20 @@ export class INetFastXMLParser implements INetParser {
       return this.iNet.elements.get(el.id)!;
     }
 
+    /**
+     * Creates or gets an already existing (merged) place leading to the places target, and
+     * links @param place to it
+     * @returns new place
+     */
     private mergePlace(place: Place) {
       assert(place.source.length === 1 && place.target.length === 1);
       const source = place.source[0];
       const target = place.target[0];
 
       const mergedPlace = this.addElement(new Place("merged_" + target.id)) as Place;
+      // if merged place does not already have a target, we are linking the target
+      // this is likely, beacuse we are the first to merge; 
+      // therefore, having just created the merged place 
       if (mergedPlace.target.length === 0) this.linkElements(mergedPlace, target);
       this.linkElements(source, mergedPlace);
       this.unlinkElement(place);

@@ -37,7 +37,7 @@ export class ProcessEncoder {
 
     this.unfoldSubNets(iNet);
     // optimisation step by removing silent transitions
-    // we need to first unfold subnets, so they're also unfold correctly
+    // we need to first unfold subnets, so they're also optimised correctly
     this.removeSilentTransitions(iNet);
 
     // places to transition markings
