@@ -6,6 +6,7 @@ export type { IM_ProcessExecution } from "./IM_ProcessExecution";
 export type { PH_ProcessChannel } from "./PH_ProcessChannel";
 export type { PH_ProcessExecution } from "./PH_ProcessExecution";
 export type { PIZZA_ProcessExecution } from "./PIZZA_ProcessExecution";
+export type { RA_ProcessExecution } from "./RA_ProcessExecution";
 export type { SC_ProcessChannel } from "./SC_ProcessChannel";
 export type { SC_ProcessExecution } from "./SC_ProcessExecution";
 export * as factories from "./factories";
@@ -14,5 +15,6 @@ export { IM_ProcessExecution__factory } from "./factories/IM_ProcessExecution__f
 export { PH_ProcessChannel__factory } from "./factories/PH_ProcessChannel__factory";
 export { PH_ProcessExecution__factory } from "./factories/PH_ProcessExecution__factory";
 export { PIZZA_ProcessExecution__factory } from "./factories/PIZZA_ProcessExecution__factory";
+export { RA_ProcessExecution__factory } from "./factories/RA_ProcessExecution__factory";
 export { SC_ProcessChannel__factory } from "./factories/SC_ProcessChannel__factory";
 export { SC_ProcessExecution__factory } from "./factories/SC_ProcessExecution__factory";

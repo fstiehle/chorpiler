@@ -1,7 +1,7 @@
 import { InteractionNet } from './InteractionNet';
 import { XMLParser } from 'fast-xml-parser';
 import { Participant } from './Participant';
-import { Element, TaskLabel, Transition, Place, LabelType, Label, PlaceType, Guard } from './Element';
+import { Element, TaskLabel, Transition, Place, LabelType, Label, PlaceType, Guard, TaskType } from './Element';
 import { INetParser } from './Parser';
 import { deleteFromArray } from '../util/helpers';
 import assert from 'assert';
@@ -104,13 +104,14 @@ export class INetFastXMLParser implements INetParser {
       if (!subChoreography[Properties.initiator]) {
         throw new Error(`Sub Choreography without initiator ${subChoreography[Properties.id]}`);
       }
-      
       const translator = new INetFastXMLParser.INetTranslator();
       translator.iNet.participants = this.iNet.participants; // inherit participants from parent net
       const subNet = translator.translateElements(subChoreography);
       const parIni = this.parseInitiatorRespondents(subChoreography);
       this.iNet.subNets.set(subNet.id, subNet);
-      this.addElement(new Transition(subNet.id, new TaskLabel(parIni.initiator, parIni.respondents, subNet.id)));
+      this.addElement(
+        new Transition(subNet.id, 
+          new TaskLabel(parIni.initiator, parIni.respondents, subNet.id, TaskType.CallChoreography)));
     }
 
     private translateStartEvent(starts: any): this {
@@ -119,7 +120,7 @@ export class INetFastXMLParser implements INetParser {
       }
       const start = starts[0];
       const startEvent = new Transition(start[Properties.id], new Label(LabelType.Start));
-      const startPlace = new Place(PlaceType[PlaceType.Start]);
+      const startPlace = new Place("place_" + start[Properties.id], PlaceType.Start);
       startPlace.type = PlaceType.Start;
       this.linkElements(startPlace, startEvent);
       this.iNet.initial = startPlace;
@@ -134,7 +135,7 @@ export class INetFastXMLParser implements INetParser {
       }
       const end = ends[0];
       const endEvent = new Transition(end[Properties.id], new Label(LabelType.End));
-      const endPlace = new Place(PlaceType[PlaceType.End]);
+      const endPlace = new Place("place_" + ends[Properties.id], PlaceType.End);
       endPlace.type = PlaceType.End;
       this.linkElements(endEvent, endPlace);
       this.addElement(endEvent);
@@ -153,8 +154,8 @@ export class INetFastXMLParser implements INetParser {
         const to = initRes.respondents; 
         this.addElement(new Transition(task[Properties.id], new TaskLabel(from!, to!, task[Properties.name])));
       
-        // check for an uncontrolled flow merge, i.e., more than one incoming sequence flows
-        // if present, we merge them later when the flows are connected.
+        // Check for an uncontrolled flow merge, i.e., more than one incoming sequence flows
+        // If present, we merge them later when the flows are connected.
         if (task[Elements.ins].length > 1) {
           for (const _in of task[Elements.ins]) {
             this.addElement(new Place(_in, PlaceType.UncontrolledMerge));
@@ -372,7 +373,6 @@ export class INetFastXMLParser implements INetParser {
       }
       const iNets = new Array<InteractionNet>();
       for (const choreography of rootElements[Elements.choreographies]) {
-        // check if there are sub choreographies
         const iNetTranslator = new INetFastXMLParser.INetTranslator();
         try {
           const iNet = iNetTranslator.translate(choreography);

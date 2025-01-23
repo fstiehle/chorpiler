@@ -62,7 +62,7 @@
       <bpmn2:startEvent id="Event_0q3i5b8">
         <bpmn2:outgoing>Flow_0tasocu</bpmn2:outgoing>
       </bpmn2:startEvent>
-      <bpmn2:exclusiveGateway id="Gateway_00ejpw3">
+      <bpmn2:exclusiveGateway id="Gateway_00ejpw3" default="Flow_01wzwnf">
         <bpmn2:incoming>Flow_0tasocu</bpmn2:incoming>
         <bpmn2:incoming>Flow_1b5hlnv</bpmn2:incoming>
         <bpmn2:outgoing>Flow_01wzwnf</bpmn2:outgoing>
@@ -224,7 +224,7 @@
         <dc:Bounds x="162" y="340" width="468" height="20" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="BPMNShape_0egtq2u" bpmnElement="Participant_1mi7ck0" isHorizontal="true" isMessageVisible="false" participantBandKind="bottom_non_initiating" choreographyActivityShape="SubChoreography_1sp0n7o_di">
-        <dc:Bounds x="410" y="600" width="100" height="20" />
+        <dc:Bounds x="162" y="660" width="468" height="20" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge id="Flow_1xnijry_di" bpmnElement="Flow_1xnijry">
         <di:waypoint x="110" y="365" />

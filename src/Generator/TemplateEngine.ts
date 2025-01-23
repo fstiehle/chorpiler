@@ -41,7 +41,7 @@ export abstract class TemplateEngine implements ITemplateEngine {
     if (this.iNet.initial == null || this.iNet.end == null) {
       throw new Error("Invalid InteractionNet"); 
     }
-    const iNet: InteractionNet = {...this.iNet}; // TODO deep copy: why?
+    const iNet: InteractionNet = {...this.iNet}; // Deep copy: why?
     const template: string = await this.getTemplate();
   
     const gen = ProcessEncoder.generate(iNet);

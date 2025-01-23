@@ -64,7 +64,6 @@ export enum LabelType {
   Start,
   End,
   Task,
-  SubNet,
   DataExclusiveIncoming,
   DataExclusiveOutgoing,
   ParallelConverging ,
@@ -73,15 +72,18 @@ export enum LabelType {
   EventExclusiveOutgoing,
 }
 
-export class TaskLabel extends Label {
-  sender: Participant
-  receiver: Participant[]
-  name: String;
+export enum TaskType {
+  Task,
+  SubChoreography,
+  CallChoreography
+}
 
-  constructor(sender: Participant, receiver: Participant[], name: String) {
-    super(LabelType.Task);
-    this.sender = sender;
-    this.receiver = receiver;
-    this.name = name;
+export class TaskLabel extends Label {
+  constructor(
+    public sender: Participant, 
+    public receiver: Participant[], 
+    public name: String, 
+    public taskType: TaskType = TaskType.Task) {
+      super(LabelType.Task);
   }
 }
