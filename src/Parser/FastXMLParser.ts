@@ -9,6 +9,7 @@ import assert from 'assert';
 enum Elements {
   rootElements = 'bpmn2:definitions',
   choreographies = 'bpmn2:choreography',
+  subChoreographies = 'bpmn2:subChoreography',
   participants = 'bpmn2:participant',
   tasks = 'bpmn2:choreographyTask',
   flows = 'bpmn2:sequenceFlow',
@@ -29,6 +30,7 @@ enum Properties {
   name = '@_name',
   default = '@_default',
   language = "@_language", 
+  initiator = "@_initiatingParticipantRef"
 }
 enum ExclusiveGatewayType {
   Data,
@@ -47,11 +49,24 @@ export class INetFastXMLParser implements INetParser {
     iNet = new InteractionNet();
 
     translate(choreography: any): InteractionNet {
-      this.iNet.id = choreography[Properties.id];
-      //console.log(choreography);
+      // need to parse participants first, so we can reference them
+      this.parseParticipants(choreography[Elements.participants]);
 
+      // check if there are sub choreographies, if:
+      // recursively translate them
+      if (choreography[Elements.subChoreographies]) {
+        for (const subChoreography of choreography[Elements.subChoreographies]) {
+          this.translateSubChoreography(subChoreography);
+        }
+      }
+
+      this.translateElements(choreography);
+      return this.iNet;
+    }
+
+    private translateElements(choreography: any) {
+      this.iNet.id = choreography[Properties.id];
       this
-        .parseParticipants(choreography[Elements.participants])
         .translateStartEvent(choreography[Elements.startEvent])
         .translateTasks(choreography[Elements.tasks])
         .translateDataGateway(choreography[Elements.exclusiveGateway])
@@ -70,6 +85,32 @@ export class INetFastXMLParser implements INetParser {
         this.iNet.participants.set(par[Properties.id], newPar);
       };
       return this;
+    }
+
+    private parseInitiatorRespondents(task: any): { initiator: Participant, respondents: Participant[] } {
+      const initiator = this.iNet.participants.get(task[Properties.initiator]);
+      if (!initiator)
+        throw new Error(`Initiator of Element not found ${task[Properties.initiator]}`)
+     
+      const respondents = new Array<Participant>();
+      for (const id of task[Elements.participantsRef]) {
+        if (id === initiator) continue;
+        respondents.push(this.iNet.participants.get(id)!);
+      }
+      return { initiator, respondents }
+    }
+
+    private translateSubChoreography(subChoreography: any) {
+      if (!subChoreography[Properties.initiator]) {
+        throw new Error(`Sub Choreography without initiator ${subChoreography[Properties.id]}`);
+      }
+      
+      const translator = new INetFastXMLParser.INetTranslator();
+      translator.iNet.participants = this.iNet.participants; // inherit participants from parent net
+      const subNet = translator.translateElements(subChoreography);
+      const parIni = this.parseInitiatorRespondents(subChoreography);
+      this.iNet.subNets.set(subNet.id, subNet);
+      this.addElement(new Transition(subNet.id, new TaskLabel(parIni.initiator, parIni.respondents, subNet.id)));
     }
 
     private translateStartEvent(starts: any): this {
@@ -107,8 +148,9 @@ export class INetFastXMLParser implements INetParser {
         return this;
       }
       for (const task of tasks) {
-        const from = this.iNet.participants.get(task[Elements.participantsRef][0]);
-        const to = this.iNet.participants.get(task[Elements.participantsRef][1]);
+        const initRes = this.parseInitiatorRespondents(task);
+        const from = initRes.initiator;
+        const to = initRes.respondents; 
         this.addElement(new Transition(task[Properties.id], new TaskLabel(from!, to!, task[Properties.name])));
       
         // check for an uncontrolled flow merge, i.e., more than one incoming sequence flows
@@ -321,27 +363,27 @@ export class INetFastXMLParser implements INetParser {
     }
   };
 
-  fromXML(xml: Buffer): Promise<InteractionNet> {
-    return new Promise<InteractionNet>((resolve, reject) => {
+  fromXML(xml: Buffer): Promise<InteractionNet[]> {
+    return new Promise<InteractionNet[]>((resolve, reject) => {
       const parsed = this.parser.parse(xml.toString());
       const rootElements = parsed[Elements.rootElements][0];
-      if (!(Elements.choreographies in rootElements)) {
+      if (!(Elements.choreographies in rootElements) || rootElements[Elements.choreographies].length < 1) {
         return reject(new Error("No choreography found"));
       }
-      if (rootElements[Elements.choreographies].length !== 1) {
-        // we don't support call choreographies yet.
-        console.warn("Warning: More than one choreography found, others are ignored.");
+      const iNets = new Array<InteractionNet>();
+      for (const choreography of rootElements[Elements.choreographies]) {
+        // check if there are sub choreographies
+        const iNetTranslator = new INetFastXMLParser.INetTranslator();
+        try {
+          const iNet = iNetTranslator.translate(choreography);
+          //console.log(iNet)
+          iNets.push(iNet);
+        } catch (error) {
+          return reject(error);
+        }
       }
-      const choreography = rootElements[Elements.choreographies][0];
-      // TODO: verify there is no element we don't support
-      const iNetTranslator = new INetFastXMLParser.INetTranslator();
-      try {
-        const iNet = iNetTranslator.translate(choreography);
-        //console.log(iNet)
-        return resolve(iNet);
-      } catch (error) {
-        return reject(error);
-      }
+      console.log(iNets);
+      return resolve(iNets);
     });
   }
 }

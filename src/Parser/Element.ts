@@ -61,23 +61,24 @@ export class Guard {
 
 // TODO: Non allignend naming incoming/outgoing vs. diverging/converging
 export enum LabelType {
-  Start = 0,
-  End = 1,
-  Task = 2,
-  DataExclusiveIncoming = 3,
-  DataExclusiveOutgoing = 4,
-  ParallelConverging = 5,
-  ParallelDiverging = 6,
-  EventExclusiveIncoming = 7,
-  EventExclusiveOutgoing = 8,
+  Start,
+  End,
+  Task,
+  SubNet,
+  DataExclusiveIncoming,
+  DataExclusiveOutgoing,
+  ParallelConverging ,
+  ParallelDiverging,
+  EventExclusiveIncoming,
+  EventExclusiveOutgoing,
 }
 
 export class TaskLabel extends Label {
   sender: Participant
-  receiver: Participant
+  receiver: Participant[]
   name: String;
 
-  constructor(sender: Participant, receiver: Participant, name: String) {
+  constructor(sender: Participant, receiver: Participant[], name: String) {
     super(LabelType.Task);
     this.sender = sender;
     this.receiver = receiver;

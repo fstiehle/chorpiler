@@ -1,4 +1,4 @@
-import { expect, use } from "chai";
+import { use } from "chai";
 import * as fs from 'fs';
 import {INetParser} from "../../src/Parser/Parser";
 import chaiAsPromised from 'chai-as-promised';
@@ -40,7 +40,6 @@ describe('Test Parsing and Generation', () => {
 
   beforeEach(() => {
     parser = new INetFastXMLParser();
-    
   });
 
   describe('Parse correct BPMN and generate Sol Contracts', () => {
@@ -48,42 +47,42 @@ describe('Test Parsing and Generation', () => {
     it('Compile model with simple seq flow ', () => {
       return readFile(path.join(BPMN_PATH, 'seq-flow.bpmn')).then(async (data) => {
         const iNet = await parser.fromXML(data);
-        return await new SolDefaultContractGenerator(iNet).compile();
+        return await new SolDefaultContractGenerator(iNet[0]).compile();
       })
     });
 
     it('Compile model with XOR that allows to skip to the end event to Sol contract', () => {
       return readFile(path.join(BPMN_PATH, 'xor-skip.bpmn')).then(async (data) => {
         const iNet = await parser.fromXML(data);
-        return await new SolDefaultContractGenerator(iNet).compile();
+        return await new SolDefaultContractGenerator(iNet[0]).compile();
       })
     });
 
     it('Compile model with AND to Sol contract', () => {
       return readFile(path.join(BPMN_PATH, 'and.bpmn')).then(async (data) => {
         const iNet = await parser.fromXML(data);
-        return await new SolDefaultContractGenerator(iNet).compile();
+        return await new SolDefaultContractGenerator(iNet[0]).compile();
       })
     });
 
     it('Compile model with XOR to Sol contract', () => {
       return readFile(path.join(BPMN_PATH, 'xor.bpmn')).then(async (data) => {
         const iNet = await parser.fromXML(data);
-        return await new SolDefaultContractGenerator(iNet).compile();
+        return await new SolDefaultContractGenerator(iNet[0]).compile();
       })
     });
 
     it('Compile model with long (7 consecutive) seq flows to Sol contract', () => {
       return readFile(path.join(BPMN_PATH, 'seq-flow-7.bpmn')).then(async (data) => {
         const iNet = await parser.fromXML(data);
-        return await new SolDefaultContractGenerator(iNet).compile();
+        return await new SolDefaultContractGenerator(iNet[0]).compile();
       })
     });
 
     it('Compile model with uncontrolled merge of seq flows to Sol contract', () => {
       return readFile(path.join(BPMN_PATH, 'uncontrolled-flow.bpmn')).then(async (data) => {
         const iNet = await parser.fromXML(data);
-        return await new SolDefaultContractGenerator(iNet).compile();
+        return await new SolDefaultContractGenerator(iNet[0]).compile();
       })
     });
 
@@ -100,7 +99,7 @@ describe('Test Parsing and Generation', () => {
     it('to Sol Contract', async () => {
 
       const data = await readFile(path.join(BPMN_PATH, '/cases/pizza/pizza.bpmn'));
-      const contract =  new SolDefaultContractGenerator(await parser.fromXML(data));
+      const contract =  new SolDefaultContractGenerator((await parser.fromXML(data))[0]);
       contract.addCaseVariable(new CaseVariable("items", "bool", "bool public items = false;", true));
 
       return compileCase(
@@ -126,7 +125,7 @@ describe('Test Parsing and Generation', () => {
       const data = await readFile(path.join(BPMN_PATH, '/cases/out-of-order/out-of-order-xml.bpmn'));
 
       return compileCase(
-        new SolDefaultContractGenerator(await parser.fromXML(data)),
+        new SolDefaultContractGenerator((await parser.fromXML(data))[0]),
         path.join(OUTPUT_PATH, "/out-of-order/PH_ProcessExecution.sol"),
         "PH_"
       );
@@ -138,7 +137,7 @@ describe('Test Parsing and Generation', () => {
       const data = await readFile(path.join(BPMN_PATH, '/cases/out-of-order/out-of-order-xml.bpmn'));
 
       return compileCase(
-        new SolStateChannelContractGenerator(await parser.fromXML(data)),
+        new SolStateChannelContractGenerator((await parser.fromXML(data))[0]),
         path.join(OUTPUT_PATH, "/out-of-order/PH_ProcessChannel.sol"),
         "PH_"
       );
@@ -160,7 +159,7 @@ describe('Test Parsing and Generation', () => {
       const data = await readFile(path.join(BPMN_PATH, '/cases/supply-chain/supply-chain.bpmn'));
 
       return compileCase(
-        new SolDefaultContractGenerator(await parser.fromXML(data)), 
+        new SolDefaultContractGenerator((await parser.fromXML(data))[0]), 
         path.join(OUTPUT_PATH, "/supply-chain/SC_ProcessExecution.sol"),
         "SC_"
       );
@@ -172,7 +171,7 @@ describe('Test Parsing and Generation', () => {
       const data = await readFile(path.join(BPMN_PATH, '/cases/supply-chain/supply-chain.bpmn'));
 
       return compileCase(
-        new SolStateChannelContractGenerator(await parser.fromXML(data)), 
+        new SolStateChannelContractGenerator((await parser.fromXML(data))[0]), 
         path.join(OUTPUT_PATH, "/supply-chain/SC_ProcessChannel.sol"),
         "SC_"
       );
@@ -194,7 +193,7 @@ describe('Test Parsing and Generation', () => {
       const data = await readFile(path.join(BPMN_PATH, '/cases/incident-management/incident-management.bpmn'));
 
       return compileCase(
-        new SolDefaultContractGenerator(await parser.fromXML(data)),
+        new SolDefaultContractGenerator((await parser.fromXML(data))[0]),
         path.join(OUTPUT_PATH, "/incident-management/IM_ProcessExecution.sol"),
         "IM_"
       );
@@ -206,9 +205,31 @@ describe('Test Parsing and Generation', () => {
       const data = await readFile(path.join(BPMN_PATH, '/cases/incident-management/incident-management.bpmn'));
 
       return compileCase(
-        new SolStateChannelContractGenerator(await parser.fromXML(data)),
+        new SolStateChannelContractGenerator((await parser.fromXML(data))[0]),
         path.join(OUTPUT_PATH, "/incident-management/IM_ProcessChannel.sol"),
         "IM_"
+      );
+      
+    });
+
+  });
+
+  describe('Parse and compile Rental Agreement Case', () => {
+
+    before(() => {
+      if (!fs.existsSync(path.join(OUTPUT_PATH, "rental-agreement"))) {
+        fs.mkdirSync(path.join(OUTPUT_PATH, "rental-agreement"));
+      }
+    })
+
+    it('to Sol Contract', async () => {
+
+      const data = await readFile(path.join(BPMN_PATH, '/cases/rental-agreement/rental-agreement.bpmn'));
+
+      return compileCase(
+        new SolDefaultContractGenerator((await parser.fromXML(data))[0]),
+        path.join(OUTPUT_PATH, "/rental-agreement/RA_ProcessExecution.sol"),
+        "RA_"
       );
       
     });

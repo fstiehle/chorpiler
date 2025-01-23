@@ -1,5 +1,5 @@
 import { InteractionNet } from './InteractionNet';
 
 export interface INetParser {
-  fromXML(xml: Buffer): Promise<InteractionNet>;
+  fromXML(xml: Buffer): Promise<InteractionNet[]>;
 }
