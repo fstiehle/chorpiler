@@ -93,6 +93,13 @@ describe('Test Parsing and Generation', () => {
       })
     });
 
+    it('Compile model with XOR followed by AND to Sol contract', () => { // Should be reduced properly, according to Rule (i)
+      return readFile(path.join(BPMN_PATH, 'xor-and.bpmn')).then(async (data) => {
+        const iNet = await parser.fromXML(data);
+        console.log(await new SolDefaultContractGenerator(iNet[0]).compile());
+      })
+    });
+
   });
 
   describe('Parse and compile Pizza Case', () => {

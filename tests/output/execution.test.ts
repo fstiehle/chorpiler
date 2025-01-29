@@ -15,11 +15,13 @@ import AIM_ProcessSmartContract from './../data/generated/artifcats/IM_ProcessEx
 import ASC_ProcessSmartContract from './../data/generated/artifcats/SC_ProcessExecution.json';
 import APH_ProcessSmartContract from './../data/generated/artifcats/PH_ProcessExecution.json';
 import APIZZA_ProcessSmartContract from './../data/generated/artifcats/PIZZA_ProcessExecution.json';
+import ARA_ProcessSmartContract from './../data/generated/artifcats/RA_ProcessExecution.json';
 
 import encodingSC from './../data/generated/supply-chain/SC_ProcessExecution_encoding.json';
 import encodingIM from './../data/generated/incident-management/IM_ProcessExecution_encoding.json';
 import encodingPH from './../data/generated/out-of-order/PH_ProcessExecution_encoding.json';
 import encodingPIZZA from './../data/generated/pizza/PIZZA_ProcessExecution_encoding.json';
+import encodingRA from './../data/generated/rental-agreement/RA_ProcessExecution_encoding.json';
 import assert from "assert";
 
 use(solidity);
@@ -40,6 +42,9 @@ const parser = new XESFastXMLParser();
 
   const eventLogPIZZA = await parser.fromXML(
     readFileSync(path.join(BPMN_PATH, 'cases', 'pizza', 'pizza.xes')));
+
+  const eventLogRA = await parser.fromXML(
+    readFileSync(path.join(BPMN_PATH, 'cases', 'rental-agreement', 'rental-agreement.xes')));
 
   describe('Test Execution of Cases', () => {
 
@@ -78,6 +83,15 @@ const parser = new XESFastXMLParser();
         new ContractFactory(APIZZA_ProcessSmartContract.abi, APIZZA_ProcessSmartContract.bytecode)
       );
     });
+
+    describe('Rental Agreement Case', () => {
+
+      testCase(
+        eventLogRA, 
+        ProcessEncoding.fromJSON(encodingRA),
+        new ContractFactory(ARA_ProcessSmartContract.abi, ARA_ProcessSmartContract.bytecode)
+      );
+    });
   });
 
 })();
@@ -113,7 +127,7 @@ const testCase = (
             const preTokenState = await contract.tokenState();
             const tx = await (await participant.enact(taskID)).wait(1);
             console.debug('Gas', 'Enact Task', event.name, ":", tx.gasUsed.toNumber());
-  
+
             // Expect that tokenState has changed!
             expect(await contract.tokenState()).to.not.equal(preTokenState);
             totalGasCost += tx.gasUsed.toNumber();

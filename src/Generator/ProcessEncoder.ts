@@ -10,6 +10,7 @@ import { Transition, Element, TaskLabel, LabelType, Place, PlaceType, TaskType }
 import { InteractionNet } from '../Parser/InteractionNet';
 import { ProcessEncoding } from './ProcessEncoding';
 import { TemplateOptions } from './TemplateOptions';
+import { assert } from 'console';
 
 export class ProcessEncoder {
 
@@ -160,6 +161,8 @@ export class ProcessEncoder {
     return { encoding: new ProcessEncoding(taskIDs, conditionIDs, participantIDs), options };
   }
 
+  // TODO: If either start or end are replaced the iNet properties must be set
+  // Check: DO we somewhere link empty Source or Target lists?!
   private static removeSilentTransitions(iNet: InteractionNet) {
     for (const element of iNet.elements.values()) {
       if (element.source.length === 1 && element.target.length === 1) {
@@ -188,16 +191,20 @@ export class ProcessEncoder {
           this.deleteElement(iNet, element);
           this.deleteElement(iNet, target);
         }
-      } else if (element.source.length === 1 && element.target.length > 1
-        && this.isSilentTransition(element)) {
-        // XOR -> AND
-        const source = element.source[0];
-        for (const andPlace of element.target) {
-          this.linkNewTargets(andPlace, source.target);
-          this.linkNewSources(andPlace, source.source);
+      } else if (this.isSilentTransition(element) 
+        && element.source.length === 1 && element.source[0].source.length > 0 
+        && element.target.length > 1) {
+        // XOR -> AND, XOR not immediately after start event
+        const xorPlace = element.source[0];
+        const andPlaces = element.target;
+        for (const prevTransition of xorPlace.source) {
+          this.linkNewTargets(prevTransition, andPlaces);
+        }
+        for (const andPlace of andPlaces) {
+          this.linkNewTargets(andPlace, xorPlace.target);
         }
         this.deleteElement(iNet, element);
-        this.deleteElement(iNet, source);
+        this.deleteElement(iNet, xorPlace); 
       }
     }
   }
@@ -252,12 +259,14 @@ export class ProcessEncoder {
   }
 
   private static unlinkAllSources(el: Element) {
+    assert(el.source.length > 0, "unlinking empty list");
     for (const source of el.source)
       deleteFromArray(source.target, el);
     el.source = new Array();
   }
 
   private static unlinkAllTargets(el: Element) {
+    assert(el.target.length > 0, "unlinking empty list");
     for (const target of el.target)
       deleteFromArray(target.source, el);
     el.target = new Array();

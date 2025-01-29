@@ -114,7 +114,7 @@ export class INetFastXMLParser implements INetParser {
     }
 
     private translateStartEvent(starts: any): this {
-      if (starts.length !== 1) {
+      if (!starts || starts.length !== 1) {
         throw new Error("Other than exactly one start event");
       }
       const start = starts[0];
@@ -129,7 +129,7 @@ export class INetFastXMLParser implements INetParser {
     }
 
     private translateEndEvent(ends: any): this {
-      if (ends.length !== 1) {
+      if (!ends || ends.length !== 1) {
         throw new Error("Other than exactly one end event");
       }
       const end = ends[0];
