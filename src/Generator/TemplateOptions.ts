@@ -1,3 +1,34 @@
+export class Transition {
+  constructor(
+    public consume: string,
+    public produce: string,
+    public isEnd: boolean,
+    public condition: string
+  ) {}
+}
+export class IDTransition extends Transition {
+  constructor(
+    consume: string,
+    produce: string,
+    isEnd: boolean,
+    condition: string,
+    public id: string
+  ) {
+    super(consume, produce, isEnd, condition);
+  }
+}
+export class ManualTransition extends IDTransition {
+  constructor(
+    consume: string,
+    produce: string,
+    isEnd: boolean,
+    condition: string,
+    id: string,
+    public initiator: string
+  ) {
+    super(consume, produce, isEnd, condition, id);
+  }
+}
 
 export class TemplateOptions {
   // note: number = 0 is interpreted as false value
@@ -17,24 +48,20 @@ export class TemplateOptions {
     address: string;
   }>();
 
-  manualTransitions = new Array<{
-    id: string;
-    initiator: string | null;
-    consume: string;
-    produce: string;
-    condition: string;
-    isEnd: boolean;
-  }>();
+  preAutoTransitions = {
+    if: Array<IDTransition>(),
+    else: Array<Transition>()
+  }
 
-  autonomousTransitions = Array<{
-    id: string | null;
-    consume: string;
-    produce: string;
-    condition: string;
-    isEnd: boolean;
-  }>();
+  manualTransitions = {
+    if: new Array<ManualTransition>()
+  }
 
-  hasConditions = false;
+  postAutoTransitions = {
+    if: Array<Transition>()
+  }
+
   hasManualTransitions = false;
-  hasAutonomousTransitions = false;
+  hasPreAutoTransitions = false;
+  hasPostAutoTransitions = false;
 }

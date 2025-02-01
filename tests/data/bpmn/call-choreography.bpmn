@@ -51,7 +51,7 @@
     </bpmn2:exclusiveGateway>
     <bpmn2:sequenceFlow id="Flow_0mkbrl0" name="yes" sourceRef="Gateway_1td68h3" targetRef="ChoreographyTask_1m3qduh" />
     <bpmn2:sequenceFlow id="Flow_1uhdzct" name="no" sourceRef="Gateway_1td68h3" targetRef="EndEvent_1lv264w">
-      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression" language="Solidity">items==true</bpmn:conditionExpression>
+      <bpmn2:conditionExpression xsi:type="bpmn:tFormalExpression" language="Solidity">items==true</bpmn:conditionExpression>
     </bpmn2:sequenceFlow>
     <bpmn2:sequenceFlow id="Flow_0z7c6wd" sourceRef="Gateway_1td68h3" targetRef="CallChoreography_0b24dcc">
      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression" language="Solidity">items==true</bpmn:conditionExpression>

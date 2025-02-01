@@ -126,10 +126,11 @@ const testCase = (
           if (taskID !== undefined) {
             const preTokenState = await contract.tokenState();
             const tx = await (await participant.enact(taskID)).wait(1);
-            console.debug('Gas', 'Enact Task', event.name, ":", tx.gasUsed.toNumber());
+            console.debug('Try to Enact Task:', event.name, 'ID:', taskID);
 
             // Expect that tokenState has changed!
             expect(await contract.tokenState()).to.not.equal(preTokenState);
+            console.debug('Gas', 'Enact Task', event.name, ":", tx.gasUsed.toNumber());
             totalGasCost += tx.gasUsed.toNumber();
           }
 

@@ -6,10 +6,10 @@
  * the conditions are met. The conditions are checked after a manual transition is attempted.
  */
 import { deleteFromArray } from '../util/helpers';
-import { Transition, Element, TaskLabel, LabelType, Place, PlaceType, TaskType } from '../Parser/Element';
+import { Transition, Element, TaskLabel, LabelType, Place, PlaceType, TaskType, Guard } from '../Parser/Element';
 import { InteractionNet } from '../Parser/InteractionNet';
 import { ProcessEncoding } from './ProcessEncoding';
-import { TemplateOptions } from './TemplateOptions';
+import { Transition as TemplateTransition, TemplateOptions, IDTransition, ManualTransition } from './TemplateOptions';
 import { assert } from 'console';
 
 export class ProcessEncoder {
@@ -39,7 +39,7 @@ export class ProcessEncoder {
     this.unfoldSubNets(iNet);
     // optimisation step by removing silent transitions
     // we need to first unfold subnets, so they're also optimised correctly
-    this.removeSilentTransitions(iNet);
+    //this.removeSilentTransitions(iNet);
 
     // places to transition markings
     const transitionMarkings = new Map<string, number>();
@@ -49,7 +49,7 @@ export class ProcessEncoder {
     transitionMarkings.set(iNet.end.id, 0);
     // transitions to ids
     const taskIDs = new Map<string, number>();
-    const conditionIDs = new Map<string, string>();
+    const transitions = new Array<Transition>();
 
     for (const element of iNet.elements.values()) {
       if (!(element instanceof Transition)) {
@@ -58,37 +58,16 @@ export class ProcessEncoder {
       if (element.source.length === 0 && element.target.length === 0) {
         throw new Error(`Unconnected transition in interaction net ${element.id}`);
       }
-      if (element instanceof Transition 
-        && !this.isSilentTransition(element)) {
-          taskIDs.set(element.id, taskIDs.size);
+      if (!this.isSilentTransition(element)) {
+        taskIDs.set(element.id, taskIDs.size);
       }
+      transitions.push(element);
+    }
+
+    for (const element of transitions) {
 
       // build condition for transition
-      let condition = "";
-      if (element.label.guards.size > 0) {
-        // filter out default flows
-        const conditions = [...element.label.guards].filter(([_, guard]) => {
-          return guard.default === false;
-        })
-
-        if (conditions.length > 0) {
-          const el = [...element.label.guards.entries()].pop()!;
-          let string = el[1].name + ` (${el[0]})`;
-          //console.log(el[1])
-          condition = el[1].condition;
-
-          if (conditions.length > 1) {
-            condition = `(${condition}`;
-            element.label.guards.forEach((guard, id) => {
-              if (!guard.default)
-                string += `AND ${guard.name} (${id})`
-                condition += `&& ${guard.condition}`
-            });
-            condition = `${condition})`;
-          }
-          conditionIDs.set(string, condition);
-        }
-      }
+      const { condition, defaultBranch } = this.buildCondition(element.label.guards);
 
       // determine sequence flows
       // console.log("ID", references.get(element.id));
@@ -127,42 +106,74 @@ export class ProcessEncoder {
       }
 
       if (this.isSilentTransition(element)) {
-        let id: string|null = null;
-        if (element.target.length === 1 && element.target[0].target.length === 1 
+        let id = "";
+        if (element.target.length === 1 && element.target[0].target.length === 1
           && this.isEventTransition(element.target[0].target[0])) {
           // Check if silent transition leads to an event that may be triggered 
           // if yes, assign event ID to autonomous transition
           id = taskIDs.get(element.target[0].target[0].id)!.toString();
         }
-        options.autonomousTransitions.push({
-          id,
-          consume: consume.toString(), 
-          produce: produce.toString(),
-          condition,
-          isEnd
-        });
+        
+        if (element.label.type !== LabelType.End) {
+          // TODO: put everything before, also without ID
+          options.preAutoTransitions.if.push(new IDTransition(
+            consume.toString(), produce.toString(), isEnd, condition, id.toString()));
+          // TODO: default branch
+          if (defaultBranch) {
+            options.preAutoTransitions.else.push(new TemplateTransition(
+              consume.toString(), produce.toString(), isEnd, condition));
+          }
+        // TODO: only put pure auto end transitions in post (normally they will get reduced)
+        } else {
+          options.postAutoTransitions.if.push(new TemplateTransition(
+            consume.toString(), produce.toString(), isEnd, condition));
+        }
       }
       else if (element.label instanceof TaskLabel) {
-        options.manualTransitions.push({
-          id: taskIDs.get(element.id)!.toString(),
-          initiator: participantIDs.get(element.label.sender.id)!.toString(),
-          consume: consume.toString(),
-          produce: produce.toString(),
+        options.manualTransitions.if.push(new ManualTransition(
+          consume.toString(),
+          produce.toString(),
+          isEnd,
           condition,
-          isEnd
-        });
+          taskIDs.get(element.id)!.toString(),
+          participantIDs.get(element.label.sender.id)!.toString()
+        ));
       }
     }
-    
-    options.hasManualTransitions = options.manualTransitions.length > 0;
-    options.hasAutonomousTransitions = options.autonomousTransitions.length > 0;
-    options.hasConditions = conditionIDs.size > 0;
 
-    return { encoding: new ProcessEncoding(taskIDs, conditionIDs, participantIDs), options };
+    console.log(options)
+    options.hasManualTransitions = options.manualTransitions.if.length > 0;
+    options.hasPreAutoTransitions = options.preAutoTransitions.if.length > 0 || options.preAutoTransitions.else.length > 0;
+    options.hasPostAutoTransitions = options.postAutoTransitions.if.length > 0;
+
+    return { encoding: new ProcessEncoding(taskIDs, participantIDs), options };
   }
 
-  // TODO: If either start or end are replaced the iNet properties must be set
-  // Check: DO we somewhere link empty Source or Target lists?!
+  private static buildCondition(guardsMap: Map<string, Guard>) {
+    let condition = "";
+    let defaultBranch = true;
+
+    const guards = [...guardsMap.values()]
+    if (guards.length > 0) {
+      const first = guards.at(0)!;
+      if (!first.default) {
+        defaultBranch = false;
+        condition += `(${first.condition})`;
+      } 
+    }
+    if (guards.length > 1) {
+      guards.shift();
+      for (const guard of guards) {
+        if (!guard.default) {
+          defaultBranch = false;
+          condition += `&& (${guard.condition})`;
+        }
+      }
+    }
+
+    return { condition, defaultBranch };
+  }
+
   private static removeSilentTransitions(iNet: InteractionNet) {
     for (const element of iNet.elements.values()) {
       if (element.source.length === 1 && element.target.length === 1) {
@@ -216,21 +227,26 @@ export class ProcessEncoder {
    */
   private static unfoldSubNets(iNet: InteractionNet) {
     for (const subNet of iNet.subNets.values()) {
-      const subNetTransition = iNet.elements.get(subNet.id);
-      if (!subNetTransition) 
+      const subNetTransition = iNet.elements.get(subNet.id) as Transition;
+      if (!subNetTransition)
         throw new Error(`SubNet with no corresponding transition in main net found: ${subNet.id}`);
 
       // add all elements to mainnet
       for (const element of subNet.elements) iNet.elements.set(element[0], element[1]);
-      const subNetTarget = subNetTransition.target;
-      // link from subNetTransition to subNet start event 
-      this.unlinkAllTargets(subNetTransition);
-      subNetTransition.target.push(subNet.initial!);
+      // replace subNetTransition with start transition of subnet
+      assert(subNet.initial && subNet.initial.target.length === 1);
+      const startTransition = subNet.initial!.target[0] as Transition;
+      // link sources of subNetTransition to start transition
+      this.linkNewSources(startTransition, subNetTransition.source);
+      this.copyProperties(subNetTransition, [startTransition]);
       // replace subNet end event with target of subNetTransition
-      for (const target of subNetTarget) {
-        this.linkNewSources(target, subNet.end!.source);
-      }
+      assert(subNet.end && subNet.end.source.length === 1);
+      const endTransition = subNet.end!.source[0] as Transition;
+      this.linkNewTargets(endTransition, startTransition.target);
+
       this.deleteElement(iNet, subNet.end!);
+      this.deleteElement(iNet, subNet.initial!);
+      this.deleteElement(iNet, subNetTransition);
     }
   }
 
@@ -244,7 +260,7 @@ export class ProcessEncoder {
     || el.label.type === LabelType.ParallelDiverging
     || el.label.type === LabelType.Start
     || el.label.type === LabelType.End
-    || el.label instanceof TaskLabel && el.label.taskType === TaskType.CallChoreography );
+    || (el.label instanceof TaskLabel && el.label.taskType === TaskType.CallChoreography) );
   }
 
   private static isEventTransition(el: Element) {
@@ -259,14 +275,14 @@ export class ProcessEncoder {
   }
 
   private static unlinkAllSources(el: Element) {
-    assert(el.source.length > 0, "unlinking empty list");
+    if(el.source.length === 0) return;
     for (const source of el.source)
       deleteFromArray(source.target, el);
     el.source = new Array();
   }
 
   private static unlinkAllTargets(el: Element) {
-    assert(el.target.length > 0, "unlinking empty list");
+    if (el.target.length === 0) return;
     for (const target of el.target)
       deleteFromArray(target.source, el);
     el.target = new Array();

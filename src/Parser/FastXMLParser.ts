@@ -134,12 +134,16 @@ export class INetFastXMLParser implements INetParser {
       }
       const end = ends[0];
       const endEvent = new Transition(end[Properties.id], new Label(LabelType.End));
-      const endPlace = new Place("place_" + ends[Properties.id], PlaceType.End);
+      const endPlace = new Place("place_" + end[Properties.id], PlaceType.End);
       endPlace.type = PlaceType.End;
       this.linkElements(endEvent, endPlace);
       this.addElement(endEvent);
       this.addElement(endPlace);
       this.iNet.end = endPlace;
+
+      // Check for an uncontrolled flow merge, i.e., more than one incoming sequence flows
+      // If present, we merge them later when the flows are connected.
+      this.translateFlowMerge(end);
       return this;
     }
 
@@ -155,11 +159,7 @@ export class INetFastXMLParser implements INetParser {
       
         // Check for an uncontrolled flow merge, i.e., more than one incoming sequence flows
         // If present, we merge them later when the flows are connected.
-        if (task[Elements.ins].length > 1) {
-          for (const _in of task[Elements.ins]) {
-            this.addElement(new Place(_in, PlaceType.UncontrolledMerge));
-          }
-        }
+        this.translateFlowMerge(task)
       }
       return this;
     }
@@ -300,7 +300,6 @@ export class INetFastXMLParser implements INetParser {
               // so we only set additional info
               guard.name = name != null ? name : "no name";
             } else {
-              console.log(flow)
               // if it is not a default flow it needs to have an expression present
               if (!flow[Elements.conditionExpression] || flow[Elements.conditionExpression].length !== 1) {
                 throw new Error(`XOR outgoing flow (${id}) without or malformed condition script expression`);
@@ -347,6 +346,15 @@ export class INetFastXMLParser implements INetParser {
       if (!this.iNet.elements.has(el.id))
         this.iNet.elements.set(el.id, el);
       return this.iNet.elements.get(el.id)!;
+    }
+
+    private translateFlowMerge(el: any) {
+      if (el[Elements.ins] && el[Elements.ins].length > 1) {
+        for (const _in of el[Elements.ins]) {
+          const place = this.addElement(new Place(_in)) as Place;
+          place.type = PlaceType.UncontrolledMerge;
+        }
+      }
     }
 
     /**

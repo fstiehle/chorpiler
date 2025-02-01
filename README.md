@@ -39,7 +39,7 @@ const bpmnXML = fs.readFileSync("yourBPMNXML.bpmn");
 const iNet = await parser.fromXML(bpmnXML);
 
 const contractGenerator = new chorpiler
-  .generators.sol.DefaultContractGenerator(iNet);
+  .generators.sol.DefaultContractGenerator(iNet[0]);
 
 // compile to smart contract
 contractGenerator.compile().then((gen) => {

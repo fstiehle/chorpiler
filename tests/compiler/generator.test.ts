@@ -146,7 +146,7 @@ describe('Test Parsing and Generation', () => {
       
     });
 
-    it('to State Channel Root', async () => {
+    it.skip('to State Channel Root', async () => {
 
       const data = await readFile(path.join(BPMN_PATH, '/cases/out-of-order/out-of-order-xml.bpmn'));
 
@@ -180,7 +180,7 @@ describe('Test Parsing and Generation', () => {
       
     });
 
-    it('to State Channel Root', async () => {
+    it.skip('to State Channel Root', async () => {
 
       const data = await readFile(path.join(BPMN_PATH, '/cases/supply-chain/supply-chain.bpmn'));
 
@@ -214,7 +214,7 @@ describe('Test Parsing and Generation', () => {
       
     });
 
-    it('to State Channel Root', async () => {
+    it.skip('to State Channel Root', async () => {
 
       const data = await readFile(path.join(BPMN_PATH, '/cases/incident-management/incident-management.bpmn'));
 

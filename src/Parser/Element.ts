@@ -35,12 +35,8 @@ export class Transition extends Element {
 
 // Transitions can have labels
 export class Label {
-  type: LabelType
   guards = new Map<string, Guard>();
-
-  constructor(type: LabelType) {
-    this.type = type;
-  }
+  constructor(public type: LabelType) { }
 }
 
 // Labels can have guards

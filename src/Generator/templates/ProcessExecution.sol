@@ -21,10 +21,11 @@ contract ProcessExecution {
   function enact(uint id) external {
     uint _tokenState = tokenState;
     
-    {{#hasAutonomousTransitions}}
+    {{#hasPreAutoTransitions}}
     while(_tokenState != 0) {
-      {{#autonomousTransitions}}
-      if ({{#condition}}{{{condition}}} && {{/condition}}{{#id}}{{{id}}} == id && {{/id}}(_tokenState & {{{consume}}} == {{{consume}}})) {
+      {{#preAutoTransitions}}
+      {{#if}}
+      if ({{#condition}}({{{condition}}}) && {{/condition}}{{#id}}{{{id}}} == id && {{/id}}(_tokenState & {{{consume}}} == {{{consume}}})) {
         _tokenState &= ~uint({{{consume}}});
         _tokenState |= {{{produce}}};
         {{#isEnd}}
@@ -34,23 +35,58 @@ contract ProcessExecution {
         continue;
         {{/isEnd}}
       }
-      {{/autonomousTransitions}}
+      {{/if}}
+      {{#else}}
+      if ({{#condition}}({{{condition}}}) && {{/condition}}(_tokenState & {{{consume}}} == {{{consume}}})) {
+        _tokenState &= ~uint({{{consume}}});
+        _tokenState |= {{{produce}}};
+        {{#isEnd}}
+        break; // is end
+        {{/isEnd}}
+        {{^isEnd}}
+        continue;
+        {{/isEnd}}
+      }
+      {{/else}}
+      {{/preAutoTransitions}}
       break;
     }
-    {{/hasAutonomousTransitions}}
+    {{/hasPreAutoTransitions}}
 
     {{#hasManualTransitions}}
-    while(true) {
+    while(_tokenState != 0) {
       {{#manualTransitions}}
-      if ({{#condition}}{{{condition}}} && {{/condition}}{{{id}}} == id && (_tokenState & {{{consume}}} == {{{consume}}}){{#initiator}} && msg.sender == participants[{{{initiator}}}]{{/initiator}}) {
+      {{#if}}
+      if ({{#condition}}({{{condition}}}) && {{/condition}}{{{id}}} == id && (_tokenState & {{{consume}}} == {{{consume}}}){{#initiator}} && msg.sender == participants[{{{initiator}}}]{{/initiator}}) {
         _tokenState &= ~uint({{{consume}}});
         _tokenState |= {{{produce}}};
         break;
       }
+      {{/if}}
       {{/manualTransitions}}
       return;
     }
     {{/hasManualTransitions}}
+
+    {{#hasPostAutoTransitions}}
+    while(_tokenState != 0) {
+      {{#postAutoTransitions}}
+      {{#if}}
+      if ({{#condition}}({{{condition}}}) && {{/condition}}(_tokenState & {{{consume}}} == {{{consume}}})) {
+        _tokenState &= ~uint({{{consume}}});
+        _tokenState |= {{{produce}}};
+        {{#isEnd}}
+        break; // is end
+        {{/isEnd}}
+        {{^isEnd}}
+        continue;
+        {{/isEnd}}
+      }
+      {{/if}}
+      {{/postAutoTransitions}}
+      break;
+    }
+    {{/hasPostAutoTransitions}}
 
     tokenState = _tokenState;
   }

@@ -1,6 +1,6 @@
 import { assert } from 'chai';
 // also test some imports
-import chorpiler, { ProcessEncoding, InteractionNet, INetParser, TemplateEngine } from '../src/index';
+import chorpiler, { ProcessEncoding, InteractionNet, INetParser, TemplateEngine, CaseVariable } from '../src/index';
 import * as fs from 'fs';
 import path from 'path';
 import { BPMN_PATH } from './config';
@@ -18,14 +18,14 @@ describe('NPM Package', () => {
 
   it('should allow importing interfaces', () => {
     class test implements INetParser {
-      fromXML(xml: Buffer): Promise<InteractionNet> {
+      fromXML(xml: Buffer): Promise<InteractionNet[]> {
         throw new Error('Method not implemented.');
       }
     }
     class test2 extends TemplateEngine {
       constructor(
           _iNet: InteractionNet, 
-          _caseVariables?: Map<string, string>) {
+          _caseVariables?: Map<string, CaseVariable>) {
           super(_iNet, "", _caseVariables);
         }
     }
@@ -64,7 +64,7 @@ describe('readme code', () => {
     const iNet = await parser.fromXML(bpmnXML);
 
     const contractGenerator = new chorpiler
-    .generators.sol.DefaultContractGenerator(iNet);
+    .generators.sol.DefaultContractGenerator(iNet[0]);
 
     // compile to smart contract
     return contractGenerator.compile().then((gen) => {

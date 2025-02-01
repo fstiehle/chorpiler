@@ -9,13 +9,11 @@
 export class ProcessEncoding {
   constructor(
     public tasks: Map<string, number>,
-    public conditions: Map<string, string>,
     public participants: Map<string, number>) { }
 
   static toJSON(encoding: ProcessEncoding) {
     return {
       tasks: Object.fromEntries(encoding.tasks),
-      conditions: Object.fromEntries(encoding.conditions),
       participants: Object.fromEntries(encoding.participants),
     };
   }
@@ -24,16 +22,12 @@ export class ProcessEncoding {
     tasks: {
       [k: string]: number;
     };
-    conditions: {
-      [k: string]: string;
-    };
     participants: {
       [k: string]: number;
     };
   }) {
     return new ProcessEncoding(
       new Map(Object.entries(object.tasks)),
-      new Map(Object.entries(object.conditions)),
       new Map(Object.entries(object.participants))
     );
   }

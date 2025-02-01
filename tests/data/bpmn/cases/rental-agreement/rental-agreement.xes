@@ -12,22 +12,16 @@
 			<string key="label" value="pay rent"/>
 		</event>
 		<event>
-			<string key="concept:name" value="ChoreographyTask_1hddg8r"/>
-			<string key="sourceRef" value="Participant_1yaj41t"/>
-			<string key="targetRef" value="Participant_1mi7ck0"/>
-			<string key="label" value="pay rent"/>
-		</event>
-		<event>
-			<string key="concept:name" value="ChoreographyTask_1hddg8r"/>
-			<string key="sourceRef" value="Participant_1yaj41t"/>
-			<string key="targetRef" value="Participant_1mi7ck0"/>
-			<string key="label" value="pay rent"/>
-		</event>
-		<event>
 			<string key="concept:name" value="ChoreographyTask_07y6gqp"/>
 			<string key="sourceRef" value="Participant_1yaj41t"/>
 			<string key="targetRef" value="Participant_1mi7ck0"/>
 			<string key="label" value="end tenancy"/>
+		</event>
+		<event>
+			<string key="concept:name" value="ChoreographyTask_19lvxvh"/>
+			<string key="sourceRef" value="Participant_1yaj41t"/>
+			<string key="targetRef" value="Participant_1dtzugx"/>
+			<string key="label" value="pay bond"/>
 		</event>
 		<event>
 			<string key="concept:name" value="ChoreographyTask_00l7an5"/>

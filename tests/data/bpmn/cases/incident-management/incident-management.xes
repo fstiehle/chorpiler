@@ -16,7 +16,6 @@
 			<string key="concept:name" value="ChoreographyTask_1y1xlzg"/>
       <string key="sourceRef" value="Participant_18ejhc5"/>
       <string key="targetRef" value="Participant_0hpgpwy"/>
-			<int key="condition" value="4"/>
 			<string key="label" value="Get problem description"/>
 		</event>
 		<event>
@@ -43,7 +42,6 @@
 			<string key="concept:name" value="ChoreographyTask_0z1rm3g"/>
       <string key="sourceRef" value="Participant_18ejhc5"/>
       <string key="targetRef" value="Participant_1yfcq7e"/>
-			<int key="condition" value="1"/>
 			<string key="label" value="Ask 1st level support"/>
 		</event>
 		<event>
@@ -82,7 +80,6 @@
 			<string key="concept:name" value="ChoreographyTask_1qslyew"/>
       <string key="sourceRef" value="Participant_1yfcq7e"/>
       <string key="targetRef" value="Participant_07mlniv"/>
-			<int key="condition" value="2"/>
 			<string key="label" value="Ask 2nd level support"/>
 		</event>
 		<event>
