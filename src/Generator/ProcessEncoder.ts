@@ -39,7 +39,7 @@ export class ProcessEncoder {
     this.unfoldSubNets(iNet);
     // optimisation step by removing silent transitions
     // we need to first unfold subnets, so they're also optimised correctly
-    //this.removeSilentTransitions(iNet);
+    this.removeSilentTransitions(iNet);
 
     // places to transition markings
     const transitionMarkings = new Map<string, number>();
@@ -115,15 +115,14 @@ export class ProcessEncoder {
         }
         
         if (element.label.type !== LabelType.End) {
-          // TODO: put everything before, also without ID
-          options.preAutoTransitions.if.push(new IDTransition(
-            consume.toString(), produce.toString(), isEnd, condition, id.toString()));
-          // TODO: default branch
           if (defaultBranch) {
             options.preAutoTransitions.else.push(new TemplateTransition(
               consume.toString(), produce.toString(), isEnd, condition));
+          } else {
+            options.preAutoTransitions.if.push(new IDTransition(
+              consume.toString(), produce.toString(), isEnd, condition, id.toString()));
           }
-        // TODO: only put pure auto end transitions in post (normally they will get reduced)
+        // auto end transitions must fire even after manual transitions
         } else {
           options.postAutoTransitions.if.push(new TemplateTransition(
             consume.toString(), produce.toString(), isEnd, condition));
@@ -141,7 +140,6 @@ export class ProcessEncoder {
       }
     }
 
-    console.log(options)
     options.hasManualTransitions = options.manualTransitions.if.length > 0;
     options.hasPreAutoTransitions = options.preAutoTransitions.if.length > 0 || options.preAutoTransitions.else.length > 0;
     options.hasPostAutoTransitions = options.postAutoTransitions.if.length > 0;
@@ -151,26 +149,21 @@ export class ProcessEncoder {
 
   private static buildCondition(guardsMap: Map<string, Guard>) {
     let condition = "";
-    let defaultBranch = true;
+    let defaultBranch = false;
 
     const guards = [...guardsMap.values()]
     if (guards.length > 0) {
       const first = guards.at(0)!;
-      if (!first.default) {
-        defaultBranch = false;
-        condition += `(${first.condition})`;
-      } 
+      if (first.default) defaultBranch = true;
+      if (first.condition) condition += `(${first.condition})`;
     }
     if (guards.length > 1) {
       guards.shift();
       for (const guard of guards) {
-        if (!guard.default) {
-          defaultBranch = false;
-          condition += `&& (${guard.condition})`;
-        }
+        if (guard.default) defaultBranch = true;
+        if (guard.condition) condition += `&& (${guard.condition})`;
       }
     }
-
     return { condition, defaultBranch };
   }
 
@@ -242,7 +235,7 @@ export class ProcessEncoder {
       // replace subNet end event with target of subNetTransition
       assert(subNet.end && subNet.end.source.length === 1);
       const endTransition = subNet.end!.source[0] as Transition;
-      this.linkNewTargets(endTransition, startTransition.target);
+      this.linkNewTargets(endTransition, subNetTransition.target);
 
       this.deleteElement(iNet, subNet.end!);
       this.deleteElement(iNet, subNet.initial!);

@@ -125,6 +125,7 @@ const testCase = (
 
           if (taskID !== undefined) {
             const preTokenState = await contract.tokenState();
+            console.log(preTokenState.toNumber());
             const tx = await (await participant.enact(taskID)).wait(1);
             console.debug('Try to Enact Task:', event.name, 'ID:', taskID);
 

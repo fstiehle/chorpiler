@@ -9,8 +9,8 @@
   ],
   "scripts": {
     "test": "mocha tests/index.test.ts && mocha tests/compiler && waffle && mocha tests/output",
-    "dev": "mocha tests/compiler -g 'Rental Agreement Case' && waffle && mocha tests/output -g 'Rental Agreement Case'",
-    "debug": "mocha tests/compiler -g 'model with sub choreographies' --inspect",
+    "dev": "mocha tests/compiler -g 'Incident Management' && waffle && mocha tests/output -g 'Incident Management'",
+    "debug": "mocha tests/compiler -g 'Loop' --inspect",
     "test/compiler": "mocha tests/compiler",
     "test/output": "mocha tests/output",
     "build": "tsc && ncp ./src/Generator/templates ./lib/Generator/templates",

@@ -100,6 +100,13 @@ describe('Test Parsing and Generation', () => {
       })
     });
 
+    it('Compile model with a Loop to Sol contract', () => {
+      return readFile(path.join(BPMN_PATH, 'loop.bpmn')).then(async (data) => {
+        const iNet = await parser.fromXML(data);
+        console.log(await new SolDefaultContractGenerator(iNet[0]).compile());
+      })
+    });
+
   });
 
   describe('Parse and compile Pizza Case', () => {
@@ -240,8 +247,8 @@ describe('Test Parsing and Generation', () => {
 
       const data = await readFile(path.join(BPMN_PATH, '/cases/rental-agreement/rental-agreement.bpmn'));
       const contract = new SolDefaultContractGenerator((await parser.fromXML(data))[0]);
-      contract.addCaseVariable(new CaseVariable("bond", "int", "int public bond = 2500;", false));
-      contract.addCaseVariable(new CaseVariable("weeklyRent", "int", "int public weeklyRent = 0;", true));
+      contract.addCaseVariable(new CaseVariable("bond", "int", "int public bond = 4000;", false));
+      contract.addCaseVariable(new CaseVariable("weeklyRent", "int", "int public weeklyRent = 1000;", true));
 
       return compileCase(
         contract,
@@ -249,6 +256,7 @@ describe('Test Parsing and Generation', () => {
         "RA_"
       );
  
+
     });
 
   });
