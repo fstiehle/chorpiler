@@ -10,6 +10,7 @@
 | Choreography tasks | ✔          |
 | Events             | Start, End |
 | Gateways           | XOR, EVENT, AND |
+| Sub-Choreographies           | ✔ |
 | Looping behaviour  | ✔          |
 | Uncontrolled flow merge  | ✔          |
 
