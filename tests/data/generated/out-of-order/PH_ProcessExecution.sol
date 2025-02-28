@@ -12,7 +12,7 @@ contract PH_ProcessExecution {
 
   function enact(uint id) external {
     uint _tokenState = tokenState;
-    
+
 
     while(_tokenState != 0) {
       if (0 == id && (_tokenState & 2 == 2) && msg.sender == participants[3]) {

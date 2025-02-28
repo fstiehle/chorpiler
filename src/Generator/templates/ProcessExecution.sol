@@ -20,10 +20,11 @@ contract ProcessExecution {
 
   function enact(uint id) external {
     uint _tokenState = tokenState;
-    
+
+    {{#transitions}}
     {{#hasPreAutoTransitions}}
     while(_tokenState != 0) {
-      {{#preAutoTransitions}}
+      {{#preAuto}}
       {{#if}}
       if ({{#condition}}({{{condition}}}) && {{/condition}}{{#id}}{{{id}}} == id && {{/id}}(_tokenState & {{{consume}}} == {{{consume}}})) {
         _tokenState &= ~uint({{{consume}}});
@@ -48,14 +49,14 @@ contract ProcessExecution {
         {{/isEnd}}
       }
       {{/else}}
-      {{/preAutoTransitions}}
+      {{/preAuto}}
       break;
     }
     {{/hasPreAutoTransitions}}
 
     {{#hasManualTransitions}}
     while(_tokenState != 0) {
-      {{#manualTransitions}}
+      {{#manual}}
       {{#if}}
       if ({{#condition}}({{{condition}}}) && {{/condition}}{{{id}}} == id && (_tokenState & {{{consume}}} == {{{consume}}}){{#initiator}} && msg.sender == participants[{{{initiator}}}]{{/initiator}}) {
         _tokenState &= ~uint({{{consume}}});
@@ -63,14 +64,14 @@ contract ProcessExecution {
         break;
       }
       {{/if}}
-      {{/manualTransitions}}
+      {{/manual}}
       return;
     }
     {{/hasManualTransitions}}
 
     {{#hasPostAutoTransitions}}
     while(_tokenState != 0) {
-      {{#postAutoTransitions}}
+      {{#postAuto}}
       {{#if}}
       if ({{#condition}}({{{condition}}}) && {{/condition}}(_tokenState & {{{consume}}} == {{{consume}}})) {
         _tokenState &= ~uint({{{consume}}});
@@ -83,10 +84,11 @@ contract ProcessExecution {
         {{/isEnd}}
       }
       {{/if}}
-      {{/postAutoTransitions}}
+      {{/postAuto}}
       break;
     }
     {{/hasPostAutoTransitions}}
+    {{/transitions}}
 
     tokenState = _tokenState;
   }

@@ -8,45 +8,90 @@
 import { deleteFromArray } from '../util/helpers';
 import { Transition, Element, TaskLabel, LabelType, Place, PlaceType, TaskType, Guard } from '../Parser/Element';
 import { InteractionNet } from '../Parser/InteractionNet';
-import { ProcessEncoding } from './ProcessEncoding';
-import { Transition as TemplateTransition, TemplateOptions, IDTransition, ManualTransition } from './TemplateOptions';
+import { ProcessEncoding, SubProcessEncoding } from './ProcessEncoding';
+import { Template } from './Template';
 import { assert } from 'console';
 
 export class ProcessEncoder {
 
-  static generate(_iNet: InteractionNet): { encoding: ProcessEncoding; options: TemplateOptions; } 
-  {
+  static generate(
+    _iNet: InteractionNet, 
+    options: { unfoldSubNets: boolean } // If true,
+    // sub choreographies are "folded" into the main choreography, i.e.,
+    // they are treated as visual option only with no consequence for the generated contract
+  ) {
     const iNet: InteractionNet = {..._iNet}
     if (iNet.initial == null || iNet.end == null) {
       throw new Error("Invalid InteractionNet"); 
     }
-    const options = new TemplateOptions();
-
-    // create participant options and IDs
-    options.numberOfParticipants = iNet.participants.size.toString();
+    const templateOptions = new Template.Process();
+    // create participant template options and IDs
+    templateOptions.numberOfParticipants = iNet.participants.size.toString();
     const participantIDs = new Map<string, number>();
-    for (let i = 0; i < iNet.participants.size; i++) {
-      const par = [...iNet.participants.values()][i];
-      participantIDs.set(par.id, i);
-      options.participants.push({
-        id: i.toString(),
-        modelID: par.id,
-        name: par.name,
-        address: "[template]" // TODO: Make this setable in the TemplateEngine
-      })
+    const participants = new Map<string, InstanceType<typeof Template.Participant>>();
+    for (let parID = 0; parID < iNet.participants.size; parID++) {
+      const par = [...iNet.participants.values()][parID];
+      participantIDs.set(par.id, parID);
+      const participant = new Template.Participant(
+        parID.toString(),
+        par.id,
+        par.name,
+        "[template]" // TODO: Make this setable in the TemplateEngine
+      );
+      participants.set(par.id, participant);
+      templateOptions.participants.push(participant);
     }
 
-    this.unfoldSubNets(iNet);
+    const subNetIDs = new Map<string, SubProcessEncoding>()
+    if (options.unfoldSubNets) {
+      // sub choreographies are "folded" into the main choreography, i.e.,
+      // they are treated as visual option only with no consequence for the generated contract
+      this.unfoldSubNets(iNet); // TODO: Recursively unfold all subnets
+    } else {
+      // recursively encode subnets
+      this.encodeSubNets(iNet, subNetIDs, participantIDs);
+    }
+
     // optimisation step by removing silent transitions
     // we need to first unfold subnets, so they're also optimised correctly
     this.removeSilentTransitions(iNet);
 
-    // places to transition markings
-    const transitionMarkings = new Map<string, number>();
-    let transitionCounter = 1;
-    // add start and end event
-    transitionMarkings.set(iNet.initial.id, 1);
-    transitionMarkings.set(iNet.end.id, 0);
+    const { encodedTransitions, taskIDs } = ProcessEncoder.encodeTransitions(iNet, participantIDs);
+    templateOptions.transitions = encodedTransitions;
+
+    return { encoding: new ProcessEncoding(taskIDs, participantIDs, subNetIDs), templateOptions };
+  }
+
+  // for each subnet
+    // set participants 
+    // encode transitions
+    // set transitionary transitions 
+    //    (either in from parent): state = 1 -> set place in parent accordingly
+    //    (either out to parent):  state = 0 -> set palce in parent accordingly
+
+    // repeat recursively
+    //this.encodeSubNets()
+  private static encodeSubNets(
+    iNet: InteractionNet, 
+    subNetIDs: Map<string, SubProcessEncoding>, 
+    participantIDs: Map<string, number>
+  ) {
+    const template = new Array<InstanceType<typeof Template.SubProcess>>()
+
+    for (const subNet of iNet.subNets.values()) {
+      // optimisation step by removing silent transitions
+      this.removeSilentTransitions(subNet);
+
+      const subNetTransition = iNet.elements.get(subNet.id) as Transition;
+      if (!subNetTransition)
+        throw new Error(`sub net (ID: ${subNet.id}) with no corresponding transition in parent net (ID: ${iNet.id}) found`);
+    }
+  }
+
+  private static encodeTransitions(iNet: InteractionNet, participantIDs: Map<string, number>) {
+    if (iNet.initial == null || iNet.end == null) {
+      throw new Error("Invalid InteractionNet"); 
+    }
     // transitions to ids
     const taskIDs = new Map<string, number>();
     const transitions = new Array<Transition>();
@@ -63,6 +108,13 @@ export class ProcessEncoder {
       }
       transitions.push(element);
     }
+
+    const encodedTransitions = new Template.Transitions();
+    const transitionMarkings = new Map<string, number>();
+    let transitionCounter = 1;
+    // add start and end event
+    transitionMarkings.set(iNet.initial.id, 1);
+    transitionMarkings.set(iNet.end.id, 0);
 
     for (const element of transitions) {
 
@@ -87,7 +139,6 @@ export class ProcessEncoder {
       }
       // collect producing places
       // console.log("OUT____");
-
       let isEnd = false;
       for (const out of element.target) {
         // console.log(out);
@@ -96,7 +147,6 @@ export class ProcessEncoder {
           isEnd = true;
           // we don"t need to increase the marking counter
           // as 0 doesn't take away a spot
-
         } else if (!transitionMarkings.get(out.id)) {
           transitionMarkings.set(out.id, 2 ** transitionCounter);
           transitionCounter++;
@@ -113,38 +163,33 @@ export class ProcessEncoder {
           // if yes, assign event ID to autonomous transition
           id = taskIDs.get(element.target[0].target[0].id)!.toString();
         }
-        
+
         if (element.label.type !== LabelType.End) {
           if (defaultBranch) {
-            options.preAutoTransitions.else.push(new TemplateTransition(
+            encodedTransitions.preAuto.else.push(new Template.Transition(
               consume.toString(), produce.toString(), isEnd, condition));
           } else {
-            options.preAutoTransitions.if.push(new IDTransition(
-              consume.toString(), produce.toString(), isEnd, condition, id.toString()));
+            encodedTransitions.preAuto.if.push(new Template.IDTransition(
+              id.toString(), consume.toString(), produce.toString(), isEnd, condition));
           }
-        // auto end transitions must fire even after manual transitions
+          // auto end transitions must fire even after manual transitions
         } else {
-          options.postAutoTransitions.if.push(new TemplateTransition(
+          encodedTransitions.postAuto.if.push(new Template.Transition(
             consume.toString(), produce.toString(), isEnd, condition));
         }
       }
       else if (element.label instanceof TaskLabel) {
-        options.manualTransitions.if.push(new ManualTransition(
+        encodedTransitions.manual.if.push(new Template.ManualTransition(
+          taskIDs.get(element.id)!.toString(),
+          participantIDs.get(element.label.sender.id)!.toString(),
           consume.toString(),
           produce.toString(),
           isEnd,
-          condition,
-          taskIDs.get(element.id)!.toString(),
-          participantIDs.get(element.label.sender.id)!.toString()
+          condition
         ));
       }
     }
-
-    options.hasManualTransitions = options.manualTransitions.if.length > 0;
-    options.hasPreAutoTransitions = options.preAutoTransitions.if.length > 0 || options.preAutoTransitions.else.length > 0;
-    options.hasPostAutoTransitions = options.postAutoTransitions.if.length > 0;
-
-    return { encoding: new ProcessEncoding(taskIDs, participantIDs), options };
+    return { encodedTransitions, taskIDs };
   }
 
   private static buildCondition(guardsMap: Map<string, Guard>) {
@@ -241,6 +286,7 @@ export class ProcessEncoder {
       this.deleteElement(iNet, subNet.initial!);
       this.deleteElement(iNet, subNetTransition);
     }
+    iNet.subNets.clear();
   }
 
   private static isSilentTransition(el: Element) {
@@ -252,8 +298,7 @@ export class ProcessEncoder {
     || el.label.type === LabelType.ParallelConverging
     || el.label.type === LabelType.ParallelDiverging
     || el.label.type === LabelType.Start
-    || el.label.type === LabelType.End
-    || (el.label instanceof TaskLabel && el.label.taskType === TaskType.CallChoreography) );
+    || el.label.type === LabelType.End );
   }
 
   private static isEventTransition(el: Element) {

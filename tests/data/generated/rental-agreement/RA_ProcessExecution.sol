@@ -20,7 +20,7 @@ contract RA_ProcessExecution {
 
   function enact(uint id) external {
     uint _tokenState = tokenState;
-    
+
     while(_tokenState != 0) {
       if (((bond > 4 * weeklyRent)) && (_tokenState & 1 == 1)) {
         _tokenState &= ~uint(1);

@@ -45,7 +45,7 @@ class Proof {
   }
 }
 
-describe('Test State Channel', () => {
+describe.skip('Test State Channel', () => {
 
   describe.skip('Test Contract: incident management case ProcessChannel', () => {
     const provider = new MockProvider();

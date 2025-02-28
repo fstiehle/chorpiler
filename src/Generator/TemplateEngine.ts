@@ -44,10 +44,10 @@ export abstract class TemplateEngine implements ITemplateEngine {
     const iNet: InteractionNet = {...this.iNet}; // Deep copy: why?
     const template: string = await this.getTemplate();
   
-    const gen = ProcessEncoder.generate(iNet);
-    gen.options.caseVariables = [...this.caseVariables.values()];
+    const gen = ProcessEncoder.generate(iNet, { unfoldSubNets: true });
+    gen.templateOptions.caseVariables = [...this.caseVariables.values()];
 
-    return { target: Mustache.render(template, gen.options), 
+    return { target: Mustache.render(template, gen.templateOptions), 
       encoding: gen.encoding };
   }
 

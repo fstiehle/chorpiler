@@ -12,7 +12,7 @@ contract IM_ProcessExecution {
 
   function enact(uint id) external {
     uint _tokenState = tokenState;
-    
+
     while(_tokenState != 0) {
       if (2 == id && (_tokenState & 4 == 4)) {
         _tokenState &= ~uint(4);

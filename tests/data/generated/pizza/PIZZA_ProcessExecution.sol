@@ -16,7 +16,7 @@ contract PIZZA_ProcessExecution {
 
   function enact(uint id) external {
     uint _tokenState = tokenState;
-    
+
     while(_tokenState != 0) {
       if (((items==true)) && 3 == id && (_tokenState & 2 == 2)) {
         _tokenState &= ~uint(2);

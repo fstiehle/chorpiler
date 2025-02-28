@@ -12,7 +12,7 @@ contract SC_ProcessExecution {
 
   function enact(uint id) external {
     uint _tokenState = tokenState;
-    
+
     while(_tokenState != 0) {
       if (4 == id && (_tokenState & 48 == 48)) {
         _tokenState &= ~uint(48);
