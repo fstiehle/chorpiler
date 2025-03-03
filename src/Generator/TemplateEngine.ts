@@ -1,9 +1,11 @@
 import Mustache from "mustache";
 import { InteractionNet } from "../Parser/InteractionNet";
-import { ProcessEncoder } from "./ProcessEncoder";
-import { ProcessEncoding } from './ProcessEncoding';
 import util from 'util';
 import * as fs from 'fs';
+import { CaseVariable, Process } from "./Encoding";
+import { INetEncoder } from "./Encoder";
+import { MustacheEncoding } from "./Encodings/MustacheEncoding";
+import { TriggerEncoding } from "./Encodings/TriggerEncoding";
 
 const readFile = util.promisify(fs.readFile);
 
@@ -11,18 +13,9 @@ export interface ITemplateEngine {
   addCaseVariable(variable: CaseVariable): void;
   deleteCaseVariable(variableName: string): boolean;
   getCaseVariable(variableName: string): CaseVariable | undefined;
-  compile(): Promise<{target: string, encoding: ProcessEncoding}>
+  compile(): Promise<{target: string, encoding: TriggerEncoding}>
   setTemplatePath(path: string): void;
   getTemplate(): Promise<string>
-}
-
-export class CaseVariable {
-  constructor(
-    public name: string,
-    public type: string,
-    public expression: string,
-    public setters: boolean
-  ) {}
 }
 
 export abstract class TemplateEngine implements ITemplateEngine {
@@ -37,18 +30,18 @@ export abstract class TemplateEngine implements ITemplateEngine {
         this.caseVariables = _caseVariables;
   }
 
-  async compile(): Promise<{target: string, encoding: ProcessEncoding}> {
+  async compile() {
     if (this.iNet.initial == null || this.iNet.end == null) {
       throw new Error("Invalid InteractionNet"); 
     }
     const iNet: InteractionNet = {...this.iNet}; // Deep copy: why?
     const template: string = await this.getTemplate();
-  
-    const gen = ProcessEncoder.generate(iNet, { unfoldSubNets: true });
-    gen.templateOptions.caseVariables = [...this.caseVariables.values()];
 
-    return { target: Mustache.render(template, gen.templateOptions), 
-      encoding: gen.encoding };
+    const gen = INetEncoder.generate(iNet, { unfoldSubNets: true });
+    gen.caseVariables = this.caseVariables;
+
+    return { target: Mustache.render(template, MustacheEncoding.fromEncoding(gen)), 
+      encoding: TriggerEncoding.fromEncoding(gen) }; 
   }
 
   addCaseVariable(variable: CaseVariable) {

@@ -16,7 +16,7 @@
   },
   "files": [
     "src/index.ts",
-    "src/Generator/Template.ts"
+    "src/Generator/Encodings/MustacheEncoding.ts"
   ],
 
   "include": ["src/**/*"],

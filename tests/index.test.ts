@@ -1,9 +1,10 @@
 import { assert } from 'chai';
 // also test some imports
-import chorpiler, { ProcessEncoding, InteractionNet, INetParser, TemplateEngine, CaseVariable } from '../src/index';
+import chorpiler, { InteractionNet, INetParser, TemplateEngine, TriggerEncoding } from '../src/index';
 import * as fs from 'fs';
 import path from 'path';
 import { BPMN_PATH } from './config';
+import { CaseVariable } from '../src/Generator/Encoding';
 
 describe('NPM Package', () => {
   it('should be an object', () => {
@@ -76,7 +77,7 @@ describe('readme code', () => {
       console.log("Process.sol generated.");
       // log encoding of participants and tasks, 
       // can also be written to a .json file
-      console.log(ProcessEncoding.toJSON(gen.encoding));
+      console.log(TriggerEncoding.toJSON(gen.encoding));
     })
     .catch(err => console.error(err));
   });

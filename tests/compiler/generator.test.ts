@@ -3,13 +3,14 @@ import * as fs from 'fs';
 import {INetParser} from "../../src/Parser/Parser";
 import chaiAsPromised from 'chai-as-promised';
 import util from 'util';
-import { CaseVariable, TemplateEngine }  from "../../src/Generator/TemplateEngine";
+import { TemplateEngine }  from "../../src/Generator/TemplateEngine";
 import path from "path";
 import { BPMN_PATH, OUTPUT_PATH } from "../config";
-import { ProcessEncoding } from "../../src/Generator/ProcessEncoding";
 import { INetFastXMLParser } from "../../src/Parser/FastXMLParser";
 import SolDefaultContractGenerator from "../../src/Generator/target/Sol/DefaultContractGenerator";
 import SolStateChannelContractGenerator from "../../src/Generator/target/Sol/StateChannelContractGenerator";
+import { TriggerEncoding } from "../../src";
+import { CaseVariable } from "../../src/Generator/Encoding";
 
 const readFile = util.promisify(fs.readFile);
 const writeFile = util.promisify(fs.writeFile);
@@ -20,7 +21,7 @@ const compileCase = async (generator: TemplateEngine, outputPath: string, caseLa
 
   await writeFile(
     path.join(outputPath.replace(".sol", "_encoding.json")), 
-    JSON.stringify(ProcessEncoding.toJSON(output.encoding)), 
+    JSON.stringify(TriggerEncoding.toJSON(output.encoding)), 
     { flag: 'w+' }
   );
 

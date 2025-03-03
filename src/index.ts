@@ -24,8 +24,8 @@ export default {
   }
 }
 
-export * from './Generator/ProcessEncoding';
-export * from './Generator/ProcessEncoder'
+export * from './Generator/Encodings/TriggerEncoding';
+export * from './Generator/Encoder'
 export * from './Generator/TemplateEngine'
 
 export * from './Parser/Element'

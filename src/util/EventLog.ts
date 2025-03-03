@@ -1,6 +1,6 @@
 import assert from "assert";
-import { ProcessEncoding } from "../Generator/ProcessEncoding";
 import seed from 'seed-random';
+import { TriggerEncoding } from "../Generator/Encodings/TriggerEncoding";
 
 export class Event {
   public target: string|null = null;
@@ -58,7 +58,7 @@ export class EventLog implements IterableIterator<Trace>{
    */
   static genNonConformingLog(
     log: EventLog, 
-    process: ProcessEncoding, 
+    process: TriggerEncoding, 
     to_generate = 10,
     _seed = "b",
     passes = 1,

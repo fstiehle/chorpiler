@@ -22,7 +22,7 @@ contract RA_ProcessExecution {
     uint _tokenState = tokenState;
 
     while(_tokenState != 0) {
-      if (((bond > 4 * weeklyRent)) && (_tokenState & 1 == 1)) {
+      if (((bond > 4 * weeklyRent)) && 0 == id && (_tokenState & 1 == 1)) {
         _tokenState &= ~uint(1);
         _tokenState |= 0;
         break; // is end

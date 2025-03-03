@@ -1,18 +1,14 @@
 /**
- * Generates a conformance check solidity contract from an interaction petri net.
- * A manual transition can be enacted when the conditions for it are met, i.e.,
- * the task is enabled and the correct participant is calling.
- * An Autonomous transition is performed by the smart contract automatically as soon as 
- * the conditions are met. The conditions are checked after a manual transition is attempted.
+ * Generates a Template.Process from an INet, by removing silent transitions and encoding tasks in a bit array fashion, 
+ * the template can be used to render the process token play by a TemplateEngine
  */
 import { deleteFromArray } from '../util/helpers';
 import { Transition, Element, TaskLabel, LabelType, Place, PlaceType, TaskType, Guard } from '../Parser/Element';
 import { InteractionNet } from '../Parser/InteractionNet';
-import { ProcessEncoding, SubProcessEncoding } from './ProcessEncoding';
-import { Template } from './Template';
+import * as Encoding from "./Encoding";
 import { assert } from 'console';
 
-export class ProcessEncoder {
+export class INetEncoder {
 
   static generate(
     _iNet: InteractionNet, 
@@ -24,45 +20,28 @@ export class ProcessEncoder {
     if (iNet.initial == null || iNet.end == null) {
       throw new Error("Invalid InteractionNet"); 
     }
-    const templateOptions = new Template.Process();
+    const encoded = new Encoding.Process();
     // create participant template options and IDs
-    templateOptions.numberOfParticipants = iNet.participants.size.toString();
-    const participantIDs = new Map<string, number>();
-    const participants = new Map<string, InstanceType<typeof Template.Participant>>();
-    for (let parID = 0; parID < iNet.participants.size; parID++) {
-      const par = [...iNet.participants.values()][parID];
-      participantIDs.set(par.id, parID);
-      const participant = new Template.Participant(
-        parID.toString(),
-        par.id,
+    [...iNet.participants.values()].forEach((par, encodedID) => {
+      encoded.participants.set(par.id, new Encoding.Participant(
+        encodedID, // encoded ID from 0..N
+        par.id, // ID as in Model
         par.name,
-        "[template]" // TODO: Make this setable in the TemplateEngine
-      );
-      participants.set(par.id, participant);
-      templateOptions.participants.push(participant);
-    }
+        "[template]" // TODO: Make this settable in the TemplateEngine
+      ));
+    });
 
-    const subNetIDs = new Map<string, SubProcessEncoding>()
     if (options.unfoldSubNets) {
       // sub choreographies are "folded" into the main choreography, i.e.,
       // they are treated as visual option only with no consequence for the generated contract
       this.unfoldSubNets(iNet); // TODO: Recursively unfold all subnets
-    } else {
-      // recursively encode subnets
-      this.encodeSubNets(iNet, subNetIDs, participantIDs);
     }
 
-    // optimisation step by removing silent transitions
-    // we need to first unfold subnets, so they're also optimised correctly
-    this.removeSilentTransitions(iNet);
-
-    const { encodedTransitions, taskIDs } = ProcessEncoder.encodeTransitions(iNet, participantIDs);
-    templateOptions.transitions = encodedTransitions;
-
-    return { encoding: new ProcessEncoding(taskIDs, participantIDs, subNetIDs), templateOptions };
+    this.encodeNets(0, iNet, encoded);
+    return encoded;
   }
 
-  // for each subnet
+   // for each subnet
     // set participants 
     // encode transitions
     // set transitionary transitions 
@@ -70,13 +49,17 @@ export class ProcessEncoder {
     //    (either out to parent):  state = 0 -> set palce in parent accordingly
 
     // repeat recursively
-    //this.encodeSubNets()
-  private static encodeSubNets(
+    // this.encodeSubNets()
+  private static encodeNets(
+    parent_id: number,
     iNet: InteractionNet, 
-    subNetIDs: Map<string, SubProcessEncoding>, 
-    participantIDs: Map<string, number>
+    encoded: Encoding.Process
   ) {
-    const template = new Array<InstanceType<typeof Template.SubProcess>>()
+
+    // optimisation step by removing silent transitions
+    // we need to first unfold subnets, so they're also optimised correctly
+    this.removeSilentTransitions(iNet);
+    encoded.transitions = this.encodeTransitions(iNet, encoded);
 
     for (const subNet of iNet.subNets.values()) {
       // optimisation step by removing silent transitions
@@ -85,10 +68,65 @@ export class ProcessEncoder {
       const subNetTransition = iNet.elements.get(subNet.id) as Transition;
       if (!subNetTransition)
         throw new Error(`sub net (ID: ${subNet.id}) with no corresponding transition in parent net (ID: ${iNet.id}) found`);
+
+      const encodedID = encoded.subProcesses.size;
+      const subProcess = new Encoding.SubProcess(encodedID, subNet.id);
+      for (const parID of subNet.participants.keys()) {
+        if (!encoded.participants.has(parID))
+          throw new Error(`participant (ID: ${parID}) in sub net (ID: ${subNet.id}) with no corresponding participant in parent net (ID: ${iNet.id}) found`);
+        subProcess.participants.set(parID, encoded.participants.get(parID)!)
+      }
+
+      subProcess.transitions = this.encodeSubNetTransition(
+        parent_id,
+        this.encodeTransitions(iNet, encoded),
+        subNetTransition
+      );
+
+      encoded.subProcesses.set(subNet.id, subProcess);
+      if (subNet.subNets.size > 0) {
+        this.encodeNets(encodedID, subNet, encoded);
+      } else {
+        return;
+      }
     }
   }
+ 
+  /**
+   * Unfolds Sub choreographies into the main net,
+   * For each sub choreography transition
+   * @param iNet 
+   */
+  private static unfoldSubNets(iNet: InteractionNet) {
+    for (const subNet of iNet.subNets.values()) {
+      const subNetTransition = iNet.elements.get(subNet.id) as Transition;
+      if (!subNetTransition)
+        throw new Error(`SubNet with no corresponding transition in main net found: ${subNet.id}`);
 
-  private static encodeTransitions(iNet: InteractionNet, participantIDs: Map<string, number>) {
+      // add all elements to mainnet
+      for (const element of subNet.elements) iNet.elements.set(element[0], element[1]);
+      // replace subNetTransition with start transition of subnet
+      assert(subNet.initial && subNet.initial.target.length === 1);
+      const startTransition = subNet.initial!.target[0] as Transition;
+      // link sources of subNetTransition to start transition
+      this.linkNewSources(startTransition, subNetTransition.source);
+      this.copyProperties(subNetTransition, [startTransition]);
+      // replace subNet end event with target of subNetTransition
+      assert(subNet.end && subNet.end.source.length === 1);
+      const endTransition = subNet.end!.source[0] as Transition;
+      this.linkNewTargets(endTransition, subNetTransition.target);
+
+      this.deleteElement(iNet, subNet.end!);
+      this.deleteElement(iNet, subNet.initial!);
+      this.deleteElement(iNet, subNetTransition);
+    }
+    iNet.subNets.clear();
+  }
+
+  private static encodeTransitions(
+    iNet: InteractionNet, 
+    encoded: Encoding.Process
+  ) {
     if (iNet.initial == null || iNet.end == null) {
       throw new Error("Invalid InteractionNet"); 
     }
@@ -97,19 +135,19 @@ export class ProcessEncoder {
     const transitions = new Array<Transition>();
 
     for (const element of iNet.elements.values()) {
-      if (!(element instanceof Transition)) {
+      if (!(element instanceof Transition) || this.isSubOrCallChoreography(element)) {
         continue;
       }
       if (element.source.length === 0 && element.target.length === 0) {
         throw new Error(`Unconnected transition in interaction net ${element.id}`);
       }
-      if (!this.isSilentTransition(element)) {
+      if (!this.isSilentTransition(element)) {  // silent transitions don't need external IDs
         taskIDs.set(element.id, taskIDs.size);
       }
       transitions.push(element);
     }
 
-    const encodedTransitions = new Template.Transitions();
+    const encodedTransitions = new Encoding.Transitions();
     const transitionMarkings = new Map<string, number>();
     let transitionCounter = 1;
     // add start and end event
@@ -156,40 +194,46 @@ export class ProcessEncoder {
       }
 
       if (this.isSilentTransition(element)) {
-        let id = "";
+        let id = 0;
         if (element.target.length === 1 && element.target[0].target.length === 1
           && this.isEventTransition(element.target[0].target[0])) {
           // Check if silent transition leads to an event that may be triggered 
           // if yes, assign event ID to autonomous transition
-          id = taskIDs.get(element.target[0].target[0].id)!.toString();
+          id = taskIDs.get(element.target[0].target[0].id)!;
         }
 
         if (element.label.type !== LabelType.End) {
           if (defaultBranch) {
-            encodedTransitions.preAuto.else.push(new Template.Transition(
-              consume.toString(), produce.toString(), isEnd, condition));
+            encodedTransitions.preAuto.else.push(new Encoding.Transition(
+              consume, produce, isEnd, condition));
           } else {
-            encodedTransitions.preAuto.if.push(new Template.IDTransition(
-              id.toString(), consume.toString(), produce.toString(), isEnd, condition));
+            encodedTransitions.preAuto.if.push(new Encoding.IDTransition(
+              id, consume, produce, isEnd, condition));
           }
           // auto end transitions must fire even after manual transitions
         } else {
-          encodedTransitions.postAuto.if.push(new Template.Transition(
-            consume.toString(), produce.toString(), isEnd, condition));
+          encodedTransitions.postAuto.if.push(new Encoding.Transition(
+            consume, produce, isEnd, condition));
         }
       }
       else if (element.label instanceof TaskLabel) {
-        encodedTransitions.manual.if.push(new Template.ManualTransition(
-          taskIDs.get(element.id)!.toString(),
-          participantIDs.get(element.label.sender.id)!.toString(),
-          consume.toString(),
-          produce.toString(),
+        encodedTransitions.manual.if.push(new Encoding.ManualTransition(
+          taskIDs.get(element.id)!,
+          element.id,
+          encoded.participants.get(element.label.sender.id)!.id,
+          consume,
+          produce,
           isEnd,
           condition
         ));
       }
     }
-    return { encodedTransitions, taskIDs };
+    return encodedTransitions;
+  }
+
+  static encodeSubNetTransition(parent_id: number, encodedTransitions: Encoding.Transitions, subNetTransition: Transition) {
+
+    return encodedTransitions;
   }
 
   private static buildCondition(guardsMap: Map<string, Guard>) {
@@ -258,37 +302,6 @@ export class ProcessEncoder {
     }
   }
 
-  /**
-   * Unfolds Sub choreographies into the main net,
-   * For each sub choreography transition
-   * @param iNet 
-   */
-  private static unfoldSubNets(iNet: InteractionNet) {
-    for (const subNet of iNet.subNets.values()) {
-      const subNetTransition = iNet.elements.get(subNet.id) as Transition;
-      if (!subNetTransition)
-        throw new Error(`SubNet with no corresponding transition in main net found: ${subNet.id}`);
-
-      // add all elements to mainnet
-      for (const element of subNet.elements) iNet.elements.set(element[0], element[1]);
-      // replace subNetTransition with start transition of subnet
-      assert(subNet.initial && subNet.initial.target.length === 1);
-      const startTransition = subNet.initial!.target[0] as Transition;
-      // link sources of subNetTransition to start transition
-      this.linkNewSources(startTransition, subNetTransition.source);
-      this.copyProperties(subNetTransition, [startTransition]);
-      // replace subNet end event with target of subNetTransition
-      assert(subNet.end && subNet.end.source.length === 1);
-      const endTransition = subNet.end!.source[0] as Transition;
-      this.linkNewTargets(endTransition, subNetTransition.target);
-
-      this.deleteElement(iNet, subNet.end!);
-      this.deleteElement(iNet, subNet.initial!);
-      this.deleteElement(iNet, subNetTransition);
-    }
-    iNet.subNets.clear();
-  }
-
   private static isSilentTransition(el: Element) {
     return el instanceof Transition &&
     (  el.label.type === LabelType.DataExclusiveIncoming
@@ -304,6 +317,12 @@ export class ProcessEncoder {
   private static isEventTransition(el: Element) {
     return el instanceof Transition &&
     (el.label.type === LabelType.Task);
+  }
+
+  static isSubOrCallChoreography(el: Transition) {
+    return el instanceof Transition && el.label instanceof TaskLabel &&
+    (   el.label.taskType === TaskType.CallChoreography 
+    ||  el.label.taskType === TaskType.SubChoreography );
   }
 
   private static deleteElement(iNet: InteractionNet, el: Element) {

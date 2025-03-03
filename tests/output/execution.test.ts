@@ -8,7 +8,6 @@ import { BPMN_PATH } from "../config";
 import { EventLog } from "../../src/util/EventLog";
 import { Contract, ContractFactory } from 'ethers';
 import { MockProvider, solidity} from 'ethereum-waffle';
-import { ProcessEncoding } from "../../src/Generator/ProcessEncoding";
 import { XESFastXMLParser } from "../../src/util/XESFastXMLParser";
 
 import AIM_ProcessSmartContract from './../data/generated/artifcats/IM_ProcessExecution.json';
@@ -23,6 +22,7 @@ import encodingPH from './../data/generated/out-of-order/PH_ProcessExecution_enc
 import encodingPIZZA from './../data/generated/pizza/PIZZA_ProcessExecution_encoding.json';
 import encodingRA from './../data/generated/rental-agreement/RA_ProcessExecution_encoding.json';
 import assert from "assert";
+import { TriggerEncoding } from "../../src";
 
 use(solidity);
 
@@ -52,7 +52,7 @@ const parser = new XESFastXMLParser();
 
       testCase(
         eventLogSC, 
-        ProcessEncoding.fromJSON(encodingSC),
+        TriggerEncoding.fromJSON(encodingSC),
         new ContractFactory(ASC_ProcessSmartContract.abi, ASC_ProcessSmartContract.bytecode)
       );
     });
@@ -61,7 +61,7 @@ const parser = new XESFastXMLParser();
 
       testCase(
         eventLogIM, 
-        ProcessEncoding.fromJSON(encodingIM),
+        TriggerEncoding.fromJSON(encodingIM),
         new ContractFactory(AIM_ProcessSmartContract.abi, AIM_ProcessSmartContract.bytecode)
       );
     });
@@ -70,7 +70,7 @@ const parser = new XESFastXMLParser();
 
       testCase(
         eventLogPH, 
-        ProcessEncoding.fromJSON(encodingPH),
+        TriggerEncoding.fromJSON(encodingPH),
         new ContractFactory(APH_ProcessSmartContract.abi, APH_ProcessSmartContract.bytecode)
       );
     });
@@ -79,7 +79,7 @@ const parser = new XESFastXMLParser();
 
       testCase(
         eventLogPIZZA, 
-        ProcessEncoding.fromJSON(encodingPIZZA),
+        TriggerEncoding.fromJSON(encodingPIZZA),
         new ContractFactory(APIZZA_ProcessSmartContract.abi, APIZZA_ProcessSmartContract.bytecode)
       );
     });
@@ -88,7 +88,7 @@ const parser = new XESFastXMLParser();
 
       testCase(
         eventLogRA, 
-        ProcessEncoding.fromJSON(encodingRA),
+        TriggerEncoding.fromJSON(encodingRA),
         new ContractFactory(ARA_ProcessSmartContract.abi, ARA_ProcessSmartContract.bytecode)
       );
     });
@@ -100,7 +100,7 @@ const parser = new XESFastXMLParser();
 // type ProcessEnactment = SC_ProcessEnactment | IM_ProcessEnactment;
 const testCase = (
   eventLog: EventLog, 
-  processEncoding: ProcessEncoding, 
+  TriggerEncoding: TriggerEncoding, 
   factory: ContractFactory) => {
 
   describe(`Replay Traces`, () => {
@@ -109,7 +109,7 @@ const testCase = (
     eventLog.traces.forEach((trace, i) => {
 
       it(`Replay Conforming Trace ${i}`, async () => {
-        const r = await deploy(factory, processEncoding);
+        const r = await deploy(factory, TriggerEncoding);
         const contracts = r.contracts;
         let totalGasCost = r.tx.gasUsed.toNumber();
 
@@ -119,7 +119,7 @@ const testCase = (
         for (const event of trace) {
           // Implement data change, allow data change also if event name not found
           const participant = contracts.get(event.source);
-          const taskID = processEncoding.tasks.get(event.name);
+          const taskID = TriggerEncoding.tasks.get(event.name);
           assert(participant !== undefined, `source (participant) '${event.source}' for event '${event.name}' not found`);
           //console.debug(`source '${event.source}' event '${event.name}'`)
 
@@ -152,13 +152,13 @@ const testCase = (
       });
     });
 
-    const badLog = EventLog.genNonConformingLog(eventLog, processEncoding, NR_NON_CONFORMING_TRACES);
+    const badLog = EventLog.genNonConformingLog(eventLog, TriggerEncoding, NR_NON_CONFORMING_TRACES);
 
     // Requires a foreach to work: https://github.com/mochajs/mocha/issues/3074
     badLog.traces.forEach((trace, i) => {
 
       it(`Replay Non-Conforming Trace ${i}`, async () => {
-        const r = await deploy(factory, processEncoding);
+        const r = await deploy(factory, TriggerEncoding);
         const contracts = r.contracts;
         const contract = [...contracts.values()][0];
 
@@ -166,7 +166,7 @@ const testCase = (
         for (const event of trace) {
 
           const participant = contracts.get(event.source);
-          const taskID = processEncoding.tasks.get(event.name);
+          const taskID = TriggerEncoding.tasks.get(event.name);
           assert(participant !== undefined && taskID !== undefined,
             `source '${event.source}' event '${event.name}' not found`);
           console.log(participant !== undefined && taskID !== undefined,
@@ -186,13 +186,13 @@ const testCase = (
   });
 
   it("should reject tx from wrong participant", async () => {
-    const r = await deploy(factory, processEncoding);
+    const r = await deploy(factory, TriggerEncoding);
     const contracts = r.contracts;
     const contract = [...contracts.values()][0];
     const firstEvent = eventLog.traces.at(0)!.events.at(0)!;
-    const taskID = processEncoding.tasks.get(firstEvent.name);
+    const taskID = TriggerEncoding.tasks.get(firstEvent.name);
     let wrongParticipant = "";
-    processEncoding.participants.forEach((_, id) => {
+    TriggerEncoding.participants.forEach((_, id) => {
       if (id !== firstEvent.source) return wrongParticipant = id;
     })
 
@@ -203,10 +203,10 @@ const testCase = (
   })
 }
 
-const deploy = async (factory: ContractFactory, processEncoding: ProcessEncoding) => {
+const deploy = async (factory: ContractFactory, TriggerEncoding: TriggerEncoding) => {
   const wallets = new MockProvider()
     .getWallets()
-    .slice(0, processEncoding.participants.size);
+    .slice(0, TriggerEncoding.participants.size);
 
   const contract = await factory
     .connect(wallets[0])
@@ -215,7 +215,7 @@ const deploy = async (factory: ContractFactory, processEncoding: ProcessEncoding
   const tx = await contract.deployTransaction.wait(1)
 
   const contracts = new Map<string, Contract>();
-  for (const [id, num] of processEncoding.participants) {
+  for (const [id, num] of TriggerEncoding.participants) {
     contracts.set(id, contract.connect(wallets[num]));
   }
   return {contracts, tx};

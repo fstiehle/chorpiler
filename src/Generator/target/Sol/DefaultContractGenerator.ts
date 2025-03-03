@@ -1,5 +1,6 @@
 import { InteractionNet } from "../../../Parser/InteractionNet"
-import { CaseVariable, TemplateEngine } from "../../TemplateEngine"
+import { CaseVariable } from "../../Encoding";
+import { TemplateEngine } from "../../TemplateEngine"
 import path from "path";
 
 export default class SolDefaultContractGenerator extends TemplateEngine {
