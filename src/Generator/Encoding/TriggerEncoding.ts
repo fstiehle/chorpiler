@@ -1,4 +1,4 @@
-import { Process, Transitions } from "../Encoding";
+import { InitiatedTransition, MainProcess, Transition } from "./Encoding";
 import { IFromEncoding } from "./IFromEncoding";
 
 /**
@@ -9,36 +9,40 @@ import { IFromEncoding } from "./IFromEncoding";
  * - `participants`: Maps participant IDs from the BPMN model (string) to implementation IDs (number).
  * - `subModels`: Stores subprocess encodings mapped by their BPMN model IDs.
  */
- export class TriggerEncoding implements IFromEncoding {
+export class TriggerEncoding implements IFromEncoding {
   constructor(
-    public processID: string,
+    public processID: number,
     public tasks: Map<string, number> = new Map(),
     public participants: Map<string, number> = new Map(),
     public subModels: Map<string, SubProcessEncoding> | null = null
   ) {}
-  
-  static fromEncoding(encoding: Process): TriggerEncoding {
+
+  static fromEncoding(encoding: MainProcess): TriggerEncoding {
     const processID = encoding.id ?? "";
-    const tasks = TriggerEncoding.IDsFromTransitions(encoding.transitions);
+    const tasks = TriggerEncoding.IDsFromTransitions(Array.from(encoding.transitions.values()));
     const participants = new Map(
       [...encoding.participants.values()].map(({ modelID, id }) => [modelID, Number(id)])
     );
-    const subModels = new Map(
-      [...encoding.subProcesses.values()].map(subProcess => [
-        subProcess.modelID,
-        new SubProcessEncoding(
-          subProcess.id,
-          TriggerEncoding.IDsFromTransitions(subProcess.transitions)
+    const subModels = encoding.subProcesses.size > 0
+      ? new Map(
+          [...encoding.subProcesses.values()].map(subProcess => [
+            subProcess.modelID,
+            new SubProcessEncoding(
+              subProcess.id,
+              TriggerEncoding.IDsFromTransitions(Array.from(subProcess.transitions.values()))
+            )
+          ])
         )
-      ])
-    );
-    
+      : null;
+
     return new TriggerEncoding(processID, tasks, participants, subModels);
   }
 
-  private static IDsFromTransitions(transitions: Transitions): Map<string, number> {
+  private static IDsFromTransitions(transitions: Transition[]): Map<string, number> {
     return new Map(
-      transitions.manual.if.map(transition => [transition.modelID, Number(transition.id)])
+      transitions
+        .filter(transition => transition instanceof InitiatedTransition)
+        .map(transition => [(transition as InitiatedTransition).modelID, Number((transition as InitiatedTransition).taskID)])
     );
   }
 
@@ -59,7 +63,7 @@ import { IFromEncoding } from "./IFromEncoding";
   }
 
   static fromJSON(object: {
-    processID: string;
+    processID: number;
     tasks: { [k: string]: number };
     participants: { [k: string]: number };
     subModels?: { [k: string]: { id: number; tasks: { [k: string]: number } } };

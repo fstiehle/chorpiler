@@ -1,5 +1,5 @@
 import { InteractionNet } from "../../../Parser/InteractionNet"
-import { CaseVariable } from "../../Encoding";
+import { CaseVariable } from "../../Encoding/Encoding";
 import { TemplateEngine } from "../../TemplateEngine"
 import path from "path";
 

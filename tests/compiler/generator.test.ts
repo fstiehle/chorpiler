@@ -7,10 +7,10 @@ import { TemplateEngine }  from "../../src/Generator/TemplateEngine";
 import path from "path";
 import { BPMN_PATH, OUTPUT_PATH } from "../config";
 import { INetFastXMLParser } from "../../src/Parser/FastXMLParser";
-import SolDefaultContractGenerator from "../../src/Generator/target/Sol/DefaultContractGenerator";
-import SolStateChannelContractGenerator from "../../src/Generator/target/Sol/StateChannelContractGenerator";
+import SolDefaultContractGenerator from "../../src/Generator/target/Sol/DefaultGenerator";
+import SolStateChannelContractGenerator from "../../src/Generator/target/Sol/StateChannelGenerator";
 import { TriggerEncoding } from "../../src";
-import { CaseVariable } from "../../src/Generator/Encoding";
+import { CaseVariable } from "../../src/Generator/Encoding/Encoding";
 
 const readFile = util.promisify(fs.readFile);
 const writeFile = util.promisify(fs.writeFile);

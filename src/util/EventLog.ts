@@ -1,6 +1,6 @@
 import assert from "assert";
 import seed from 'seed-random';
-import { TriggerEncoding } from "../Generator/Encodings/TriggerEncoding";
+import { TriggerEncoding } from "../Generator/Encoding/TriggerEncoding";
 
 export class Event {
   public target: string|null = null;

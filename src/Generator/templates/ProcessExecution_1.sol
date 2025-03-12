@@ -25,10 +25,10 @@ contract ProcessExecution {
       if (_tokenState & {{{consume}}} == {{{consume}}}) {
       {{#transitions}} 
         {{> transition }}
-      {{/transitions}} 
-      {{#defaultBranch}} 
+      {{/transitions}}
+      {{#else}} 
         {{> transition }}
-      {{/defaultBranch}}
+      {{/else}}
       }
       {{/states}}
       break;

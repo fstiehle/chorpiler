@@ -2,10 +2,10 @@ import Mustache from "mustache";
 import { InteractionNet } from "../Parser/InteractionNet";
 import util from 'util';
 import * as fs from 'fs';
-import { CaseVariable, Process } from "./Encoding";
+import { CaseVariable } from "./Encoding/Encoding";
 import { INetEncoder } from "./Encoder";
-import { MustacheEncoding } from "./Encodings/MustacheEncoding";
-import { TriggerEncoding } from "./Encodings/TriggerEncoding";
+import { MustacheEncoding } from "./Encoding/MustacheEncoding";
+import { TriggerEncoding } from "./Encoding/TriggerEncoding";
 
 const readFile = util.promisify(fs.readFile);
 
@@ -19,16 +19,13 @@ export interface ITemplateEngine {
 }
 
 export abstract class TemplateEngine implements ITemplateEngine {
-  caseVariables: Map<string, CaseVariable> = new Map();
 
   constructor(
     private iNet: InteractionNet, 
     private templatePath: string, 
-    _caseVariables?: Map<string, CaseVariable>) {
-      
-      if (_caseVariables != null)
-        this.caseVariables = _caseVariables;
-  }
+    private caseVariables = new Map<string, CaseVariable>(),
+    private templatePartials = new Array<{ partial: string, path: string}>()
+  ) { }
 
   async compile() {
     if (this.iNet.initial == null || this.iNet.end == null) {
@@ -36,11 +33,15 @@ export abstract class TemplateEngine implements ITemplateEngine {
     }
     const iNet: InteractionNet = {...this.iNet}; // Deep copy: why?
     const template: string = await this.getTemplate();
+    const partials = this.templatePartials.reduce((acc: Record<string, string>, partial) => { 
+      acc[partial.partial] = (fs.readFileSync(partial.path)).toString();
+      return acc;
+     }, {} );
 
     const gen = INetEncoder.generate(iNet, { unfoldSubNets: true });
     gen.caseVariables = this.caseVariables;
 
-    return { target: Mustache.render(template, MustacheEncoding.fromEncoding(gen)), 
+    return { target: Mustache.render(template, MustacheEncoding.fromEncoding(gen), partials), 
       encoding: TriggerEncoding.fromEncoding(gen) }; 
   }
 

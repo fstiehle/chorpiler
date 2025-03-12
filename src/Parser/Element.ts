@@ -78,7 +78,7 @@ export class TaskLabel extends Label {
   constructor(
     public sender: Participant, 
     public receiver: Participant[], 
-    public name: String, 
+    public name: string, 
     public taskType: TaskType = TaskType.Task) {
       super(LabelType.Task);
   }

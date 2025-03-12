@@ -4,7 +4,7 @@ import chorpiler, { InteractionNet, INetParser, TemplateEngine, TriggerEncoding 
 import * as fs from 'fs';
 import path from 'path';
 import { BPMN_PATH } from './config';
-import { CaseVariable } from '../src/Generator/Encoding';
+import { CaseVariable } from '../src/Generator/Encoding/Encoding';
 
 describe('NPM Package', () => {
   it('should be an object', () => {

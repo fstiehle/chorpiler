@@ -1,5 +1,5 @@
-import SolDefaultContractGenerator from './Generator/target/Sol/DefaultContractGenerator';
-import SolStateChannelContractGenerator from './Generator/target/Sol/StateChannelContractGenerator';
+import SolDefaultContractGenerator from './Generator/target/Sol/DefaultGenerator';
+import SolStateChannelContractGenerator from './Generator/target/Sol/StateChannelGenerator';
 import TSDefaultFuncGenerator from './Generator/target/Typescript/DefaultFuncGenerator';
 import { INetFastXMLParser } from './Parser/FastXMLParser';
 import { EventLog, Trace, Event } from './util/EventLog';
@@ -24,7 +24,7 @@ export default {
   }
 }
 
-export * from './Generator/Encodings/TriggerEncoding';
+export * from './Generator/Encoding/TriggerEncoding';
 export * from './Generator/Encoder'
 export * from './Generator/TemplateEngine'
 

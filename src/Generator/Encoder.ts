@@ -1,11 +1,11 @@
 /**
- * Generates a Template.Process from an INet, by removing silent transitions and encoding tasks in a bit array fashion, 
+ * Generates a Encoding from an INet, by removing silent transitions and encoding tasks in a bit array fashion, 
  * the template can be used to render the process token play by a TemplateEngine
  */
 import { deleteFromArray } from '../util/helpers';
 import { Transition, Element, TaskLabel, LabelType, Place, PlaceType, TaskType, Guard } from '../Parser/Element';
 import { InteractionNet } from '../Parser/InteractionNet';
-import * as Encoding from "./Encoding";
+import * as Encoding from "./Encoding/Encoding";
 import { assert } from 'console';
 
 export class INetEncoder {
@@ -20,7 +20,7 @@ export class INetEncoder {
     if (iNet.initial == null || iNet.end == null) {
       throw new Error("Invalid InteractionNet"); 
     }
-    const encoded = new Encoding.Process();
+    const encoded = new Encoding.MainProcess(iNet.id);
     // create participant template options and IDs
     [...iNet.participants.values()].forEach((par, encodedID) => {
       encoded.participants.set(par.id, new Encoding.Participant(
@@ -37,29 +37,19 @@ export class INetEncoder {
       this.unfoldSubNets(iNet); // TODO: Recursively unfold all subnets
     }
 
-    this.encodeNets(0, iNet, encoded);
+    this.encodeNets(encoded.id, iNet, encoded);
     return encoded;
   }
 
-   // for each subnet
-    // set participants 
-    // encode transitions
-    // set transitionary transitions 
-    //    (either in from parent): state = 1 -> set place in parent accordingly
-    //    (either out to parent):  state = 0 -> set palce in parent accordingly
-
-    // repeat recursively
-    // this.encodeSubNets()
   private static encodeNets(
-    parent_id: number,
+    parent_id: number, // 0 if main choreography
     iNet: InteractionNet, 
-    encoded: Encoding.Process
+    encoded: Encoding.MainProcess
   ) {
-
     // optimisation step by removing silent transitions
     // we need to first unfold subnets, so they're also optimised correctly
     this.removeSilentTransitions(iNet);
-    encoded.transitions = this.encodeTransitions(iNet, encoded);
+    this.encodeTransitions(iNet, encoded);
 
     for (const subNet of iNet.subNets.values()) {
       // optimisation step by removing silent transitions
@@ -70,18 +60,15 @@ export class INetEncoder {
         throw new Error(`sub net (ID: ${subNet.id}) with no corresponding transition in parent net (ID: ${iNet.id}) found`);
 
       const encodedID = encoded.subProcesses.size;
-      const subProcess = new Encoding.SubProcess(encodedID, subNet.id);
+      const subProcess = new Encoding.Process(encodedID, subNet.id);
       for (const parID of subNet.participants.keys()) {
         if (!encoded.participants.has(parID))
           throw new Error(`participant (ID: ${parID}) in sub net (ID: ${subNet.id}) with no corresponding participant in parent net (ID: ${iNet.id}) found`);
         subProcess.participants.set(parID, encoded.participants.get(parID)!)
       }
 
-      subProcess.transitions = this.encodeSubNetTransition(
-        parent_id,
-        this.encodeTransitions(iNet, encoded),
-        subNetTransition
-      );
+      this.encodeTransitions(iNet, subProcess)
+      this.encodeSubNetTransition(parent_id, subProcess, subNetTransition);
 
       encoded.subProcesses.set(subNet.id, subProcess);
       if (subNet.subNets.size > 0) {
@@ -123,6 +110,14 @@ export class INetEncoder {
     iNet.subNets.clear();
   }
 
+  /**
+   * Encodes the transitions of an InteractionNet into an Encoding.Process.
+   *
+   * @param iNet - The InteractionNet to encode.
+   * @param encoded - The Encoding.Process to store the encoded transitions.
+   * @throws {Error} If the InteractionNet is invalid or contains unconnected transitions.
+   * @returns The encoded transitions.
+   */
   private static encodeTransitions(
     iNet: InteractionNet, 
     encoded: Encoding.Process
@@ -142,12 +137,11 @@ export class INetEncoder {
         throw new Error(`Unconnected transition in interaction net ${element.id}`);
       }
       if (!this.isSilentTransition(element)) {  // silent transitions don't need external IDs
-        taskIDs.set(element.id, taskIDs.size);
+        taskIDs.set(element.id, taskIDs.size + 1); // keep 0 for noop
       }
       transitions.push(element);
     }
 
-    const encodedTransitions = new Encoding.Transitions();
     const transitionMarkings = new Map<string, number>();
     let transitionCounter = 1;
     // add start and end event
@@ -194,46 +188,38 @@ export class INetEncoder {
       }
 
       if (this.isSilentTransition(element)) {
-        let id = 0;
         if (element.target.length === 1 && element.target[0].target.length === 1
           && this.isEventTransition(element.target[0].target[0])) {
           // Check if silent transition leads to an event that may be triggered 
           // if yes, assign event ID to autonomous transition
-          id = taskIDs.get(element.target[0].target[0].id)!;
-        }
-
-        if (element.label.type !== LabelType.End) {
-          if (defaultBranch) {
-            encodedTransitions.preAuto.else.push(new Encoding.Transition(
-              consume, produce, isEnd, condition));
-          } else {
-            encodedTransitions.preAuto.if.push(new Encoding.IDTransition(
-              id, consume, produce, isEnd, condition));
-          }
-          // auto end transitions must fire even after manual transitions
+          const taskID = taskIDs.get(element.target[0].target[0].id)!;
+          encoded.addTransition(element.id, new Encoding.TaskTransition({
+            taskID, consume, produce, condition, isEnd, defaultBranch
+          }));
         } else {
-          encodedTransitions.postAuto.if.push(new Encoding.Transition(
-            consume, produce, isEnd, condition));
+          encoded.addTransition(element.id, new Encoding.Transition({
+            consume, produce, condition, isEnd, defaultBranch
+          }));
         }
       }
       else if (element.label instanceof TaskLabel) {
-        encodedTransitions.manual.if.push(new Encoding.ManualTransition(
-          taskIDs.get(element.id)!,
-          element.id,
-          encoded.participants.get(element.label.sender.id)!.id,
-          consume,
-          produce,
-          isEnd,
-          condition
-        ));
+        encoded.addTransition(element.id, new Encoding.InitiatedTransition({
+          modelID: element.id,
+          initiatorID: encoded.participants.get(element.label.sender.id)!.id,
+          taskID: taskIDs.get(element.id)!,
+          taskName: element.label.name,
+          consume, produce, condition, isEnd, defaultBranch,
+        }));
       }
     }
-    return encodedTransitions;
   }
 
-  static encodeSubNetTransition(parent_id: number, encodedTransitions: Encoding.Transitions, subNetTransition: Transition) {
-
-    return encodedTransitions;
+  static encodeSubNetTransition(
+    parent_id: number, 
+    encoded: Encoding.Process, 
+    subNetTransition: Transition) {
+    
+    
   }
 
   private static buildCondition(guardsMap: Map<string, Guard>) {
