@@ -3,8 +3,7 @@ import { XMLParser } from 'fast-xml-parser';
 import { Participant } from './Participant';
 import { Element, TaskLabel, Transition, Place, LabelType, Label, PlaceType, Guard, TaskType } from './Element';
 import { INetParser } from './Parser';
-import { deleteFromArray } from '../util/helpers';
-import assert from 'assert';
+import { deleteFromArray, printInet } from '../util/helpers';
 
 enum Elements {
   rootElements = 'bpmn2:definitions',
@@ -32,10 +31,6 @@ enum Properties {
   language = "@_language", 
   initiator = "@_initiatingParticipantRef"
 }
-enum ExclusiveGatewayType {
-  Data,
-  Event
-}
 
 export class INetFastXMLParser implements INetParser {
   parser: XMLParser = new XMLParser({
@@ -47,50 +42,85 @@ export class INetFastXMLParser implements INetParser {
 
   private static INetTranslator = class {
     iNet = new InteractionNet();
+    flows = new Map<string, { flow: any, place: Place|null }>;
 
     translate(choreography: any): InteractionNet {
       // need to parse participants first, so we can reference them
       this.parseParticipants(choreography[Elements.participants]);
+      return this.translateChoreography(choreography);
+    }
 
-      // check if there are sub choreographies, if:
-      // recursively translate them
-      if (choreography[Elements.subChoreographies]) {
-        for (const subChoreography of choreography[Elements.subChoreographies]) {
-          this.translateSubChoreography(subChoreography);
-        }
-      }
-
+    translateChoreography(choreography: any): InteractionNet {
+      this.iNet.id = choreography[Properties.id];
       this.translateElements(choreography);
       return this.iNet;
     }
 
-    private translateElements(choreography: any) {
-      this.iNet.id = choreography[Properties.id];
-      this
-        .translateStartEvent(choreography[Elements.startEvent])
-        .translateTasks(choreography[Elements.tasks])
-        .translateDataGateway(choreography[Elements.exclusiveGateway])
-        .translateEventGateway(choreography[Elements.eventGateway])
-        .translateParallelGateway(choreography[Elements.parallelGateway])
-        .translateEndEvent(choreography[Elements.endEvent])
-        // connect flows last, and report error when a flow leads to an unknown transition, which means
-        // we were not able to translate all elements before
-        .connectFlows(choreography[Elements.flows]);
-      return this.iNet;
-    }
-
     private parseParticipants(participants: any) {
+      if (!participants) return;
       for (const par of participants) {
         const newPar = new Participant(par[Properties.id], par[Properties.name]);
         this.iNet.participants.set(par[Properties.id], newPar);
-      };
+      }
+    }
+
+    private translateElements(choreography: any) {
+      this
+        // need to parse flows first, so they're accessible
+        .parseFlows(choreography[Elements.flows])
+        .translateStartEvent(choreography[Elements.startEvent])
+        .translateEndEvent(choreography[Elements.endEvent])
+        .translateTasks(choreography[Elements.tasks])
+        this.translateSubChoreography(choreography[Elements.subChoreographies])
+        // translate events before gateways
+        .translateExclusiveGateways(choreography[Elements.exclusiveGateway])
+        .translateParallelGateways(choreography[Elements.parallelGateway])
+        .translateEventGateways(choreography[Elements.eventGateway])
+        // connect flows last, and report error when a flow leads to an unknown transition, which means
+        // we were not able to translate all elements before
+        .checkFlows();
+
+      return this.iNet;
+    }
+
+    // check if there are sub choreographies, if:
+    // recursively translate them
+    private translateSubChoreography(subChoreographies: any) {
+      if (!subChoreographies) return this;
+      for (const subChoreography of subChoreographies) {
+        const { initiator, respondents } = this.parseInitiatorRespondents(subChoreography);
+        const subNetID = subChoreography[Properties.id];
+
+        // translate sub choreography task
+        const subTransition = this.addTransition(new Transition(
+          subChoreography[Properties.id], 
+          new TaskLabel(initiator, respondents, subNetID, TaskType.CallChoreography))
+        );
+        this.translateIncomingFlows(subTransition, subChoreography[Elements.ins]);
+        this.translateOutgoingFlows(subTransition, subChoreography[Elements.outs]);
+
+        const translator = new INetFastXMLParser.INetTranslator();
+        // set subNet participants
+        const subNet = translator.iNet;
+        subNet.participants.set(initiator.id, initiator);
+        for (const respondent of respondents) subNet.participants.set(respondent.id, respondent);
+        // translate sub choreography
+        this.iNet.subNets.set(subNetID, translator.translateChoreography(subChoreography));
+      }
+      return this;
+    }
+
+    parseFlows(flows: any) {
+      if (flows == null) throw new Error(`No flows in the model`);
+      for (const flow of flows) {
+         this.flows.set(flow[Properties.id], { flow: flow, place: null });
+      }
+      return this;
     }
 
     private parseInitiatorRespondents(task: any): { initiator: Participant, respondents: Participant[] } {
       const initiator = this.iNet.participants.get(task[Properties.initiator]);
-      if (!initiator)
-        throw new Error(`Initiator of Element not found ${task[Properties.initiator]}`)
-     
+      if (!initiator) throw new Error(`Initiator of Element not found ${task[Properties.initiator]}`)
       const respondents = new Array<Participant>();
       for (const id of task[Elements.participantsRef]) {
         if (id === initiator) continue;
@@ -99,136 +129,138 @@ export class INetFastXMLParser implements INetParser {
       return { initiator, respondents }
     }
 
-    private translateSubChoreography(subChoreography: any) {
-      if (!subChoreography[Properties.initiator]) {
-        throw new Error(`Sub Choreography without initiator ${subChoreography[Properties.id]}`);
-      }
-      const translator = new INetFastXMLParser.INetTranslator();
-      translator.iNet.participants = this.iNet.participants; // inherit participants from parent net
-      const subNet = translator.translateElements(subChoreography);
-      const parIni = this.parseInitiatorRespondents(subChoreography);
-      this.iNet.subNets.set(subNet.id, subNet);
-      this.addElement(
-        new Transition(subNet.id, 
-          new TaskLabel(parIni.initiator, parIni.respondents, subNet.id, TaskType.CallChoreography)));
-    }
-
     private translateStartEvent(starts: any): this {
-      if (!starts || starts.length !== 1) {
+      if (!starts || starts.length !== 1) 
         throw new Error("Other than exactly one start event");
-      }
+  
       const start = starts[0];
       const startEvent = new Transition(start[Properties.id], new Label(LabelType.Start));
       const startPlace = new Place("place_" + start[Properties.id], PlaceType.Start);
-      startPlace.type = PlaceType.Start;
-      this.linkElements(startPlace, startEvent);
+      this.linkSourceToTarget(startPlace, startEvent);
+      this.addTransition(startEvent);
+      this.addPlace(startPlace); // We add it directly, as nothing should be linked to it except the start transtition
       this.iNet.initial = startPlace;
-      this.addElement(startEvent);
-      this.addElement(startPlace);
+      this.translateOutgoingFlows(startEvent, start[Elements.outs]);
       return this;
     }
 
     private translateEndEvent(ends: any): this {
-      if (!ends || ends.length !== 1) {
+      if (!ends || ends.length !== 1) 
         throw new Error("Other than exactly one end event");
-      }
+
       const end = ends[0];
       const endEvent = new Transition(end[Properties.id], new Label(LabelType.End));
       const endPlace = new Place("place_" + end[Properties.id], PlaceType.End);
       endPlace.type = PlaceType.End;
-      this.linkElements(endEvent, endPlace);
-      this.addElement(endEvent);
-      this.addElement(endPlace);
+      this.linkSourceToTarget(endEvent, endPlace);
+      this.addTransition(endEvent);
+      this.addPlace(endPlace); // We add it directly, as nothing should be linked to it except the end transtition
       this.iNet.end = endPlace;
-
-      // Check for an uncontrolled flow merge, i.e., more than one incoming sequence flows
-      // If present, we merge them later when the flows are connected.
-      this.translateFlowMerge(end);
+      this.translateIncomingFlows(endEvent, end[Elements.ins]);
       return this;
     }
 
     private translateTasks(tasks: any): this {
-      if (tasks == null) {
-        return this;
-      }
+      if (tasks == null) return this;
+
       for (const task of tasks) {
-        const initRes = this.parseInitiatorRespondents(task);
-        const from = initRes.initiator;
-        const to = initRes.respondents; 
-        this.addElement(new Transition(task[Properties.id], new TaskLabel(from!, to!, task[Properties.name])));
-      
-        // Check for an uncontrolled flow merge, i.e., more than one incoming sequence flows
-        // If present, we merge them later when the flows are connected.
-        this.translateFlowMerge(task)
+        const { initiator , respondents } = this.parseInitiatorRespondents(task);
+        const transition = this.addTransition(
+          new Transition(task[Properties.id], new TaskLabel(initiator!, respondents!, task[Properties.name]))
+        );
+        this.translateIncomingFlows(transition, task[Elements.ins]);
+        this.translateOutgoingFlows(transition, task[Elements.outs]);
       }
       return this;
     }
 
-    private translateDataGateway(gateways: any) {
-      this.translateExclusiveGateway(gateways, ExclusiveGatewayType.Data);
+    /**
+     * Event-based Gateway: merge incoming flows and use the merged place to connect to all outgoing events
+     * must be translated after events
+     * @param gateways 
+     * @returns 
+     */
+    private translateEventGateways(gateways: any) {
+      if (gateways == null) return this;
+
+      for (const gateway of gateways) {
+        const gatewayID = gateway[Properties.id];
+
+        const inIDs = gateway[Elements.ins];
+        const gatewayFlowID = inIDs[0]; // use this flow as gateway place
+        const gatewayPlace = this.setFlowPlace(gatewayFlowID, new Place(gatewayID + "_" + inIDs.join("_"))) // flow merge
+        for (const inID of inIDs) {
+          // assign all incoming flows to gateway place
+          this.setFlowPlace(inID, gatewayPlace);
+        }
+
+        const outIDs = gateway[Elements.outs];
+        if (outIDs.length < 2) {
+            throw new Error(`Event Gateway (${gatewayID}) requires at least two outgoing flows`);
+        }
+        for (const outID of outIDs) {
+          const outPlace = this.getPlace(outID);
+          if (!outPlace || outPlace.target.length !== 1) 
+            throw new Error(`Event-based gateway outgoing flow (${outID}) does not lead to a singular event`);
+          const outTransition = outPlace!.target[0]
+          if (!this.isEvent(outTransition))
+            throw new Error(`Event-based gateway outgoing transition (${outTransition.id}) is not an event`);
+          if (outTransition.source.length !== 1)
+            throw new Error(`Target elements (${outTransition.id}) of an Event Gateway (${gatewayID}) MUST NOT have any additional incoming Sequence Flows.`);
+          // delete the current outgoing flows, as events now connect to the gatewayPlace
+          this.deleteElement(outID); 
+          this.linkSourceToTarget(gatewayPlace, outTransition); // re-wire event with gateway place
+        }
+      }
       return this;
     }
 
-    private translateEventGateway(gateways: any) {
-      this.translateExclusiveGateway(gateways, ExclusiveGatewayType.Event);
-      return this;
+    isEvent(el: Transition) {
+      return el instanceof Transition &&
+      (el.label.type === LabelType.Task);
     }
 
-    private translateExclusiveGateway(gateways: any, type: ExclusiveGatewayType): this {
-      if (gateways == null)
-        return this;
+    /**
+     * XOR gateways: create a transition and place for each incoming and outgoing flow
+     * @param gateways 
+     * @returns 
+     */
+    private translateExclusiveGateways(gateways: any): this {
+      if (gateways == null) return this;
 
       for (const gateway of gateways) {
         const gatewayID = gateway[Properties.id];
         const outs = gateway[Elements.outs];
         const ins = gateway[Elements.ins];
-        const transitions = new Array<Transition>();
-
-        if (type === ExclusiveGatewayType.Event && outs.length < 2) {
-          throw new Error("Event Gateway needs at least two outgoing flows");
-          // TODO: Check that the outgoings lead to events
-        }
 
         if (outs.length === 1 && outs.length < ins.length) {
           // converging
-          // build transition for each incoming flow
+          const convergingPlace = this.setFlowPlace(outs[0], new Place(outs[0]));
+          // build transition and link place for each incoming flow
           for (const flowID of ins) {
             const id = `${gatewayID}_${flowID}`;
             const transition = new Transition(id,
-              new Label((type === ExclusiveGatewayType.Data) ? LabelType.DataExclusiveIncoming : LabelType.EventExclusiveIncoming));
-            const place = this.addElement(new Place(flowID));
-            this.linkElements(place, transition);
-            transitions.push(transition);
-          }
-          const place = this.addElement(new Place(outs[0]));
-          for (const t of transitions) {
-            this.linkElements(t, place);
-            this.addElement(t);
+              new Label(LabelType.DataExclusiveIncoming));
+            this.linkSourceToTarget(this.setFlowPlace(flowID, new Place(flowID)), transition);
+            this.linkSourceToTarget(transition, convergingPlace);
+            this.addTransition(transition);
           }
         } else if (ins.length === 1 && ins.length < outs.length) {
           // diverging
-          if (type === ExclusiveGatewayType.Data) {
-            if (!gateway[Properties.default]) {
-              throw new Error("XOR without an outgoing default flow");
-            }
-          }
+          const divergingPlace = this.setFlowPlace(ins[0], new Place(ins[0]));
+          if (!gateway[Properties.default])
+            throw new Error("XOR without an outgoing default flow");
+
           // build transition for each outcoming flow
           for (const flowID of outs) {
             const id = `${gatewayID}_${flowID}`;
             const transition = new Transition(id,
-              new Label((type === ExclusiveGatewayType.Data) ? LabelType.DataExclusiveOutgoing : LabelType.EventExclusiveOutgoing));
-            // set default flow
-            if (type === ExclusiveGatewayType.Data && flowID === gateway[Properties.default]) {
-              transition.label.guards.set(flowID, new Guard("", true));
-            }
-            const place = this.addElement(new Place(flowID));
-            this.linkElements(transition, place);
-            transitions.push(transition);
-          }
-          const place = this.addElement(new Place(ins[0]));
-          for (const t of transitions) {
-            this.linkElements(place, t);
-            this.addElement(t);
+              new Label(LabelType.DataExclusiveOutgoing));
+            // mark guards
+            this.translateGuards(transition, flowID, gateway[Properties.default] === flowID);
+            this.linkSourceToTarget(transition, this.setFlowPlace(flowID, new Place(flowID)));
+            this.linkSourceToTarget(divergingPlace, transition);
+            this.addTransition(transition);
           }
         } else {
           throw new Error("Neither converging nor diverging Exclusive (Data or Event) Gateway");
@@ -237,7 +269,33 @@ export class INetFastXMLParser implements INetParser {
       return this;
     }
 
-    private translateParallelGateway(gateways: any): this {
+    private translateGuards(transition: Transition, flowID: string, defaultFlow: boolean) {
+      const flow = this.getFlow(flowID)!.flow;
+      const guard = new Guard(flow[Properties.name] ?? "no name")
+
+      if (!defaultFlow) {
+          if (!flow[Elements.conditionExpression] || flow[Elements.conditionExpression].length !== 1) {
+            throw new Error(`XOR outgoing flow (${flowID}) without or malformed condition script expression`);
+          }
+          const condition = flow[Elements.conditionExpression][0];
+          const lang = condition[Properties.language];
+          const expression = condition['#text'];
+          if (!expression || !lang)
+            throw new Error(`XOR outgoing flow (${flowID}) without proper (language and expression) script condition expression`);
+          
+          guard.condition = expression;
+          guard.language = lang;
+        }
+
+      transition.label.guards.set(flowID, guard);
+    }
+
+    /**
+     * AND Gateways: Add a transition to emulate the gateway
+     * @param gateways 
+     * @returns 
+     */
+    private translateParallelGateways(gateways: any): this {
       if (gateways == null)
         return this;
 
@@ -248,13 +306,19 @@ export class INetFastXMLParser implements INetParser {
 
         if (outs.length === 1 && outs.length < ins.length) {
           // converging
-          this.addElement(new Transition(gatewayID,
-            new Label(LabelType.ParallelConverging)));
+          const gatewayTransition = this.addTransition(
+            new Transition(gatewayID, new Label(LabelType.ParallelConverging)));
+          this.linkSourceToTarget(gatewayTransition, this.setFlowPlace(outs[0], new Place(outs[0])));
+          for (const inID of ins)
+            this.linkSourceToTarget(this.setFlowPlace(inID, new Place(inID)), gatewayTransition);
         }
         else if (ins.length === 1 && ins.length < outs.length) {
           // diverging
-          this.addElement(new Transition(gatewayID,
-            new Label(LabelType.ParallelDiverging)));
+          const gatewayTransition = this.addTransition(
+            new Transition(gatewayID, new Label(LabelType.ParallelDiverging)));
+          this.linkSourceToTarget(this.setFlowPlace(ins[0], new Place(ins[0])), gatewayTransition);
+          for (const outID of outs)
+            this.linkSourceToTarget(gatewayTransition, this.setFlowPlace(outID, new Place(outID)));
         }
         else {
           throw new Error("Neither converging nor diverging AND Gateway");
@@ -263,121 +327,100 @@ export class INetFastXMLParser implements INetParser {
       return this;
     }
 
-    private connectFlows(flows: any) {
-      if (this.iNet.initial == null) {
-        throw new Error("No start event translated");
-      }
+    private checkFlows() {
+      if (this.flows.size === 0) throw new Error(`No flows to connect`);
 
-      for (const flow of flows) {
-        const id = flow[Properties.id];
-        const name = flow[Properties.name];
+      for (const flow of this.flows.values()) {
+        if (!flow.place)
+          throw new Error(`Unset Flow ${flow.flow[Properties.id]} found`);
 
-        const place = this.addElement(new Place(id)) as Place;
-
-        if (place.source.length === 0) {
-          const source = this.iNet.elements.get(flow[Properties.source]);
-          if (!source) throw new Error(
-            `Unsupported Element ${flow[Properties.source]} as source, referenced in flow ${id}`);
-          this.linkElements(source, place);
-        }
-
-        if (place.target.length === 0) {
-          const target = this.iNet.elements.get(flow[Properties.target]);
-          if (!target) throw new Error(
-            `Unsupported Element ${flow[Properties.target]} as target, referenced in flow ${id}`);
-          this.linkElements(place, target);
-        }
-
-        // look for guard information 
-        for (const sourceTransition of place.source) {
-          if (sourceTransition instanceof Transition
-          && sourceTransition.label.type === LabelType.DataExclusiveOutgoing) {
-            // the flow leads to an outgoing exclusive gateway transition,
-            // we need to assign the condition of the flow to the transition
-            const guard = sourceTransition.label.guards.get(id);
-            if (guard != null && guard.default) {
-              // the guard of the default flow is already present,
-              // so we only set additional info
-              guard.name = name != null ? name : "no name";
-            } else {
-              // if it is not a default flow it needs to have an expression present
-              if (!flow[Elements.conditionExpression] || flow[Elements.conditionExpression].length !== 1) {
-                throw new Error(`XOR outgoing flow (${id}) without or malformed condition script expression`);
-              }
-              const condition = flow[Elements.conditionExpression][0];
-              const lang = condition[Properties.language];
-              const expression = condition['#text'];
-              if (!expression || !lang) {
-                throw new Error(
-                  `XOR outgoing flow (${id}) without proper (language and expression) script condition expression`);
-              }
-              const guard = new Guard(name != null ? name : "no name", false);
-              guard.condition = expression;
-              guard.language = lang;
-              sourceTransition.label.guards.set(id, guard);
-            }
-          }
-        }
-
-        // merge uncontrolled flow merge, i.e., more than one incoming sequence flow into a task
-        // we merge the places to create the equivalent of an XOR, 
-        // which is closer to the standard than an AND merge behaviour, 
-        // which is what we would create by default.
-        if (place.type === PlaceType.UncontrolledMerge) {
-          this.mergePlace(place);
-        }
+        if (flow.place.type !== PlaceType.End && flow.place.target.length === 0)
+          throw new Error(
+            `Unconncted Flow ${flow.flow[Properties.id]} found leading to 
+            ${flow.flow[Properties.target]} (Target Unsupported Element?)`);
       }
     }
 
-    private linkElements(source: Element, target: Element) {
-      target.source.push(source);
-      source.target.push(target);
+    private linkSourceToTarget(source: Element, target: Element) {
+      if (!target.source.includes(source))
+        target.source.push(source);
+      if (!source.target.includes(target))
+        source.target.push(target);
     }
 
-    private unlinkElement(el: Element) {
-      for (const source of el.source)
-        deleteFromArray(source.target, el);
-      for (const target of el.target)
-        deleteFromArray(target.source, el);
+    private unlinkElement(id: string) {
+      const el = this.iNet.elements.get(id);
+      if (el) {
+        for (const source of el.source) deleteFromArray(source.target, el);
+        for (const target of el.target) deleteFromArray(target.source, el);
+      }
+    }
+
+    private deleteElement(id: string) {
+      this.unlinkElement(id);
+      this.iNet.elements.delete(id);
+    }
+
+    private getPlace(id: string) {
+      return this.flows.get(id)?.place;
+    }
+
+    private getFlow(id: string) {
+      return this.flows.get(id);
+    }
+
+    private setFlowPlace(id: string, place: Place): Place {
+      const existing = this.getFlow(id);
+      if (!existing) throw Error(`Flow not found: ${id}`);
+      if (existing.place) {
+        this.mergePlaces(place, existing.place);
+      } else {
+        existing.place = this.addPlace(place);
+      }
+      this.flows.set(id, existing);
+      return existing.place;
+    }
+
+    private addPlace(el: Place): Place {
+      return this.addElement(el) as Place;
+    }
+
+    private mergePlaces(add: Place, existing: Place): Place {
+      // Copy all sources of del into keep
+      for (const source of add.source) if (!existing.source.includes(source)) existing.source.push(source);
+      for (const target of add.target) if (!existing.target.includes(target)) existing.target.push(target);
+      return existing;
+    }
+
+    private addTransition(el: Transition): Transition {
+      return this.addElement(el) as Transition;
     }
 
     private addElement(el: Element): Element {
       // Be aware of already connected places
       if (!this.iNet.elements.has(el.id))
         this.iNet.elements.set(el.id, el);
+
       return this.iNet.elements.get(el.id)!;
     }
 
-    private translateFlowMerge(el: any) {
-      if (el[Elements.ins] && el[Elements.ins].length > 1) {
-        for (const _in of el[Elements.ins]) {
-          const place = this.addElement(new Place(_in)) as Place;
-          place.type = PlaceType.UncontrolledMerge;
-        }
+    translateOutgoingFlows(transition: Transition, outIDs: any[]) {
+      for (const id of outIDs) {
+        this.linkSourceToTarget(
+          transition, 
+          this.setFlowPlace(id, new Place(id)));
       }
     }
 
-    /**
-     * Creates or gets an already existing (merged) place leading to the places target, and
-     * links @param place to it
-     * @returns new place
-     */
-    private mergePlace(place: Place) {
-      assert(place.source.length === 1 && place.target.length === 1);
-      const source = place.source[0];
-      const target = place.target[0];
-
-      const mergedPlace = this.addElement(new Place("merged_" + target.id)) as Place;
-      // if merged place does not already have a target, we are linking the target
-      // this is likely, beacuse we are the first to merge; 
-      // therefore, having just created the merged place 
-      if (mergedPlace.target.length === 0) this.linkElements(mergedPlace, target);
-      this.linkElements(source, mergedPlace);
-      this.unlinkElement(place);
-      this.iNet.elements.delete(place.id);
-      return mergedPlace;
+    translateIncomingFlows(transition: Transition, inIDs: any[]) {
+      const place = new Place(inIDs.join("_")) // flow merge
+      for (const id of inIDs) {
+        this.linkSourceToTarget(
+          this.setFlowPlace(id, place),
+          transition);
+      }
     }
-  };
+  }
 
   fromXML(xml: Buffer): Promise<InteractionNet[]> {
     return new Promise<InteractionNet[]>((resolve, reject) => {
@@ -391,13 +434,13 @@ export class INetFastXMLParser implements INetParser {
         const iNetTranslator = new INetFastXMLParser.INetTranslator();
         try {
           const iNet = iNetTranslator.translate(choreography);
-          //console.log(iNet)
           iNets.push(iNet);
+          printInet(iNet);
         } catch (error) {
           return reject(error);
         }
       }
-      console.log(iNets);
+      //console.log(iNets);
       return resolve(iNets);
     });
   }

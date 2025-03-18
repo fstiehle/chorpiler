@@ -1,35 +1,33 @@
 import { Participant } from "./Participant";
 
 export class Element {
-  id: string;
-  source = new Array<Element>();
-  target = new Array<Element>(); 
+  public source = new Array<Element>();
+  public target = new Array<Element>(); 
 
-  constructor(id: string) {
-    this.id = id;
-  }
+  constructor(public id: string) {}
 }
 
 export class Place extends Element { 
+  public source = new Array<Transition>();
+  public target = new Array<Transition>(); 
+
   constructor(id: string, public type: PlaceType = PlaceType.Flow) {
     super(id);
-    this.type = type;
   }
 }
 
 export enum PlaceType {
   Flow = 0,
   Start = 1,
-  End = 2,
-  UncontrolledMerge = 3
+  End = 2
 }
 
 export class Transition extends Element {
-  label: Label;
+  source = new Array<Place>();
+  target = new Array<Place>(); 
 
-  constructor(id: string, label: Label) {
+  constructor(id: string, public label: Label) {
     super(id);
-    this.label = label;
   }
 }
 
@@ -55,7 +53,23 @@ export class Guard {
   }
 }
 
-// TODO: Non allignend naming incoming/outgoing vs. diverging/converging
+export class EventLabel extends Label {
+  constructor(
+    public sender: Participant, 
+    public receiver: Participant[], 
+    public name: string,
+    labelType: LabelType) {
+      super(labelType);
+  }
+}
+
+export class TaskLabel extends EventLabel {
+  constructor(sender: Participant, receiver: Participant[], name: string, 
+    public taskType: TaskType = TaskType.Task) {
+    super(sender, receiver, name, LabelType.Task);
+  }
+}
+
 export enum LabelType {
   Start,
   End,
@@ -72,14 +86,4 @@ export enum TaskType {
   Task,
   SubChoreography,
   CallChoreography
-}
-
-export class TaskLabel extends Label {
-  constructor(
-    public sender: Participant, 
-    public receiver: Participant[], 
-    public name: string, 
-    public taskType: TaskType = TaskType.Task) {
-      super(LabelType.Task);
-  }
 }

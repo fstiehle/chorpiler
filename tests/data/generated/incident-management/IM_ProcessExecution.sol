@@ -4,9 +4,13 @@ pragma solidity ^0.8.9;
 contract IM_ProcessExecution {
   uint public tokenState = 1;
   address[5] public participants;
+  bool public resolved = false;
 
   constructor(address[5] memory _participants) {
     participants = _participants;
+  }
+  function setresolved(bool _resolved) external {
+    resolved = _resolved;
   }
 
   function enact(uint id) external {
@@ -70,6 +74,8 @@ contract IM_ProcessExecution {
         }
         // <---  auto transition  --->
         if ( 
+        (resolved==true)
+        && 
         3 == id
         ) {
         _tokenState &= ~uint(4);
@@ -106,6 +112,8 @@ contract IM_ProcessExecution {
         }
         // <---  auto transition  --->
         if ( 
+        (resolved==true)
+        && 
         5 == id
         ) {
         _tokenState &= ~uint(16);
@@ -128,6 +136,8 @@ contract IM_ProcessExecution {
         }
         // <---  auto transition  --->
         if ( 
+        (resolved==true)
+        && 
         9 == id
         ) {
         _tokenState &= ~uint(64);

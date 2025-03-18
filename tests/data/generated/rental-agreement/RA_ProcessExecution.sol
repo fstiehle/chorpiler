@@ -129,6 +129,12 @@ contract RA_ProcessExecution {
         _tokenState |= 130;
         continue; 
       }
+      if (_tokenState & 260 == 260) {
+        // <---  auto transition  --->
+        _tokenState &= ~uint(260);
+        _tokenState |= 8;
+        continue; 
+      }
       if (_tokenState & 128 == 128) {
         // <--- ChoreographyTask_1hddg8r pay rent --->
         if ( 
@@ -154,12 +160,6 @@ contract RA_ProcessExecution {
         id = 0;
         continue; 
         }
-      }
-      if (_tokenState & 260 == 260) {
-        // <---  auto transition  --->
-        _tokenState &= ~uint(260);
-        _tokenState |= 8;
-        continue; 
       }
       break;
     }

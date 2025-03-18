@@ -83,21 +83,28 @@ describe('Test Parsing and Generation', () => {
     it('Compile model with uncontrolled merge of seq flows to Sol contract', () => {
       return readFile(path.join(BPMN_PATH, 'uncontrolled-flow.bpmn')).then(async (data) => {
         const iNet = await parser.fromXML(data);
-        return await new SolDefaultContractGenerator(iNet[0]).compile();
+        console.log(await new SolDefaultContractGenerator(iNet[0]).compile());
       })
     });
 
     it('Compile model with sub choreographies to Sol contract', () => {
       return readFile(path.join(BPMN_PATH, 'sub-choreography.bpmn')).then(async (data) => {
         const iNet = await parser.fromXML(data);
-        console.log(await new SolDefaultContractGenerator(iNet[0]).compile());
+        return await new SolDefaultContractGenerator(iNet[0]).compile();
       })
     });
 
     it('Compile model with XOR followed by AND to Sol contract', () => { // Should be reduced properly, according to Rule (i)
       return readFile(path.join(BPMN_PATH, 'xor-and.bpmn')).then(async (data) => {
         const iNet = await parser.fromXML(data);
-        console.log(await new SolDefaultContractGenerator(iNet[0]).compile());
+        return await new SolDefaultContractGenerator(iNet[0]).compile();
+      })
+    });
+
+    it('Compile model with event-based gateway', () => {
+      return readFile(path.join(BPMN_PATH, 'event.bpmn')).then(async (data) => {
+        const iNet = await parser.fromXML(data);
+        await new SolDefaultContractGenerator(iNet[0]).compile();
       })
     });
 
@@ -151,7 +158,7 @@ describe('Test Parsing and Generation', () => {
         path.join(OUTPUT_PATH, "/out-of-order/PH_ProcessExecution.sol"),
         "PH_"
       );
-      
+
     });
 
     it.skip('to State Channel Root', async () => {
@@ -214,8 +221,11 @@ describe('Test Parsing and Generation', () => {
 
       const data = await readFile(path.join(BPMN_PATH, '/cases/incident-management/incident-management.bpmn'));
 
+      const contract = new SolDefaultContractGenerator((await parser.fromXML(data))[0]);
+      contract.addCaseVariable(new CaseVariable("resolved", "bool", "bool public resolved = false;", false));
+
       return compileCase(
-        new SolDefaultContractGenerator((await parser.fromXML(data))[0]),
+        contract,
         path.join(OUTPUT_PATH, "/incident-management/IM_ProcessExecution.sol"),
         "IM_"
       );

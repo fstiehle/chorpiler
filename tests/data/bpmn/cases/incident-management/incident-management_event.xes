@@ -19,11 +19,6 @@
 			<string key="label" value="Get problem description"/>
 		</event>
 		<event>
-			<string key="concept:name" value="InstanceDataChange"/>
-			<string key="sourceRef" value="Participant_18ejhc5"/>
-			<boolean key="resolved" value="true"/>
-		</event>
-		<event>
 			<string key="concept:name" value="ChoreographyTask_0uo8k5k"/>
       <string key="sourceRef" value="Participant_18ejhc5"/>
       <string key="targetRef" value="Participant_0hpgpwy"/>
@@ -48,11 +43,6 @@
       <string key="sourceRef" value="Participant_18ejhc5"/>
       <string key="targetRef" value="Participant_1yfcq7e"/>
 			<string key="label" value="Ask 1st level support"/>
-		</event>
-		<event>
-			<string key="concept:name" value="InstanceDataChange"/>
-			<string key="sourceRef" value="Participant_18ejhc5"/>
-			<boolean key="resolved" value="true"/>
 		</event>
 		<event>
 			<string key="concept:name" value="ChoreographyTask_1qccz6z"/>
@@ -93,11 +83,6 @@
 			<string key="label" value="Ask 2nd level support"/>
 		</event>
 		<event>
-			<string key="concept:name" value="InstanceDataChange"/>
-			<string key="sourceRef" value="Participant_1yfcq7e"/>
-			<boolean key="resolved" value="true"/>
-		</event>
-		<event>
 			<string key="concept:name" value="ChoreographyTask_1ecmkkd"/>
       <string key="sourceRef" value="Participant_07mlniv"/>
       <string key="targetRef" value="Participant_1yfcq7e"/>
@@ -116,6 +101,7 @@
 			<string key="label" value="Explain solution"/>
 		</event>
 	</trace>
+
 	<trace>
 		<event>
 			<string key="concept:name" value="ChoreographyTask_1586fdc"/>

@@ -27,11 +27,18 @@ export interface IM_ProcessExecutionInterface extends utils.Interface {
   functions: {
     "enact(uint256)": FunctionFragment;
     "participants(uint256)": FunctionFragment;
+    "resolved()": FunctionFragment;
+    "setresolved(bool)": FunctionFragment;
     "tokenState()": FunctionFragment;
   };
 
   getFunction(
-    nameOrSignatureOrTopic: "enact" | "participants" | "tokenState"
+    nameOrSignatureOrTopic:
+      | "enact"
+      | "participants"
+      | "resolved"
+      | "setresolved"
+      | "tokenState"
   ): FunctionFragment;
 
   encodeFunctionData(
@@ -42,6 +49,11 @@ export interface IM_ProcessExecutionInterface extends utils.Interface {
     functionFragment: "participants",
     values: [PromiseOrValue<BigNumberish>]
   ): string;
+  encodeFunctionData(functionFragment: "resolved", values?: undefined): string;
+  encodeFunctionData(
+    functionFragment: "setresolved",
+    values: [PromiseOrValue<boolean>]
+  ): string;
   encodeFunctionData(
     functionFragment: "tokenState",
     values?: undefined
@@ -50,6 +62,11 @@ export interface IM_ProcessExecutionInterface extends utils.Interface {
   decodeFunctionResult(functionFragment: "enact", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "participants",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(functionFragment: "resolved", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "setresolved",
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "tokenState", data: BytesLike): Result;
@@ -94,6 +111,13 @@ export interface IM_ProcessExecution extends BaseContract {
       overrides?: CallOverrides
     ): Promise<[string]>;
 
+    resolved(overrides?: CallOverrides): Promise<[boolean]>;
+
+    setresolved(
+      _resolved: PromiseOrValue<boolean>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<ContractTransaction>;
+
     tokenState(overrides?: CallOverrides): Promise<[BigNumber]>;
   };
 
@@ -107,6 +131,13 @@ export interface IM_ProcessExecution extends BaseContract {
     overrides?: CallOverrides
   ): Promise<string>;
 
+  resolved(overrides?: CallOverrides): Promise<boolean>;
+
+  setresolved(
+    _resolved: PromiseOrValue<boolean>,
+    overrides?: Overrides & { from?: PromiseOrValue<string> }
+  ): Promise<ContractTransaction>;
+
   tokenState(overrides?: CallOverrides): Promise<BigNumber>;
 
   callStatic: {
@@ -119,6 +150,13 @@ export interface IM_ProcessExecution extends BaseContract {
       arg0: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
     ): Promise<string>;
+
+    resolved(overrides?: CallOverrides): Promise<boolean>;
+
+    setresolved(
+      _resolved: PromiseOrValue<boolean>,
+      overrides?: CallOverrides
+    ): Promise<void>;
 
     tokenState(overrides?: CallOverrides): Promise<BigNumber>;
   };
@@ -136,6 +174,13 @@ export interface IM_ProcessExecution extends BaseContract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
+    resolved(overrides?: CallOverrides): Promise<BigNumber>;
+
+    setresolved(
+      _resolved: PromiseOrValue<boolean>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<BigNumber>;
+
     tokenState(overrides?: CallOverrides): Promise<BigNumber>;
   };
 
@@ -148,6 +193,13 @@ export interface IM_ProcessExecution extends BaseContract {
     participants(
       arg0: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    resolved(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    setresolved(
+      _resolved: PromiseOrValue<boolean>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<PopulatedTransaction>;
 
     tokenState(overrides?: CallOverrides): Promise<PopulatedTransaction>;

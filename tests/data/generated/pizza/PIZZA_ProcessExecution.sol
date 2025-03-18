@@ -32,16 +32,6 @@ contract PIZZA_ProcessExecution {
         }
       }
       if (_tokenState & 2 == 2) {
-        // <---  auto transition  --->
-        if ( 
-        (items==true)
-        && 
-        4 == id
-        ) {
-        _tokenState &= ~uint(2);
-        _tokenState |= 8;
-        continue; 
-        }
         // <--- ChoreographyTask_1b2vkz9 Confirm ETA --->
         if ( 
         2 == id
@@ -52,6 +42,16 @@ contract PIZZA_ProcessExecution {
         _tokenState &= ~uint(2);
         _tokenState |= 4;
         id = 0;
+        continue; 
+        }
+        // <---  auto transition  --->
+        if ( 
+        (items==true)
+        && 
+        4 == id
+        ) {
+        _tokenState &= ~uint(2);
+        _tokenState |= 8;
         continue; 
         }
       }
