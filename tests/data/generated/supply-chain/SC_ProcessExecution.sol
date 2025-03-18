@@ -155,13 +155,9 @@ contract SC_ProcessExecution {
       }
       if (_tokenState & 48 == 48) {
         // <---  auto transition  --->
-        if ( 
-        5 == id
-        ) {
         _tokenState &= ~uint(48);
         _tokenState |= 64;
         continue; 
-        }
       }
       break;
     }

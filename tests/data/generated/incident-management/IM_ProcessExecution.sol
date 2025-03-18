@@ -75,8 +75,6 @@ contract IM_ProcessExecution {
         // <---  auto transition  --->
         if ( 
         (resolved==true)
-        && 
-        3 == id
         ) {
         _tokenState &= ~uint(4);
         _tokenState |= 8;
@@ -113,8 +111,6 @@ contract IM_ProcessExecution {
         // <---  auto transition  --->
         if ( 
         (resolved==true)
-        && 
-        5 == id
         ) {
         _tokenState &= ~uint(16);
         _tokenState |= 32;
@@ -137,8 +133,6 @@ contract IM_ProcessExecution {
         // <---  auto transition  --->
         if ( 
         (resolved==true)
-        && 
-        9 == id
         ) {
         _tokenState &= ~uint(64);
         _tokenState |= 256;

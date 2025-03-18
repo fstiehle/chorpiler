@@ -130,7 +130,7 @@ export class INetEncoder {
     const transitions = new Array<Transition>();
 
     for (const element of iNet.elements.values()) {
-      if (!(element instanceof Transition) || this.isSubOrCallChoreography(element)) {
+      if (!(element instanceof Transition) || this.isSubOrCallChoreography(element)) { // don't need extra IDs for other choreos
         continue;
       }
       if (element.source.length === 0 && element.target.length === 0) {
@@ -188,19 +188,9 @@ export class INetEncoder {
       }
 
       if (this.isSilentTransition(element)) {
-        if (element.target.length === 1 && element.target[0].target.length === 1
-          && this.isEventTransition(element.target[0].target[0])) {
-          // Check if silent transition leads to an event that may be triggered 
-          // if yes, assign event ID to autonomous transition
-          const taskID = taskIDs.get(element.target[0].target[0].id)!;
-          encoded.addTransition(element.id, new Encoding.TaskTransition({
-            taskID, consume, produce, condition, isEnd, defaultBranch
-          }));
-        } else {
-          encoded.addTransition(element.id, new Encoding.Transition({
-            consume, produce, condition, isEnd, defaultBranch
-          }));
-        }
+        encoded.addTransition(element.id, new Encoding.Transition({
+          consume, produce, condition, isEnd, defaultBranch
+        }));
       }
       else if (element.label instanceof TaskLabel) {
         encoded.addTransition(element.id, new Encoding.InitiatedTransition({
