@@ -71,7 +71,7 @@ export class MustacheEncoding extends MustacheProcessEncoding implements IFromEn
    */
 
   hasSubProcesses = () => this.subProcesses.length > 0;
-  
+
   constructor(public subProcesses: MustacheProcessEncoding[] = [], ...args: ConstructorParameters<typeof MustacheProcessEncoding>
   ) {
     super(...args);
@@ -146,14 +146,5 @@ class Participant {
     public modelID: string, // ID as was found in model
     public name: string,
     public address: string
-  ) {}
-}
-
-class CaseVariable {
-  constructor(
-    public name: string,
-    public type: string,
-    public expression: string,
-    public setters: boolean
   ) {}
 }

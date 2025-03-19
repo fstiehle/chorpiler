@@ -229,7 +229,6 @@ describe('Test Parsing and Generation', () => {
         path.join(OUTPUT_PATH, "/incident-management/IM_ProcessExecution.sol"),
         "IM_"
       );
-      
     });
 
     it.skip('to State Channel Root', async () => {
@@ -241,7 +240,7 @@ describe('Test Parsing and Generation', () => {
         path.join(OUTPUT_PATH, "/incident-management/IM_ProcessChannel.sol"),
         "IM_"
       );
-      
+
     });
 
   });
@@ -267,7 +266,6 @@ describe('Test Parsing and Generation', () => {
         "RA_"
       );
  
-
     });
 
   });
