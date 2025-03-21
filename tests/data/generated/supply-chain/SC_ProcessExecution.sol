@@ -69,12 +69,26 @@ contract SC_ProcessExecution {
         continue; 
         }
       }
-      if (_tokenState & 64 == 64) {
+      if (_tokenState & 48 == 48) {
         // <--- ChoreographyTask_16xqypd Request Details --->
         if ( 
         5 == id
         && 
         msg.sender == participants[3]
+        ) {
+        // <--- custom code for task here --->
+        _tokenState &= ~uint(48);
+        _tokenState |= 64;
+        id = 0;
+        continue; 
+        }
+      }
+      if (_tokenState & 64 == 64) {
+        // <--- ChoreographyTask_0uqv9gl Provide Details --->
+        if ( 
+        6 == id
+        && 
+        msg.sender == participants[2]
         ) {
         // <--- custom code for task here --->
         _tokenState &= ~uint(64);
@@ -84,9 +98,9 @@ contract SC_ProcessExecution {
         }
       }
       if (_tokenState & 128 == 128) {
-        // <--- ChoreographyTask_0uqv9gl Provide Details --->
+        // <--- ChoreographyTask_1pt59s6 Send Waybill --->
         if ( 
-        6 == id
+        7 == id
         && 
         msg.sender == participants[2]
         ) {
@@ -98,11 +112,11 @@ contract SC_ProcessExecution {
         }
       }
       if (_tokenState & 256 == 256) {
-        // <--- ChoreographyTask_1pt59s6 Send Waybill --->
+        // <--- ChoreographyTask_0g98slq Deliver Supplies --->
         if ( 
-        7 == id
+        8 == id
         && 
-        msg.sender == participants[2]
+        msg.sender == participants[3]
         ) {
         // <--- custom code for task here --->
         _tokenState &= ~uint(256);
@@ -112,11 +126,11 @@ contract SC_ProcessExecution {
         }
       }
       if (_tokenState & 512 == 512) {
-        // <--- ChoreographyTask_0g98slq Deliver Supplies --->
+        // <--- ChoreographyTask_0c08h7c Report Start of Production --->
         if ( 
-        8 == id
+        9 == id
         && 
-        msg.sender == participants[3]
+        msg.sender == participants[4]
         ) {
         // <--- custom code for task here --->
         _tokenState &= ~uint(512);
@@ -126,20 +140,6 @@ contract SC_ProcessExecution {
         }
       }
       if (_tokenState & 1024 == 1024) {
-        // <--- ChoreographyTask_0c08h7c Report Start of Production --->
-        if ( 
-        9 == id
-        && 
-        msg.sender == participants[4]
-        ) {
-        // <--- custom code for task here --->
-        _tokenState &= ~uint(1024);
-        _tokenState |= 2048;
-        id = 0;
-        continue; 
-        }
-      }
-      if (_tokenState & 2048 == 2048) {
         // <--- ChoreographyTask_1mgz3z1 Deliver Goods --->
         if ( 
         10 == id
@@ -147,17 +147,11 @@ contract SC_ProcessExecution {
         msg.sender == participants[4]
         ) {
         // <--- custom code for task here --->
-        _tokenState &= ~uint(2048);
+        _tokenState &= ~uint(1024);
         _tokenState |= 0;
         id = 0;
         break; // is end
         }
-      }
-      if (_tokenState & 48 == 48) {
-        // <---  auto transition  --->
-        _tokenState &= ~uint(48);
-        _tokenState |= 64;
-        continue; 
       }
       break;
     }

@@ -232,48 +232,105 @@ export class INetEncoder {
     return { condition, defaultBranch };
   }
 
+  /**
+   * Assure source and target are connected through one place and source doesn't have other targets and target doesn't have other sources
+   * Includes rule a, b, e, f.1, h
+   */
+  private static removeSilentTransitionCaseA(iNet: InteractionNet, prevElement: Element, element: Element, nextElement: Element) {
+    if (element.source.length !== 1 || element.target.length !== 1) return;
+    if (prevElement.target.length !== 1 || nextElement.source.length !== 1) return;
+    assert(element instanceof Place);
+    if (this.isSilentTransition(prevElement)) {
+      this.mergeSourceIntoTarget(iNet, prevElement, nextElement);
+      this.deleteElement(iNet, element);
+      return true;
+    } else if (this.isSilentTransition(nextElement)) {
+      this.mergeTargetIntoSource(iNet, prevElement, nextElement);
+      this.deleteElement(iNet, element);
+      return true;
+    }
+    return false;
+  }
+
+  private static removeSilentTransitionCaseB(iNet: InteractionNet, prevElement: Element, element: Element, nextElement: Element) {
+    if (element.source.length !== 1 || element.target.length !== 1) return;
+    if (!this.isSilentTransition(prevElement) || !this.isSilentTransition(nextElement)) return;
+    assert(element instanceof Place);
+    if (prevElement.target.length > 1 && nextElement.source.length === 1) { // rule f.2
+      this.mergeTargetIntoSource(iNet, prevElement, nextElement);
+      this.deleteElement(iNet, element);
+      return true;
+    } else if (prevElement.target.length === 1 && nextElement.source.length > 1) { // rule g
+      this.mergeSourceIntoTarget(iNet, prevElement, nextElement);
+      this.deleteElement(iNet, element);
+      return true;
+    }
+    return false;
+  }
+
+  private static removeSilentTransitionCaseC(iNet: InteractionNet, prevElement: Element, element: Element, nextElement: Element) {
+    if (element.source.length !== 1 || element.target.length !== 1) return;
+    if (!this.isSilentTransition(element)) return;
+    assert(element instanceof Transition);
+
+    if (prevElement.target.length > 1 && nextElement.source.length === 1) { // rule c
+      this.mergeSourceIntoTarget(iNet, prevElement, nextElement);
+      this.copyProperties(element as Transition, nextElement.target as Transition[]);
+      this.deleteElement(iNet, element);
+      return true;
+    } else if (prevElement.target.length === 1 && nextElement.source.length > 1) { // rule d
+      this.mergeTargetIntoSource(iNet, prevElement, nextElement);
+      this.copyProperties(element as Transition, prevElement.source as Transition[]);
+      this.deleteElement(iNet, element);
+      return true;
+    }
+    return false;
+  }
+
+  // rule i
+  private static removeSilentTransitionCaseD(iNet: InteractionNet, prevElement: Element, element: Element, nextElement: Element) {
+    if (element.source.length !== 1 || element.target.length !== 1) return;
+    if (!this.isSilentTransition(element)) return;
+    assert(element instanceof Transition);
+
+    if (this.isSilentTransition(element) // rule i
+      && element.source.length === 1 && element.target.length > 1
+      && element.source[0].source.length > 0 && element.source[0].target.length > 1
+      ) {
+      // XOR -> AND, XOR not immediately after start event (a manual task is present before the XOR)
+      const xorPlace = element.source[0];
+      const andPlaces = element.target;
+      for (const prevTransition of xorPlace.source) this.linkNewTargets(prevTransition, andPlaces);
+      for (const andPlace of andPlaces) this.linkNewTargets(andPlace, xorPlace.target);
+      this.deleteElement(iNet, element);
+      this.deleteElement(iNet, xorPlace); 
+      return true;
+    }
+    return false;
+  }
+
+  private static mergeSourceIntoTarget(iNet: InteractionNet, source: Element, target: Element) {
+    this.linkNewSources(target, source.source);
+    if (source instanceof Transition) this.copyProperties(source, [target as Transition]);
+    this.deleteElement(iNet, source);
+  }
+
+  private static mergeTargetIntoSource(iNet: InteractionNet, source: Element, target: Element) {
+    this.linkNewTargets(source, target.target);
+    if (target instanceof Transition) this.copyProperties(target, [source as Transition]);
+    this.deleteElement(iNet, target);
+  }
+
   private static removeSilentTransitions(iNet: InteractionNet) {
     for (const element of iNet.elements.values()) {
       if (element.source.length === 1 && element.target.length === 1) {
-        const source = element.source[0];
-        const target = element.target[0];
-        if (this.isSilentTransition(element)) {
-          // a previous place only connected to this transition but with other previous transitions
-          if (source.target.length === 1 && source.source.length > 0) {
-            this.linkNewSources(target, source.source);
-            this.copyProperties(element as Transition, source.source as Transition[]);
-            this.deleteElement(iNet, element);
-            this.deleteElement(iNet, source);
-            // target place only connected to this transition but with other target transitions
-          } else if (target.source.length === 1 && target.target.length > 0) {
-            this.linkNewTargets(source, target.target);
-            this.copyProperties(element as Transition, target.target as Transition[]);
-            this.deleteElement(iNet, element);
-            this.deleteElement(iNet, target);
-          }
-        } else if (element instanceof Place
-          && this.isSilentTransition(source) && this.isSilentTransition(target)) {
-          // two AND gateways (silent transitions) in sucession 
-          this.linkNewSources(source, target.source);
-          this.linkNewTargets(source, target.target);
-          this.copyProperties(target as Transition, [source as Transition]);
-          this.deleteElement(iNet, element);
-          this.deleteElement(iNet, target);
-        }
-      } else if (this.isSilentTransition(element) 
-        && element.source.length === 1 && element.source[0].source.length > 0 
-        && element.target.length > 1) {
-        // XOR -> AND, XOR not immediately after start event
-        const xorPlace = element.source[0];
-        const andPlaces = element.target;
-        for (const prevTransition of xorPlace.source) {
-          this.linkNewTargets(prevTransition, andPlaces);
-        }
-        for (const andPlace of andPlaces) {
-          this.linkNewTargets(andPlace, xorPlace.target);
-        }
-        this.deleteElement(iNet, element);
-        this.deleteElement(iNet, xorPlace); 
+        const prevElement = element.source[0];
+        const nextElement = element.target[0];
+        
+        if (this.removeSilentTransitionCaseA(iNet, prevElement, element, nextElement)) continue;
+        if (this.removeSilentTransitionCaseB(iNet, prevElement, element, nextElement)) continue;
+        if (this.removeSilentTransitionCaseC(iNet, prevElement, element, nextElement)) continue;
+        if (this.removeSilentTransitionCaseD(iNet, prevElement, element, nextElement)) continue;
       }
     }
   }
@@ -288,11 +345,6 @@ export class INetEncoder {
     || el.label.type === LabelType.ParallelDiverging
     || el.label.type === LabelType.Start
     || el.label.type === LabelType.End );
-  }
-
-  private static isEventTransition(el: Element) {
-    return el instanceof Transition &&
-    (el.label.type === LabelType.Task);
   }
 
   static isSubOrCallChoreography(el: Transition) {
