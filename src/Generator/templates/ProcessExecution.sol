@@ -2,7 +2,12 @@
 pragma solidity ^0.8.9;
 
 contract ProcessExecution {
+  {{^hasSubProcesses}}
   uint public tokenState = 1;
+  {{/hasSubProcesses}}
+  {{#hasSubProcesses}}
+  uint[{{{numberOfSubProcesses}}}] public tokenState;
+  {{/hasSubProcesses}}
   address[{{{numberOfParticipants}}}] public participants;
   {{#caseVariables}}
   {{{expression}}}
@@ -18,22 +23,12 @@ contract ProcessExecution {
   {{/caseVariables}}
 
   function enact(uint id) external {
-    uint _tokenState = tokenState;
-
-    while(_tokenState != 0) {
-      {{#states}}
-      if (_tokenState & {{{consume}}} == {{{consume}}}) {
-      {{#transitions}} 
-        {{> transition }}
-      {{/transitions}} 
-      {{#defaultBranch}} 
-        {{> transition }}
-      {{/defaultBranch}}
-      }
-      {{/states}}
-      break;
-    }
-
-    tokenState = _tokenState;
+    {{> execution}}
   }
+
+  {{#subProcesses}}
+  function {{modelID}}(uint id) external {
+    {{> execution}}
+  }
+  {{/subProcesses}}
 }

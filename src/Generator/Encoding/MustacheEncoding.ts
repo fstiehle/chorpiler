@@ -24,7 +24,7 @@ class MustacheProcessEncoding {
       encoding.modelID,
       Array.from(encoding.participants.values()).map(p => new Participant(p.id.toString(), p.modelID, p.name, p.address)),
       Array.from(encoding.caseVariables.values()),
-      this.convertStates(states),
+      MustacheProcessEncoding.convertStates(states),
     );
   }
 
@@ -56,8 +56,7 @@ class MustacheProcessEncoding {
       t instanceof Encoding.InitiatedTransition ? t.taskName : "",
       t.condition ?? "",
       t.isEnd,
-      t.outTo !== null ? t.outTo.toString() : null,
-      t.inFrom !== null ? t.inFrom.toString() : null
+      t.outTo !== null ? { id: t.outTo.id.toString(), produce: t.outTo.produce.toString() } : null,
     );
   }
 }
@@ -71,6 +70,7 @@ export class MustacheEncoding extends MustacheProcessEncoding implements IFromEn
    */
 
   hasSubProcesses = () => this.subProcesses.length > 0;
+  numberOfSubProcesses = () => this.subProcesses.length.toString();
 
   constructor(public subProcesses: MustacheProcessEncoding[] = [], ...args: ConstructorParameters<typeof MustacheProcessEncoding>
   ) {
@@ -104,8 +104,7 @@ class Transition {
     public taskName: string,
     public condition: string,
     public isEnd: boolean,
-    public outTo: string | null = null, // transition leads to subnet with id @outTo
-    public inFrom: string | null = null, // transition enters from subnet with id @inFrom,
+    public outTo: { id: string; produce: string } | null,
     public last: boolean | null = null
   ) {
     if (this.condition) {

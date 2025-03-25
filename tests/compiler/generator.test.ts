@@ -94,6 +94,13 @@ describe('Test Parsing and Generation', () => {
       })
     });
 
+    it('Compile model with sub choreographies to Sol contract that seperates the instance state (unfold=false)', () => {
+      return readFile(path.join(BPMN_PATH, 'sub-choreography2.bpmn')).then(async (data) => {
+        const iNet = await parser.fromXML(data);
+        return console.log(await new SolDefaultContractGenerator(iNet[0]).compile(false));
+      })
+    });
+
     it('Compile model with XOR followed by AND to Sol contract', () => { // Should be reduced properly, according to Rule (i)
       return readFile(path.join(BPMN_PATH, 'xor-and.bpmn')).then(async (data) => {
         const iNet = await parser.fromXML(data);
@@ -104,14 +111,14 @@ describe('Test Parsing and Generation', () => {
     it('Compile model with event-based gateway', () => {
       return readFile(path.join(BPMN_PATH, 'event.bpmn')).then(async (data) => {
         const iNet = await parser.fromXML(data);
-        await new SolDefaultContractGenerator(iNet[0]).compile();
+        return await new SolDefaultContractGenerator(iNet[0]).compile();
       })
     });
 
     it('Compile model with a Loop to Sol contract', () => {
       return readFile(path.join(BPMN_PATH, 'loop.bpmn')).then(async (data) => {
         const iNet = await parser.fromXML(data);
-        console.log(await new SolDefaultContractGenerator(iNet[0]).compile());
+        return await new SolDefaultContractGenerator(iNet[0]).compile();
       })
     });
 

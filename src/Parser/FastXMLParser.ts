@@ -1,7 +1,7 @@
 import { InteractionNet } from './InteractionNet';
 import { XMLParser } from 'fast-xml-parser';
 import { Participant } from './Participant';
-import { Element, TaskLabel, Transition, Place, LabelType, Label, PlaceType, Guard, TaskType } from './Element';
+import { Element, TaskLabel, Transition, Place, LabelType, Label, PlaceType, Guard, TaskType, SubChoreographyTaskLabel } from './Element';
 import { INetParser } from './Parser';
 import { deleteFromArray, printInet } from '../util/helpers';
 
@@ -94,7 +94,7 @@ export class INetFastXMLParser implements INetParser {
         // translate sub choreography task
         const subTransition = this.addTransition(new Transition(
           subChoreography[Properties.id], 
-          new TaskLabel(initiator, respondents, subNetID, TaskType.CallChoreography))
+          new SubChoreographyTaskLabel(initiator, respondents, subNetID, subNetID, TaskType.CallChoreography))
         );
         this.translateIncomingFlows(subTransition, subChoreography[Elements.ins]);
         this.translateOutgoingFlows(subTransition, subChoreography[Elements.outs]);

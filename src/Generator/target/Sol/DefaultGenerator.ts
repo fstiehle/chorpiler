@@ -13,6 +13,7 @@ export default class SolDefaultContractGenerator extends TemplateEngine {
       _caseVariables,
     [ { partial: 'transition', path: path.join(__dirname, '..', '..', 'templates/partials/transition.mustache.sol') },
       { partial: 'condition', path: path.join(__dirname, '..', '..', 'templates/partials/condition.mustache.sol') },
+      { partial: 'execution', path: path.join(__dirname, '..', '..', 'templates/partials/execution.mustache.sol') },
     ]);
   }
 }

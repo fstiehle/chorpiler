@@ -70,6 +70,14 @@ export class TaskLabel extends EventLabel {
   }
 }
 
+export class SubChoreographyTaskLabel extends TaskLabel {
+  constructor(sender: Participant, receiver: Participant[], name: string, 
+    public chorID: number,
+    type: TaskType.SubChoreography | TaskType.CallChoreography) {
+    super(sender, receiver, name, type);
+  }
+}
+
 export enum LabelType {
   Start,
   End,

@@ -23,6 +23,7 @@ contract SC_ProcessExecution {
         // <--- custom code for task here --->
         _tokenState &= ~uint(1);
         _tokenState |= 2;
+        _tokenState |= 2;
         id = 0;
         continue; 
         }
@@ -36,6 +37,7 @@ contract SC_ProcessExecution {
         ) {
         // <--- custom code for task here --->
         _tokenState &= ~uint(2);
+        _tokenState |= 12;
         _tokenState |= 12;
         id = 0;
         continue; 
@@ -51,6 +53,7 @@ contract SC_ProcessExecution {
         // <--- custom code for task here --->
         _tokenState &= ~uint(4);
         _tokenState |= 16;
+        _tokenState |= 16;
         id = 0;
         continue; 
         }
@@ -64,6 +67,7 @@ contract SC_ProcessExecution {
         ) {
         // <--- custom code for task here --->
         _tokenState &= ~uint(8);
+        _tokenState |= 32;
         _tokenState |= 32;
         id = 0;
         continue; 
@@ -79,6 +83,7 @@ contract SC_ProcessExecution {
         // <--- custom code for task here --->
         _tokenState &= ~uint(48);
         _tokenState |= 64;
+        _tokenState |= 64;
         id = 0;
         continue; 
         }
@@ -92,6 +97,7 @@ contract SC_ProcessExecution {
         ) {
         // <--- custom code for task here --->
         _tokenState &= ~uint(64);
+        _tokenState |= 128;
         _tokenState |= 128;
         id = 0;
         continue; 
@@ -107,6 +113,7 @@ contract SC_ProcessExecution {
         // <--- custom code for task here --->
         _tokenState &= ~uint(128);
         _tokenState |= 256;
+        _tokenState |= 256;
         id = 0;
         continue; 
         }
@@ -120,6 +127,7 @@ contract SC_ProcessExecution {
         ) {
         // <--- custom code for task here --->
         _tokenState &= ~uint(256);
+        _tokenState |= 512;
         _tokenState |= 512;
         id = 0;
         continue; 
@@ -135,6 +143,7 @@ contract SC_ProcessExecution {
         // <--- custom code for task here --->
         _tokenState &= ~uint(512);
         _tokenState |= 1024;
+        _tokenState |= 1024;
         id = 0;
         continue; 
         }
@@ -148,6 +157,7 @@ contract SC_ProcessExecution {
         ) {
         // <--- custom code for task here --->
         _tokenState &= ~uint(1024);
+        _tokenState |= 0;
         _tokenState |= 0;
         id = 0;
         break; // is end

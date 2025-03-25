@@ -27,6 +27,7 @@ contract IM_ProcessExecution {
         // <--- custom code for task here --->
         _tokenState &= ~uint(1);
         _tokenState |= 2;
+        _tokenState |= 2;
         id = 0;
         continue; 
         }
@@ -40,6 +41,7 @@ contract IM_ProcessExecution {
         ) {
         // <--- custom code for task here --->
         _tokenState &= ~uint(2);
+        _tokenState |= 4;
         _tokenState |= 4;
         id = 0;
         continue; 
@@ -55,6 +57,7 @@ contract IM_ProcessExecution {
         // <--- custom code for task here --->
         _tokenState &= ~uint(8);
         _tokenState |= 0;
+        _tokenState |= 0;
         id = 0;
         break; // is end
         }
@@ -69,6 +72,7 @@ contract IM_ProcessExecution {
         // <--- custom code for task here --->
         _tokenState &= ~uint(4);
         _tokenState |= 16;
+        _tokenState |= 16;
         id = 0;
         continue; 
         }
@@ -77,6 +81,7 @@ contract IM_ProcessExecution {
         (resolved==true)
         ) {
         _tokenState &= ~uint(4);
+        _tokenState |= 8;
         _tokenState |= 8;
         continue; 
         }
@@ -90,6 +95,7 @@ contract IM_ProcessExecution {
         ) {
         // <--- custom code for task here --->
         _tokenState &= ~uint(32);
+        _tokenState |= 8;
         _tokenState |= 8;
         id = 0;
         continue; 
@@ -105,6 +111,7 @@ contract IM_ProcessExecution {
         // <--- custom code for task here --->
         _tokenState &= ~uint(16);
         _tokenState |= 64;
+        _tokenState |= 64;
         id = 0;
         continue; 
         }
@@ -113,6 +120,7 @@ contract IM_ProcessExecution {
         (resolved==true)
         ) {
         _tokenState &= ~uint(16);
+        _tokenState |= 32;
         _tokenState |= 32;
         continue; 
         }
@@ -127,6 +135,7 @@ contract IM_ProcessExecution {
         // <--- custom code for task here --->
         _tokenState &= ~uint(64);
         _tokenState |= 128;
+        _tokenState |= 128;
         id = 0;
         continue; 
         }
@@ -135,6 +144,7 @@ contract IM_ProcessExecution {
         (resolved==true)
         ) {
         _tokenState &= ~uint(64);
+        _tokenState |= 256;
         _tokenState |= 256;
         continue; 
         }
@@ -149,6 +159,7 @@ contract IM_ProcessExecution {
         // <--- custom code for task here --->
         _tokenState &= ~uint(128);
         _tokenState |= 256;
+        _tokenState |= 256;
         id = 0;
         continue; 
         }
@@ -162,6 +173,7 @@ contract IM_ProcessExecution {
         ) {
         // <--- custom code for task here --->
         _tokenState &= ~uint(256);
+        _tokenState |= 32;
         _tokenState |= 32;
         id = 0;
         continue; 

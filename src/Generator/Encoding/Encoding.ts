@@ -3,10 +3,10 @@ export class Process {
   public transitions = new Map<string, Transition>();
   public states = new Map<number, Transition[]>();
   caseVariables = new Map<string, CaseVariable>();
+  public modelID = ""; // ID as was found in model
 
   constructor(
     public id: number, // ID in form 0...n assigned by generator
-    public modelID: string, // ID as was found in model
   ) {}
 
   addTransition(netID: string, transition: Transition) {
@@ -19,13 +19,16 @@ export class Process {
   }
 }
 
+export class SubProcess extends Process {
+  sourceIDs: string[] = []; // transition in the parent process before this sub process
+  targetIDs: string[] = []; // transition in the parent process after this sub process
+}
+
 export class MainProcess extends Process {
-  constructor(
-    modelID: string, // ID as was found in model
-  ) {
-    super(0, modelID);
+  constructor() {
+    super(0);
   }
-  subProcesses = new Map<string, Process>();
+  subProcesses = new Map<string, SubProcess>();
 }
 
 export class CaseVariable {
@@ -43,19 +46,24 @@ interface TransitionParams {
   condition?: string | null;
   isEnd?: boolean;
   defaultBranch?: boolean;
-  outTo?: number | null;
-  inFrom?: number | null;
+  outTo?: { id: number; produce: number } | null;
 }
 
 export class Transition {
+  public consume: number;
+  public produce: number;
+  public condition: string | null;
+  public isEnd: boolean;
+  public defaultBranch: boolean;
+  public outTo: { id: number; produce: number } | null;
+
   constructor({
     consume,
     produce,
     condition = null,
     isEnd = false,
     defaultBranch = false,
-    outTo = null,
-    inFrom = null
+    outTo = null
   }: TransitionParams) {
     this.consume = consume;
     this.produce = produce;
@@ -63,16 +71,7 @@ export class Transition {
     this.isEnd = isEnd;
     this.defaultBranch = defaultBranch;
     this.outTo = outTo;
-    this.inFrom = inFrom;
   }
-
-  public consume: number;
-  public produce: number;
-  public condition: string | null;
-  public isEnd: boolean;
-  public defaultBranch: boolean;
-  public outTo: number | null;
-  public inFrom: number | null;
 }
 
 interface TaskTransitionParams extends TransitionParams {

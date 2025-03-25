@@ -13,7 +13,7 @@ export interface ITemplateEngine {
   addCaseVariable(variable: CaseVariable): void;
   deleteCaseVariable(variableName: string): boolean;
   getCaseVariable(variableName: string): CaseVariable | undefined;
-  compile(): Promise<{target: string, encoding: TriggerEncoding}>
+  compile(unfoldSubNets: boolean): Promise<{target: string, encoding: TriggerEncoding}>
   setTemplatePath(path: string): void;
   getTemplate(): Promise<string>
 }
@@ -27,7 +27,7 @@ export abstract class TemplateEngine implements ITemplateEngine {
     private templatePartials = new Array<{ partial: string, path: string}>()
   ) { }
 
-  async compile() {
+  async compile(unfoldSubNets = false) {
     if (this.iNet.initial == null || this.iNet.end == null) {
       throw new Error("Invalid InteractionNet"); 
     }
@@ -38,7 +38,8 @@ export abstract class TemplateEngine implements ITemplateEngine {
       return acc;
      }, {} );
 
-    const gen = INetEncoder.generate(iNet, { unfoldSubNets: true });
+    const encoder = new INetEncoder();
+    const gen = encoder.generate(iNet, { unfoldSubNets });
     gen.caseVariables = this.caseVariables;
 
     return { target: Mustache.render(template, MustacheEncoding.fromEncoding(gen), partials), 

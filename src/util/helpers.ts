@@ -59,4 +59,7 @@ export const printInet = (iNet: InteractionNet): void => {
   };
 
   traverse(iNet.initial);
+  for (const subNet of iNet.subNets.values()) {
+    printInet(subNet);
+  }
 }
