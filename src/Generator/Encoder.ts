@@ -2,7 +2,7 @@
  * Generates a Encoding from an INet, by removing silent transitions and encoding tasks in a bit array fashion, 
  * the template can be used to render the process token play by a TemplateEngine
  */
-import { deleteFromArray } from '../util/helpers';
+import { deleteFromArray, printInet } from '../util/helpers';
 import { Transition, Element, TaskLabel, LabelType, Place, PlaceType, Guard, SubChoreographyTaskLabel } from '../Parser/Element';
 import { InteractionNet } from '../Parser/InteractionNet';
 import * as Encoding from "./Encoding/Encoding";
@@ -292,15 +292,14 @@ export class INetEncoder {
     if (element.source.length !== 1 || element.target.length !== 1) return;
     if (!this.isSilentTransition(element)) return;
     assert(element instanceof Transition);
-
     if (prevElement.target.length > 1 && nextElement.source.length === 1) { // rule c
-      this.mergeSourceIntoTarget(iNet, prevElement, nextElement);
       this.copyProperties(element as Transition, nextElement.target as Transition[]);
+      this.mergeTargetIntoSource(iNet, prevElement, nextElement);
       this.deleteElement(iNet, element);
       return true;
     } else if (prevElement.target.length === 1 && nextElement.source.length > 1) { // rule d
-      this.mergeTargetIntoSource(iNet, prevElement, nextElement);
       this.copyProperties(element as Transition, prevElement.source as Transition[]);
+      this.mergeSourceIntoTarget(iNet, prevElement, nextElement);
       this.deleteElement(iNet, element);
       return true;
     }
@@ -341,7 +340,9 @@ export class INetEncoder {
     this.deleteElement(iNet, target);
   }
 
-  private removeSilentTransitions(iNet: InteractionNet) {
+  public removeSilentTransitions(iNet: InteractionNet) {
+    console.log("Parsed:")
+    printInet(iNet);
     for (const element of iNet.elements.values()) {
       if (element.source.length === 1 && element.target.length === 1) {
         const prevElement = element.source[0];
@@ -354,7 +355,10 @@ export class INetEncoder {
           if (this.removeSilentTransitionCaseD(iNet, prevElement, element, nextElement)) continue;
         }
       }
+      console.log("Reduced:")
+      printInet(iNet);
     }
+    return iNet;
   }
 
   private isSilentTransition(el: Element) {

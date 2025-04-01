@@ -1,27 +1,7 @@
 import assert from "assert";
 import seed from 'seed-random';
-import { TriggerEncoding } from "../Generator/Encoding/TriggerEncoding";
-
-export class Event {
-  public target: string|null = null;
-  public dataChange: InstanceDataChange[]|null = null;
-
-  constructor(
-    public name: string, 
-    public source: string, 
-    _target?: string,
-    _dataChange?: InstanceDataChange[]) {
-    
-    if (_dataChange)
-      this.dataChange = _dataChange;
-    if (_target)
-      this.target = _target;
-  }
-}
-
-export class InstanceDataChange {
-  constructor(public variable: string, public val: boolean) { }
-}
+import { TriggerEncoding } from "../../Generator/Encoding/TriggerEncoding";
+import { Trace } from "./Trace";
 
 export class EventLog implements IterableIterator<Trace>{
   constructor(public traces: Trace[]) {}
@@ -153,27 +133,23 @@ export class EventLog implements IterableIterator<Trace>{
   }
 }
 
-export class Trace implements IterableIterator<Event> {
+export class Event {
+  public target: string|null = null;
+  public dataChange: InstanceDataChange[]|null = null;
 
-  private pointer = 0;
+  constructor(
+    public name: string, 
+    public source: string, 
+    _target?: string,
+    _dataChange?: InstanceDataChange[]) {
 
-  constructor(public events: Event[]) {}
-
-  public next(): IteratorResult<Event> {
-    if (this.pointer < this.events.length) {
-      return {
-        done: false,
-        value: this.events[this.pointer++]
-      }
-    } else {
-      return {
-        done: true,
-        value: null
-      }
-    }
+    if (_dataChange)
+      this.dataChange = _dataChange;
+    if (_target)
+      this.target = _target;
   }
+}
 
-  [Symbol.iterator](): IterableIterator<Event> {
-    return this;
-  }
+export class InstanceDataChange {
+  constructor(public variable: string, public val: boolean) { }
 }

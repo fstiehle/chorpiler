@@ -1,6 +1,7 @@
 import { XMLParser } from 'fast-xml-parser';
-import { EventLog, Event, Trace, InstanceDataChange } from './EventLog';
+import { EventLog, Event, InstanceDataChange } from './EventLog';
 import assert from 'assert';
+import { Trace } from './Trace';
 
 enum Props {
   key = '@_key',
@@ -67,7 +68,8 @@ export class XESFastXMLParser {
               }
             }
 
-            assert(name && from);
+            assert(name);
+            if (!from) console.warn(`No initiator defined in event ${name}`);
             events.push(new Event(name, from, to, data));
           }
 

@@ -5,10 +5,8 @@ import { expect, use } from "chai";
 import { readFileSync } from 'fs';
 import path from "path";
 import { BPMN_PATH } from "../config";
-import { EventLog } from "../../src/util/EventLog";
 import { Contract, ContractFactory } from 'ethers';
 import { MockProvider, solidity} from 'ethereum-waffle';
-import { XESFastXMLParser } from "../../src/util/XESFastXMLParser";
 
 import AIM_ProcessSmartContract from './../data/generated/artifcats/IM_ProcessExecution.json';
 import ASC_ProcessSmartContract from './../data/generated/artifcats/SC_ProcessExecution.json';
@@ -23,6 +21,8 @@ import encodingPIZZA from './../data/generated/pizza/PIZZA_ProcessExecution_enco
 import encodingRA from './../data/generated/rental-agreement/RA_ProcessExecution_encoding.json';
 import assert from "assert";
 import { TriggerEncoding } from "../../src";
+import { XESFastXMLParser } from "../../src/util/EventLog/XESFastXMLParser";
+import { EventLog } from "../../src/util/EventLog/EventLog";
 
 use(solidity);
 

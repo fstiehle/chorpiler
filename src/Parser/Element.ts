@@ -78,6 +78,9 @@ export class SubChoreographyTaskLabel extends TaskLabel {
   }
 }
 
+// TODO: LabelTypes might be Reduntant? 
+// Below cannot be relied upon anyway, as these could get reduced,
+// Task is its own class anyway, maybe LabelType Manual or Silent is enough
 export enum LabelType {
   Start,
   End,

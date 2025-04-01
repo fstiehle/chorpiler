@@ -123,7 +123,7 @@ export class INetFastXMLParser implements INetParser {
       if (!initiator) throw new Error(`Initiator of Element not found ${task[Properties.initiator]}`)
       const respondents = new Array<Participant>();
       for (const id of task[Elements.participantsRef]) {
-        if (id === initiator) continue;
+        if (id === initiator.id) continue;
         respondents.push(this.iNet.participants.get(id)!);
       }
       return { initiator, respondents }
@@ -435,7 +435,6 @@ export class INetFastXMLParser implements INetParser {
         try {
           const iNet = iNetTranslator.translate(choreography);
           iNets.push(iNet);
-          printInet(iNet);
         } catch (error) {
           return reject(error);
         }

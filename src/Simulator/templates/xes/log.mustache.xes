@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<log xes.version="1.0">
+	<global scope="event">
+		<string key="concept:name" value="Task Name"/>
+		<string key="sourceRef" value="Participant ID"/>
+	</global>
+
+  {{#traces}}
+  <trace>
+    {{#events}}
+    <event>
+      <string key="concept:name" value="{{name}}"/>
+      <string key="sourceRef" value="{{source}}"/>
+      {{#target}}<string key="targetRef" value="{{target}}"/>{{/target}}
+      {{#dataChange}}
+      <boolean key="items" value="{{.}}"/>
+      {{/dataChange}}
+    </event>
+    {{/events}}
+  </trace>
+  {{/traces}}
+</log>
