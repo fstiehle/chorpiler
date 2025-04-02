@@ -341,8 +341,6 @@ export class INetEncoder {
   }
 
   public removeSilentTransitions(iNet: InteractionNet) {
-    console.log("Parsed:")
-    printInet(iNet);
     for (const element of iNet.elements.values()) {
       if (element.source.length === 1 && element.target.length === 1) {
         const prevElement = element.source[0];
@@ -355,8 +353,6 @@ export class INetEncoder {
           if (this.removeSilentTransitionCaseD(iNet, prevElement, element, nextElement)) continue;
         }
       }
-      console.log("Reduced:")
-      printInet(iNet);
     }
     return iNet;
   }

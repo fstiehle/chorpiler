@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<log xes.version="1.0">
+	<global scope="event">
+		<string key="concept:name" value="Task Name"/>
+		<string key="sourceRef" value="Participant ID"/>
+	</global>
+
+  <trace>
+    <event>
+      <string key="concept:name" value="Order Pizza"/>
+      <string key="sourceRef" value="Participant_06qakjv"/>
+    </event>
+    <event>
+      <string key="concept:name" value="data change"/>
+      <string key="sourceRef" value="Participant 0"/>
+      <boolean key="items" value="cond[items > 1]"/>
+    </event>
+    <event>
+      <string key="concept:name" value="data change"/>
+      <string key="sourceRef" value="Participant 0"/>
+      <boolean key="items" value="cond[items==true]"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Deliver Pizza"/>
+      <string key="sourceRef" value="Participant_0537iz2"/>
+    </event>
+  </trace>
+  <trace>
+    <event>
+      <string key="concept:name" value="Order Pizza"/>
+      <string key="sourceRef" value="Participant_06qakjv"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Announce Delivery"/>
+      <string key="sourceRef" value="Participant_0mgz9si"/>
+    </event>
+    <event>
+      <string key="concept:name" value="data change"/>
+      <string key="sourceRef" value="Participant 0"/>
+      <boolean key="items" value="cond[items > 1]"/>
+    </event>
+    <event>
+      <string key="concept:name" value="data change"/>
+      <string key="sourceRef" value="Participant 0"/>
+      <boolean key="items" value="cond[items==true]"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Deliver Pizza"/>
+      <string key="sourceRef" value="Participant_0537iz2"/>
+    </event>
+  </trace>
+  <trace>
+    <event>
+      <string key="concept:name" value="Order Pizza"/>
+      <string key="sourceRef" value="Participant_06qakjv"/>
+    </event>
+    <event>
+      <string key="concept:name" value="data change"/>
+      <string key="sourceRef" value="Participant 0"/>
+      <boolean key="items" value="cond[items > 1 && items==fl]"/>
+    </event>
+    <event>
+      <string key="concept:name" value="New Activity"/>
+      <string key="sourceRef" value="Participant_0mgz9si"/>
+    </event>
+    <event>
+      <string key="concept:name" value="data change"/>
+      <string key="sourceRef" value="Participant 0"/>
+      <boolean key="items" value="cond[items > 1]"/>
+    </event>
+    <event>
+      <string key="concept:name" value="data change"/>
+      <string key="sourceRef" value="Participant 0"/>
+      <boolean key="items" value="cond[items==true]"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Deliver Pizza"/>
+      <string key="sourceRef" value="Participant_0537iz2"/>
+    </event>
+  </trace>
+</log>

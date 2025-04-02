@@ -38,14 +38,14 @@ export class Simulator implements ISimulator {
       }
     } else if (element instanceof Place) {
       // TODO: If element is start
-      if (element.type === PlaceType.Start) {
-        taskList.push("Start");
+      if (element.type === PlaceType.End) {
+        taskList.push("End");
         return taskList;
       }
     }
 
-    for (const source of element.source) {
-      return Simulator.traverse(source, visited, taskList);
+    for (const target of element.target) {
+      return Simulator.traverse(target, visited, taskList);
     }
 
     return taskList;
@@ -104,8 +104,9 @@ export class Simulator implements ISimulator {
                 undefined,
                 [new InstanceDataChange(`cond[${gateway}]`, true)]
               ));
-            } else if (i === 0 && eventName.includes("Start")) {
-              console.log(`Add Gateway: ${gateway} to start of the log`);
+            }
+            if (eventName.includes("End")) {
+              console.log(`Add Gateway: ${gateway} to end of the log`);
               trace.events.splice(i, 0, new Event(
                 "data change",
                 "Participant 0",
@@ -117,7 +118,7 @@ export class Simulator implements ISimulator {
         }
       }
 
-      const template = fs.readFileSync(path.join("./templates/xes", "log.mustache.xes"), "utf-8");
+      const template = fs.readFileSync(path.join(__dirname, "./templates/xes", "log.mustache.xes"), "utf-8");
       const renderedLog = Mustache.render(template, log);
 
       if (!fs.existsSync(this.outputDir)) {

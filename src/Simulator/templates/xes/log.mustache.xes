@@ -11,9 +11,8 @@
     <event>
       <string key="concept:name" value="{{name}}"/>
       <string key="sourceRef" value="{{source}}"/>
-      {{#target}}<string key="targetRef" value="{{target}}"/>{{/target}}
       {{#dataChange}}
-      <boolean key="items" value="{{.}}"/>
+      <boolean key="items" value="{{{variable}}}"/>
       {{/dataChange}}
     </event>
     {{/events}}
