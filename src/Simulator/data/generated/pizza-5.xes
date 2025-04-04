@@ -11,14 +11,9 @@
       <string key="sourceRef" value="Participant_06qakjv"/>
     </event>
     <event>
-      <string key="concept:name" value="data change"/>
-      <string key="sourceRef" value="Participant 0"/>
-      <boolean key="items" value="cond[items > 1]"/>
-    </event>
-    <event>
-      <string key="concept:name" value="data change"/>
-      <string key="sourceRef" value="Participant 0"/>
-      <boolean key="items" value="cond[items==true]"/>
+      <string key="concept:name" value="Instance Data Change"/>
+      <string key="sourceRef" value="Participant"/>
+      <boolean key="items" value="conditions[0]"/>
     </event>
     <event>
       <string key="concept:name" value="Deliver Pizza"/>
@@ -35,14 +30,19 @@
       <string key="sourceRef" value="Participant_0mgz9si"/>
     </event>
     <event>
-      <string key="concept:name" value="data change"/>
-      <string key="sourceRef" value="Participant 0"/>
-      <boolean key="items" value="cond[items > 1]"/>
+      <string key="concept:name" value="Deliver Pizza"/>
+      <string key="sourceRef" value="Participant_0537iz2"/>
+    </event>
+  </trace>
+  <trace>
+    <event>
+      <string key="concept:name" value="Order Pizza"/>
+      <string key="sourceRef" value="Participant_06qakjv"/>
     </event>
     <event>
-      <string key="concept:name" value="data change"/>
-      <string key="sourceRef" value="Participant 0"/>
-      <boolean key="items" value="cond[items==true]"/>
+      <string key="concept:name" value="Instance Data Change"/>
+      <string key="sourceRef" value="Participant"/>
+      <boolean key="items" value="conditions[1]"/>
     </event>
     <event>
       <string key="concept:name" value="Deliver Pizza"/>
@@ -55,23 +55,18 @@
       <string key="sourceRef" value="Participant_06qakjv"/>
     </event>
     <event>
-      <string key="concept:name" value="data change"/>
-      <string key="sourceRef" value="Participant 0"/>
-      <boolean key="items" value="cond[items > 1 && items==fl]"/>
+      <string key="concept:name" value="Instance Data Change"/>
+      <string key="sourceRef" value="Participant"/>
+      <boolean key="items" value="conditions[1]"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Instance Data Change"/>
+      <string key="sourceRef" value="Participant"/>
+      <boolean key="items" value="conditions[2]"/>
     </event>
     <event>
       <string key="concept:name" value="New Activity"/>
       <string key="sourceRef" value="Participant_0mgz9si"/>
-    </event>
-    <event>
-      <string key="concept:name" value="data change"/>
-      <string key="sourceRef" value="Participant 0"/>
-      <boolean key="items" value="cond[items > 1]"/>
-    </event>
-    <event>
-      <string key="concept:name" value="data change"/>
-      <string key="sourceRef" value="Participant 0"/>
-      <boolean key="items" value="cond[items==true]"/>
     </event>
     <event>
       <string key="concept:name" value="Deliver Pizza"/>

@@ -1,13 +1,15 @@
 import { INetEncoder } from "../Generator/Encoder";
-import { Place, PlaceType, TaskLabel, Transition } from "../Parser/Element";
+import { Element, Place, PlaceType, TaskLabel, Transition } from "../Parser/Element";
 import { INetFastXMLParser } from "../Parser/FastXMLParser";
 import { INetParser } from "../Parser/Parser";
 import { XESFastXMLParser } from "../util/EventLog/XESFastXMLParser";
 import { IXESParser } from "../util/EventLog/XESParser";
-import { Event, InstanceDataChange } from "../util/EventLog/EventLog"
+import { Event, EventLog, InstanceDataChange } from "../util/EventLog/EventLog"
 import fs from 'fs';
 import path from 'path';
 import Mustache from "mustache";
+import { InteractionNet } from "../Parser/InteractionNet";
+import { Trace } from "../util/EventLog/Trace";
 
 export interface ISimulator {
   prepare(): void;
@@ -24,7 +26,7 @@ export class Simulator implements ISimulator {
     public outputDir: string = path.join(__dirname, "/data/generated")
   ) {}
 
-  private static traverse(element: Place | Transition, visited: Set<string>, taskList: string[]): string[] {
+  /* private static traverse(element: Place | Transition, visited: Set<string>, taskList: string[]): string[] {
 
     if (visited.has(element.id)) {
       return taskList; // Prevent infinite loops by skipping already visited elements
@@ -49,12 +51,78 @@ export class Simulator implements ISimulator {
     }
 
     return taskList;
+  } */
+
+  private static Simulation = class {
+    public traces = new Array<Trace>();
+    public visited = new Array<string[]>();
+    public conditions = new Map<number, string>();
+
+    constructor(private iNet: InteractionNet) {}
+
+    prepare() {
+      this.replay2(this.iNet.initial!, [], new Trace([]))
+    }
+
+    replay2(current: Place, visited: string[], trace: Trace) {
+      if (current.type === PlaceType.End) {
+        this.visited.push([...visited]); // reached end, deep copy
+        this.traces.push(new Trace([...trace.events])); // reached end, deep copy
+        return;
+      }
+
+      for (const transition of current.target) {
+        // Check if transition is enabled
+        if (transition.source.every(p => visited.includes(p.id) || p.id === current.id)) {
+          // Fire transition
+          visited.push(transition.id);
+          const cond = this.getCondition(transition)
+          if (cond) {
+            const condID = this.conditions.size;
+            this.conditions.set(condID, cond);  
+            // add instance data change
+            trace.events.push(new Event(
+              "Instance Data Change",
+              "Participant",
+              "",
+              [new InstanceDataChange(`conditions[${condID}]`, true)]
+            ));
+          }
+          if (transition.label instanceof TaskLabel) {      
+            trace.events.push(new Event(
+              transition.label.name,
+              transition.label.sender.id
+            ));
+          }
+          for (const nextPlace of transition.target) {
+            this.replay2(nextPlace, visited, trace);
+          }
+
+          visited.pop(); // backtrack (XOR fork)
+          if (transition.label instanceof TaskLabel) {  
+            trace.events.pop()
+          }
+          if (cond) { 
+            trace.events.pop()
+          }
+        }
+      }
+    }
+
+    private getCondition(transition: Transition) {
+      if (transition.label.guards.size > 0) {
+        const conditions = [];
+        for (const guard of transition.label.guards.values()) {
+          if (guard.condition && !guard.default) conditions.push(guard.condition);
+        }
+        if (conditions.length > 0) return conditions.join(" && ");
+      }
+    }
   }
 
   async prepare(): Promise<void> {
 
     const bpmnFiles = fs.readdirSync(this.bpmnDir).filter(file => file.endsWith('.bpmn'));
-    const xesFiles = fs.readdirSync(this.xesDir).filter(file => file.endsWith('.xes'));
 
     for (const file of bpmnFiles) {
       console.log(file)
@@ -63,60 +131,11 @@ export class Simulator implements ISimulator {
       const nets = await this.bpmnParser!.fromXML(model);
       const iNet = nets[0]; // only support one model
 
-      const xesFile = xesFiles.find(xes => xes.startsWith(path.basename(file, '.bpmn')));
-      if (!xesFile) {
-        throw new Error(`No corresponding .xes file found for ${file}`);
-      }
-
-      const xesContent = fs.readFileSync(path.join(this.xesDir, xesFile));
-      const log = await this.xesParser!.fromXML(xesContent);
-
-      const encoder = new INetEncoder();
-      const net = encoder.removeSilentTransitions(iNet);
-
-      // find XOR gateways and match participants
-      const gatewayTasks = new Map<string, string[]>();
-      const taskParticipants = new Map<string, { from: string, to: string[] }>();
-      for (const element of net.elements.values()) {
-        if (!(element instanceof Transition)) continue;
-        const condition = Simulator.getCondition(element);
-        if (condition) 
-          gatewayTasks.set(condition, Simulator.traverse(element, new Set(), []));
-        if (element.label instanceof TaskLabel)
-          taskParticipants.set(element.label.name, { 
-            from: element.label.sender.id, 
-            to: element.label.receiver.map(t => t.id) 
-          })
-      }
-
-      for (const trace of log.traces) {
-        // Traverse the trace starting from the end
-        for (let i = trace.events.length - 1; i >= 0; i--) {
-          const entry = trace.events[i];
-          entry.source = taskParticipants.get(entry.name)!.from;
-
-          for (const [gateway, eventName] of gatewayTasks.entries()) {
-            if (eventName.includes(entry.name)) {
-              console.log(`Matched gateway: ${gateway} for event: ${entry.name}`);
-              trace.events.splice(i, 0, new Event(
-                "data change",
-                "Participant 0",
-                undefined,
-                [new InstanceDataChange(`cond[${gateway}]`, true)]
-              ));
-            }
-            if (eventName.includes("End")) {
-              console.log(`Add Gateway: ${gateway} to end of the log`);
-              trace.events.splice(i, 0, new Event(
-                "data change",
-                "Participant 0",
-                undefined,
-                [new InstanceDataChange(`cond[${gateway}]`, true)]
-              ));
-            }
-          }
-        }
-      }
+      const simu = new Simulator.Simulation(iNet);
+      simu.prepare();
+      console.log(JSON.stringify(simu.traces))
+      console.log(simu.conditions)
+      const log = new EventLog([...simu.traces.values()]);
 
       const template = fs.readFileSync(path.join(__dirname, "./templates/xes", "log.mustache.xes"), "utf-8");
       const renderedLog = Mustache.render(template, log);
@@ -130,15 +149,7 @@ export class Simulator implements ISimulator {
     }
   }
 
-  private static getCondition(transition: Transition) {
-    if (transition.label.guards.size > 0) {
-      const conditions = [];
-      for (const guard of transition.label.guards.values()) {
-        if (guard.condition) conditions.push(guard.condition);
-      }
-      if (conditions.length > 0) return conditions.join(" && ");
-    }
-  }
+
 
   simulate(): void {
     throw new Error("Method not implemented.");
