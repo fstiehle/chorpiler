@@ -8,12 +8,13 @@
     "lib/**/*"
   ],
   "scripts": {
-    "test": "mocha tests/index.test.ts && mocha tests/compiler && waffle && mocha tests/output",
-    "dev": "mocha tests/compiler -g 'Incident Management' && waffle && mocha tests/output -g 'Incident Management'",
+    "test": "mocha tests/index.test.ts && mocha tests/compiler && npx hardhat compile && mocha tests/output",
+    "dev": "mocha tests/compiler -g 'Incident Management' && npx hardhat compile && mocha tests/output -g 'Incident Management'",
     "dev2": "mocha tests/output/simulator --inspect",
     "debug": "mocha tests/compiler -g 'unfold=false' --inspect",
     "test/compiler": "mocha tests/compiler",
     "test/output": "mocha tests/output",
+    "test/sim": "mocha tests/simulator",
     "build": "tsc && ncp ./src/Generator/templates ./lib/Generator/templates",
     "prepublishOnly": "npm run build",
     "preversion": "npm run build"
@@ -21,6 +22,7 @@
   "author": "Fabian Stiehle",
   "license": "ISC",
   "devDependencies": {
+    "@nomicfoundation/hardhat-toolbox": "^5.0.0",
     "@openzeppelin/contracts": "^4.9.5",
     "@types/chai": "^4.3.11",
     "@types/chai-as-promised": "^7.1.8",
@@ -28,7 +30,7 @@
     "@types/node": "^18.19.17",
     "chai": "^4.4.1",
     "chai-as-promised": "^7.1.1",
-    "ethereum-waffle": "^4.0.10",
+    "hardhat": "^2.23.0",
     "mocha": "^10.3.0",
     "ncp": "^2.0.0",
     "typescript": "^4.9.5"

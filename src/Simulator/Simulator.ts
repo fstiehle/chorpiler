@@ -1,5 +1,4 @@
-import { INetEncoder } from "../Generator/Encoder";
-import { Element, Place, PlaceType, TaskLabel, Transition } from "../Parser/Element";
+import { Place, PlaceType, TaskLabel, Transition } from "../Parser/Element";
 import { INetFastXMLParser } from "../Parser/FastXMLParser";
 import { INetParser } from "../Parser/Parser";
 import { XESFastXMLParser } from "../util/EventLog/XESFastXMLParser";
@@ -10,61 +9,50 @@ import path from 'path';
 import Mustache from "mustache";
 import { InteractionNet } from "../Parser/InteractionNet";
 import { Trace } from "../util/EventLog/Trace";
+import { TemplateEngine } from "../Generator/TemplateEngine";
+import SolDefaultContractGenerator from "../Generator/target/Sol/DefaultGenerator";
+import { TriggerEncoding } from "../Generator/Encoding/TriggerEncoding";
+import { CaseVariable } from "../Generator/Encoding/Encoding";
 
 export interface ISimulator {
-  prepare(): void;
-  simulate(): void;
+  generate(): void;
 }
 
 export class Simulator implements ISimulator {
 
   constructor(
-    public bpmnDir: string = path.join(__dirname, "/data/bpmn"),
+    public workdir: string = ".",
+    public bpmnDir: string = path.join(workdir + "/data/bpmn"),
     public bpmnParser: INetParser = new INetFastXMLParser(),
-    public xesDir: string = path.join(__dirname, "/data/xes"),
+    public xesDir: string = path.join(workdir + "/data/xes"),
     public xesParser: IXESParser = new XESFastXMLParser(),
-    public outputDir: string = path.join(__dirname, "/data/generated")
+    public outputDir: string = path.join(workdir + "/data/generated")
   ) {}
-
-  /* private static traverse(element: Place | Transition, visited: Set<string>, taskList: string[]): string[] {
-
-    if (visited.has(element.id)) {
-      return taskList; // Prevent infinite loops by skipping already visited elements
-    }
-
-    visited.add(element.id); // Mark the element as visited
-    if (element instanceof Transition) {
-      if (element.label instanceof TaskLabel) {
-        taskList.push(element.label.name);
-        return taskList;
-      }
-    } else if (element instanceof Place) {
-      // TODO: If element is start
-      if (element.type === PlaceType.End) {
-        taskList.push("End");
-        return taskList;
-      }
-    }
-
-    for (const target of element.target) {
-      return Simulator.traverse(target, visited, taskList);
-    }
-
-    return taskList;
-  } */
 
   private static Simulation = class {
     public traces = new Array<Trace>();
     public visited = new Array<string[]>();
-    public conditions = new Map<number, string>();
+    public conditions = new Map<number, string>(); 
+    public contract: null | { target: string, encoding: TriggerEncoding } = null;
 
-    constructor(private iNet: InteractionNet) {}
+    constructor(private iNet: InteractionNet, public contractGenerator: TemplateEngine) {}
 
-    prepare() {
-      this.replay2(this.iNet.initial!, [], new Trace([]))
+    async generate() {
+      this.generateLog();
+      await this.generateContract();
     }
 
-    replay2(current: Place, visited: string[], trace: Trace) {
+    async generateContract() {
+      if (this.traces.length === 0) return console.warn(`No trace generated for ${this.iNet.id}`);
+      this.contract = await this.contractGenerator.compile();
+      return this.contract;
+    }
+
+    generateLog() {
+      this.replay(this.iNet.initial!, [], new Trace([]))
+    }
+
+    replay(current: Place, visited: string[], trace: Trace) {
       if (current.type === PlaceType.End) {
         this.visited.push([...visited]); // reached end, deep copy
         this.traces.push(new Trace([...trace.events])); // reached end, deep copy
@@ -83,7 +71,7 @@ export class Simulator implements ISimulator {
             // add instance data change
             trace.events.push(new Event(
               "Instance Data Change",
-              "Participant",
+              [...this.iNet.participants.values()].at(0)!.id,
               "",
               [new InstanceDataChange(`conditions[${condID}]`, true)]
             ));
@@ -95,7 +83,7 @@ export class Simulator implements ISimulator {
             ));
           }
           for (const nextPlace of transition.target) {
-            this.replay2(nextPlace, visited, trace);
+            this.replay(nextPlace, visited, trace);
           }
 
           visited.pop(); // backtrack (XOR fork)
@@ -120,39 +108,33 @@ export class Simulator implements ISimulator {
     }
   }
 
-  async prepare(): Promise<void> {
-
+  async generate(): Promise<void> {
     const bpmnFiles = fs.readdirSync(this.bpmnDir).filter(file => file.endsWith('.bpmn'));
 
     for (const file of bpmnFiles) {
-      console.log(file)
+      console.log(`Simulation for ${file}`);
       const filePath = path.join(this.bpmnDir, file);
       const model = fs.readFileSync(filePath);
       const nets = await this.bpmnParser!.fromXML(model);
       const iNet = nets[0]; // only support one model
 
-      const simu = new Simulator.Simulation(iNet);
-      simu.prepare();
-      console.log(JSON.stringify(simu.traces))
-      console.log(simu.conditions)
-      const log = new EventLog([...simu.traces.values()]);
+      const generator = new SolDefaultContractGenerator(iNet);
+      generator.addCaseVariable(new CaseVariable("conditions", "uint", "uint public conditions;", true));
+      const sim = new Simulator.Simulation(iNet, generator);
+      await sim.generate();
 
+      if (sim.traces.length === 0) continue;
+
+      const log = new EventLog([...sim.traces.values()]);
       const template = fs.readFileSync(path.join(__dirname, "./templates/xes", "log.mustache.xes"), "utf-8");
       const renderedLog = Mustache.render(template, log);
 
-      if (!fs.existsSync(this.outputDir)) {
-        fs.mkdirSync(this.outputDir, { recursive: true });
-      }
-      const outputFilePath = path.join(this.outputDir, `${path.basename(file, '.bpmn')}.xes`);
-      fs.writeFileSync(outputFilePath, renderedLog, "utf-8");
-      console.log(`Generated log written to ${outputFilePath}`);
+      if (!fs.existsSync(this.outputDir)) fs.mkdirSync(this.outputDir, { recursive: true });
+
+      const outputFilePath = path.join(this.outputDir, `${path.basename(file, '.bpmn')}`);
+      fs.writeFileSync(outputFilePath + ".xes", renderedLog, "utf-8");
+      fs.writeFileSync(outputFilePath + ".sol", sim.contract!.target, "utf-8");
+      console.log(`Generated log and contract written to ${outputFilePath}`);
     }
   }
-
-
-
-  simulate(): void {
-    throw new Error("Method not implemented.");
-  }
-
 }

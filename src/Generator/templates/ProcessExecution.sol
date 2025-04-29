@@ -6,7 +6,7 @@ contract ProcessExecution {
   uint public tokenState = 1;
   {{/hasSubProcesses}}
   {{#hasSubProcesses}}
-  uint[{{{numberOfSubProcesses}}}] public tokenState;
+  uint[{{{numberOfProcesses}}}] public tokenState;
   {{/hasSubProcesses}}
   address[{{{numberOfParticipants}}}] public participants;
   {{#caseVariables}}

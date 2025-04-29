@@ -2,6 +2,7 @@ import SolDefaultContractGenerator from './Generator/target/Sol/DefaultGenerator
 import SolStateChannelContractGenerator from './Generator/target/Sol/StateChannelGenerator';
 import TSDefaultFuncGenerator from './Generator/target/Typescript/DefaultFuncGenerator';
 import { INetFastXMLParser } from './Parser/FastXMLParser';
+import { Simulator } from './Simulator/Simulator';
 import { EventLog, Event } from './util/EventLog/EventLog';
 import { Trace } from './util/EventLog/Trace';
 import { XESFastXMLParser } from './util/EventLog/XESFastXMLParser';
@@ -18,6 +19,7 @@ export default {
     }
   },
   utils: {
+    Simulator,
     EventLog,
     Trace,
     Event,

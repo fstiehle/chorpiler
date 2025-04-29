@@ -70,7 +70,7 @@ export class MustacheEncoding extends MustacheProcessEncoding implements IFromEn
    */
 
   hasSubProcesses = () => this.subProcesses.length > 0;
-  numberOfSubProcesses = () => this.subProcesses.length.toString();
+  numberOfProcesses = () => (this.subProcesses.length + 1).toString();
 
   constructor(public subProcesses: MustacheProcessEncoding[] = [], ...args: ConstructorParameters<typeof MustacheProcessEncoding>
   ) {
