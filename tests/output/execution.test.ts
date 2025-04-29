@@ -11,11 +11,11 @@ import { TriggerEncoding } from "../../src";
 import { XESFastXMLParser } from "../../src/util/EventLog/XESFastXMLParser";
 import { EventLog } from "../../src/util/EventLog/EventLog";
 
-import encodingSC from './../data/generated/supply-chain/SC_ProcessExecution_encoding.json';
-import encodingIM from './../data/generated/incident-management/IM_ProcessExecution_encoding.json';
-import encodingPH from './../data/generated/out-of-order/PH_ProcessExecution_encoding.json';
-import encodingPIZZA from './../data/generated/pizza/PIZZA_ProcessExecution_encoding.json';
-import encodingRA from './../data/generated/rental-agreement/RA_ProcessExecution_encoding.json';
+import encodingSC from '../data/generated/supply-chain/SC_ProcessExecution_encoding.json';
+import encodingIM from '../data/generated/incident-management/IM_ProcessExecution_encoding.json';
+import encodingPH from '../data/generated/out-of-order/PH_ProcessExecution_encoding.json';
+import encodingPIZZA from '../data/generated/pizza/PIZZA_ProcessExecution_encoding.json';
+import encodingRA from '../data/generated/rental-agreement/RA_ProcessExecution_encoding.json';
 
 const NR_NON_CONFORMING_TRACES = 0;
 const parser = new XESFastXMLParser();
