@@ -6,21 +6,21 @@ import { INetParser } from './Parser';
 import { deleteFromArray, printInet } from '../util/helpers';
 
 enum Elements {
-  rootElements = 'bpmn2:definitions',
-  choreographies = 'bpmn2:choreography',
-  subChoreographies = 'bpmn2:subChoreography',
-  participants = 'bpmn2:participant',
-  tasks = 'bpmn2:choreographyTask',
-  flows = 'bpmn2:sequenceFlow',
-  participantsRef = 'bpmn2:participantRef',
-  startEvent = 'bpmn2:startEvent',
-  endEvent = 'bpmn2:endEvent',
-  exclusiveGateway = 'bpmn2:exclusiveGateway',
-  conditionExpression = 'bpmn2:conditionExpression',
-  parallelGateway = 'bpmn2:parallelGateway',
-  eventGateway = 'bpmn2:eventBasedGateway',
-  outs = 'bpmn2:outgoing',
-  ins = 'bpmn2:incoming'
+  rootElements = 'definitions',
+  choreographies = 'choreography',
+  subChoreographies = 'subChoreography',
+  participants = 'participant',
+  tasks = 'choreographyTask',
+  flows = 'sequenceFlow',
+  participantsRef = 'participantRef',
+  startEvent = 'startEvent',
+  endEvent = 'endEvent',
+  exclusiveGateway = 'exclusiveGateway',
+  conditionExpression = 'conditionExpression',
+  parallelGateway = 'parallelGateway',
+  eventGateway = 'eventBasedGateway',
+  outs = 'outgoing',
+  ins = 'incoming'
 }
 enum Properties {
   id = '@_id',
@@ -35,6 +35,7 @@ enum Properties {
 export class INetFastXMLParser implements INetParser {
   parser: XMLParser = new XMLParser({
     ignoreAttributes: false,
+    removeNSPrefix: true,
     isArray: (_, __, ___, isAttribute) => {
       return !isAttribute;
     }
