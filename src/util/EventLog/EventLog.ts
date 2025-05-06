@@ -138,7 +138,8 @@ export class Event {
   public dataChange: InstanceDataChange[]|null = null;
 
   constructor(
-    public name: string, 
+    public name: string,
+    public id: string,
     public source: string, 
     _target?: string,
     _dataChange?: InstanceDataChange[]) {

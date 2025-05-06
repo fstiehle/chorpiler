@@ -32,6 +32,7 @@ export class XESFastXMLParser {
 
           for (const event of trace['event']) {
             let name = null;
+            let id = null;
             let from = null;
             let to = null;
 
@@ -39,6 +40,10 @@ export class XESFastXMLParser {
 
               if (stringEntry[Props.key] === 'concept:name') {
                 name = stringEntry[Props.val];
+                continue;
+              }
+              if (stringEntry[Props.key] === 'id') {
+                id = stringEntry[Props.val];
                 continue;
               }
               if (stringEntry[Props.key] === 'sourceRef') {
@@ -70,7 +75,7 @@ export class XESFastXMLParser {
 
             assert(name);
             if (!from) console.warn(`No initiator defined in event ${name}`);
-            events.push(new Event(name, from, to, data));
+            events.push(new Event(name, id ?? name, from, to, data));
           }
 
           traces.push(new Trace(events));

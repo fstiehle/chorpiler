@@ -8,119 +8,146 @@
   <trace>
     <event>
       <string key="concept:name" value="Customer Has a Problem"/>
+      <string key="id" value="ChoreographyTask_1586fdc"/>
       <string key="sourceRef" value="Participant_0hpgpwy"/>
     </event>
     <event>
       <string key="concept:name" value="Get problem description"/>
+      <string key="id" value="ChoreographyTask_1y1xlzg"/>
       <string key="sourceRef" value="Participant_18ejhc5"/>
     </event>
     <event>
       <string key="concept:name" value="Ask 1st level support"/>
+      <string key="id" value="ChoreographyTask_0z1rm3g"/>
       <string key="sourceRef" value="Participant_18ejhc5"/>
     </event>
     <event>
       <string key="concept:name" value="Ask 2nd level support"/>
+      <string key="id" value="ChoreographyTask_1qslyew"/>
       <string key="sourceRef" value="Participant_1yfcq7e"/>
     </event>
     <event>
       <string key="concept:name" value="Ask developer"/>
+      <string key="id" value="ChoreographyTask_15fmbmw"/>
       <string key="sourceRef" value="Participant_07mlniv"/>
     </event>
     <event>
       <string key="concept:name" value="Provide feedback"/>
+      <string key="id" value="ChoreographyTask_15tec1l"/>
       <string key="sourceRef" value="Participant_0avg1dg"/>
     </event>
     <event>
       <string key="concept:name" value="Provide feedback"/>
+      <string key="id" value="ChoreographyTask_1ecmkkd"/>
       <string key="sourceRef" value="Participant_07mlniv"/>
     </event>
     <event>
       <string key="concept:name" value="Provide feedback"/>
+      <string key="id" value="ChoreographyTask_1qccz6z"/>
       <string key="sourceRef" value="Participant_1yfcq7e"/>
     </event>
     <event>
       <string key="concept:name" value="Explain solution"/>
+      <string key="id" value="ChoreographyTask_0uo8k5k"/>
       <string key="sourceRef" value="Participant_18ejhc5"/>
     </event>
   </trace>
   <trace>
     <event>
       <string key="concept:name" value="Customer Has a Problem"/>
+      <string key="id" value="ChoreographyTask_1586fdc"/>
       <string key="sourceRef" value="Participant_0hpgpwy"/>
     </event>
     <event>
       <string key="concept:name" value="Get problem description"/>
+      <string key="id" value="ChoreographyTask_1y1xlzg"/>
       <string key="sourceRef" value="Participant_18ejhc5"/>
     </event>
     <event>
       <string key="concept:name" value="Ask 1st level support"/>
+      <string key="id" value="ChoreographyTask_0z1rm3g"/>
       <string key="sourceRef" value="Participant_18ejhc5"/>
     </event>
     <event>
       <string key="concept:name" value="Ask 2nd level support"/>
+      <string key="id" value="ChoreographyTask_1qslyew"/>
       <string key="sourceRef" value="Participant_1yfcq7e"/>
     </event>
     <event>
       <string key="concept:name" value="Instance Data Change"/>
-      <string key="sourceRef" value="Participant_0hpgpwy"/>
+      <string key="id" value="Participant_0hpgpwy"/>
+      <string key="sourceRef" value=""/>
       <boolean key="conditions" value="0"/>
     </event>
     <event>
       <string key="concept:name" value="Provide feedback"/>
+      <string key="id" value="ChoreographyTask_1ecmkkd"/>
       <string key="sourceRef" value="Participant_07mlniv"/>
     </event>
     <event>
       <string key="concept:name" value="Provide feedback"/>
+      <string key="id" value="ChoreographyTask_1qccz6z"/>
       <string key="sourceRef" value="Participant_1yfcq7e"/>
     </event>
     <event>
       <string key="concept:name" value="Explain solution"/>
+      <string key="id" value="ChoreographyTask_0uo8k5k"/>
       <string key="sourceRef" value="Participant_18ejhc5"/>
     </event>
   </trace>
   <trace>
     <event>
       <string key="concept:name" value="Customer Has a Problem"/>
+      <string key="id" value="ChoreographyTask_1586fdc"/>
       <string key="sourceRef" value="Participant_0hpgpwy"/>
     </event>
     <event>
       <string key="concept:name" value="Get problem description"/>
+      <string key="id" value="ChoreographyTask_1y1xlzg"/>
       <string key="sourceRef" value="Participant_18ejhc5"/>
     </event>
     <event>
       <string key="concept:name" value="Ask 1st level support"/>
+      <string key="id" value="ChoreographyTask_0z1rm3g"/>
       <string key="sourceRef" value="Participant_18ejhc5"/>
     </event>
     <event>
       <string key="concept:name" value="Instance Data Change"/>
-      <string key="sourceRef" value="Participant_0hpgpwy"/>
+      <string key="id" value="Participant_0hpgpwy"/>
+      <string key="sourceRef" value=""/>
       <boolean key="conditions" value="1"/>
     </event>
     <event>
       <string key="concept:name" value="Provide feedback"/>
+      <string key="id" value="ChoreographyTask_1qccz6z"/>
       <string key="sourceRef" value="Participant_1yfcq7e"/>
     </event>
     <event>
       <string key="concept:name" value="Explain solution"/>
+      <string key="id" value="ChoreographyTask_0uo8k5k"/>
       <string key="sourceRef" value="Participant_18ejhc5"/>
     </event>
   </trace>
   <trace>
     <event>
       <string key="concept:name" value="Customer Has a Problem"/>
+      <string key="id" value="ChoreographyTask_1586fdc"/>
       <string key="sourceRef" value="Participant_0hpgpwy"/>
     </event>
     <event>
       <string key="concept:name" value="Get problem description"/>
+      <string key="id" value="ChoreographyTask_1y1xlzg"/>
       <string key="sourceRef" value="Participant_18ejhc5"/>
     </event>
     <event>
       <string key="concept:name" value="Instance Data Change"/>
-      <string key="sourceRef" value="Participant_0hpgpwy"/>
+      <string key="id" value="Participant_0hpgpwy"/>
+      <string key="sourceRef" value=""/>
       <boolean key="conditions" value="2"/>
     </event>
     <event>
       <string key="concept:name" value="Explain solution"/>
+      <string key="id" value="ChoreographyTask_0uo8k5k"/>
       <string key="sourceRef" value="Participant_18ejhc5"/>
     </event>
   </trace>
