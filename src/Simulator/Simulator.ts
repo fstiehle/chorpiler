@@ -65,7 +65,7 @@ export class Simulator implements ISimulator {
           visited.push(transition.id);
           const cond = this.getCondition(transition)
           if (cond) {
-            const condID = this.conditions.size;
+            const condID = this.conditions.size + 1; // start at 1
             this.conditions.set(condID, cond);  
             // add instance data change
             trace.events.push(new Event(

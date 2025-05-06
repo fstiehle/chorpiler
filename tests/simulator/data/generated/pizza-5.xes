@@ -15,7 +15,7 @@
       <string key="concept:name" value="Instance Data Change"/>
       <string key="id" value="Participant_06qakjv"/>
       <string key="sourceRef" value=""/>
-      <boolean key="conditions" value="0"/>
+      <boolean key="conditions" value="1"/>
     </event>
     <event>
       <string key="concept:name" value="Deliver Pizza"/>
@@ -50,7 +50,7 @@
       <string key="concept:name" value="Instance Data Change"/>
       <string key="id" value="Participant_06qakjv"/>
       <string key="sourceRef" value=""/>
-      <boolean key="conditions" value="1"/>
+      <boolean key="conditions" value="2"/>
     </event>
     <event>
       <string key="concept:name" value="Deliver Pizza"/>
@@ -68,13 +68,13 @@
       <string key="concept:name" value="Instance Data Change"/>
       <string key="id" value="Participant_06qakjv"/>
       <string key="sourceRef" value=""/>
-      <boolean key="conditions" value="1"/>
+      <boolean key="conditions" value="2"/>
     </event>
     <event>
       <string key="concept:name" value="Instance Data Change"/>
       <string key="id" value="Participant_06qakjv"/>
       <string key="sourceRef" value=""/>
-      <boolean key="conditions" value="2"/>
+      <boolean key="conditions" value="3"/>
     </event>
     <event>
       <string key="concept:name" value="New Activity"/>
