@@ -10,6 +10,7 @@
     {{#events}}
     <event>
       <string key="concept:name" value="{{name}}"/>
+      <string key="id" value="{{id}}"/>
       <string key="sourceRef" value="{{source}}"/>
       {{#dataChange}}
       <boolean key="{{{variable}}}" value="{{{val}}}"/>

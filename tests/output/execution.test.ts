@@ -5,7 +5,7 @@ import { expect } from "chai";
 import { readFileSync } from 'fs';
 import path from "path";
 import { BPMN_PATH } from "../config";
-import hre from "hardhat";
+import { ethers } from "hardhat";
 import assert from "assert";
 import { TriggerEncoding } from "../../src";
 import { XESFastXMLParser } from "../../src/util/EventLog/XESFastXMLParser";
@@ -110,7 +110,7 @@ const testCase = (
         for (const event of trace) {
           // Implement data change, allow data change also if event name not found
           const participant = contracts.get(event.source);
-          const taskID = TriggerEncoding.tasks.get(event.name);
+          const taskID = TriggerEncoding.tasks.get(event.id);
           assert(participant !== undefined, `source (participant) '${event.source}' for event '${event.name}' not found`);
           //console.debug(`source '${event.source}' event '${event.name}'`)
 
@@ -157,7 +157,7 @@ const testCase = (
 
           const participant = contracts.get(event.source);
           const taskID = TriggerEncoding.tasks.get(event.name);
-          
+
           assert(participant !== undefined, `source (participant) '${event.source}' for event '${event.name}' not found`);
           //console.debug(`source '${event.source}' event '${event.name}'`)
 
@@ -201,19 +201,19 @@ const testCase = (
   })
 }
 
-const deploy = async (name: string, TriggerEncoding: TriggerEncoding) => {
+const deploy = async (name: string, triggerEncoding: TriggerEncoding) => {
   const wallets = 
-  (await hre.ethers.getSigners())
-    .slice(0, TriggerEncoding.participants.size);
+  (await ethers.getSigners())
+    .slice(0, triggerEncoding.participants.size);
 
-  const contract = await hre.ethers.deployContract(
+  const contract = await ethers.deployContract(
     name + "_ProcessExecution", [[...wallets.values()].map(v => v.address)], wallets[0]);
 
   const tx = await contract.deploymentTransaction()!.wait(1)
   if (!tx) throw Error()
 
   const contracts = new Map<string, any>();
-  for (const [id, num] of TriggerEncoding.participants) {
+  for (const [id, num] of triggerEncoding.participants) {
     contracts.set(id, contract.connect(wallets[num]));
   }
   

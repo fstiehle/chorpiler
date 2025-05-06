@@ -72,6 +72,7 @@ export class Simulator implements ISimulator {
               "Instance Data Change",
               [...this.contractGenerator.iNet.participants.values()].at(0)!.id,
               "",
+              "",
               [new InstanceDataChange(`conditions`, condID)]
             ));
             const guard = new Guard(`conditions[${condID}] == true`)
@@ -83,6 +84,7 @@ export class Simulator implements ISimulator {
           if (transition.label instanceof TaskLabel) {      
             trace.events.push(new Event(
               transition.label.name,
+              transition.label.modelID,
               transition.label.sender.id
             ));
           }

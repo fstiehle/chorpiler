@@ -8,68 +8,82 @@
   <trace>
     <event>
       <string key="concept:name" value="Order Pizza"/>
+      <string key="id" value="ChoreographyTask_0hy9n0g"/>
       <string key="sourceRef" value="Participant_06qakjv"/>
     </event>
     <event>
       <string key="concept:name" value="Instance Data Change"/>
-      <string key="sourceRef" value="Participant_06qakjv"/>
+      <string key="id" value="Participant_06qakjv"/>
+      <string key="sourceRef" value=""/>
       <boolean key="conditions" value="0"/>
     </event>
     <event>
       <string key="concept:name" value="Deliver Pizza"/>
+      <string key="id" value="ChoreographyTask_1797ws1"/>
       <string key="sourceRef" value="Participant_0537iz2"/>
     </event>
   </trace>
   <trace>
     <event>
       <string key="concept:name" value="Order Pizza"/>
+      <string key="id" value="ChoreographyTask_0hy9n0g"/>
       <string key="sourceRef" value="Participant_06qakjv"/>
     </event>
     <event>
       <string key="concept:name" value="Announce Delivery"/>
+      <string key="id" value="ChoreographyTask_1jrfmx8"/>
       <string key="sourceRef" value="Participant_0mgz9si"/>
     </event>
     <event>
       <string key="concept:name" value="Deliver Pizza"/>
+      <string key="id" value="ChoreographyTask_1797ws1"/>
       <string key="sourceRef" value="Participant_0537iz2"/>
     </event>
   </trace>
   <trace>
     <event>
       <string key="concept:name" value="Order Pizza"/>
+      <string key="id" value="ChoreographyTask_0hy9n0g"/>
       <string key="sourceRef" value="Participant_06qakjv"/>
     </event>
     <event>
       <string key="concept:name" value="Instance Data Change"/>
-      <string key="sourceRef" value="Participant_06qakjv"/>
+      <string key="id" value="Participant_06qakjv"/>
+      <string key="sourceRef" value=""/>
       <boolean key="conditions" value="1"/>
     </event>
     <event>
       <string key="concept:name" value="Deliver Pizza"/>
+      <string key="id" value="ChoreographyTask_1797ws1"/>
       <string key="sourceRef" value="Participant_0537iz2"/>
     </event>
   </trace>
   <trace>
     <event>
       <string key="concept:name" value="Order Pizza"/>
+      <string key="id" value="ChoreographyTask_0hy9n0g"/>
       <string key="sourceRef" value="Participant_06qakjv"/>
     </event>
     <event>
       <string key="concept:name" value="Instance Data Change"/>
-      <string key="sourceRef" value="Participant_06qakjv"/>
+      <string key="id" value="Participant_06qakjv"/>
+      <string key="sourceRef" value=""/>
       <boolean key="conditions" value="1"/>
     </event>
     <event>
       <string key="concept:name" value="Instance Data Change"/>
-      <string key="sourceRef" value="Participant_06qakjv"/>
+      <string key="id" value="Participant_06qakjv"/>
+      <string key="sourceRef" value=""/>
       <boolean key="conditions" value="2"/>
     </event>
     <event>
       <string key="concept:name" value="New Activity"/>
+      <string key="id" value="ChoreographyTask_1wapvxj"/>
       <string key="sourceRef" value="Participant_0mgz9si"/>
     </event>
     <event>
       <string key="concept:name" value="Deliver Pizza"/>
+      <string key="id" value="ChoreographyTask_1797ws1"/>
       <string key="sourceRef" value="Participant_0537iz2"/>
     </event>
   </trace>

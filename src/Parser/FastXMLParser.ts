@@ -95,7 +95,8 @@ export class INetFastXMLParser implements INetParser {
         // translate sub choreography task
         const subTransition = this.addTransition(new Transition(
           subChoreography[Properties.id], 
-          new SubChoreographyTaskLabel(initiator, respondents, subNetID, subNetID, TaskType.CallChoreography))
+          new SubChoreographyTaskLabel(initiator, respondents, subNetID, subNetID, 
+            subChoreography[Properties.id], TaskType.CallChoreography))
         );
         this.translateIncomingFlows(subTransition, subChoreography[Elements.ins]);
         this.translateOutgoingFlows(subTransition, subChoreography[Elements.outs]);
@@ -167,7 +168,7 @@ export class INetFastXMLParser implements INetParser {
       for (const task of tasks) {
         const { initiator , respondents } = this.parseInitiatorRespondents(task);
         const transition = this.addTransition(
-          new Transition(task[Properties.id], new TaskLabel(initiator!, respondents!, task[Properties.name]))
+          new Transition(task[Properties.id], new TaskLabel(initiator!, respondents!, task[Properties.name], task[Properties.id]))
         );
         this.translateIncomingFlows(transition, task[Elements.ins]);
         this.translateOutgoingFlows(transition, task[Elements.outs]);

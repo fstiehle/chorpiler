@@ -2,6 +2,7 @@
 <log xes.version="1.0">
 	<global scope="event">
 		<string key="concept:name" value="Choreography Task ID"/>
+		<string key="concept:id" value="Choreography Task ID"/>
 		<string key="sourceRef" value="Participant ID"/>
 		<string key="targetRef" value="Participant ID"/>
 	</global>
