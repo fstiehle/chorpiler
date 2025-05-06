@@ -7,7 +7,6 @@ import { Event, EventLog, InstanceDataChange } from "../util/EventLog/EventLog"
 import fs from 'fs';
 import path from 'path';
 import Mustache from "mustache";
-import { InteractionNet } from "../Parser/InteractionNet";
 import { Trace } from "../util/EventLog/Trace";
 import { TemplateEngine } from "../Generator/TemplateEngine";
 import SolDefaultContractGenerator from "../Generator/target/Sol/DefaultGenerator";
@@ -26,7 +25,7 @@ export class Simulator implements ISimulator {
     public bpmnParser: INetParser = new INetFastXMLParser(),
     public xesDir: string = path.join(workdir + "/data/generated"),
     public xesParser: IXESParser = new XESFastXMLParser(),
-    public contractDir: string = path.join(workdir + "/data/generated")
+    public contractDir: string = path.join(workdir + "/data/generated"),
   ) {}
 
   private static Simulation = class {
@@ -139,6 +138,7 @@ export class Simulator implements ISimulator {
 
       fs.writeFileSync(path.join(this.xesDir, `${path.basename(file, '.bpmn')}`) + ".xes", renderedLog, "utf-8");
       fs.writeFileSync(path.join(this.contractDir, `${path.basename(file, '.bpmn')}`) + ".sol", sim.contract!.target, "utf-8");
+      fs.writeFileSync(path.join(this.contractDir, `${path.basename(file, '.bpmn')}`) + ".json", JSON.stringify(TriggerEncoding.toJSON(sim.contract!.encoding)), "utf-8");
       console.log(`Generated log and contract written to ${this.xesDir} and ${this.contractDir}`);
     }
   }
