@@ -128,7 +128,7 @@
     <bpmn2:sequenceFlow id="Flow_0968tvr" sourceRef="ChoreographyTask_0c08h7c" targetRef="ChoreographyTask_1mgz3z1" />
   </bpmn2:choreography>
   <bpmndi:BPMNDiagram id="BPMNDiagram_1">
-    <bpmndi:BPMNPlane id="BPMNPlane_Choreography_1" bpmnElement="SupplyChain">
+    <bpmndi:BPMNPlane id="BPMNPlane_Choreography_1" bpmnElement="ProcessExecution">
       <bpmndi:BPMNShape id="StartEvent_00yy9i8_di" bpmnElement="StartEvent_00yy9i8">
         <dc:Bounds x="234" y="330" width="36" height="36" />
       </bpmndi:BPMNShape>

@@ -1,4 +1,4 @@
-import { Place, PlaceType, TaskLabel, Transition } from "../Parser/Element";
+import { Guard, Place, PlaceType, TaskLabel, Transition } from "../Parser/Element";
 import { INetFastXMLParser } from "../Parser/FastXMLParser";
 import { INetParser } from "../Parser/Parser";
 import { XESFastXMLParser } from "../util/EventLog/XESFastXMLParser";
@@ -35,7 +35,7 @@ export class Simulator implements ISimulator {
     public conditions = new Map<number, string>(); 
     public contract: null | { target: string, encoding: TriggerEncoding } = null;
 
-    constructor(private iNet: InteractionNet, public contractGenerator: TemplateEngine) {}
+    constructor(public contractGenerator: TemplateEngine) {}
 
     async generate() {
       this.generateLog();
@@ -43,13 +43,13 @@ export class Simulator implements ISimulator {
     }
 
     async generateContract() {
-      if (this.traces.length === 0) return console.warn(`No trace generated for ${this.iNet.id}`);
+      if (this.traces.length === 0) return console.warn(`No trace generated for ${this.contractGenerator.iNet.id}`);
       this.contract = await this.contractGenerator.compile();
       return this.contract;
     }
 
     generateLog() {
-      this.replay(this.iNet.initial!, [], new Trace([]))
+      this.replay(this.contractGenerator.iNet.initial!, [], new Trace([]))
     }
 
     replay(current: Place, visited: string[], trace: Trace) {
@@ -71,10 +71,15 @@ export class Simulator implements ISimulator {
             // add instance data change
             trace.events.push(new Event(
               "Instance Data Change",
-              [...this.iNet.participants.values()].at(0)!.id,
+              [...this.contractGenerator.iNet.participants.values()].at(0)!.id,
               "",
-              [new InstanceDataChange(`conditions[${condID}]`, true)]
+              [new InstanceDataChange(`conditions`, condID)]
             ));
+            const guard = new Guard(`conditions[${condID}] == true`)
+            guard.condition = `conditions & ${condID} == ${condID}`;
+            guard.language = "Solidity";
+            transition.label.guards.clear();
+            transition.label.guards.set(guard.name, guard);
           }
           if (transition.label instanceof TaskLabel) {      
             trace.events.push(new Event(
@@ -120,7 +125,7 @@ export class Simulator implements ISimulator {
 
       const generator = new SolDefaultContractGenerator(iNet);
       generator.addCaseVariable(new CaseVariable("conditions", "uint", "uint public conditions;", true));
-      const sim = new Simulator.Simulation(iNet, generator);
+      const sim = new Simulator.Simulation(generator);
       await sim.generate();
 
       if (sim.traces.length === 0) continue;
@@ -134,7 +139,7 @@ export class Simulator implements ISimulator {
 
       fs.writeFileSync(path.join(this.xesDir, `${path.basename(file, '.bpmn')}`) + ".xes", renderedLog, "utf-8");
       fs.writeFileSync(path.join(this.contractDir, `${path.basename(file, '.bpmn')}`) + ".sol", sim.contract!.target, "utf-8");
-      console.log(`Generated log and contract written to ${this.xesDir} and  ${this.contractDir}`);
+      console.log(`Generated log and contract written to ${this.xesDir} and ${this.contractDir}`);
     }
   }
 }

@@ -1,7 +1,7 @@
 //SPDX-License-Identifier: MIT
 pragma solidity ^0.8.9;
 
-contract ProcessExecution {
+contract PizzaDelivery {
   uint public tokenState = 1;
   address[3] public participants;
   uint public conditions;
@@ -46,7 +46,7 @@ contract ProcessExecution {
         }
         // <--- ChoreographyTask_1wapvxj New Activity --->
         if ( 
-        (items > 1)&& (items==fl)
+        (conditions & 1 == 1)&& (conditions & 2 == 2)
         && 
         4 == id
         && 
@@ -60,7 +60,7 @@ contract ProcessExecution {
         }
         // <---  auto transition  --->
         if ( 
-        (items==true)
+        (conditions & 0 == 0)
         ) {
         _tokenState &= ~uint(2);
         _tokenState |= 4;
@@ -68,7 +68,7 @@ contract ProcessExecution {
         }
         // <---  auto transition  --->
         if ( 
-        (items > 1)
+        (conditions & 1 == 1)
         ) {
         _tokenState &= ~uint(2);
         _tokenState |= 4;

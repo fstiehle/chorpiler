@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<log xes.version="1.0">
+	<global scope="event">
+		<string key="concept:name" value="Task Name"/>
+		<string key="sourceRef" value="Participant ID"/>
+	</global>
+
+  <trace>
+    <event>
+      <string key="concept:name" value="Customer Has a Problem"/>
+      <string key="sourceRef" value="Participant_0hpgpwy"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Get problem description"/>
+      <string key="sourceRef" value="Participant_18ejhc5"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Ask 1st level support"/>
+      <string key="sourceRef" value="Participant_18ejhc5"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Ask 2nd level support"/>
+      <string key="sourceRef" value="Participant_1yfcq7e"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Ask developer"/>
+      <string key="sourceRef" value="Participant_07mlniv"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Provide feedback"/>
+      <string key="sourceRef" value="Participant_0avg1dg"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Provide feedback"/>
+      <string key="sourceRef" value="Participant_07mlniv"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Provide feedback"/>
+      <string key="sourceRef" value="Participant_1yfcq7e"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Explain solution"/>
+      <string key="sourceRef" value="Participant_18ejhc5"/>
+    </event>
+  </trace>
+  <trace>
+    <event>
+      <string key="concept:name" value="Customer Has a Problem"/>
+      <string key="sourceRef" value="Participant_0hpgpwy"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Get problem description"/>
+      <string key="sourceRef" value="Participant_18ejhc5"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Ask 1st level support"/>
+      <string key="sourceRef" value="Participant_18ejhc5"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Ask 2nd level support"/>
+      <string key="sourceRef" value="Participant_1yfcq7e"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Instance Data Change"/>
+      <string key="sourceRef" value="Participant_0hpgpwy"/>
+      <boolean key="conditions" value="0"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Provide feedback"/>
+      <string key="sourceRef" value="Participant_07mlniv"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Provide feedback"/>
+      <string key="sourceRef" value="Participant_1yfcq7e"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Explain solution"/>
+      <string key="sourceRef" value="Participant_18ejhc5"/>
+    </event>
+  </trace>
+  <trace>
+    <event>
+      <string key="concept:name" value="Customer Has a Problem"/>
+      <string key="sourceRef" value="Participant_0hpgpwy"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Get problem description"/>
+      <string key="sourceRef" value="Participant_18ejhc5"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Ask 1st level support"/>
+      <string key="sourceRef" value="Participant_18ejhc5"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Instance Data Change"/>
+      <string key="sourceRef" value="Participant_0hpgpwy"/>
+      <boolean key="conditions" value="1"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Provide feedback"/>
+      <string key="sourceRef" value="Participant_1yfcq7e"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Explain solution"/>
+      <string key="sourceRef" value="Participant_18ejhc5"/>
+    </event>
+  </trace>
+  <trace>
+    <event>
+      <string key="concept:name" value="Customer Has a Problem"/>
+      <string key="sourceRef" value="Participant_0hpgpwy"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Get problem description"/>
+      <string key="sourceRef" value="Participant_18ejhc5"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Instance Data Change"/>
+      <string key="sourceRef" value="Participant_0hpgpwy"/>
+      <boolean key="conditions" value="2"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Explain solution"/>
+      <string key="sourceRef" value="Participant_18ejhc5"/>
+    </event>
+  </trace>
+</log>

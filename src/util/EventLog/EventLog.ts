@@ -151,5 +151,5 @@ export class Event {
 }
 
 export class InstanceDataChange {
-  constructor(public variable: string, public val: boolean) { }
+  constructor(public variable: string, public val: boolean|number) { }
 }
