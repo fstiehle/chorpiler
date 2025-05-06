@@ -12,7 +12,7 @@
   <bpmn2:message id="Message_1rnq4x3" name="pizza" />
   <bpmn2:message id="Message_1mi4idx" />
   <bpmn2:message id="Message_1pam53q" name="pizza order" />
-  <bpmn2:choreography id="Choreography_1bp5o6k">
+  <bpmn2:choreography id="ProcessExecution">
     <bpmn2:participant id="Participant_0hpgpwy" name="VIP customer" />
     <bpmn2:participant id="Participant_18ejhc5" name="KAM" />
     <bpmn2:participant id="Participant_1yfcq7e" name="1st level support" />

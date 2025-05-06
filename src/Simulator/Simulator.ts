@@ -24,9 +24,9 @@ export class Simulator implements ISimulator {
     public workdir: string = ".",
     public bpmnDir: string = path.join(workdir + "/data/bpmn"),
     public bpmnParser: INetParser = new INetFastXMLParser(),
-    public xesDir: string = path.join(workdir + "/data/xes"),
+    public xesDir: string = path.join(workdir + "/data/generated"),
     public xesParser: IXESParser = new XESFastXMLParser(),
-    public outputDir: string = path.join(workdir + "/data/generated")
+    public contractDir: string = path.join(workdir + "/data/generated")
   ) {}
 
   private static Simulation = class {
@@ -129,12 +129,12 @@ export class Simulator implements ISimulator {
       const template = fs.readFileSync(path.join(__dirname, "./templates/xes", "log.mustache.xes"), "utf-8");
       const renderedLog = Mustache.render(template, log);
 
-      if (!fs.existsSync(this.outputDir)) fs.mkdirSync(this.outputDir, { recursive: true });
+      if (!fs.existsSync(this.contractDir)) fs.mkdirSync(this.contractDir, { recursive: true });
+      if (!fs.existsSync(this.xesDir)) fs.mkdirSync(this.xesDir, { recursive: true });
 
-      const outputFilePath = path.join(this.outputDir, `${path.basename(file, '.bpmn')}`);
-      fs.writeFileSync(outputFilePath + ".xes", renderedLog, "utf-8");
-      fs.writeFileSync(outputFilePath + ".sol", sim.contract!.target, "utf-8");
-      console.log(`Generated log and contract written to ${outputFilePath}`);
+      fs.writeFileSync(path.join(this.xesDir, `${path.basename(file, '.bpmn')}`) + ".xes", renderedLog, "utf-8");
+      fs.writeFileSync(path.join(this.contractDir, `${path.basename(file, '.bpmn')}`) + ".sol", sim.contract!.target, "utf-8");
+      console.log(`Generated log and contract written to ${this.xesDir} and  ${this.contractDir}`);
     }
   }
 }

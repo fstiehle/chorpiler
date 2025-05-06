@@ -10,7 +10,7 @@
   <bpmn2:message id="Message_09f26hz" />
   <bpmn2:message id="Message_04ofcm9" />
   <bpmn2:message id="Message_0jjynjh" />
-  <bpmn2:choreography id="SupplyChain" name="SupplyChain">
+  <bpmn2:choreography id="ProcessExecution" name="SupplyChain">
     <bpmn2:participant id="Participant_06qakjv" name="Bulk Buyer" />
     <bpmn2:participant id="Participant_0hpnjt0" name="Middleman" />
     <bpmn2:participant id="Participant_0s975ua" name="Supplier" />

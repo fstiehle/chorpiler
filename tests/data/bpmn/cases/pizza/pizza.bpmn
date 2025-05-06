@@ -4,7 +4,7 @@
   <bpmn2:message id="Message_11aqot7" />
   <bpmn2:message id="Message_1n1tjfo" />
   <bpmn2:message id="Message_1pam53q" name="pizza orde" />
-  <bpmn2:choreography id="PizzaDelivery">
+  <bpmn2:choreography id="ProcessExecution">
     <bpmn2:participant id="Participant_06qakjv" name="Customer" />
     <bpmn2:participant id="Participant_0mgz9si" name="Pizza Place" />
     <bpmn2:participant id="Participant_0537iz2" name="Delivery Boy" />
