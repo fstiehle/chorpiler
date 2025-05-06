@@ -21,7 +21,7 @@ export interface ITemplateEngine {
 export abstract class TemplateEngine implements ITemplateEngine {
 
   constructor(
-    private iNet: InteractionNet, 
+    public iNet: InteractionNet, 
     private templatePath: string, 
     private caseVariables = new Map<string, CaseVariable>(),
     private templatePartials = new Array<{ partial: string, path: string}>()

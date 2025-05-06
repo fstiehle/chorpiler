@@ -4,8 +4,9 @@
     "module": "CommonJS",
     "esModuleInterop": true,
     "declaration": true,
-    "target": "ES6",
+    "target": "es2020",
     "skipLibCheck": true,
+    "resolveJsonModule": true,
     "forceConsistentCasingInFileNames": true,
     "moduleResolution": "node",
     "outDir": "lib"
