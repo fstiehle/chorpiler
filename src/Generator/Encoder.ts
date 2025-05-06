@@ -235,7 +235,6 @@ export class INetEncoder {
     let defaultBranch = false;
 
     const guards = [...guardsMap.values()]
-    console.log(guards)
     if (guards.length > 0) {
       const first = guards.at(0)!;
       if (first.default) defaultBranch = true;
