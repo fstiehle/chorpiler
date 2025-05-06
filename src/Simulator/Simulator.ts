@@ -70,8 +70,8 @@ export class Simulator implements ISimulator {
             // add instance data change
             trace.events.push(new Event(
               "Instance Data Change",
+              "Instance Data Change",
               [...this.contractGenerator.iNet.participants.values()].at(0)!.id,
-              "",
               "",
               [new InstanceDataChange(`conditions`, condID)]
             ));
