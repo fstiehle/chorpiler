@@ -7,7 +7,7 @@
   <bpmn2:message id="Message_1689ji8" />
   <bpmn2:message id="Message_0c9wx64" />
   <bpmn2:message id="Message_0x2066n" />
-  <bpmn2:choreography id="Choreography_1yv8svf" name="Pharmacy">
+  <bpmn2:choreography id="ProcessExecution" name="Pharmacy">
     <bpmn2:participant id="Participant_1x26dag" name="Doctor" />
     <bpmn2:participant id="Participant_0cm7kml" name="Distributor" />
     <bpmn2:participant id="Participant_1mwdmng" name="Manufacturer" />

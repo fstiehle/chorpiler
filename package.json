@@ -15,7 +15,7 @@
     "test/compiler": "mocha tests/compiler",
     "test/output": "mocha tests/output",
     "test/sim": "mocha tests/simulator",
-    "build": "tsc && ncp ./src/Generator/templates ./lib/Generator/templates",
+    "build": "tsc && ncp ./src/Generator/templates ./lib/Generator/templates && ncp ./src/Simulator/templates ./lib/Simulator/templates",
     "prepublishOnly": "npm run build",
     "preversion": "npm run build"
   },

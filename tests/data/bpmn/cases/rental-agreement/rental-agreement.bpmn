@@ -9,7 +9,7 @@
   <bpmn2:message id="Message_0xhrzx5" />
   <bpmn2:message id="Message_1nu0nuo" />
   <bpmn2:message id="Message_0t3vn6v" />
-  <bpmn2:choreography id="Choreography" name="Rental Agreement">
+  <bpmn2:choreography id="ProcessExecution" name="Rental Agreement">
     <bpmn2:participant id="Participant_1yaj41t" name="Tenant" />
     <bpmn2:participant id="Participant_1dtzugx" name="RBO" />
     <bpmn2:participant id="Participant_1mi7ck0" name="Landlord" />

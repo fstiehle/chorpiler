@@ -1,7 +1,7 @@
 //SPDX-License-Identifier: MIT
 pragma solidity ^0.8.9;
 
-contract ProcessExecution {
+contract {{{modelID}}} {
   {{^hasSubProcesses}}
   uint public tokenState = 1;
   {{/hasSubProcesses}}
