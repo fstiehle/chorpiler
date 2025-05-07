@@ -46,7 +46,7 @@ contract PizzaDelivery {
         }
         // <--- ChoreographyTask_1wapvxj New Activity --->
         if ( 
-        (conditions & 1 == 1)&& (conditions & 2 == 2)
+        (conditions & 2 == 2)&& (conditions & 3 == 3)
         && 
         4 == id
         && 
@@ -60,7 +60,7 @@ contract PizzaDelivery {
         }
         // <---  auto transition  --->
         if ( 
-        (conditions & 0 == 0)
+        (conditions & 1 == 1)
         ) {
         _tokenState &= ~uint(2);
         _tokenState |= 4;
@@ -68,7 +68,7 @@ contract PizzaDelivery {
         }
         // <---  auto transition  --->
         if ( 
-        (conditions & 1 == 1)
+        (conditions & 2 == 2)
         ) {
         _tokenState &= ~uint(2);
         _tokenState |= 4;
