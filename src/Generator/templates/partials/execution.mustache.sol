@@ -9,11 +9,20 @@ while(_tokenState != 0) {
   {{#states}}
   if (_tokenState & {{{consume}}} == {{{consume}}}) {
   {{#transitions}} 
+    {{#isDecision}}
+    {{^last}}
+    if ({{{decision}}}) {
+    {{/last}}
+    {{#last}}
+    else {
+    {{/last}}
+      {{> transition }}
+    }
+    {{/isDecision}}
+    {{^isDecision}}
     {{> transition }}
-  {{/transitions}} 
-  {{#defaultBranch}} 
-    {{> transition }}
-  {{/defaultBranch}}
+    {{/isDecision}}
+  {{/transitions}}
   }
   {{/states}}
   break;

@@ -273,21 +273,21 @@ export class INetFastXMLParser implements INetParser {
 
     private translateGuards(transition: Transition, flowID: string, defaultFlow: boolean) {
       const flow = this.getFlow(flowID)!.flow;
-      const guard = new Guard(flow[Properties.name] ?? "no name")
+      const guard = new Guard(flow[Properties.name] ?? "no name", defaultFlow);
 
       if (!defaultFlow) {
-          if (!flow[Elements.conditionExpression] || flow[Elements.conditionExpression].length !== 1) {
-            throw new Error(`XOR outgoing flow (${flowID}) without or malformed condition script expression`);
-          }
-          const condition = flow[Elements.conditionExpression][0];
-          const lang = condition[Properties.language];
-          const expression = condition['#text'];
-          if (!expression || !lang)
-            throw new Error(`XOR outgoing flow (${flowID}) without proper (language and expression) script condition expression`);
-          
-          guard.condition = expression;
-          guard.language = lang;
+        if (!flow[Elements.conditionExpression] || flow[Elements.conditionExpression].length !== 1) {
+          throw new Error(`XOR outgoing flow (${flowID}) without or malformed condition script expression`);
         }
+        const condition = flow[Elements.conditionExpression][0];
+        const lang = condition[Properties.language];
+        const expression = condition['#text'];
+        if (!expression || !lang)
+          throw new Error(`XOR outgoing flow (${flowID}) without proper (language and expression) script condition expression`);
+        
+        guard.condition = expression;
+        guard.language = lang;
+      }
 
       transition.label.guards.set(flowID, guard);
     }

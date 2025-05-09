@@ -1,12 +1,1 @@
-{{#hasID}}
-{{content}} == id
-{{/hasID}}
-{{#hasCondition}}
-{{{content}}}
-{{/hasCondition}}
-{{#hasInitiator}}
-msg.sender == participants[{{{content}}}]
-{{/hasInitiator}}
-{{^last}}
-&& 
-{{/last}}
+{{#hasID}}{{content}} == id{{/hasID}}{{#hasInitiator}}msg.sender == participants[{{{content}}}]{{/hasInitiator}}{{^last}} && {{/last}}
