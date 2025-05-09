@@ -51,57 +51,86 @@ export class Simulator implements ISimulator {
       this.replay(this.contractGenerator.iNet.initial!, [], new Trace([]))
     }
 
-    replay(current: Place, visited: string[], trace: Trace) {
-      if (current.type === PlaceType.End) {
-        this.visited.push([...visited]); // reached end, deep copy
-        this.traces.push(new Trace([...trace.events])); // reached end, deep copy
+    replay(current: Place | Transition, visited: string[], trace: Trace) {
+      if (current instanceof Place && current.type === PlaceType.End) {
+        this.visited.push([...visited]); // Reached end, deep copy
+        this.traces.push(new Trace([...trace.events])); // Reached end, deep copy
         return;
       }
 
-      for (const transition of current.target) {
-        // Check if transition is enabled
-        if (transition.source.every(p => visited.includes(p.id) || p.id === current.id)) {
-          // Fire transition
-          visited.push(transition.id);
-          const cond = this.getCondition(transition)
-          if (cond) {
-            if (!this.conditions.has(transition.id)) {
-              transition.label.guards.clear();
-              this.conditions.set(transition.id, 2 ** this.conditions.size);     
+      if (current instanceof Transition) {
+        // Push the current transition to the events array
+        if (current.label instanceof TaskLabel) {
+          trace.events.push(
+            new Event(
+              current.label.name,
+              current.label.modelID,
+              current.label.sender.id
+            )
+          );
+        }
+
+        // Visit the next places
+        for (const nextPlace of current.target) {
+          this.replay(nextPlace, visited, trace);
+        }
+
+        return;
+      }
+    
+      if (current instanceof Place) {
+        for (const transition of current.target) {
+          // Check if transition is enabled
+          if (transition.source.every((p) => visited.includes(p.id) || p.id === current.id)) {
+
+            // Check or assign a condition ID
+            const cond = this.getCondition(transition);
+            if (cond) {
+              let condID: number;
+              if (!this.conditions.has(transition.id)) {
+                condID = 2 ** this.conditions.size; // Assign a new condID
+                this.conditions.set(transition.id, condID); // Map transition to condID
+        
+                // Add instance data change
+                const lastEvent = trace.events[trace.events.length - 1];
+                if (lastEvent) {
+                  if (lastEvent.dataChange) {
+                    lastEvent.dataChange.push(new InstanceDataChange(`conditions`, condID));
+                  } else {
+                    lastEvent.dataChange = [new InstanceDataChange(`conditions`, condID)];
+                  }
+                } else {
+                  trace.events.push(
+                  new Event(
+                    "Instance Data Change",
+                    "Instance Data Change",
+                    [...this.contractGenerator.iNet.participants.values()].at(0)!.id,
+                    "",
+                    [new InstanceDataChange(`conditions`, condID)]
+                  )
+                  );
+                }
+        
+                // Add guard to the transition
+                const guard = new Guard(`conditions[${condID}] == true`);
+                guard.condition = `conditions & ${condID} == ${condID}`;
+                guard.language = "Solidity";
+                transition.label.guards.set(guard.name, guard);
+              } else {
+                condID = this.conditions.get(transition.id)!; // Reuse existing condID
+              }
             }
-            const condID = this.conditions.get(transition.id)!;
 
-            // add instance data change
-            trace.events.push(new Event(
-              "Instance Data Change",
-              "Instance Data Change",
-              [...this.contractGenerator.iNet.participants.values()].at(0)!.id,
-              "",
-              [new InstanceDataChange(`conditions`, condID)]
-            ));
-            const guard = new Guard(`conditions[${condID}] == true`)
-            guard.condition = `conditions & ${condID} == ${condID}`;
-            guard.language = "Solidity";
-            //transition.label.guards.clear();
-            transition.label.guards.set(guard.name, guard);
-          }
-          if (transition.label instanceof TaskLabel) {      
-            trace.events.push(new Event(
-              transition.label.name,
-              transition.label.modelID,
-              transition.label.sender.id
-            ));
-          }
-          for (const nextPlace of transition.target) {
-            this.replay(nextPlace, visited, trace);
-          }
-
-          visited.pop(); // backtrack (XOR fork)
-          if (transition.label instanceof TaskLabel) {  
-            trace.events.pop()
-          }
-          if (cond) { 
-            trace.events.pop()
+            // Fire transition
+            visited.push(transition.id);
+            this.replay(transition, visited, trace);
+            visited.pop(); // Backtrack (XOR fork)
+            if (transition.label instanceof TaskLabel) {
+              trace.events.pop();
+            }
+            if (cond) {
+              trace.events.pop();
+            }
           }
         }
       }
