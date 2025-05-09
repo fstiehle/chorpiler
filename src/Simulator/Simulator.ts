@@ -31,7 +31,7 @@ export class Simulator implements ISimulator {
   private static Simulation = class {
     public traces = new Array<Trace>();
     public visited = new Array<string[]>();
-    public conditions = new Map<number, string>(); 
+    public conditions = new Map<string, number>(); 
     public contract: null | { target: string, encoding: TriggerEncoding } = null;
 
     constructor(public contractGenerator: TemplateEngine) {}
@@ -61,24 +61,41 @@ export class Simulator implements ISimulator {
       for (const transition of current.target) {
         // Check if transition is enabled
         if (transition.source.every(p => visited.includes(p.id) || p.id === current.id)) {
+          const traceSizeBefore = trace.events.length;
+
           // Fire transition
           visited.push(transition.id);
           const cond = this.getCondition(transition)
           if (cond) {
-            const condID = this.conditions.size + 1; // start at 1
-            this.conditions.set(condID, cond);  
-            // add instance data change
-            trace.events.push(new Event(
-              "Instance Data Change",
-              "Instance Data Change",
-              [...this.contractGenerator.iNet.participants.values()].at(0)!.id,
-              "",
-              [new InstanceDataChange(`conditions`, condID)]
-            ));
+            if (!this.conditions.has(transition.id)) {
+              transition.label.guards.clear();
+              this.conditions.set(transition.id, 2 ** this.conditions.size);     
+            }
+            const condID = this.conditions.get(transition.id)!;
+            // Add instance data change
+            const lastEvent = trace.events[trace.events.length - 1];
+            if (lastEvent) {
+              if (lastEvent.dataChange) {
+                lastEvent.dataChange.push(new InstanceDataChange(`conditions`, condID));
+              } else {
+                lastEvent.dataChange = [new InstanceDataChange(`conditions`, condID)];
+              }
+            } else {
+              trace.events.push(
+              new Event(
+                "Instance Data Change",
+                "Instance Data Change",
+                [...this.contractGenerator.iNet.participants.values()].at(0)!.id,
+                "",
+                [new InstanceDataChange(`conditions`, condID)]
+              )
+              );
+            }
+
             const guard = new Guard(`conditions[${condID}] == true`)
             guard.condition = `conditions & ${condID} == ${condID}`;
             guard.language = "Solidity";
-            transition.label.guards.clear();
+            //transition.label.guards.clear();
             transition.label.guards.set(guard.name, guard);
           }
           if (transition.label instanceof TaskLabel) {      
@@ -93,10 +110,7 @@ export class Simulator implements ISimulator {
           }
 
           visited.pop(); // backtrack (XOR fork)
-          if (transition.label instanceof TaskLabel) {  
-            trace.events.pop()
-          }
-          if (cond) { 
+          if (traceSizeBefore < trace.events.length) {  
             trace.events.pop()
           }
         }

@@ -14,33 +14,17 @@ import * as Contracts from ".";
 declare module "hardhat/types/runtime" {
   interface HardhatEthersHelpers extends HardhatEthersHelpersBase {
     getContractFactory(
-      name: "IM_Choreography_1bp5o6k",
-      signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.IM_Choreography_1bp5o6k__factory>;
-    getContractFactory(
       name: "IM_ProcessExecution",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.IM_ProcessExecution__factory>;
-    getContractFactory(
-      name: "PH_Choreography_1yv8svf",
-      signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.PH_Choreography_1yv8svf__factory>;
     getContractFactory(
       name: "PH_ProcessExecution",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.PH_ProcessExecution__factory>;
     getContractFactory(
-      name: "PIZZA_PizzaDelivery",
-      signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.PIZZA_PizzaDelivery__factory>;
-    getContractFactory(
       name: "PIZZA_ProcessExecution",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.PIZZA_ProcessExecution__factory>;
-    getContractFactory(
-      name: "RA_Choreography",
-      signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.RA_Choreography__factory>;
     getContractFactory(
       name: "RA_ProcessExecution",
       signerOrOptions?: ethers.Signer | FactoryOptions
@@ -49,46 +33,22 @@ declare module "hardhat/types/runtime" {
       name: "SC_ProcessExecution",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.SC_ProcessExecution__factory>;
-    getContractFactory(
-      name: "SC_SupplyChain",
-      signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.SC_SupplyChain__factory>;
 
-    getContractAt(
-      name: "IM_Choreography_1bp5o6k",
-      address: string | ethers.Addressable,
-      signer?: ethers.Signer
-    ): Promise<Contracts.IM_Choreography_1bp5o6k>;
     getContractAt(
       name: "IM_ProcessExecution",
       address: string | ethers.Addressable,
       signer?: ethers.Signer
     ): Promise<Contracts.IM_ProcessExecution>;
     getContractAt(
-      name: "PH_Choreography_1yv8svf",
-      address: string | ethers.Addressable,
-      signer?: ethers.Signer
-    ): Promise<Contracts.PH_Choreography_1yv8svf>;
-    getContractAt(
       name: "PH_ProcessExecution",
       address: string | ethers.Addressable,
       signer?: ethers.Signer
     ): Promise<Contracts.PH_ProcessExecution>;
     getContractAt(
-      name: "PIZZA_PizzaDelivery",
-      address: string | ethers.Addressable,
-      signer?: ethers.Signer
-    ): Promise<Contracts.PIZZA_PizzaDelivery>;
-    getContractAt(
       name: "PIZZA_ProcessExecution",
       address: string | ethers.Addressable,
       signer?: ethers.Signer
     ): Promise<Contracts.PIZZA_ProcessExecution>;
-    getContractAt(
-      name: "RA_Choreography",
-      address: string | ethers.Addressable,
-      signer?: ethers.Signer
-    ): Promise<Contracts.RA_Choreography>;
     getContractAt(
       name: "RA_ProcessExecution",
       address: string | ethers.Addressable,
@@ -99,40 +59,19 @@ declare module "hardhat/types/runtime" {
       address: string | ethers.Addressable,
       signer?: ethers.Signer
     ): Promise<Contracts.SC_ProcessExecution>;
-    getContractAt(
-      name: "SC_SupplyChain",
-      address: string | ethers.Addressable,
-      signer?: ethers.Signer
-    ): Promise<Contracts.SC_SupplyChain>;
 
-    deployContract(
-      name: "IM_Choreography_1bp5o6k",
-      signerOrOptions?: ethers.Signer | DeployContractOptions
-    ): Promise<Contracts.IM_Choreography_1bp5o6k>;
     deployContract(
       name: "IM_ProcessExecution",
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.IM_ProcessExecution>;
     deployContract(
-      name: "PH_Choreography_1yv8svf",
-      signerOrOptions?: ethers.Signer | DeployContractOptions
-    ): Promise<Contracts.PH_Choreography_1yv8svf>;
-    deployContract(
       name: "PH_ProcessExecution",
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.PH_ProcessExecution>;
     deployContract(
-      name: "PIZZA_PizzaDelivery",
-      signerOrOptions?: ethers.Signer | DeployContractOptions
-    ): Promise<Contracts.PIZZA_PizzaDelivery>;
-    deployContract(
       name: "PIZZA_ProcessExecution",
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.PIZZA_ProcessExecution>;
-    deployContract(
-      name: "RA_Choreography",
-      signerOrOptions?: ethers.Signer | DeployContractOptions
-    ): Promise<Contracts.RA_Choreography>;
     deployContract(
       name: "RA_ProcessExecution",
       signerOrOptions?: ethers.Signer | DeployContractOptions
@@ -141,46 +80,22 @@ declare module "hardhat/types/runtime" {
       name: "SC_ProcessExecution",
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.SC_ProcessExecution>;
-    deployContract(
-      name: "SC_SupplyChain",
-      signerOrOptions?: ethers.Signer | DeployContractOptions
-    ): Promise<Contracts.SC_SupplyChain>;
 
-    deployContract(
-      name: "IM_Choreography_1bp5o6k",
-      args: any[],
-      signerOrOptions?: ethers.Signer | DeployContractOptions
-    ): Promise<Contracts.IM_Choreography_1bp5o6k>;
     deployContract(
       name: "IM_ProcessExecution",
       args: any[],
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.IM_ProcessExecution>;
     deployContract(
-      name: "PH_Choreography_1yv8svf",
-      args: any[],
-      signerOrOptions?: ethers.Signer | DeployContractOptions
-    ): Promise<Contracts.PH_Choreography_1yv8svf>;
-    deployContract(
       name: "PH_ProcessExecution",
       args: any[],
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.PH_ProcessExecution>;
     deployContract(
-      name: "PIZZA_PizzaDelivery",
-      args: any[],
-      signerOrOptions?: ethers.Signer | DeployContractOptions
-    ): Promise<Contracts.PIZZA_PizzaDelivery>;
-    deployContract(
       name: "PIZZA_ProcessExecution",
       args: any[],
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.PIZZA_ProcessExecution>;
-    deployContract(
-      name: "RA_Choreography",
-      args: any[],
-      signerOrOptions?: ethers.Signer | DeployContractOptions
-    ): Promise<Contracts.RA_Choreography>;
     deployContract(
       name: "RA_ProcessExecution",
       args: any[],
@@ -191,11 +106,6 @@ declare module "hardhat/types/runtime" {
       args: any[],
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.SC_ProcessExecution>;
-    deployContract(
-      name: "SC_SupplyChain",
-      args: any[],
-      signerOrOptions?: ethers.Signer | DeployContractOptions
-    ): Promise<Contracts.SC_SupplyChain>;
 
     // default types
     getContractFactory(

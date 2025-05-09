@@ -1,10 +1,6 @@
 // <--- {{#modelID}}{{modelID}} {{taskName}}{{/modelID}}{{^modelID}} auto transition {{/modelID}} --->
 {{#hasConditions}}
-if ( 
-{{#conditions}}
-{{> condition}}
-{{/conditions}}
-) {
+if ({{#conditions}}{{> condition}}{{/conditions}}) {
 {{/hasConditions}}
 {{#taskName}}
 // <--- custom code for task here --->

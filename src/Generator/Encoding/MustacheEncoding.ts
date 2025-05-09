@@ -1,3 +1,4 @@
+import { assert } from "console";
 import * as Encoding from "./Encoding";
 import { IFromEncoding } from "./IFromEncoding";
 
@@ -30,13 +31,9 @@ class MustacheProcessEncoding {
 
   private static convertStates(states: Map<number, Encoding.Transition[]>): State[] {
     const stateArray = Array.from(states.entries()).map(([consume, transitions]) => {
-      const elseTransitions = transitions.filter(t => t.defaultBranch).map(t => this.convertTransition(t));
-      const mainTransitions = transitions.filter(t => !t.defaultBranch).map(t => this.convertTransition(t));
-
       return new State(
         consume.toString(),
-        mainTransitions,
-        elseTransitions
+        transitions.map(t => this.convertTransition(t))
       );
     });
 
@@ -56,6 +53,7 @@ class MustacheProcessEncoding {
       t instanceof Encoding.InitiatedTransition ? t.taskName : "",
       t.condition ?? "",
       t.isEnd,
+      t.defaultBranch,
       t.outTo !== null ? { id: t.outTo.id.toString(), produce: t.outTo.produce.toString() } : null,
     );
   }
@@ -102,14 +100,12 @@ class Transition {
     public modelID: string, // ID as was found in model
     public initiator: string,
     public taskName: string,
-    public condition: string,
+    public decision: string,
     public isEnd: boolean,
+    public defaultBranch: boolean,
     public outTo: { id: string; produce: string } | null,
-    public last: boolean | null = null
+    public last: boolean | null = null,
   ) {
-    if (this.condition) {
-      this.conditions.push({content: this.condition, hasCondition: true, last: false})
-    } 
     if (this.taskID) {
       this.conditions.push({content: this.taskID, hasID: true, last: false})
     }
@@ -127,14 +123,21 @@ class State {
   constructor(
     public consume: string,
     public transitions: Transition[],
-    public defaultBranch: Transition[],
+    public isDecision: boolean = false,
     public last: boolean | null = null
   ) {
-    if (transitions.length > 0) {
-      transitions[transitions.length - 1].last = true;
-    }
-    if (defaultBranch.length > 0) {
-      defaultBranch[defaultBranch.length - 1].last = true;
+    const defaultBranches = this.transitions.filter(t => t.defaultBranch);
+    if (defaultBranches.length > 0) {
+      this.isDecision = true;
+      this.transitions.sort((a, b) => {
+        if (a.defaultBranch && !b.defaultBranch) return 1;
+        if (!a.defaultBranch && b.defaultBranch) return -1;
+        return 0;
+      });
+      if (transitions.length > 0) {
+        assert(transitions[transitions.length - 1].defaultBranch, "The last transition must be the defaultBranch.");
+        transitions[transitions.length - 1].last = true;
+      }
     }
   }
 }

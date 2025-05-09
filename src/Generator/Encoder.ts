@@ -206,7 +206,7 @@ export class INetEncoder {
           initiatorID: encoded.participants.get(element.label.sender.id)!.id,
           taskID: taskIDs.get(element.id)!,
           taskName: element.label.name,
-          consume, produce, condition, isEnd, defaultBranch,
+          consume, produce, condition, isEnd, defaultBranch
         }));
       }
     }
