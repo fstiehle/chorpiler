@@ -73,7 +73,7 @@ contract ProcessExecution {
         }
         // <---  auto transition  --->
         if ( 
-        (conditions & 3 == 3)
+        (conditions & 4 == 4)
         ) {
         _tokenState &= ~uint(4);
         _tokenState |= 8;

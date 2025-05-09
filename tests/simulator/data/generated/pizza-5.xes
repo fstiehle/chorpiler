@@ -74,7 +74,7 @@
       <string key="concept:name" value="Instance Data Change"/>
       <string key="id" value="Instance Data Change"/>
       <string key="sourceRef" value="Participant_06qakjv"/>
-      <boolean key="conditions" value="3"/>
+      <boolean key="conditions" value="4"/>
     </event>
     <event>
       <string key="concept:name" value="New Activity"/>

@@ -67,8 +67,8 @@ export class Simulator implements ISimulator {
           if (cond) {
             if (!this.conditions.has(transition.id)) {
               transition.label.guards.clear();
-              this.conditions.set(transition.id, this.conditions.size + 1);     
-            } 
+              this.conditions.set(transition.id, 2 ** this.conditions.size);     
+            }
             const condID = this.conditions.get(transition.id)!;
 
             // add instance data change

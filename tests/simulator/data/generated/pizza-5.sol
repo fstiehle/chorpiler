@@ -46,7 +46,7 @@ contract PizzaDelivery {
         }
         // <--- ChoreographyTask_1wapvxj New Activity --->
         if ( 
-        (conditions & 2 == 2)&& (conditions & 3 == 3)
+        (conditions & 2 == 2)&& (conditions & 4 == 4)
         && 
         4 == id
         && 
