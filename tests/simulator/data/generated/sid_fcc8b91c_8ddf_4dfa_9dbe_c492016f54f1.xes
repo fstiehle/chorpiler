@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<log xes.version="1.0">
+	<global scope="event">
+		<string key="concept:name" value="Task Name"/>
+		<string key="sourceRef" value="Participant ID"/>
+	</global>
+
+  <trace>
+    <event>
+      <string key="concept:name" value="Bewerbung und Eingangsbestätigung senden"/>
+      <string key="id" value="sid-C12DEEB5-86BF-4254-BB68-C930FD0905D6"/>
+      <string key="sourceRef" value="sid-DEB0453E-CA6C-4EF9-A672-5C532227F23D"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Instance Data Change"/>
+      <string key="id" value="Instance Data Change"/>
+      <string key="sourceRef" value="sid-DEB0453E-CA6C-4EF9-A672-5C532227F23D"/>
+      <boolean key="conditions" value="1"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Zusage senden"/>
+      <string key="id" value="sid-996BBBD2-CA44-45A3-BD54-6C7090363FBF"/>
+      <string key="sourceRef" value="sid-4008BC50-EDA9-499D-BBA7-DF7DDC897FDF"/>
+    </event>
+  </trace>
+  <trace>
+    <event>
+      <string key="concept:name" value="Bewerbung und Eingangsbestätigung senden"/>
+      <string key="id" value="sid-C12DEEB5-86BF-4254-BB68-C930FD0905D6"/>
+      <string key="sourceRef" value="sid-DEB0453E-CA6C-4EF9-A672-5C532227F23D"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Absage senden"/>
+      <string key="id" value="sid-510EFA3E-DFC7-4FCE-A5B1-57AB528CFBB9"/>
+      <string key="sourceRef" value="sid-DEAD035B-2ABC-4E50-B910-156ECC692EAE"/>
+    </event>
+  </trace>
+  <trace>
+    <event>
+      <string key="concept:name" value="Bewerbung und Eingangsbestätigung senden"/>
+      <string key="id" value="sid-C12DEEB5-86BF-4254-BB68-C930FD0905D6"/>
+      <string key="sourceRef" value="sid-DEB0453E-CA6C-4EF9-A672-5C532227F23D"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Instance Data Change"/>
+      <string key="id" value="Instance Data Change"/>
+      <string key="sourceRef" value="sid-DEB0453E-CA6C-4EF9-A672-5C532227F23D"/>
+      <boolean key="conditions" value="2"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Fehlende Unterlagen anfordern"/>
+      <string key="id" value="sid-63049054-FF0D-448E-A42E-7B917601D74C"/>
+      <string key="sourceRef" value="sid-87AF061B-967D-4188-9442-9C3FADF3EFE2"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Fehlende Unterlagen schicken"/>
+      <string key="id" value="sid-9153A3B6-9D23-44BA-A624-2B6C91C8355F"/>
+      <string key="sourceRef" value="sid-8D5C8892-C331-48AF-A5DA-D7F14A7B5FEC"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Instance Data Change"/>
+      <string key="id" value="Instance Data Change"/>
+      <string key="sourceRef" value="sid-DEB0453E-CA6C-4EF9-A672-5C532227F23D"/>
+      <boolean key="conditions" value="1"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Zusage senden"/>
+      <string key="id" value="sid-996BBBD2-CA44-45A3-BD54-6C7090363FBF"/>
+      <string key="sourceRef" value="sid-4008BC50-EDA9-499D-BBA7-DF7DDC897FDF"/>
+    </event>
+  </trace>
+  <trace>
+    <event>
+      <string key="concept:name" value="Bewerbung und Eingangsbestätigung senden"/>
+      <string key="id" value="sid-C12DEEB5-86BF-4254-BB68-C930FD0905D6"/>
+      <string key="sourceRef" value="sid-DEB0453E-CA6C-4EF9-A672-5C532227F23D"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Instance Data Change"/>
+      <string key="id" value="Instance Data Change"/>
+      <string key="sourceRef" value="sid-DEB0453E-CA6C-4EF9-A672-5C532227F23D"/>
+      <boolean key="conditions" value="2"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Fehlende Unterlagen anfordern"/>
+      <string key="id" value="sid-63049054-FF0D-448E-A42E-7B917601D74C"/>
+      <string key="sourceRef" value="sid-87AF061B-967D-4188-9442-9C3FADF3EFE2"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Fehlende Unterlagen schicken"/>
+      <string key="id" value="sid-9153A3B6-9D23-44BA-A624-2B6C91C8355F"/>
+      <string key="sourceRef" value="sid-8D5C8892-C331-48AF-A5DA-D7F14A7B5FEC"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Absage senden"/>
+      <string key="id" value="sid-510EFA3E-DFC7-4FCE-A5B1-57AB528CFBB9"/>
+      <string key="sourceRef" value="sid-DEAD035B-2ABC-4E50-B910-156ECC692EAE"/>
+    </event>
+  </trace>
+</log>

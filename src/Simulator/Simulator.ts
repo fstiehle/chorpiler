@@ -31,7 +31,7 @@ export class Simulator implements ISimulator {
   private static Simulation = class {
     public traces = new Array<Trace>();
     public visited = new Array<string[]>();
-    public conditions = new Map<number, string>(); 
+    public conditions = new Map<string, number>(); 
     public contract: null | { target: string, encoding: TriggerEncoding } = null;
 
     constructor(public contractGenerator: TemplateEngine) {}
@@ -65,8 +65,12 @@ export class Simulator implements ISimulator {
           visited.push(transition.id);
           const cond = this.getCondition(transition)
           if (cond) {
-            const condID = this.conditions.size + 1; // start at 1
-            this.conditions.set(condID, cond);  
+            if (!this.conditions.has(transition.id)) {
+              transition.label.guards.clear();
+              this.conditions.set(transition.id, this.conditions.size + 1);     
+            } 
+            const condID = this.conditions.get(transition.id)!;
+
             // add instance data change
             trace.events.push(new Event(
               "Instance Data Change",
@@ -78,7 +82,7 @@ export class Simulator implements ISimulator {
             const guard = new Guard(`conditions[${condID}] == true`)
             guard.condition = `conditions & ${condID} == ${condID}`;
             guard.language = "Solidity";
-            transition.label.guards.clear();
+            //transition.label.guards.clear();
             transition.label.guards.set(guard.name, guard);
           }
           if (transition.label instanceof TaskLabel) {      
