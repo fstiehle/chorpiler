@@ -86,39 +86,37 @@ export class Simulator implements ISimulator {
             // Check or assign a condition ID
             const cond = this.getCondition(transition);
             if (cond) {
-              let condID: number;
               if (!this.conditions.has(transition.id)) {
-                condID = 2 ** this.conditions.size; // Assign a new condID
-                this.conditions.set(transition.id, condID); // Map transition to condID
-        
-                // Add instance data change
-                const lastEvent = trace.events[trace.events.length - 1];
-                if (lastEvent) {
-                  if (lastEvent.dataChange) {
-                    lastEvent.dataChange.push(new InstanceDataChange(`conditions`, condID));
-                  } else {
-                    lastEvent.dataChange = [new InstanceDataChange(`conditions`, condID)];
-                  }
-                } else {
-                  trace.events.push(
-                  new Event(
-                    "Instance Data Change",
-                    "Instance Data Change",
-                    [...this.contractGenerator.iNet.participants.values()].at(0)!.id,
-                    "",
-                    [new InstanceDataChange(`conditions`, condID)]
-                  )
-                  );
-                }
-        
-                // Add guard to the transition
-                const guard = new Guard(`conditions[${condID}] == true`);
-                guard.condition = `conditions & ${condID} == ${condID}`;
-                guard.language = "Solidity";
-                transition.label.guards.set(guard.name, guard);
-              } else {
-                condID = this.conditions.get(transition.id)!; // Reuse existing condID
+                this.conditions.set(transition.id, 2 ** this.conditions.size); 
+                transition.label.guards.clear();
               }
+
+              const condID = this.conditions.get(transition.id)!; 
+              // Add instance data change
+              const lastEvent = trace.events[trace.events.length - 1];
+              if (lastEvent) {
+                if (lastEvent.dataChange) {
+                  lastEvent.dataChange.push(new InstanceDataChange(`conditions`, condID));
+                } else {
+                  lastEvent.dataChange = [new InstanceDataChange(`conditions`, condID)];
+                }
+              } else {
+                trace.events.push(
+                new Event(
+                  "Instance Data Change",
+                  "Instance Data Change",
+                  [...this.contractGenerator.iNet.participants.values()].at(0)!.id,
+                  "",
+                  [new InstanceDataChange(`conditions`, condID)]
+                )
+                );
+              }
+
+              // Add guard to the transition
+              const guard = new Guard(`conditions[${condID}] == true`);
+              guard.condition = `conditions & ${condID} == ${condID}`;
+              guard.language = "Solidity";
+              transition.label.guards.set(guard.name, guard);
             }
 
             // Fire transition

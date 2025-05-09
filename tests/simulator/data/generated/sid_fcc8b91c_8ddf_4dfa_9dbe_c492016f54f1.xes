@@ -41,6 +41,7 @@
       <string key="concept:name" value="Fehlende Unterlagen schicken"/>
       <string key="id" value="sid-9153A3B6-9D23-44BA-A624-2B6C91C8355F"/>
       <string key="sourceRef" value="sid-8D5C8892-C331-48AF-A5DA-D7F14A7B5FEC"/>
+      <boolean key="conditions" value="1"/>
     </event>
     <event>
       <string key="concept:name" value="Zusage senden"/>

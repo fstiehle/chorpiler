@@ -46,7 +46,7 @@ contract PizzaDelivery {
         }
         // <--- ChoreographyTask_1wapvxj New Activity --->
         if ( 
-        (items > 1)&& (conditions & 2 == 2)&& (items==fl)&& (conditions & 4 == 4)
+        (conditions & 2 == 2)&& (conditions & 4 == 4)
         && 
         4 == id
         && 
@@ -60,7 +60,7 @@ contract PizzaDelivery {
         }
         // <---  auto transition  --->
         if ( 
-        (items==true)&& (conditions & 1 == 1)
+        (conditions & 1 == 1)
         ) {
         _tokenState &= ~uint(2);
         _tokenState |= 4;
@@ -68,7 +68,7 @@ contract PizzaDelivery {
         }
         // <---  auto transition  --->
         if ( 
-        (items > 1)&& (conditions & 2 == 2)
+        (conditions & 2 == 2)
         ) {
         _tokenState &= ~uint(2);
         _tokenState |= 4;

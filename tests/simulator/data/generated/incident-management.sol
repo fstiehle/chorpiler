@@ -73,7 +73,7 @@ contract ProcessExecution {
         }
         // <---  auto transition  --->
         if ( 
-        (resolved==true)&& (conditions & 4 == 4)
+        (conditions & 4 == 4)
         ) {
         _tokenState &= ~uint(4);
         _tokenState |= 8;
@@ -109,7 +109,7 @@ contract ProcessExecution {
         }
         // <---  auto transition  --->
         if ( 
-        (resolved==true)&& (conditions & 2 == 2)
+        (conditions & 2 == 2)
         ) {
         _tokenState &= ~uint(16);
         _tokenState |= 32;
@@ -131,7 +131,7 @@ contract ProcessExecution {
         }
         // <---  auto transition  --->
         if ( 
-        (resolved==true)&& (conditions & 1 == 1)
+        (conditions & 1 == 1)
         ) {
         _tokenState &= ~uint(64);
         _tokenState |= 256;
