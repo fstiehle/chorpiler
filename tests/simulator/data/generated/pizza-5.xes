@@ -11,6 +11,8 @@
       <string key="id" value="ChoreographyTask_0hy9n0g"/>
       <string key="sourceRef" value="Participant_06qakjv"/>
       <boolean key="conditions" value="1"/>
+      <boolean key="conditions" value="2"/>
+      <boolean key="conditions" value="4"/>
     </event>
     <event>
       <string key="concept:name" value="Deliver Pizza"/>
@@ -19,6 +21,14 @@
     </event>
   </trace>
   <trace>
+    <event>
+      <string key="concept:name" value="Order Pizza"/>
+      <string key="id" value="ChoreographyTask_0hy9n0g"/>
+      <string key="sourceRef" value="Participant_06qakjv"/>
+      <boolean key="conditions" value="1"/>
+      <boolean key="conditions" value="2"/>
+      <boolean key="conditions" value="4"/>
+    </event>
     <event>
       <string key="concept:name" value="Announce Delivery"/>
       <string key="id" value="ChoreographyTask_1jrfmx8"/>
@@ -32,9 +42,10 @@
   </trace>
   <trace>
     <event>
-      <string key="concept:name" value="Instance Data Change"/>
-      <string key="id" value="Instance Data Change"/>
+      <string key="concept:name" value="Order Pizza"/>
+      <string key="id" value="ChoreographyTask_0hy9n0g"/>
       <string key="sourceRef" value="Participant_06qakjv"/>
+      <boolean key="conditions" value="1"/>
       <boolean key="conditions" value="2"/>
       <boolean key="conditions" value="4"/>
     </event>
@@ -46,9 +57,10 @@
   </trace>
   <trace>
     <event>
-      <string key="concept:name" value="Instance Data Change"/>
-      <string key="id" value="Instance Data Change"/>
+      <string key="concept:name" value="Order Pizza"/>
+      <string key="id" value="ChoreographyTask_0hy9n0g"/>
       <string key="sourceRef" value="Participant_06qakjv"/>
+      <boolean key="conditions" value="1"/>
       <boolean key="conditions" value="2"/>
       <boolean key="conditions" value="4"/>
     </event>
