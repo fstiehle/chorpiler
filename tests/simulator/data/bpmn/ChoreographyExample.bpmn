@@ -46,12 +46,14 @@
     <sequenceFlow id="Flow_0e2c805" sourceRef="Event_0y1sdn3" targetRef="ChoreographyTask_1vnykqp"></sequenceFlow>
     <sequenceFlow id="Flow_0d6j7vb" sourceRef="ChoreographyTask_1vnykqp" targetRef="Gateway_1bpkhpg"></sequenceFlow>
     <sequenceFlow id="Flow_0ymdsa2" name="unavailable" sourceRef="Gateway_1bpkhpg" targetRef="Gateway_1klfaw3"></sequenceFlow>
-    <sequenceFlow id="Flow_0ybxbuc" sourceRef="Gateway_1klfaw3" targetRef="ChoreographyTask_16lc74v"></sequenceFlow>
+    <sequenceFlow id="Flow_0ybxbuc" sourceRef="Gateway_1klfaw3" targetRef="ChoreographyTask_16lc74v">
+      <conditionExpression xsi:type="bpmn2:tFormalExpression" language="Solidity">conditions &amp; 1 == 1</conditionExpression>
+    </sequenceFlow>
     <sequenceFlow id="Flow_02gqwyg" sourceRef="Gateway_1klfaw3" targetRef="ChoreographyTask_07t2zjo"></sequenceFlow>
     <sequenceFlow id="Flow_1kim4vq" sourceRef="ChoreographyTask_07t2zjo" targetRef="Gateway_0xcnzox"></sequenceFlow>
     <sequenceFlow id="Flow_14ulro8" sourceRef="ChoreographyTask_16lc74v" targetRef="Gateway_0xcnzox"></sequenceFlow>
     <sequenceFlow id="Flow_067nql1" name="available" sourceRef="Gateway_1bpkhpg" targetRef="Gateway_1yl9mch">
-      <conditionExpression xsi:type="bpmn2:tFormalExpression" language="Solidity">conditions &amp; 1 == 1</conditionExpression>
+      <conditionExpression xsi:type="bpmn2:tFormalExpression" language="Solidity">conditions &amp; 3 == 3</conditionExpression>
     </sequenceFlow>
     <sequenceFlow id="Flow_198zju1" sourceRef="Gateway_0xcnzox" targetRef="Gateway_1yl9mch"></sequenceFlow>
     <sequenceFlow id="Flow_11zi7qu" sourceRef="Gateway_1yl9mch" targetRef="ChoreographyTask_056ylqg"></sequenceFlow>

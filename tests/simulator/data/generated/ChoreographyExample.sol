@@ -19,34 +19,37 @@ contract test_ChoreographyExample {
     while(_tokenState != 0) {
       if (_tokenState & 1 == 1) {
         // <--- ChoreographyTask_1vnykqp Order goods --->
-        if (0 == id && msg.sender == participants[0]) {
+        if (1 == id && msg.sender == participants[0]) {
         // <--- custom code for task here --->
         _tokenState &= ~uint(1);
         _tokenState |= 6;
+        id = 0;
         continue; 
         }
       }
       if (_tokenState & 2 == 2) {
         // <--- ChoreographyTask_16lc74v Produce goods --->
-        if (1 == id && msg.sender == participants[1]) {
+        if (2 == id && msg.sender == participants[1]) {
         // <--- custom code for task here --->
         _tokenState &= ~uint(2);
         _tokenState |= 8;
+        id = 0;
         continue; 
         }
       }
       if (_tokenState & 4 == 4) {
         // <--- ChoreographyTask_07t2zjo Inform customer --->
-        if (2 == id && msg.sender == participants[1]) {
+        if (3 == id && msg.sender == participants[1]) {
         // <--- custom code for task here --->
         _tokenState &= ~uint(4);
         _tokenState |= 16;
+        id = 0;
         continue; 
         }
       }
       if (_tokenState & 32 == 32) {
         // <--- ChoreographyTask_056ylqg Ship goods --->
-        if (3 == id && msg.sender == participants[1]) {
+        if (4 == id && msg.sender == participants[1]) {
         // <--- custom code for task here --->
         _tokenState &= ~uint(32);
         _tokenState |= 0;

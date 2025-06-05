@@ -1,12 +1,14 @@
 import SolDefaultContractGenerator from "../../src/Generator/target/Sol/DefaultGenerator";
-import { Simulator } from "../../src/Simulator/Simulator";
+import { Simulation, Simulator } from "../../src/Simulator/Simulator";
 
 describe('Simulate...', () => {
 
   const sim = new Simulator(__dirname);
 
   before(() => {
-    return sim.generate("test_", SolDefaultContractGenerator, { unfoldSubNets: true, loopProtection: false });
+    return sim.generate(
+      "test_", 
+      new Simulation(SolDefaultContractGenerator, { unfoldSubNets: true, loopProtection: false, parseConditions: true }));
   })
 
   it("", () => {})
