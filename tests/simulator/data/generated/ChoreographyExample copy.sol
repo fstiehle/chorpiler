@@ -54,12 +54,10 @@ contract test_ChoreographyExample {
         }
       }
       if (_tokenState & 6 == 6) {
-        if (conditions & 3 == 3) {
-          // <---  auto transition  --->
-          _tokenState &= ~uint(6);
-          _tokenState |= 32;
-          continue; 
-        }
+        // <---  auto transition  --->
+        _tokenState &= ~uint(6);
+        _tokenState |= 32;
+        continue; 
       }
       if (_tokenState & 24 == 24) {
         // <---  auto transition  --->

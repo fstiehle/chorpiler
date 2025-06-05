@@ -124,32 +124,27 @@ export class Simulation implements ISimulation {
     return Array.from(numbers);
   }
 
-    const processTransition = (
-      transitionCandidate: Transition,
-      currentTrace: Trace
-    ) => {
-      //console.log("Executing transition:", transitionCandidate.id);
-    
-      // Add the transition to the trace if it has a TaskLabel
-      if (transitionCandidate.label instanceof TaskLabel) {
-        currentTrace.events.push(
-          new Event(
-            transitionCandidate.label.name,
-            transitionCandidate.id,
-            transitionCandidate.label.sender.id
-          )
-        );
-      }
+  const processTransition = (
+    transitionCandidate: Transition,
+    currentTrace: Trace
+  ) => {
+    //console.log("Executing transition:", transitionCandidate.id);
+  
+    // Add the transition to the trace if it has a TaskLabel
+    if (transitionCandidate.label instanceof TaskLabel) {
+      currentTrace.events.push(
+        new Event(
+          transitionCandidate.label.name,
+          transitionCandidate.id,
+          transitionCandidate.label.sender.id
+        )
+      );
+    }
   
     // Handle conditions for the transition
     const condition = this.getCondition(transitionCandidate);
 
     if (condition) {
-      if (!this.conditions.has(transitionCandidate.id)) {
-        transitionCandidate.label.guard?.conditions.clear();
-        this.conditions.set(transitionCandidate.id, 1 << this.conditions.size);
-      }
-
       if (this.options.parseConditions) {
         // parse numbers from the condition, for each add it to the log
         const conditionIDs = extractUniqueBitmaskNumbers(condition);
@@ -157,10 +152,14 @@ export class Simulation implements ISimulation {
           addConditionToLog(currentTrace, "conditions", id);
         }
       } else {
+        if (!this.conditions.has(transitionCandidate.id)) {
+          transitionCandidate.label.guard?.conditions.clear();
+          this.conditions.set(transitionCandidate.id, 1 << this.conditions.size);
+        }
         const conditionID = this.conditions.get(transitionCandidate.id)!;
         // Add instance data change to the last event or create a new event
         addConditionToLog(currentTrace, "conditions", conditionID);
-    
+
         // Update the guard for the transition
         const guard = new Guard(`conditions[${conditionID}] == true`);
         guard.conditions.set("", `conditions & ${conditionID} == ${conditionID}`);

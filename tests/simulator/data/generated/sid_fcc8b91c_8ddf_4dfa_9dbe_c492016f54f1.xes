@@ -10,7 +10,20 @@
       <string key="concept:name" value="Bewerbung und Eingangsbestätigung senden"/>
       <string key="id" value="sid-C12DEEB5-86BF-4254-BB68-C930FD0905D6"/>
       <string key="sourceRef" value="sid-DEB0453E-CA6C-4EF9-A672-5C532227F23D"/>
-      <boolean key="conditions" value="2"/>
+      <boolean key="conditions" value="1"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Zusage senden"/>
+      <string key="id" value="sid-996BBBD2-CA44-45A3-BD54-6C7090363FBF"/>
+      <string key="sourceRef" value="sid-4008BC50-EDA9-499D-BBA7-DF7DDC897FDF"/>
+    </event>
+  </trace>
+  <trace>
+    <event>
+      <string key="concept:name" value="Bewerbung und Eingangsbestätigung senden"/>
+      <string key="id" value="sid-C12DEEB5-86BF-4254-BB68-C930FD0905D6"/>
+      <string key="sourceRef" value="sid-DEB0453E-CA6C-4EF9-A672-5C532227F23D"/>
+      <boolean key="conditions" value="1"/>
     </event>
     <event>
       <string key="concept:name" value="Fehlende Unterlagen anfordern"/>
@@ -33,7 +46,6 @@
       <string key="concept:name" value="Bewerbung und Eingangsbestätigung senden"/>
       <string key="id" value="sid-C12DEEB5-86BF-4254-BB68-C930FD0905D6"/>
       <string key="sourceRef" value="sid-DEB0453E-CA6C-4EF9-A672-5C532227F23D"/>
-      <boolean key="conditions" value="2"/>
     </event>
     <event>
       <string key="concept:name" value="Fehlende Unterlagen anfordern"/>
@@ -44,20 +56,6 @@
       <string key="concept:name" value="Fehlende Unterlagen schicken"/>
       <string key="id" value="sid-9153A3B6-9D23-44BA-A624-2B6C91C8355F"/>
       <string key="sourceRef" value="sid-8D5C8892-C331-48AF-A5DA-D7F14A7B5FEC"/>
-      <boolean key="conditions" value="4"/>
-    </event>
-    <event>
-      <string key="concept:name" value="Zusage senden"/>
-      <string key="id" value="sid-996BBBD2-CA44-45A3-BD54-6C7090363FBF"/>
-      <string key="sourceRef" value="sid-4008BC50-EDA9-499D-BBA7-DF7DDC897FDF"/>
-    </event>
-  </trace>
-  <trace>
-    <event>
-      <string key="concept:name" value="Bewerbung und Eingangsbestätigung senden"/>
-      <string key="id" value="sid-C12DEEB5-86BF-4254-BB68-C930FD0905D6"/>
-      <string key="sourceRef" value="sid-DEB0453E-CA6C-4EF9-A672-5C532227F23D"/>
-      <boolean key="conditions" value="4"/>
     </event>
     <event>
       <string key="concept:name" value="Zusage senden"/>

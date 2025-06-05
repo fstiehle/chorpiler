@@ -10,7 +10,7 @@
       <string key="concept:name" value="Order goods"/>
       <string key="id" value="ChoreographyTask_1vnykqp"/>
       <string key="sourceRef" value="Participant_1tzf68i"/>
-      <boolean key="conditions" value="3"/>
+      <boolean key="conditions" value="1"/>
     </event>
     <event>
       <string key="concept:name" value="Ship goods"/>

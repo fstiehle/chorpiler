@@ -8,7 +8,7 @@ describe('Simulate...', () => {
   before(() => {
     return sim.generate(
       "test_", 
-      new Simulation(SolDefaultContractGenerator, { unfoldSubNets: true, loopProtection: false, parseConditions: true }));
+      new Simulation({ unfoldSubNets: true, loopProtection: false, parseConditions: true }));
   })
 
   it("", () => {})
