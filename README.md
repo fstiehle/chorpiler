@@ -37,26 +37,26 @@ import chorpiler, { TriggerEncoding } from 'chorpiler';
 
 const parser = new chorpiler.Parser();
 
-    const bpmnXML = fs.readFileSync(path.join(BPMN_PATH, 'xor.bpmn'));   
-    // parse BPMN file into petri net
-    const iNet = await parser.fromXML(bpmnXML);
+const bpmnXML = fs.readFileSync(path.join(BPMN_PATH, 'xor.bpmn'));   
+// parse BPMN file into petri net
+const iNet = await parser.fromXML(bpmnXML);
 
-    const contractGenerator = new chorpiler
-    .generators.sol.DefaultContractGenerator(iNet[0]);
+const contractGenerator = new chorpiler
+.generators.sol.DefaultContractGenerator(iNet[0]);
 
-    // compile to smart contract
-    return contractGenerator.compile().then((gen) => {
-      fs.writeFileSync(
-        "Process.sol", 
-        gen.target, 
-        { flag: 'w+' }
-      );
-      console.log("Process.sol generated.");
-      // log encoding of participants and tasks, 
-      // can also be written to a .json file
-      console.log(TriggerEncoding.toJSON(gen.encoding));
-    })
-    .catch(err => console.error(err));
+// compile to smart contract
+return contractGenerator.compile().then((gen) => {
+  fs.writeFileSync(
+    "Process.sol", 
+    gen.target, 
+    { flag: 'w+' }
+  );
+  console.log("Process.sol generated.");
+  // log encoding of participants and tasks, 
+  // can also be written to a .json file
+  console.log(TriggerEncoding.toJSON(gen.encoding));
+})
+.catch(err => console.error(err));
 ```
 
 For usage see also the tests defined in `tests/compiler`. For usage of the resulting smart contracts also see `tests/output`.
