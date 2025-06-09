@@ -89,7 +89,7 @@ const parser = new XESFastXMLParser();
       );
     });
 
-    describe.skip('Rental Agreement Case', () => {
+    describe('Rental Agreement Case', () => {
 
       testCase(
         eventLogRA, 

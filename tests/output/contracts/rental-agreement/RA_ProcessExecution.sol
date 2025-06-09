@@ -2,7 +2,7 @@
 pragma solidity ^0.8.9;
 
 contract RA_ProcessExecution {
-  uint[2] public tokenState;
+  uint public tokenState = 1;
   address[3] public participants;
   int public bond = 4000;
   int public weeklyRent = 1000;
@@ -15,7 +15,7 @@ contract RA_ProcessExecution {
   }
 
   function enact(uint id) external {
-    uint _tokenState = tokenState[0];
+    uint _tokenState = tokenState;
 
     while(_tokenState != 0) {
       if (_tokenState & 2 == 2) {
@@ -91,7 +91,6 @@ contract RA_ProcessExecution {
         else {
           // <---  auto transition  --->
           _tokenState &= ~uint(1);
-          tokenState[1] = 1;
           _tokenState |= 130;
           continue; 
         }
@@ -102,37 +101,28 @@ contract RA_ProcessExecution {
         _tokenState |= 8;
         continue; 
       }
-      break;
-    }
-
-    tokenState[0] = _tokenState;
-  }
-
-  function SubChoreography_1sp0n7o(uint id) external {
-    uint _tokenState = tokenState[1];
-
-    while(_tokenState != 0) {
-      if (_tokenState & 1 == 1) {
+      if (_tokenState & 128 == 128) {
         // <--- ChoreographyTask_1hddg8r pay rent --->
-        if (1 == id && msg.sender == participants[0]) {
+        if (8 == id && msg.sender == participants[0]) {
         // <--- custom code for task here --->
-        _tokenState &= ~uint(1);
-        _tokenState |= 1;
+        _tokenState &= ~uint(128);
+        _tokenState |= 128;
         id = 0;
         continue; 
         }
         // <--- ChoreographyTask_07y6gqp end tenancy --->
-        if (2 == id && msg.sender == participants[0]) {
+        if (9 == id && msg.sender == participants[0]) {
         // <--- custom code for task here --->
-        _tokenState &= ~uint(1);
-        tokenState[0] = 130;
-        _tokenState |= 0;
-        break; // is end
+        _tokenState &= ~uint(128);
+        _tokenState |= 256;
+        id = 0;
+        continue; 
         }
       }
       break;
     }
 
-    tokenState[1] = _tokenState;
+    tokenState = _tokenState;
   }
+
 }

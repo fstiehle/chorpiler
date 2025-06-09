@@ -23,7 +23,6 @@ import type {
 export interface RA_ProcessExecutionInterface extends Interface {
   getFunction(
     nameOrSignature:
-      | "SubChoreography_1sp0n7o"
       | "bond"
       | "enact"
       | "participants"
@@ -32,10 +31,6 @@ export interface RA_ProcessExecutionInterface extends Interface {
       | "weeklyRent"
   ): FunctionFragment;
 
-  encodeFunctionData(
-    functionFragment: "SubChoreography_1sp0n7o",
-    values: [BigNumberish]
-  ): string;
   encodeFunctionData(functionFragment: "bond", values?: undefined): string;
   encodeFunctionData(functionFragment: "enact", values: [BigNumberish]): string;
   encodeFunctionData(
@@ -48,17 +43,13 @@ export interface RA_ProcessExecutionInterface extends Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "tokenState",
-    values: [BigNumberish]
+    values?: undefined
   ): string;
   encodeFunctionData(
     functionFragment: "weeklyRent",
     values?: undefined
   ): string;
 
-  decodeFunctionResult(
-    functionFragment: "SubChoreography_1sp0n7o",
-    data: BytesLike
-  ): Result;
   decodeFunctionResult(functionFragment: "bond", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "enact", data: BytesLike): Result;
   decodeFunctionResult(
@@ -116,12 +107,6 @@ export interface RA_ProcessExecution extends BaseContract {
     event?: TCEvent
   ): Promise<this>;
 
-  SubChoreography_1sp0n7o: TypedContractMethod<
-    [id: BigNumberish],
-    [void],
-    "nonpayable"
-  >;
-
   bond: TypedContractMethod<[], [bigint], "view">;
 
   enact: TypedContractMethod<[id: BigNumberish], [void], "nonpayable">;
@@ -134,7 +119,7 @@ export interface RA_ProcessExecution extends BaseContract {
     "nonpayable"
   >;
 
-  tokenState: TypedContractMethod<[arg0: BigNumberish], [bigint], "view">;
+  tokenState: TypedContractMethod<[], [bigint], "view">;
 
   weeklyRent: TypedContractMethod<[], [bigint], "view">;
 
@@ -142,9 +127,6 @@ export interface RA_ProcessExecution extends BaseContract {
     key: string | FunctionFragment
   ): T;
 
-  getFunction(
-    nameOrSignature: "SubChoreography_1sp0n7o"
-  ): TypedContractMethod<[id: BigNumberish], [void], "nonpayable">;
   getFunction(
     nameOrSignature: "bond"
   ): TypedContractMethod<[], [bigint], "view">;
@@ -159,7 +141,7 @@ export interface RA_ProcessExecution extends BaseContract {
   ): TypedContractMethod<[_weeklyRent: BigNumberish], [void], "nonpayable">;
   getFunction(
     nameOrSignature: "tokenState"
-  ): TypedContractMethod<[arg0: BigNumberish], [bigint], "view">;
+  ): TypedContractMethod<[], [bigint], "view">;
   getFunction(
     nameOrSignature: "weeklyRent"
   ): TypedContractMethod<[], [bigint], "view">;

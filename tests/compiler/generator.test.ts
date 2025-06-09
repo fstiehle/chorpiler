@@ -17,7 +17,7 @@ const writeFile = util.promisify(fs.writeFile);
 use(chaiAsPromised);
 
 const compileCase = async (generator: TemplateEngine, outputPath: string, caseLabel: string) => {
-  const output = await generator.compile();
+  const output = await generator.compile(true);
 
   await writeFile(
     path.join(outputPath.replace(".sol", "_encoding.json")), 

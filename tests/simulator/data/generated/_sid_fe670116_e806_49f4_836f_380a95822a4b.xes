@@ -1,0 +1,412 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<log xes.version="1.0">
+	<global scope="event">
+		<string key="concept:name" value="Task Name"/>
+		<string key="sourceRef" value="Participant ID"/>
+	</global>
+
+  <trace>
+    <event>
+      <string key="concept:name" value="Anfrage schicken"/>
+      <string key="id" value="sid-078D9F14-BB3F-415A-8BDF-729A134F7266"/>
+      <string key="sourceRef" value="sid-BACFC3C4-5F82-4B8F-A015-747A2EDD3DD1"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Rückmeldung übermitteln"/>
+      <string key="id" value="sid-F48C4505-3AB7-4844-8A36-28E3336DEA54"/>
+      <string key="sourceRef" value="sid-9BE3FF75-ED76-4B6B-8112-E27F2F88A063"/>
+    </event>
+  </trace>
+  <trace>
+    <event>
+      <string key="concept:name" value="Anfrage schicken"/>
+      <string key="id" value="sid-078D9F14-BB3F-415A-8BDF-729A134F7266"/>
+      <string key="sourceRef" value="sid-BACFC3C4-5F82-4B8F-A015-747A2EDD3DD1"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Rückmeldung übermitteln"/>
+      <string key="id" value="sid-F48C4505-3AB7-4844-8A36-28E3336DEA54"/>
+      <string key="sourceRef" value="sid-9BE3FF75-ED76-4B6B-8112-E27F2F88A063"/>
+      <boolean key="conditions" value="1"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Anfrage schicken"/>
+      <string key="id" value="sid-078D9F14-BB3F-415A-8BDF-729A134F7266"/>
+      <string key="sourceRef" value="sid-BACFC3C4-5F82-4B8F-A015-747A2EDD3DD1"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Rückmeldung übermitteln"/>
+      <string key="id" value="sid-F48C4505-3AB7-4844-8A36-28E3336DEA54"/>
+      <string key="sourceRef" value="sid-9BE3FF75-ED76-4B6B-8112-E27F2F88A063"/>
+      <boolean key="conditions" value="1"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Anfrage schicken"/>
+      <string key="id" value="sid-078D9F14-BB3F-415A-8BDF-729A134F7266"/>
+      <string key="sourceRef" value="sid-BACFC3C4-5F82-4B8F-A015-747A2EDD3DD1"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Rückmeldung übermitteln"/>
+      <string key="id" value="sid-F48C4505-3AB7-4844-8A36-28E3336DEA54"/>
+      <string key="sourceRef" value="sid-9BE3FF75-ED76-4B6B-8112-E27F2F88A063"/>
+    </event>
+  </trace>
+  <trace>
+    <event>
+      <string key="concept:name" value="Anfrage schicken"/>
+      <string key="id" value="sid-078D9F14-BB3F-415A-8BDF-729A134F7266"/>
+      <string key="sourceRef" value="sid-BACFC3C4-5F82-4B8F-A015-747A2EDD3DD1"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Rückmeldung übermitteln"/>
+      <string key="id" value="sid-F48C4505-3AB7-4844-8A36-28E3336DEA54"/>
+      <string key="sourceRef" value="sid-9BE3FF75-ED76-4B6B-8112-E27F2F88A063"/>
+      <boolean key="conditions" value="1"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Anfrage schicken"/>
+      <string key="id" value="sid-078D9F14-BB3F-415A-8BDF-729A134F7266"/>
+      <string key="sourceRef" value="sid-BACFC3C4-5F82-4B8F-A015-747A2EDD3DD1"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Rückmeldung übermitteln"/>
+      <string key="id" value="sid-F48C4505-3AB7-4844-8A36-28E3336DEA54"/>
+      <string key="sourceRef" value="sid-9BE3FF75-ED76-4B6B-8112-E27F2F88A063"/>
+      <boolean key="conditions" value="1"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Anfrage schicken"/>
+      <string key="id" value="sid-078D9F14-BB3F-415A-8BDF-729A134F7266"/>
+      <string key="sourceRef" value="sid-BACFC3C4-5F82-4B8F-A015-747A2EDD3DD1"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Rückmeldung übermitteln"/>
+      <string key="id" value="sid-F48C4505-3AB7-4844-8A36-28E3336DEA54"/>
+      <string key="sourceRef" value="sid-9BE3FF75-ED76-4B6B-8112-E27F2F88A063"/>
+      <boolean key="conditions" value="1"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Anfrage schicken"/>
+      <string key="id" value="sid-078D9F14-BB3F-415A-8BDF-729A134F7266"/>
+      <string key="sourceRef" value="sid-BACFC3C4-5F82-4B8F-A015-747A2EDD3DD1"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Rückmeldung übermitteln"/>
+      <string key="id" value="sid-F48C4505-3AB7-4844-8A36-28E3336DEA54"/>
+      <string key="sourceRef" value="sid-9BE3FF75-ED76-4B6B-8112-E27F2F88A063"/>
+    </event>
+  </trace>
+  <trace>
+    <event>
+      <string key="concept:name" value="Anfrage schicken"/>
+      <string key="id" value="sid-078D9F14-BB3F-415A-8BDF-729A134F7266"/>
+      <string key="sourceRef" value="sid-BACFC3C4-5F82-4B8F-A015-747A2EDD3DD1"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Rückmeldung übermitteln"/>
+      <string key="id" value="sid-F48C4505-3AB7-4844-8A36-28E3336DEA54"/>
+      <string key="sourceRef" value="sid-9BE3FF75-ED76-4B6B-8112-E27F2F88A063"/>
+      <boolean key="conditions" value="1"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Anfrage schicken"/>
+      <string key="id" value="sid-078D9F14-BB3F-415A-8BDF-729A134F7266"/>
+      <string key="sourceRef" value="sid-BACFC3C4-5F82-4B8F-A015-747A2EDD3DD1"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Rückmeldung übermitteln"/>
+      <string key="id" value="sid-F48C4505-3AB7-4844-8A36-28E3336DEA54"/>
+      <string key="sourceRef" value="sid-9BE3FF75-ED76-4B6B-8112-E27F2F88A063"/>
+      <boolean key="conditions" value="1"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Anfrage schicken"/>
+      <string key="id" value="sid-078D9F14-BB3F-415A-8BDF-729A134F7266"/>
+      <string key="sourceRef" value="sid-BACFC3C4-5F82-4B8F-A015-747A2EDD3DD1"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Rückmeldung übermitteln"/>
+      <string key="id" value="sid-F48C4505-3AB7-4844-8A36-28E3336DEA54"/>
+      <string key="sourceRef" value="sid-9BE3FF75-ED76-4B6B-8112-E27F2F88A063"/>
+      <boolean key="conditions" value="1"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Anfrage schicken"/>
+      <string key="id" value="sid-078D9F14-BB3F-415A-8BDF-729A134F7266"/>
+      <string key="sourceRef" value="sid-BACFC3C4-5F82-4B8F-A015-747A2EDD3DD1"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Rückmeldung übermitteln"/>
+      <string key="id" value="sid-F48C4505-3AB7-4844-8A36-28E3336DEA54"/>
+      <string key="sourceRef" value="sid-9BE3FF75-ED76-4B6B-8112-E27F2F88A063"/>
+      <boolean key="conditions" value="1"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Anfrage schicken"/>
+      <string key="id" value="sid-078D9F14-BB3F-415A-8BDF-729A134F7266"/>
+      <string key="sourceRef" value="sid-BACFC3C4-5F82-4B8F-A015-747A2EDD3DD1"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Rückmeldung übermitteln"/>
+      <string key="id" value="sid-F48C4505-3AB7-4844-8A36-28E3336DEA54"/>
+      <string key="sourceRef" value="sid-9BE3FF75-ED76-4B6B-8112-E27F2F88A063"/>
+      <boolean key="conditions" value="1"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Anfrage schicken"/>
+      <string key="id" value="sid-078D9F14-BB3F-415A-8BDF-729A134F7266"/>
+      <string key="sourceRef" value="sid-BACFC3C4-5F82-4B8F-A015-747A2EDD3DD1"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Rückmeldung übermitteln"/>
+      <string key="id" value="sid-F48C4505-3AB7-4844-8A36-28E3336DEA54"/>
+      <string key="sourceRef" value="sid-9BE3FF75-ED76-4B6B-8112-E27F2F88A063"/>
+      <boolean key="conditions" value="1"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Anfrage schicken"/>
+      <string key="id" value="sid-078D9F14-BB3F-415A-8BDF-729A134F7266"/>
+      <string key="sourceRef" value="sid-BACFC3C4-5F82-4B8F-A015-747A2EDD3DD1"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Rückmeldung übermitteln"/>
+      <string key="id" value="sid-F48C4505-3AB7-4844-8A36-28E3336DEA54"/>
+      <string key="sourceRef" value="sid-9BE3FF75-ED76-4B6B-8112-E27F2F88A063"/>
+    </event>
+  </trace>
+  <trace>
+    <event>
+      <string key="concept:name" value="Anfrage schicken"/>
+      <string key="id" value="sid-078D9F14-BB3F-415A-8BDF-729A134F7266"/>
+      <string key="sourceRef" value="sid-BACFC3C4-5F82-4B8F-A015-747A2EDD3DD1"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Rückmeldung übermitteln"/>
+      <string key="id" value="sid-F48C4505-3AB7-4844-8A36-28E3336DEA54"/>
+      <string key="sourceRef" value="sid-9BE3FF75-ED76-4B6B-8112-E27F2F88A063"/>
+      <boolean key="conditions" value="1"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Anfrage schicken"/>
+      <string key="id" value="sid-078D9F14-BB3F-415A-8BDF-729A134F7266"/>
+      <string key="sourceRef" value="sid-BACFC3C4-5F82-4B8F-A015-747A2EDD3DD1"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Rückmeldung übermitteln"/>
+      <string key="id" value="sid-F48C4505-3AB7-4844-8A36-28E3336DEA54"/>
+      <string key="sourceRef" value="sid-9BE3FF75-ED76-4B6B-8112-E27F2F88A063"/>
+      <boolean key="conditions" value="1"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Anfrage schicken"/>
+      <string key="id" value="sid-078D9F14-BB3F-415A-8BDF-729A134F7266"/>
+      <string key="sourceRef" value="sid-BACFC3C4-5F82-4B8F-A015-747A2EDD3DD1"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Rückmeldung übermitteln"/>
+      <string key="id" value="sid-F48C4505-3AB7-4844-8A36-28E3336DEA54"/>
+      <string key="sourceRef" value="sid-9BE3FF75-ED76-4B6B-8112-E27F2F88A063"/>
+      <boolean key="conditions" value="1"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Anfrage schicken"/>
+      <string key="id" value="sid-078D9F14-BB3F-415A-8BDF-729A134F7266"/>
+      <string key="sourceRef" value="sid-BACFC3C4-5F82-4B8F-A015-747A2EDD3DD1"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Rückmeldung übermitteln"/>
+      <string key="id" value="sid-F48C4505-3AB7-4844-8A36-28E3336DEA54"/>
+      <string key="sourceRef" value="sid-9BE3FF75-ED76-4B6B-8112-E27F2F88A063"/>
+      <boolean key="conditions" value="1"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Anfrage schicken"/>
+      <string key="id" value="sid-078D9F14-BB3F-415A-8BDF-729A134F7266"/>
+      <string key="sourceRef" value="sid-BACFC3C4-5F82-4B8F-A015-747A2EDD3DD1"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Rückmeldung übermitteln"/>
+      <string key="id" value="sid-F48C4505-3AB7-4844-8A36-28E3336DEA54"/>
+      <string key="sourceRef" value="sid-9BE3FF75-ED76-4B6B-8112-E27F2F88A063"/>
+      <boolean key="conditions" value="1"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Anfrage schicken"/>
+      <string key="id" value="sid-078D9F14-BB3F-415A-8BDF-729A134F7266"/>
+      <string key="sourceRef" value="sid-BACFC3C4-5F82-4B8F-A015-747A2EDD3DD1"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Rückmeldung übermitteln"/>
+      <string key="id" value="sid-F48C4505-3AB7-4844-8A36-28E3336DEA54"/>
+      <string key="sourceRef" value="sid-9BE3FF75-ED76-4B6B-8112-E27F2F88A063"/>
+      <boolean key="conditions" value="1"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Anfrage schicken"/>
+      <string key="id" value="sid-078D9F14-BB3F-415A-8BDF-729A134F7266"/>
+      <string key="sourceRef" value="sid-BACFC3C4-5F82-4B8F-A015-747A2EDD3DD1"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Rückmeldung übermitteln"/>
+      <string key="id" value="sid-F48C4505-3AB7-4844-8A36-28E3336DEA54"/>
+      <string key="sourceRef" value="sid-9BE3FF75-ED76-4B6B-8112-E27F2F88A063"/>
+      <boolean key="conditions" value="1"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Anfrage schicken"/>
+      <string key="id" value="sid-078D9F14-BB3F-415A-8BDF-729A134F7266"/>
+      <string key="sourceRef" value="sid-BACFC3C4-5F82-4B8F-A015-747A2EDD3DD1"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Rückmeldung übermitteln"/>
+      <string key="id" value="sid-F48C4505-3AB7-4844-8A36-28E3336DEA54"/>
+      <string key="sourceRef" value="sid-9BE3FF75-ED76-4B6B-8112-E27F2F88A063"/>
+    </event>
+  </trace>
+  <trace>
+    <event>
+      <string key="concept:name" value="Anfrage schicken"/>
+      <string key="id" value="sid-078D9F14-BB3F-415A-8BDF-729A134F7266"/>
+      <string key="sourceRef" value="sid-BACFC3C4-5F82-4B8F-A015-747A2EDD3DD1"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Rückmeldung übermitteln"/>
+      <string key="id" value="sid-F48C4505-3AB7-4844-8A36-28E3336DEA54"/>
+      <string key="sourceRef" value="sid-9BE3FF75-ED76-4B6B-8112-E27F2F88A063"/>
+      <boolean key="conditions" value="1"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Anfrage schicken"/>
+      <string key="id" value="sid-078D9F14-BB3F-415A-8BDF-729A134F7266"/>
+      <string key="sourceRef" value="sid-BACFC3C4-5F82-4B8F-A015-747A2EDD3DD1"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Rückmeldung übermitteln"/>
+      <string key="id" value="sid-F48C4505-3AB7-4844-8A36-28E3336DEA54"/>
+      <string key="sourceRef" value="sid-9BE3FF75-ED76-4B6B-8112-E27F2F88A063"/>
+    </event>
+  </trace>
+  <trace>
+    <event>
+      <string key="concept:name" value="Anfrage schicken"/>
+      <string key="id" value="sid-078D9F14-BB3F-415A-8BDF-729A134F7266"/>
+      <string key="sourceRef" value="sid-BACFC3C4-5F82-4B8F-A015-747A2EDD3DD1"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Rückmeldung übermitteln"/>
+      <string key="id" value="sid-F48C4505-3AB7-4844-8A36-28E3336DEA54"/>
+      <string key="sourceRef" value="sid-9BE3FF75-ED76-4B6B-8112-E27F2F88A063"/>
+      <boolean key="conditions" value="1"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Anfrage schicken"/>
+      <string key="id" value="sid-078D9F14-BB3F-415A-8BDF-729A134F7266"/>
+      <string key="sourceRef" value="sid-BACFC3C4-5F82-4B8F-A015-747A2EDD3DD1"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Rückmeldung übermitteln"/>
+      <string key="id" value="sid-F48C4505-3AB7-4844-8A36-28E3336DEA54"/>
+      <string key="sourceRef" value="sid-9BE3FF75-ED76-4B6B-8112-E27F2F88A063"/>
+      <boolean key="conditions" value="1"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Anfrage schicken"/>
+      <string key="id" value="sid-078D9F14-BB3F-415A-8BDF-729A134F7266"/>
+      <string key="sourceRef" value="sid-BACFC3C4-5F82-4B8F-A015-747A2EDD3DD1"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Rückmeldung übermitteln"/>
+      <string key="id" value="sid-F48C4505-3AB7-4844-8A36-28E3336DEA54"/>
+      <string key="sourceRef" value="sid-9BE3FF75-ED76-4B6B-8112-E27F2F88A063"/>
+      <boolean key="conditions" value="1"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Anfrage schicken"/>
+      <string key="id" value="sid-078D9F14-BB3F-415A-8BDF-729A134F7266"/>
+      <string key="sourceRef" value="sid-BACFC3C4-5F82-4B8F-A015-747A2EDD3DD1"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Rückmeldung übermitteln"/>
+      <string key="id" value="sid-F48C4505-3AB7-4844-8A36-28E3336DEA54"/>
+      <string key="sourceRef" value="sid-9BE3FF75-ED76-4B6B-8112-E27F2F88A063"/>
+      <boolean key="conditions" value="1"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Anfrage schicken"/>
+      <string key="id" value="sid-078D9F14-BB3F-415A-8BDF-729A134F7266"/>
+      <string key="sourceRef" value="sid-BACFC3C4-5F82-4B8F-A015-747A2EDD3DD1"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Rückmeldung übermitteln"/>
+      <string key="id" value="sid-F48C4505-3AB7-4844-8A36-28E3336DEA54"/>
+      <string key="sourceRef" value="sid-9BE3FF75-ED76-4B6B-8112-E27F2F88A063"/>
+    </event>
+  </trace>
+  <trace>
+    <event>
+      <string key="concept:name" value="Anfrage schicken"/>
+      <string key="id" value="sid-078D9F14-BB3F-415A-8BDF-729A134F7266"/>
+      <string key="sourceRef" value="sid-BACFC3C4-5F82-4B8F-A015-747A2EDD3DD1"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Rückmeldung übermitteln"/>
+      <string key="id" value="sid-F48C4505-3AB7-4844-8A36-28E3336DEA54"/>
+      <string key="sourceRef" value="sid-9BE3FF75-ED76-4B6B-8112-E27F2F88A063"/>
+      <boolean key="conditions" value="1"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Anfrage schicken"/>
+      <string key="id" value="sid-078D9F14-BB3F-415A-8BDF-729A134F7266"/>
+      <string key="sourceRef" value="sid-BACFC3C4-5F82-4B8F-A015-747A2EDD3DD1"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Rückmeldung übermitteln"/>
+      <string key="id" value="sid-F48C4505-3AB7-4844-8A36-28E3336DEA54"/>
+      <string key="sourceRef" value="sid-9BE3FF75-ED76-4B6B-8112-E27F2F88A063"/>
+      <boolean key="conditions" value="1"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Anfrage schicken"/>
+      <string key="id" value="sid-078D9F14-BB3F-415A-8BDF-729A134F7266"/>
+      <string key="sourceRef" value="sid-BACFC3C4-5F82-4B8F-A015-747A2EDD3DD1"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Rückmeldung übermitteln"/>
+      <string key="id" value="sid-F48C4505-3AB7-4844-8A36-28E3336DEA54"/>
+      <string key="sourceRef" value="sid-9BE3FF75-ED76-4B6B-8112-E27F2F88A063"/>
+      <boolean key="conditions" value="1"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Anfrage schicken"/>
+      <string key="id" value="sid-078D9F14-BB3F-415A-8BDF-729A134F7266"/>
+      <string key="sourceRef" value="sid-BACFC3C4-5F82-4B8F-A015-747A2EDD3DD1"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Rückmeldung übermitteln"/>
+      <string key="id" value="sid-F48C4505-3AB7-4844-8A36-28E3336DEA54"/>
+      <string key="sourceRef" value="sid-9BE3FF75-ED76-4B6B-8112-E27F2F88A063"/>
+      <boolean key="conditions" value="1"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Anfrage schicken"/>
+      <string key="id" value="sid-078D9F14-BB3F-415A-8BDF-729A134F7266"/>
+      <string key="sourceRef" value="sid-BACFC3C4-5F82-4B8F-A015-747A2EDD3DD1"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Rückmeldung übermitteln"/>
+      <string key="id" value="sid-F48C4505-3AB7-4844-8A36-28E3336DEA54"/>
+      <string key="sourceRef" value="sid-9BE3FF75-ED76-4B6B-8112-E27F2F88A063"/>
+      <boolean key="conditions" value="1"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Anfrage schicken"/>
+      <string key="id" value="sid-078D9F14-BB3F-415A-8BDF-729A134F7266"/>
+      <string key="sourceRef" value="sid-BACFC3C4-5F82-4B8F-A015-747A2EDD3DD1"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Rückmeldung übermitteln"/>
+      <string key="id" value="sid-F48C4505-3AB7-4844-8A36-28E3336DEA54"/>
+      <string key="sourceRef" value="sid-9BE3FF75-ED76-4B6B-8112-E27F2F88A063"/>
+    </event>
+  </trace>
+</log>
