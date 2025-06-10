@@ -36,7 +36,7 @@ describe('Simulate...', () => {
 
       // Generate a non-conforming log by shuffling events in each trace
       const nonConformingLog = EventLog.genNonConformingLog(eventLog, triggerEncoding, 30);
-
+      console.log(JSON.stringify(nonConformingLog, null, 2));
     }
   });
 

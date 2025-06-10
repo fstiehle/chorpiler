@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<log xes.version="1.0">
+	<global scope="event">
+		<string key="concept:name" value="Task Name"/>
+		<string key="sourceRef" value="Participant ID"/>
+	</global>
+
+  <trace>
+    <event>
+      <string key="concept:name" value="task1"/>
+      <string key="id" value="sid-BD7B4002-9065-4315-AA74-82D3A6E7F757"/>
+      <string key="sourceRef" value="sid-CA137D2D-7844-4734-87D4-EAF4E16F95DD"/>
+    </event>
+    <event>
+      <string key="concept:name" value="task2"/>
+      <string key="id" value="sid-BD08DB98-E701-4D6C-9CAA-C146871F6BD5"/>
+      <string key="sourceRef" value="sid-4CA24E93-70CC-475D-99E9-879F787AA2E5"/>
+    </event>
+    <event>
+      <string key="concept:name" value="task4"/>
+      <string key="id" value="sid-34B7968B-AE9A-47F7-BC39-04BD8B6B1548"/>
+      <string key="sourceRef" value="sid-01A6D1B4-C5D2-40BC-93C0-33C5591D1D42"/>
+    </event>
+  </trace>
+  <trace>
+    <event>
+      <string key="concept:name" value="task2"/>
+      <string key="id" value="sid-BD08DB98-E701-4D6C-9CAA-C146871F6BD5"/>
+      <string key="sourceRef" value="sid-4CA24E93-70CC-475D-99E9-879F787AA2E5"/>
+    </event>
+    <event>
+      <string key="concept:name" value="task1"/>
+      <string key="id" value="sid-BD7B4002-9065-4315-AA74-82D3A6E7F757"/>
+      <string key="sourceRef" value="sid-CA137D2D-7844-4734-87D4-EAF4E16F95DD"/>
+    </event>
+    <event>
+      <string key="concept:name" value="task4"/>
+      <string key="id" value="sid-34B7968B-AE9A-47F7-BC39-04BD8B6B1548"/>
+      <string key="sourceRef" value="sid-01A6D1B4-C5D2-40BC-93C0-33C5591D1D42"/>
+    </event>
+  </trace>
+  <trace>
+    <event>
+      <string key="concept:name" value="task2"/>
+      <string key="id" value="sid-BD08DB98-E701-4D6C-9CAA-C146871F6BD5"/>
+      <string key="sourceRef" value="sid-4CA24E93-70CC-475D-99E9-879F787AA2E5"/>
+    </event>
+    <event>
+      <string key="concept:name" value="task1"/>
+      <string key="id" value="sid-BD7B4002-9065-4315-AA74-82D3A6E7F757"/>
+      <string key="sourceRef" value="sid-CA137D2D-7844-4734-87D4-EAF4E16F95DD"/>
+    </event>
+    <event>
+      <string key="concept:name" value="task3"/>
+      <string key="id" value="sid-A83DECE7-E09F-4824-A820-4C2272E6E1B4"/>
+      <string key="sourceRef" value="sid-5F5ED979-47A1-4A2A-BF8D-8C3D3E16018F"/>
+    </event>
+  </trace>
+  <trace>
+    <event>
+      <string key="concept:name" value="task1"/>
+      <string key="id" value="sid-BD7B4002-9065-4315-AA74-82D3A6E7F757"/>
+      <string key="sourceRef" value="sid-CA137D2D-7844-4734-87D4-EAF4E16F95DD"/>
+    </event>
+    <event>
+      <string key="concept:name" value="task2"/>
+      <string key="id" value="sid-BD08DB98-E701-4D6C-9CAA-C146871F6BD5"/>
+      <string key="sourceRef" value="sid-4CA24E93-70CC-475D-99E9-879F787AA2E5"/>
+    </event>
+    <event>
+      <string key="concept:name" value="task3"/>
+      <string key="id" value="sid-A83DECE7-E09F-4824-A820-4C2272E6E1B4"/>
+      <string key="sourceRef" value="sid-5F5ED979-47A1-4A2A-BF8D-8C3D3E16018F"/>
+    </event>
+  </trace>
+</log>

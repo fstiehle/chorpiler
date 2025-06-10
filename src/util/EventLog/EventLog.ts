@@ -51,11 +51,16 @@ export class EventLog implements IterableIterator<Trace>{
     const randomEventID = () => {
       return [...process.tasks.keys()][seedRandMax(process.tasks.size)];
     }
-    const randomEventName = () => {
-      // Return a random event name from the log's events
-      const allEventNames = log.traces.flatMap(trace => trace.events.map(event => event.name));
-      return allEventNames[seedRandMax(allEventNames.length)];
-    }
+    const getEventNameForID = (eventID: string) => {
+      for (const trace of log.traces) {
+      for (const event of trace.events) {
+        if (event.id === eventID) {
+        return event.name;
+        }
+      }
+      }
+      return eventID; // fallback if not found
+    };
 
     const seedRand = seed(_seed);
     const seedRandMax = (max: number) => Math.floor(seedRand() * max);
@@ -77,10 +82,11 @@ export class EventLog implements IterableIterator<Trace>{
         switch (randOperation) {
           case 0: { 
             // add an event
+            const id = randomEventID();
             genEvents.splice(
               seedRandMax(genEvents.length), 
               0, 
-              new Event(randomEventName(), randomEventID(), randomParticipantName(), randomParticipantName())
+              new Event(getEventNameForID(id), id, randomParticipantName(), randomParticipantName())
             );
             break;
           }
