@@ -1,0 +1,83 @@
+<ns0:definitions xmlns:ns0="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:ns2="http://www.signavio.com" xmlns:ns3="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:ns4="http://www.omg.org/spec/DD/20100524/DI" xmlns:ns5="http://www.omg.org/spec/DD/20100524/DC" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" exporter="Signavio Process Editor, http://www.signavio.com" exporterVersion="19.1.2" expressionLanguage="http://www.w3.org/TR/XPath" id="sid-ba5eb474-d509-4dfc-a09e-a661f678f2b3" targetNamespace="http://www.signavio.com" typeLanguage="http://www.w3.org/2001/XMLSchema" xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL http://www.omg.org/spec/BPMN/2.0/20100501/BPMN20.xsd">
+  <ns0:collaboration id="sid-8d443809-2b9a-4ee4-b54f-bf69a4017ad4">
+    <ns0:association associationDirection="None" id="sid-37E2AAAD-1D69-4A94-88F2-D752B6869514" sourceRef="sid-1981991E-29DD-441D-8448-1FC4425556A3" targetRef="sid-CD0EA145-545E-4C05-8E04-5B7C5F029077"></ns0:association>
+  </ns0:collaboration>
+  <ns0:message id="sid-b02a61e1-72bb-4d31-a4bc-17c5824eec5c" name="Prośba o skasowaniu&amp;#10;wizyty"></ns0:message>
+  <ns0:message id="sid-835ef5a4-53a4-4fd9-aeb8-1bc625b1fc4f" name="Powiadomienie o&amp;#10;skasowaniu terminu"></ns0:message>
+  <ns0:message id="sid-96f678cc-90ea-4919-9786-68ae2b8bedf1" name="Prośba o skasowaniu&amp;#10;wizyty"></ns0:message>
+  <ns0:message id="sid-6b4e38dd-25dc-42cc-843e-0e6606fe68f2" name="Powiadomienie o&amp;#10;skasowaniu terminu"></ns0:message>
+  <ns0:choreography id="sid_328a2509_2c20_498a_96e7_5cc2a7fa12c0" isClosed="false">
+    <ns0:participant id="sid-873cdd24-59ac-421d-9806-31740d0974ce" name="Pacjent"></ns0:participant>
+    <ns0:participant id="sid-84c9a4a5-c9d6-4ac7-a197-b1f3f1bf78d9" name="Szpital"></ns0:participant>
+    <ns0:participant id="sid-b56c83b4-9af7-4c84-a3e9-171f976994df" name="Szpital"></ns0:participant>
+    <ns0:participant id="sid-133391b3-fb33-4ba9-8e0a-ea397eb7fe2c" name="Lekarz"></ns0:participant>
+    <ns0:participant id="sid-EFEBA1C0-1903-49E2-8FA3-6EA5A92E89E8" name="Szpital"></ns0:participant>
+    <ns0:participant id="sid-3B8A1FE7-589F-4569-832C-CC3F7E604339" name="Lekarz"></ns0:participant>
+    <ns0:participant id="sid-DBC71017-8C7E-415C-B876-F19C3A362AE1" name="Pacjent"></ns0:participant>
+    <ns0:participant id="sid-CD0EA145-545E-4C05-8E04-5B7C5F029077" name="Szpital"></ns0:participant>
+    <ns0:messageFlow id="sid-43af5c4d-1ade-476d-9bbf-3d9ef898c46a" messageRef="sid-b02a61e1-72bb-4d31-a4bc-17c5824eec5c" sourceRef="sid-873cdd24-59ac-421d-9806-31740d0974ce" targetRef="sid-84c9a4a5-c9d6-4ac7-a197-b1f3f1bf78d9"></ns0:messageFlow>
+    <ns0:messageFlow id="sid-a97d9ec1-890a-4543-a234-cc0823693567" messageRef="sid-835ef5a4-53a4-4fd9-aeb8-1bc625b1fc4f" sourceRef="sid-b56c83b4-9af7-4c84-a3e9-171f976994df" targetRef="sid-133391b3-fb33-4ba9-8e0a-ea397eb7fe2c"></ns0:messageFlow>
+    <ns0:messageFlow id="sid-2c9b3ed8-8a5a-440a-bc6d-9facc285e314" messageRef="sid-96f678cc-90ea-4919-9786-68ae2b8bedf1" sourceRef="sid-3B8A1FE7-589F-4569-832C-CC3F7E604339" targetRef="sid-EFEBA1C0-1903-49E2-8FA3-6EA5A92E89E8"></ns0:messageFlow>
+    <ns0:messageFlow id="sid-162a3ec9-bb1f-4758-ab5b-d1c50f46fa5a" messageRef="sid-6b4e38dd-25dc-42cc-843e-0e6606fe68f2" sourceRef="sid-CD0EA145-545E-4C05-8E04-5B7C5F029077" targetRef="sid-DBC71017-8C7E-415C-B876-F19C3A362AE1"></ns0:messageFlow>
+    <ns0:choreographyTask id="sid-4DB685DD-6383-42A3-8D06-0AB4D69F921C" initiatingParticipantRef="sid-873cdd24-59ac-421d-9806-31740d0974ce" loopType="None" name="Skasowanie wizyty">
+      <ns0:incoming>sid-AE7FD9F2-089E-4675-B6BD-B4E543902680</ns0:incoming>
+      <ns0:outgoing>sid-C3D9CDB8-C5B2-4C3D-88DE-7C3D4974EDE9</ns0:outgoing>
+      <ns0:participantRef>sid-873cdd24-59ac-421d-9806-31740d0974ce</ns0:participantRef>
+      <ns0:participantRef>sid-84c9a4a5-c9d6-4ac7-a197-b1f3f1bf78d9</ns0:participantRef>
+      <ns0:messageFlowRef>sid-43af5c4d-1ade-476d-9bbf-3d9ef898c46a</ns0:messageFlowRef>
+    </ns0:choreographyTask>
+    <ns0:choreographyTask id="sid-CD8932F0-FA63-4338-B81E-2E2B4D6E149F" initiatingParticipantRef="sid-b56c83b4-9af7-4c84-a3e9-171f976994df" loopType="None" name="Dokonanie skasowania wizyty">
+      <ns0:incoming>sid-599161B4-CDC2-4AE4-BF24-45B7F6E1847B</ns0:incoming>
+      <ns0:outgoing>sid-3A0B8A31-E3E0-4920-98E5-1B701BB442F5</ns0:outgoing>
+      <ns0:participantRef>sid-b56c83b4-9af7-4c84-a3e9-171f976994df</ns0:participantRef>
+      <ns0:participantRef>sid-133391b3-fb33-4ba9-8e0a-ea397eb7fe2c</ns0:participantRef>
+      <ns0:messageFlowRef>sid-a97d9ec1-890a-4543-a234-cc0823693567</ns0:messageFlowRef>
+    </ns0:choreographyTask>
+    <ns0:choreographyTask id="sid-9A69B876-7737-4E82-9EAF-4023E127749C" initiatingParticipantRef="sid-3B8A1FE7-589F-4569-832C-CC3F7E604339" loopType="None" name="Skasowanie wizyty">
+      <ns0:incoming>sid-7ED6FD29-A918-4BEE-984F-7D61BC91A277</ns0:incoming>
+      <ns0:outgoing>sid-B28A64DD-E529-42CC-8977-F03E32A92272</ns0:outgoing>
+      <ns0:participantRef>sid-EFEBA1C0-1903-49E2-8FA3-6EA5A92E89E8</ns0:participantRef>
+      <ns0:participantRef>sid-3B8A1FE7-589F-4569-832C-CC3F7E604339</ns0:participantRef>
+      <ns0:messageFlowRef>sid-2c9b3ed8-8a5a-440a-bc6d-9facc285e314</ns0:messageFlowRef>
+    </ns0:choreographyTask>
+    <ns0:choreographyTask id="sid-E40BD334-AFF4-43A2-9144-B49F16663E03" initiatingParticipantRef="sid-CD0EA145-545E-4C05-8E04-5B7C5F029077" loopType="None" name="Dokonanie skasowania wizyty">
+      <ns0:incoming>sid-61499B70-AE27-420D-BAD6-3364F25D3DAB</ns0:incoming>
+      <ns0:outgoing>sid-9F4A7D1C-A10A-41DD-A9B1-001DA66F4F8C</ns0:outgoing>
+      <ns0:participantRef>sid-DBC71017-8C7E-415C-B876-F19C3A362AE1</ns0:participantRef>
+      <ns0:participantRef>sid-CD0EA145-545E-4C05-8E04-5B7C5F029077</ns0:participantRef>
+      <ns0:messageFlowRef>sid-162a3ec9-bb1f-4758-ab5b-d1c50f46fa5a</ns0:messageFlowRef>
+    </ns0:choreographyTask>
+    <ns0:exclusiveGateway gatewayDirection="Converging" id="sid-5ECAAC87-4877-474A-A106-1ABD47BAA1EA" name="" default="sid-38BF3CF6-2305-4E4A-8E21-F20878ECDB1B">
+      <ns0:incoming>sid-B28A64DD-E529-42CC-8977-F03E32A92272</ns0:incoming>
+      <ns0:incoming>sid-C3D9CDB8-C5B2-4C3D-88DE-7C3D4974EDE9</ns0:incoming>
+      <ns0:outgoing>sid-38BF3CF6-2305-4E4A-8E21-F20878ECDB1B</ns0:outgoing>
+    </ns0:exclusiveGateway>
+    <ns0:parallelGateway gatewayDirection="Diverging" id="sid-26AD080D-D2BA-4FFF-A84A-5ED32418E470" name="">
+      <ns0:incoming>sid-38BF3CF6-2305-4E4A-8E21-F20878ECDB1B</ns0:incoming>
+      <ns0:outgoing>sid-599161B4-CDC2-4AE4-BF24-45B7F6E1847B</ns0:outgoing>
+      <ns0:outgoing>sid-61499B70-AE27-420D-BAD6-3364F25D3DAB</ns0:outgoing>
+    </ns0:parallelGateway>
+    <ns0:endEvent id="sid-8FFD75E0-7F1D-4AB7-90B8-163F66D0AF51" name="Wizyta usunięta">
+      <ns0:incoming>sid-3A0B8A31-E3E0-4920-98E5-1B701BB442F5</ns0:incoming>
+      <ns0:incoming>sid-9F4A7D1C-A10A-41DD-A9B1-001DA66F4F8C</ns0:incoming>
+    </ns0:endEvent>
+    <ns0:eventBasedGateway eventGatewayType="Exclusive" gatewayDirection="Diverging" id="sid-AA462EEC-E354-4613-8331-6A7316716EDF" instantiate="false" name="">
+      <ns0:incoming>sid-0D4557C1-8E82-4E5A-893E-C176B253617E</ns0:incoming>
+      <ns0:outgoing>sid-7ED6FD29-A918-4BEE-984F-7D61BC91A277</ns0:outgoing>
+      <ns0:outgoing>sid-AE7FD9F2-089E-4675-B6BD-B4E543902680</ns0:outgoing>
+    </ns0:eventBasedGateway>
+    <ns0:startEvent id="sid-FC15200D-EFC8-49F5-A378-85EF47E5DD36" name="Usunięcie&amp;#10;wizyty">
+      <ns0:outgoing>sid-0D4557C1-8E82-4E5A-893E-C176B253617E</ns0:outgoing>
+    </ns0:startEvent>
+    <ns0:sequenceFlow id="sid-B28A64DD-E529-42CC-8977-F03E32A92272" name="" sourceRef="sid-9A69B876-7737-4E82-9EAF-4023E127749C" targetRef="sid-5ECAAC87-4877-474A-A106-1ABD47BAA1EA"></ns0:sequenceFlow>
+    <ns0:sequenceFlow id="sid-C3D9CDB8-C5B2-4C3D-88DE-7C3D4974EDE9" name="" sourceRef="sid-4DB685DD-6383-42A3-8D06-0AB4D69F921C" targetRef="sid-5ECAAC87-4877-474A-A106-1ABD47BAA1EA"></ns0:sequenceFlow>
+    <ns0:sequenceFlow id="sid-38BF3CF6-2305-4E4A-8E21-F20878ECDB1B" name="" sourceRef="sid-5ECAAC87-4877-474A-A106-1ABD47BAA1EA" targetRef="sid-26AD080D-D2BA-4FFF-A84A-5ED32418E470"></ns0:sequenceFlow>
+    <ns0:sequenceFlow id="sid-599161B4-CDC2-4AE4-BF24-45B7F6E1847B" name="" sourceRef="sid-26AD080D-D2BA-4FFF-A84A-5ED32418E470" targetRef="sid-CD8932F0-FA63-4338-B81E-2E2B4D6E149F"></ns0:sequenceFlow>
+    <ns0:sequenceFlow id="sid-61499B70-AE27-420D-BAD6-3364F25D3DAB" name="" sourceRef="sid-26AD080D-D2BA-4FFF-A84A-5ED32418E470" targetRef="sid-E40BD334-AFF4-43A2-9144-B49F16663E03"></ns0:sequenceFlow>
+    <ns0:sequenceFlow id="sid-3A0B8A31-E3E0-4920-98E5-1B701BB442F5" name="" sourceRef="sid-CD8932F0-FA63-4338-B81E-2E2B4D6E149F" targetRef="sid-8FFD75E0-7F1D-4AB7-90B8-163F66D0AF51"></ns0:sequenceFlow>
+    <ns0:sequenceFlow id="sid-9F4A7D1C-A10A-41DD-A9B1-001DA66F4F8C" name="" sourceRef="sid-E40BD334-AFF4-43A2-9144-B49F16663E03" targetRef="sid-8FFD75E0-7F1D-4AB7-90B8-163F66D0AF51"></ns0:sequenceFlow>
+    <ns0:sequenceFlow id="sid-7ED6FD29-A918-4BEE-984F-7D61BC91A277" name="" sourceRef="sid-AA462EEC-E354-4613-8331-6A7316716EDF" targetRef="sid-9A69B876-7737-4E82-9EAF-4023E127749C"></ns0:sequenceFlow>
+    <ns0:sequenceFlow id="sid-AE7FD9F2-089E-4675-B6BD-B4E543902680" name="" sourceRef="sid-AA462EEC-E354-4613-8331-6A7316716EDF" targetRef="sid-4DB685DD-6383-42A3-8D06-0AB4D69F921C"></ns0:sequenceFlow>
+    <ns0:sequenceFlow id="sid-0D4557C1-8E82-4E5A-893E-C176B253617E" name="" sourceRef="sid-FC15200D-EFC8-49F5-A378-85EF47E5DD36" targetRef="sid-AA462EEC-E354-4613-8331-6A7316716EDF"></ns0:sequenceFlow>
+  </ns0:choreography>
+</ns0:definitions>

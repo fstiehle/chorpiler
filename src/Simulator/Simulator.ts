@@ -14,6 +14,8 @@ import { CaseVariable } from "../Generator/Encoding/Encoding";
 import SolDefaultContractGenerator from "../Generator/target/Sol/DefaultGenerator";
 import { GeneratorConstructor } from "../Generator/Generator";
 
+const LOGGING_ENABLED = true; // Toggleable logging
+
 type options = { 
   unfoldSubNets?: boolean, 
   loopProtection?: boolean, 
@@ -73,6 +75,7 @@ export class Simulation implements ISimulation {
   public visited = new Array<string[]>();
   public conditions = new Map<string, number>(); 
   public contract: null | { target: string, encoding: TriggerEncoding } = null;
+  public loggingEnabled = false; // Toggleable logging
 
   constructor(
     public options: options = { 
@@ -176,19 +179,23 @@ export class Simulation implements ISimulation {
     const toExecute: Transition[] = [...contractGenerator.iNet.elements.values()]
       .filter((t): t is Transition => t instanceof Transition);
     const maxLogEntries = 100; // Threshold for maximum log entries
+    const minLogEntries = 0; // Try at least this many 
     const log = new EventLog([]); // Initialize the log variable
     let currentTrace = new Trace([]);
 
-    //console.log("To Execute", toExecute.map((t) => t.id))
+    // Logging helper
+    const logIfEnabled = (...args: any[]) => {
+      if (LOGGING_ENABLED) console.log(...args);
+    };
 
-    //console.log("Starting replay...");
-    //console.log(`Initial place: ${initial.id}, End place: ${end.id}`);
-    //console.log("Initial candidates:", candidates.map((t) => t.id));
+    logIfEnabled("To Execute", toExecute.map((t) => t.id));
+    logIfEnabled("Starting replay...");
+    logIfEnabled(`Initial place: ${initial.id}, End place: ${end.id}`);
+    logIfEnabled("Initial candidates:", candidates.map((t) => t.id));
 
     while (log.traces.length < maxLogEntries) {
-      // Stop if all transitions in toExecute are executed
-      if (toExecute.every((t) => executed.includes(t))) {
-        //console.log("All transitions executed. Stopping replay.");
+      if (minLogEntries <= log.traces.length && toExecute.every((t) => executed.includes(t))) {
+        logIfEnabled("All transitions executed. Stopping replay.");
         break;
       }
 
@@ -207,7 +214,7 @@ export class Simulation implements ISimulation {
 
       // Pick a random candidate
       const transitionCandidate = availableCandidates[Math.floor(Math.random() * availableCandidates.length)];
-      // console.log("Selected transition candidate:", transitionCandidate.id);
+      logIfEnabled("Selected transition candidate:", transitionCandidate.id);
 
       // Process the transition
       processTransition(transitionCandidate, currentTrace);
@@ -226,23 +233,22 @@ export class Simulation implements ISimulation {
       candidates.splice(candidates.indexOf(transitionCandidate), 1); // Remove from candidates
       executed.push(transitionCandidate); // Add to executed
 
-      //console.log("Enabled places after execution:", enabled.map((p) => p.id));
-      //console.log("Executed transitions:", executed.map((t) => t.id));
+      logIfEnabled("Enabled places after execution:", enabled.map((p) => p.id));
+      logIfEnabled("Executed transitions:", executed.map((t) => t.id));
 
-      // Check if the end place is reached
       if (transitionCandidate.target.includes(end)) {
-        //console.log("End place reached. Flushing trace to log.");
-        log.traces.push(currentTrace); // Add the trace to the log
-        //console.log("Trace added to log:", currentTrace.events.map((e) => e.name));
+        logIfEnabled("End place reached. Flushing trace to log.");
+        log.traces.push(currentTrace);
+        logIfEnabled("Trace added to log:", currentTrace.events.map((e) => e.name));
 
         // Reset state for the next trace
         enabled.length = 0;
-        enabled.push(initial); // Start again with the initial place
+        enabled.push(initial);
         candidates.length = 0;
-        candidates.push(...initial.target); // Start again with initial candidates
+        candidates.push(...initial.target);
         executed.length = 0;
         currentTrace = new Trace([]);
-        //console.log("State reset for the next trace.");
+        logIfEnabled("State reset for the next trace.");
         continue;
       }
 
@@ -253,20 +259,18 @@ export class Simulation implements ISimulation {
         });
       });
 
-      //console.log("Updated candidates:", candidates.map((t) => t.id));
+      logIfEnabled("Updated candidates:", candidates.map((t) => t.id));
     }
-
-    
 
     // Remove duplicate traces from the log
     log.traces = log.traces.filter((trace, index, self) =>
       index === self.findIndex((t) =>
-        t.events.map((e) => e.name).join(",") === trace.events.map((e) => e.name).join(",")
+        t.events.map((e) => e.id).join(",") === trace.events.map((e) => e.id).join(",")
       )
     );
 
     // Output the log
-    //console.log("Generated log:", log.traces.map((trace) => trace.events.map((e) => e.name)));
+    logIfEnabled("Generated log:", log.traces.map((trace) => trace.events.map((e) => e.name)));
     this.traces = log.traces;
   }
 
