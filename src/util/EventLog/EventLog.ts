@@ -143,10 +143,11 @@ export class EventLog implements IterableIterator<Trace>{
       }
 
       const isConforming = log.traces.some(t =>
-        t.events.length === genEvents.length &&
-        t.events.every((e, idx) =>
-          e.id === genEvents[idx].id &&
-          e.source === genEvents[idx].source
+        // Only compare non-"Instance Data Change" events
+        t.events.filter(e => e.name !== "Instance Data Change").length === genEvents.filter(e => e.name !== "Instance Data Change").length &&
+        t.events.filter(e => e.name !== "Instance Data Change").every((e, idx) =>
+          e.id === genEvents.filter(ev => ev.name !== "Instance Data Change")[idx].id &&
+          e.source === genEvents.filter(ev => ev.name !== "Instance Data Change")[idx].source
         )
       );
       if (isConforming) {
