@@ -128,7 +128,14 @@ export class EventLog implements IterableIterator<Trace>{
         }
       }
 
-      if (log.traces.some(t => JSON.stringify(t.events) === JSON.stringify(genEvents))) {
+      const isConforming = log.traces.some(t =>
+        t.events.length === genEvents.length &&
+        t.events.every((e, idx) =>
+          e.id === genEvents[idx].id &&
+          e.source === genEvents[idx].source
+        )
+      );
+      if (isConforming) {
         conformingNr++;
       } else {
         generatedLog.traces.push(new Trace(genEvents));

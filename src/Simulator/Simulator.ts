@@ -202,7 +202,6 @@ export class Simulation implements ISimulation {
     const toExecute: Transition[] = [...contractGenerator.iNet.elements.values()]
       .filter((t): t is Transition => t instanceof Transition);
     const maxLogEntries = 100; // Threshold for maximum log entries
-    const minLogEntries = 0; // Try at least this many 
     const log = new EventLog([]); // Initialize the log variable
     let currentTrace = new Trace([]);
 
