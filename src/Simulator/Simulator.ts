@@ -14,7 +14,7 @@ import { CaseVariable } from "../Generator/Encoding/Encoding";
 import SolDefaultContractGenerator from "../Generator/target/Sol/DefaultGenerator";
 import { GeneratorConstructor } from "../Generator/Generator";
 
-const LOGGING_ENABLED = true; // Toggleable logging
+const LOGGING_ENABLED = false; // Toggleable logging
 
 type options = { 
   unfoldSubNets?: boolean, 

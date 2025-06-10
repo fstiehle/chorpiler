@@ -16,12 +16,51 @@
       <string key="id" value="sid-E40BD334-AFF4-43A2-9144-B49F16663E03"/>
       <string key="sourceRef" value="sid-CD0EA145-545E-4C05-8E04-5B7C5F029077"/>
     </event>
+    <event>
+      <string key="concept:name" value="Dokonanie skasowania wizyty"/>
+      <string key="id" value="sid-CD8932F0-FA63-4338-B81E-2E2B4D6E149F"/>
+      <string key="sourceRef" value="sid-b56c83b4-9af7-4c84-a3e9-171f976994df"/>
+    </event>
   </trace>
   <trace>
     <event>
       <string key="concept:name" value="Skasowanie wizyty"/>
       <string key="id" value="sid-9A69B876-7737-4E82-9EAF-4023E127749C"/>
       <string key="sourceRef" value="sid-3B8A1FE7-589F-4569-832C-CC3F7E604339"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Dokonanie skasowania wizyty"/>
+      <string key="id" value="sid-CD8932F0-FA63-4338-B81E-2E2B4D6E149F"/>
+      <string key="sourceRef" value="sid-b56c83b4-9af7-4c84-a3e9-171f976994df"/>
+    </event>
+  </trace>
+  <trace>
+    <event>
+      <string key="concept:name" value="Skasowanie wizyty"/>
+      <string key="id" value="sid-9A69B876-7737-4E82-9EAF-4023E127749C"/>
+      <string key="sourceRef" value="sid-3B8A1FE7-589F-4569-832C-CC3F7E604339"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Dokonanie skasowania wizyty"/>
+      <string key="id" value="sid-E40BD334-AFF4-43A2-9144-B49F16663E03"/>
+      <string key="sourceRef" value="sid-CD0EA145-545E-4C05-8E04-5B7C5F029077"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Dokonanie skasowania wizyty"/>
+      <string key="id" value="sid-CD8932F0-FA63-4338-B81E-2E2B4D6E149F"/>
+      <string key="sourceRef" value="sid-b56c83b4-9af7-4c84-a3e9-171f976994df"/>
+    </event>
+  </trace>
+  <trace>
+    <event>
+      <string key="concept:name" value="Skasowanie wizyty"/>
+      <string key="id" value="sid-9A69B876-7737-4E82-9EAF-4023E127749C"/>
+      <string key="sourceRef" value="sid-3B8A1FE7-589F-4569-832C-CC3F7E604339"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Dokonanie skasowania wizyty"/>
+      <string key="id" value="sid-CD8932F0-FA63-4338-B81E-2E2B4D6E149F"/>
+      <string key="sourceRef" value="sid-b56c83b4-9af7-4c84-a3e9-171f976994df"/>
     </event>
     <event>
       <string key="concept:name" value="Dokonanie skasowania wizyty"/>
@@ -54,11 +93,6 @@
     </event>
     <event>
       <string key="concept:name" value="Dokonanie skasowania wizyty"/>
-      <string key="id" value="sid-E40BD334-AFF4-43A2-9144-B49F16663E03"/>
-      <string key="sourceRef" value="sid-CD0EA145-545E-4C05-8E04-5B7C5F029077"/>
-    </event>
-    <event>
-      <string key="concept:name" value="Dokonanie skasowania wizyty"/>
       <string key="id" value="sid-CD8932F0-FA63-4338-B81E-2E2B4D6E149F"/>
       <string key="sourceRef" value="sid-b56c83b4-9af7-4c84-a3e9-171f976994df"/>
     </event>
@@ -71,23 +105,6 @@
     </event>
     <event>
       <string key="concept:name" value="Dokonanie skasowania wizyty"/>
-      <string key="id" value="sid-CD8932F0-FA63-4338-B81E-2E2B4D6E149F"/>
-      <string key="sourceRef" value="sid-b56c83b4-9af7-4c84-a3e9-171f976994df"/>
-    </event>
-  </trace>
-  <trace>
-    <event>
-      <string key="concept:name" value="Skasowanie wizyty"/>
-      <string key="id" value="sid-9A69B876-7737-4E82-9EAF-4023E127749C"/>
-      <string key="sourceRef" value="sid-3B8A1FE7-589F-4569-832C-CC3F7E604339"/>
-    </event>
-    <event>
-      <string key="concept:name" value="Dokonanie skasowania wizyty"/>
-      <string key="id" value="sid-CD8932F0-FA63-4338-B81E-2E2B4D6E149F"/>
-      <string key="sourceRef" value="sid-b56c83b4-9af7-4c84-a3e9-171f976994df"/>
-    </event>
-    <event>
-      <string key="concept:name" value="Dokonanie skasowania wizyty"/>
       <string key="id" value="sid-E40BD334-AFF4-43A2-9144-B49F16663E03"/>
       <string key="sourceRef" value="sid-CD0EA145-545E-4C05-8E04-5B7C5F029077"/>
     </event>
@@ -100,25 +117,8 @@
     </event>
     <event>
       <string key="concept:name" value="Dokonanie skasowania wizyty"/>
-      <string key="id" value="sid-CD8932F0-FA63-4338-B81E-2E2B4D6E149F"/>
-      <string key="sourceRef" value="sid-b56c83b4-9af7-4c84-a3e9-171f976994df"/>
-    </event>
-  </trace>
-  <trace>
-    <event>
-      <string key="concept:name" value="Skasowanie wizyty"/>
-      <string key="id" value="sid-9A69B876-7737-4E82-9EAF-4023E127749C"/>
-      <string key="sourceRef" value="sid-3B8A1FE7-589F-4569-832C-CC3F7E604339"/>
-    </event>
-    <event>
-      <string key="concept:name" value="Dokonanie skasowania wizyty"/>
       <string key="id" value="sid-E40BD334-AFF4-43A2-9144-B49F16663E03"/>
       <string key="sourceRef" value="sid-CD0EA145-545E-4C05-8E04-5B7C5F029077"/>
-    </event>
-    <event>
-      <string key="concept:name" value="Dokonanie skasowania wizyty"/>
-      <string key="id" value="sid-CD8932F0-FA63-4338-B81E-2E2B4D6E149F"/>
-      <string key="sourceRef" value="sid-b56c83b4-9af7-4c84-a3e9-171f976994df"/>
     </event>
   </trace>
 </log>
