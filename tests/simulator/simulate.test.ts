@@ -13,7 +13,7 @@ describe('Simulate...', () => {
   before(() => {
     return sim.generate(
       "test_", 
-      new Simulation({ unfoldSubNets: true, loopProtection: false, parseConditions: true }));
+      new Simulation({ unfoldSubNets: true, loopProtection: true, parseConditions: true }));
   });
 
   it("should parse every XES in data/generated and generate a non-conforming log", async () => {

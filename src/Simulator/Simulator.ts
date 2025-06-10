@@ -99,82 +99,100 @@ export class Simulation implements ISimulation {
 
   replay(contractGenerator: TemplateEngine): Trace[] {
     const traces: Trace[] = [];
-    const visited = new Array<string[]>();
     const conditions = new Map<string, number>(); 
 
-    const addConditionToLog = (currentTrace: Trace, conditionName: string, conditionID: number) => {
-    const lastEvent = currentTrace.events.at(-1);
-    if (lastEvent) {
-      lastEvent.dataChange = lastEvent.dataChange || [];
-      lastEvent.dataChange.push(new InstanceDataChange(conditionName, conditionID));
-    } else {
-      currentTrace.events.push(
-        new Event(
-          "Instance Data Change",
-          "Instance Data Change",
-          [...contractGenerator.iNet.participants.values()][0]!.id,
-          "",
-          [new InstanceDataChange(conditionName, conditionID)]
-        )
-      );
-    }
-  }
+    // New: Track visited transitions for loop detection and flushing
+    let visited: Transition[] = [];
 
-  const extractUniqueBitmaskNumbers = (expression: string): number[] => {
-    const regex = /&\s*(\d+)/g;
-    const numbers = new Set<number>();
-    let match;
-
-    while ((match = regex.exec(expression)) !== null) {
-      numbers.add(Number(match[1]));
-    }
-
-    return Array.from(numbers);
-  }
-
-  const processTransition = (
-    transitionCandidate: Transition,
-    currentTrace: Trace
-  ) => {
-    //console.log("Executing transition:", transitionCandidate.id);
-  
-    // Add the transition to the trace if it has a TaskLabel
-    if (transitionCandidate.label instanceof TaskLabel) {
-      currentTrace.events.push(
-        new Event(
-          transitionCandidate.label.name,
-          transitionCandidate.id,
-          transitionCandidate.label.sender.id
-        )
-      );
-    }
-  
-    // Handle conditions for the transition
-    const condition = this.getCondition(transitionCandidate);
-
-    if (condition) {
-      if (this.options.parseConditions) {
-        // parse numbers from the condition, for each add it to the log
-        const conditionIDs = extractUniqueBitmaskNumbers(condition);
-        for (const id of conditionIDs) {
-          addConditionToLog(currentTrace, "conditions", id);
-        }
+    const addConditionToLog = (
+      currentTrace: Trace, 
+      conditionName: string, 
+      conditionID: number,
+      addNext = false
+    ) => {
+      const lastEvent = currentTrace.events.at(-1);
+      if (lastEvent && !addNext) {
+        lastEvent.dataChange = lastEvent.dataChange || [];
+        lastEvent.dataChange.push(new InstanceDataChange(conditionName, conditionID));
       } else {
-        if (!conditions.has(transitionCandidate.id)) {
-          transitionCandidate.label.guard?.conditions.clear();
-          conditions.set(transitionCandidate.id, 1 << conditions.size);
-        }
-        const conditionID = conditions.get(transitionCandidate.id)!;
-        // Add instance data change to the last event or create a new event
-        addConditionToLog(currentTrace, "conditions", conditionID);
-
-        // Update the guard for the transition
-        const guard = new Guard(`conditions[${conditionID}] == true`);
-        guard.conditions.set("", `conditions & ${conditionID} == ${conditionID}`);
-        transitionCandidate.label.guard = guard;
+        currentTrace.events.push(
+          new Event(
+            "Instance Data Change",
+            "Instance Data Change",
+            [...contractGenerator.iNet.participants.values()][0]!.id,
+            "",
+            [new InstanceDataChange(conditionName, conditionID)]
+          )
+        );
       }
     }
-  }
+
+    const extractUniqueBitmaskNumbers = (expression: string): number[] => {
+      const regex = /&\s*(\d+)/g;
+      const numbers = new Set<number>();
+      let match;
+
+      while ((match = regex.exec(expression)) !== null) {
+        numbers.add(Number(match[1]));
+      }
+
+      return Array.from(numbers);
+    }
+
+    const processTransition = (
+      transitionCandidate: Transition,
+      currentTrace: Trace
+    ) => {
+      // If the transition has been visited before in this trace, flush visited and reset
+      if (visited.includes(transitionCandidate)) {
+        // Flush visited transitions to the log as a special event
+        if (visited.length > 0) {
+          addConditionToLog(currentTrace, "conditions", 0, true);
+          logIfEnabled(
+            `Loop detected: Flushing visited transitions [${visited.map(t => t.id).join(", ")}] and resetting visited.`
+          );
+          visited = [];
+        }
+      }
+      visited.push(transitionCandidate);
+
+      // Add the transition to the trace if it has a TaskLabel
+      if (transitionCandidate.label instanceof TaskLabel) {
+        currentTrace.events.push(
+          new Event(
+            transitionCandidate.label.name,
+            transitionCandidate.id,
+            transitionCandidate.label.sender.id
+          )
+        );
+      }
+    
+      // Handle conditions for the transition
+      const condition = this.getCondition(transitionCandidate);
+
+      if (condition) {
+        if (this.options.parseConditions) {
+          // parse numbers from the condition, for each add it to the log
+          const conditionIDs = extractUniqueBitmaskNumbers(condition);
+          for (const id of conditionIDs) {
+            addConditionToLog(currentTrace, "conditions", id);
+          }
+        } else {
+          if (!conditions.has(transitionCandidate.id)) {
+            transitionCandidate.label.guard?.conditions.clear();
+            conditions.set(transitionCandidate.id, 1 << conditions.size);
+          }
+          const conditionID = conditions.get(transitionCandidate.id)!;
+          // Add instance data change to the last event or create a new event
+          addConditionToLog(currentTrace, "conditions", conditionID);
+
+          // Update the guard for the transition
+          const guard = new Guard(`conditions[${conditionID}] == true`);
+          guard.conditions.set("", `conditions & ${conditionID} == ${conditionID}`);
+          transitionCandidate.label.guard = guard;
+        }
+      }
+    }
 
     const initial = contractGenerator.iNet.initial!;
     const end = contractGenerator.iNet.end!;
@@ -253,6 +271,7 @@ export class Simulation implements ISimulation {
         candidates.push(...initial.target);
         executed.length = 0;
         currentTrace = new Trace([]);
+        visited = [];
         logIfEnabled("State reset for the next trace.");
         continue;
       }
