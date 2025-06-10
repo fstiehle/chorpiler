@@ -23,8 +23,7 @@ type options = {
 }
 
 export interface ISimulation {
-  traces: Array<Trace>;
-  generate(generator: TemplateEngine): void;
+  generate(generator: TemplateEngine): Promise<{ traces: Trace[], contract: { target: string, encoding: TriggerEncoding } | null }>;
 }
 
 export class Simulator {
@@ -51,11 +50,14 @@ export class Simulator {
       iNet.id = prePend + iNet.id;
       const generator = new this.generatorType(iNet);
       generator.addCaseVariable(new CaseVariable("conditions", "uint", "uint public conditions;", true));
-      await sim.generate(generator);
 
-      if (sim.traces.length === 0) continue;
+      const simRes = await sim.generate(generator);
+      if (simRes.contract === null || simRes.traces.length === 0) {
+        console.warn(`No contract or traces generated for ${file}, skipping.`);
+        continue;
+      }
 
-      const log = new EventLog([...sim.traces.values()]);
+      const log = new EventLog([...simRes.traces.values()]);
       const template = fs.readFileSync(path.join(__dirname, "./templates/xes", "log.mustache.xes"), "utf-8");
       const renderedLog = Mustache.render(template, log);
 
@@ -63,18 +65,14 @@ export class Simulator {
       if (!fs.existsSync(this.xesDir)) fs.mkdirSync(this.xesDir, { recursive: true });
 
       fs.writeFileSync(path.join(this.xesDir, `${path.basename(file, '.bpmn')}`) + ".xes", renderedLog, "utf-8");
-      fs.writeFileSync(path.join(this.contractDir, `${path.basename(file, '.bpmn')}`) + ".sol", sim.contract!.target, "utf-8");
-      fs.writeFileSync(path.join(this.contractDir, `${path.basename(file, '.bpmn')}`) + ".json", JSON.stringify(TriggerEncoding.toJSON(sim.contract!.encoding)), "utf-8");
-      console.log(`Generated log and contract written to ${this.xesDir} and ${this.contractDir}`);
+      fs.writeFileSync(path.join(this.contractDir, `${path.basename(file, '.bpmn')}`) + ".sol", simRes.contract.target, "utf-8");
+      fs.writeFileSync(path.join(this.contractDir, `${path.basename(file, '.bpmn')}`) + ".json", JSON.stringify(TriggerEncoding.toJSON(simRes.contract.encoding)), "utf-8");
+      console.log(`Generated log and contract (${path.basename(file, '.bpmn')}) written to ${this.xesDir} and ${this.contractDir}`);
     }
   }
 }
 
 export class Simulation implements ISimulation {
-  public traces = new Array<Trace>();
-  public visited = new Array<string[]>();
-  public conditions = new Map<string, number>(); 
-  public contract: null | { target: string, encoding: TriggerEncoding } = null;
   public loggingEnabled = false; // Toggleable logging
 
   constructor(
@@ -84,18 +82,25 @@ export class Simulation implements ISimulation {
       parseConditions: false
     }) {}
 
-  async generate(contractGenerator: TemplateEngine) {
-    this.replay(contractGenerator);
-    await this.generateContract(contractGenerator);
+  async generate(contractGenerator: TemplateEngine): Promise<{ traces: Trace[], contract: { target: string, encoding: TriggerEncoding } | null }> {
+    const traces = this.replay(contractGenerator);
+    const contract = await this.generateContract(contractGenerator, traces);
+    return { traces, contract };
   }
 
-  async generateContract(contractGenerator: TemplateEngine) {
-    if (this.traces.length === 0) return console.warn(`No trace generated for ${contractGenerator.iNet.id}`);
-    this.contract = await contractGenerator.compile(this.options.unfoldSubNets, this.options.loopProtection);
-    return this.contract;
+  async generateContract(contractGenerator: TemplateEngine, traces: Trace[]): Promise<{ target: string, encoding: TriggerEncoding } | null> {
+    if (traces.length === 0) {
+      console.warn(`No trace generated for ${contractGenerator.iNet.id}`);
+      return null;
+    }
+    const contract = await contractGenerator.compile(this.options.unfoldSubNets, this.options.loopProtection);
+    return contract;
   }
 
-  replay(contractGenerator: TemplateEngine) {
+  replay(contractGenerator: TemplateEngine): Trace[] {
+    const traces: Trace[] = [];
+    const visited = new Array<string[]>();
+    const conditions = new Map<string, number>(); 
 
     const addConditionToLog = (currentTrace: Trace, conditionName: string, conditionID: number) => {
     const lastEvent = currentTrace.events.at(-1);
@@ -155,11 +160,11 @@ export class Simulation implements ISimulation {
           addConditionToLog(currentTrace, "conditions", id);
         }
       } else {
-        if (!this.conditions.has(transitionCandidate.id)) {
+        if (!conditions.has(transitionCandidate.id)) {
           transitionCandidate.label.guard?.conditions.clear();
-          this.conditions.set(transitionCandidate.id, 1 << this.conditions.size);
+          conditions.set(transitionCandidate.id, 1 << conditions.size);
         }
-        const conditionID = this.conditions.get(transitionCandidate.id)!;
+        const conditionID = conditions.get(transitionCandidate.id)!;
         // Add instance data change to the last event or create a new event
         addConditionToLog(currentTrace, "conditions", conditionID);
 
@@ -194,7 +199,7 @@ export class Simulation implements ISimulation {
     logIfEnabled("Initial candidates:", candidates.map((t) => t.id));
 
     while (log.traces.length < maxLogEntries) {
-      if (minLogEntries <= log.traces.length && toExecute.every((t) => executed.includes(t))) {
+      if (toExecute.every((t) => executed.includes(t))) {
         logIfEnabled("All transitions executed. Stopping replay.");
         break;
       }
@@ -205,7 +210,7 @@ export class Simulation implements ISimulation {
       );
       if (executableCandidates.length === 0) {
         console.error("Deadlock detected: No executable transitions.");
-        return;
+        return [];
       }
 
       // Prioritize transitions that are both in toExecute and candidates
@@ -269,9 +274,9 @@ export class Simulation implements ISimulation {
       )
     );
 
-    // Output the log
     logIfEnabled("Generated log:", log.traces.map((trace) => trace.events.map((e) => e.name)));
-    this.traces = log.traces;
+    traces.push(...log.traces);
+    return traces;
   }
 
   private getCondition(transition: Transition) {

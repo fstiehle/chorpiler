@@ -51,6 +51,11 @@ export class EventLog implements IterableIterator<Trace>{
     const randomEventID = () => {
       return [...process.tasks.keys()][seedRandMax(process.tasks.size)];
     }
+    const randomEventName = () => {
+      // Return a random event name from the log's events
+      const allEventNames = log.traces.flatMap(trace => trace.events.map(event => event.name));
+      return allEventNames[seedRandMax(allEventNames.length)];
+    }
 
     const seedRand = seed(_seed);
     const seedRandMax = (max: number) => Math.floor(seedRand() * max);
@@ -75,7 +80,7 @@ export class EventLog implements IterableIterator<Trace>{
             genEvents.splice(
               seedRandMax(genEvents.length), 
               0, 
-              new Event(randomEventID(), randomEventID(), randomParticipantName(), randomParticipantName())
+              new Event(randomEventName(), randomEventID(), randomParticipantName(), randomParticipantName())
             );
             break;
           }
@@ -128,7 +133,6 @@ export class EventLog implements IterableIterator<Trace>{
       "Generated", to_generate - conformingNr, "traces; generated", 
       conformingNr, "conforming traces, which were skipped."
     )
-
     return generatedLog;
   }
 }
