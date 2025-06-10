@@ -201,7 +201,7 @@ export class Simulation implements ISimulation {
     const executed: Transition[] = [];
     const toExecute: Transition[] = [...contractGenerator.iNet.elements.values()]
       .filter((t): t is Transition => t instanceof Transition);
-    const maxLogEntries = 100; // Threshold for maximum log entries
+    const maxLogEntries = 1000; // Threshold for maximum log entries
     const log = new EventLog([]); // Initialize the log variable
     let currentTrace = new Trace([]);
 
@@ -283,6 +283,10 @@ export class Simulation implements ISimulation {
       });
 
       logIfEnabled("Updated candidates:", candidates.map((t) => t.id));
+    }
+
+    if (log.traces.length >= maxLogEntries) {
+      console.warn(`Maximum number of log entries (${maxLogEntries}) reached. The search was not exhaustive.`);
     }
 
     // Remove duplicate traces from the log
