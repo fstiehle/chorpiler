@@ -73,7 +73,7 @@ export class EventLog implements IterableIterator<Trace>{
       // Pick a random conforming trace as basis
       // (!) make a deep copy 
       let genEvents = [...log.traces[seedRandMax(log.traces.length)].events];
-      assert(genEvents.length > 1, "empty trace");
+      assert(genEvents.length >= 1, "empty trace");
 
       for (let j = 0; j < passes; j++) {
 
