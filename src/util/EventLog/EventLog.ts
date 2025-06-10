@@ -73,11 +73,16 @@ export class EventLog implements IterableIterator<Trace>{
       // Pick a random conforming trace as basis
       // (!) make a deep copy 
       let genEvents = [...log.traces[seedRandMax(log.traces.length)].events];
-      assert(genEvents.length > 0, "empty trace");
+      assert(genEvents.length > 1, "empty trace");
 
       for (let j = 0; j < passes; j++) {
 
-        const randOperation = seedRandMax(5);    
+        const randOperation = seedRandMax(5);
+
+        // Only operate on events that are not "Instance Data Change"
+        const validEventIndexes = genEvents
+          .map((e, idx) => e.name !== "Instance Data Change" ? idx : -1)
+          .filter(idx => idx !== -1);
 
         switch (randOperation) {
           case 0: { 
@@ -92,37 +97,46 @@ export class EventLog implements IterableIterator<Trace>{
           }
           case 1: {
             // move an event
-            genEvents.splice(
-              seedRandMax(genEvents.length), 
-              0, 
-              genEvents.pop()!
-            );
+            if (validEventIndexes.length > 0) {
+              const moveIdx = validEventIndexes[seedRandMax(validEventIndexes.length)];
+              const [event] = genEvents.splice(moveIdx, 1);
+              genEvents.splice(seedRandMax(genEvents.length + 1), 0, event);
+            }
             break;
           }
           case 2: {
             // duplicate an event
-            genEvents.splice(
-              seedRandMax(genEvents.length), 
-              0, 
-              genEvents[seedRandMax(genEvents.length)]
-            );
+            if (validEventIndexes.length > 0) {
+              const dupIdx = validEventIndexes[seedRandMax(validEventIndexes.length)];
+              genEvents.splice(
+                seedRandMax(genEvents.length + 1), 
+                0, 
+                genEvents[dupIdx]
+              );
+            }
             break;
           }
           case 3: {
             // remove an event
-            const remove = randomEventID();
-            genEvents = genEvents.filter(event => event.name !== remove);
+            if (validEventIndexes.length > 0) {
+              const remIdx = validEventIndexes[seedRandMax(validEventIndexes.length)];
+              genEvents.splice(remIdx, 1);
+            }
             break;
           }
           case 4: {
             // switch the order of two events
-            if (genEvents.length <= 1) {
-              break;
+            if (validEventIndexes.length > 1) {
+              const idx1 = validEventIndexes[seedRandMax(validEventIndexes.length)];
+              let idx2 = idx1;
+              while (idx2 === idx1) {
+                idx2 = validEventIndexes[seedRandMax(validEventIndexes.length)];
+              }
+              // Swap only if both are valid and not the same
+              const tmp = genEvents[idx1];
+              genEvents[idx1] = genEvents[idx2];
+              genEvents[idx2] = tmp;
             }
-            const index = seedRandMax(genEvents.length-1) + 1;
-            const tmp = genEvents[index-1];
-            genEvents[index-1] = genEvents[index];
-            genEvents[index] = tmp;
             break;
           }
         }

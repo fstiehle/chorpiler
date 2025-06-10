@@ -36,7 +36,15 @@ describe('Simulate...', () => {
 
       // Generate a non-conforming log by shuffling events in each trace
       const nonConformingLog = EventLog.genNonConformingLog(eventLog, triggerEncoding, 30);
-      console.log(JSON.stringify(nonConformingLog, null, 2));
+      nonConformingLog.traces.forEach((trace, idx) => {
+        console.log(`\n--- Trace ${idx + 1} ---`);
+        trace.events.forEach((event, eventIdx) => {
+          console.log(`  Event ${eventIdx + 1}:`);
+          Object.entries(event).forEach(([key, value]) => {
+        console.log(`    ${key}: ${JSON.stringify(value)}`);
+          });
+        });
+      });
     }
   });
 

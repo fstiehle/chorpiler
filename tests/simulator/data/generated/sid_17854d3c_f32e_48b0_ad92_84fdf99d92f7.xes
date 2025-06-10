@@ -1,0 +1,1102 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<log xes.version="1.0">
+	<global scope="event">
+		<string key="concept:name" value="Task Name"/>
+		<string key="sourceRef" value="Participant ID"/>
+	</global>
+
+  <trace>
+    <event>
+      <string key="concept:name" value="Wohnung"/>
+      <string key="id" value="sid-90E1E0CC-4697-4AF5-98CB-B0DDA7792ED4"/>
+      <string key="sourceRef" value="sid-13C6ACD3-6178-4F67-9BB8-F436F4FEB36C"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Gespräch"/>
+      <string key="id" value="sid-47422B2D-5D26-41DB-B127-0615FC7D32FD"/>
+      <string key="sourceRef" value="sid-8B133E30-63CD-4F51-9054-2128FAA3AE77"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Besichtigung"/>
+      <string key="id" value="sid-E4488B23-225F-450A-A883-49E9EB7FD866"/>
+      <string key="sourceRef" value="sid-8EA9E66A-FD82-451E-8458-B4E0A6B0410A"/>
+      <boolean key="conditions" value="1"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Wohnung angenommen"/>
+      <string key="id" value="sid-4398A998-AB97-4E2E-82AE-44E22B35EC42"/>
+      <string key="sourceRef" value="sid-CD775C64-A4DB-4C3E-B6CB-E2040EAF114E"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Kredit"/>
+      <string key="id" value="sid-F278FFA9-D781-428C-9061-460B36BB8DC8"/>
+      <string key="sourceRef" value="sid-942990EF-5FB7-45AA-A6F9-19F0B710BBB3"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Kein Kredit"/>
+      <string key="id" value="sid-5831EEC3-4682-46D2-A619-5E6920AE6F1F"/>
+      <string key="sourceRef" value="sid-E916F18E-55C8-450D-B8C2-208E4682B278"/>
+    </event>
+  </trace>
+  <trace>
+    <event>
+      <string key="concept:name" value="Wohnung"/>
+      <string key="id" value="sid-90E1E0CC-4697-4AF5-98CB-B0DDA7792ED4"/>
+      <string key="sourceRef" value="sid-13C6ACD3-6178-4F67-9BB8-F436F4FEB36C"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Gespräch"/>
+      <string key="id" value="sid-47422B2D-5D26-41DB-B127-0615FC7D32FD"/>
+      <string key="sourceRef" value="sid-8B133E30-63CD-4F51-9054-2128FAA3AE77"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Besichtigung"/>
+      <string key="id" value="sid-E4488B23-225F-450A-A883-49E9EB7FD866"/>
+      <string key="sourceRef" value="sid-8EA9E66A-FD82-451E-8458-B4E0A6B0410A"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Wohnung abgelehnt"/>
+      <string key="id" value="sid-A8A5AA32-6339-48DB-A399-FE69B576C63A"/>
+      <string key="sourceRef" value="sid-284A3027-4CF4-4FB2-92F1-E78901FA7FC0"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Instance Data Change"/>
+      <string key="id" value="Instance Data Change"/>
+      <string key="sourceRef" value="sid-942990EF-5FB7-45AA-A6F9-19F0B710BBB3"/>
+      <boolean key="conditions" value="0"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Wohnung"/>
+      <string key="id" value="sid-90E1E0CC-4697-4AF5-98CB-B0DDA7792ED4"/>
+      <string key="sourceRef" value="sid-13C6ACD3-6178-4F67-9BB8-F436F4FEB36C"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Gespräch"/>
+      <string key="id" value="sid-47422B2D-5D26-41DB-B127-0615FC7D32FD"/>
+      <string key="sourceRef" value="sid-8B133E30-63CD-4F51-9054-2128FAA3AE77"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Besichtigung"/>
+      <string key="id" value="sid-E4488B23-225F-450A-A883-49E9EB7FD866"/>
+      <string key="sourceRef" value="sid-8EA9E66A-FD82-451E-8458-B4E0A6B0410A"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Wohnung abgelehnt"/>
+      <string key="id" value="sid-A8A5AA32-6339-48DB-A399-FE69B576C63A"/>
+      <string key="sourceRef" value="sid-284A3027-4CF4-4FB2-92F1-E78901FA7FC0"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Instance Data Change"/>
+      <string key="id" value="Instance Data Change"/>
+      <string key="sourceRef" value="sid-942990EF-5FB7-45AA-A6F9-19F0B710BBB3"/>
+      <boolean key="conditions" value="0"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Wohnung"/>
+      <string key="id" value="sid-90E1E0CC-4697-4AF5-98CB-B0DDA7792ED4"/>
+      <string key="sourceRef" value="sid-13C6ACD3-6178-4F67-9BB8-F436F4FEB36C"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Gespräch"/>
+      <string key="id" value="sid-47422B2D-5D26-41DB-B127-0615FC7D32FD"/>
+      <string key="sourceRef" value="sid-8B133E30-63CD-4F51-9054-2128FAA3AE77"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Besichtigung"/>
+      <string key="id" value="sid-E4488B23-225F-450A-A883-49E9EB7FD866"/>
+      <string key="sourceRef" value="sid-8EA9E66A-FD82-451E-8458-B4E0A6B0410A"/>
+      <boolean key="conditions" value="1"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Wohnung angenommen"/>
+      <string key="id" value="sid-4398A998-AB97-4E2E-82AE-44E22B35EC42"/>
+      <string key="sourceRef" value="sid-CD775C64-A4DB-4C3E-B6CB-E2040EAF114E"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Kredit"/>
+      <string key="id" value="sid-F278FFA9-D781-428C-9061-460B36BB8DC8"/>
+      <string key="sourceRef" value="sid-942990EF-5FB7-45AA-A6F9-19F0B710BBB3"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Kein Kredit"/>
+      <string key="id" value="sid-5831EEC3-4682-46D2-A619-5E6920AE6F1F"/>
+      <string key="sourceRef" value="sid-E916F18E-55C8-450D-B8C2-208E4682B278"/>
+    </event>
+  </trace>
+  <trace>
+    <event>
+      <string key="concept:name" value="Wohnung"/>
+      <string key="id" value="sid-90E1E0CC-4697-4AF5-98CB-B0DDA7792ED4"/>
+      <string key="sourceRef" value="sid-13C6ACD3-6178-4F67-9BB8-F436F4FEB36C"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Gespräch"/>
+      <string key="id" value="sid-47422B2D-5D26-41DB-B127-0615FC7D32FD"/>
+      <string key="sourceRef" value="sid-8B133E30-63CD-4F51-9054-2128FAA3AE77"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Besichtigung"/>
+      <string key="id" value="sid-E4488B23-225F-450A-A883-49E9EB7FD866"/>
+      <string key="sourceRef" value="sid-8EA9E66A-FD82-451E-8458-B4E0A6B0410A"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Wohnung abgelehnt"/>
+      <string key="id" value="sid-A8A5AA32-6339-48DB-A399-FE69B576C63A"/>
+      <string key="sourceRef" value="sid-284A3027-4CF4-4FB2-92F1-E78901FA7FC0"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Instance Data Change"/>
+      <string key="id" value="Instance Data Change"/>
+      <string key="sourceRef" value="sid-942990EF-5FB7-45AA-A6F9-19F0B710BBB3"/>
+      <boolean key="conditions" value="0"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Wohnung"/>
+      <string key="id" value="sid-90E1E0CC-4697-4AF5-98CB-B0DDA7792ED4"/>
+      <string key="sourceRef" value="sid-13C6ACD3-6178-4F67-9BB8-F436F4FEB36C"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Gespräch"/>
+      <string key="id" value="sid-47422B2D-5D26-41DB-B127-0615FC7D32FD"/>
+      <string key="sourceRef" value="sid-8B133E30-63CD-4F51-9054-2128FAA3AE77"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Besichtigung"/>
+      <string key="id" value="sid-E4488B23-225F-450A-A883-49E9EB7FD866"/>
+      <string key="sourceRef" value="sid-8EA9E66A-FD82-451E-8458-B4E0A6B0410A"/>
+      <boolean key="conditions" value="1"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Wohnung angenommen"/>
+      <string key="id" value="sid-4398A998-AB97-4E2E-82AE-44E22B35EC42"/>
+      <string key="sourceRef" value="sid-CD775C64-A4DB-4C3E-B6CB-E2040EAF114E"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Kredit"/>
+      <string key="id" value="sid-F278FFA9-D781-428C-9061-460B36BB8DC8"/>
+      <string key="sourceRef" value="sid-942990EF-5FB7-45AA-A6F9-19F0B710BBB3"/>
+      <boolean key="conditions" value="2"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Kredit geben"/>
+      <string key="id" value="sid-905ABD45-2BED-4426-84B1-6A5AA93CCBF1"/>
+      <string key="sourceRef" value="sid-A28477C4-E927-43E7-917A-82FB5927368A"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Unterschreiben des Vertrags"/>
+      <string key="id" value="sid-93BAFAD4-8005-4C6C-8D2E-0717C32C60D7"/>
+      <string key="sourceRef" value="sid-AB2F2F14-A9C0-45CF-862F-01EA4614C301"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Eintragung"/>
+      <string key="id" value="sid-EE223F01-9025-4791-8371-FA708DA6D6AF"/>
+      <string key="sourceRef" value="sid-46404607-BAC7-4D2A-83A7-C0DD65848D37"/>
+    </event>
+  </trace>
+  <trace>
+    <event>
+      <string key="concept:name" value="Wohnung"/>
+      <string key="id" value="sid-90E1E0CC-4697-4AF5-98CB-B0DDA7792ED4"/>
+      <string key="sourceRef" value="sid-13C6ACD3-6178-4F67-9BB8-F436F4FEB36C"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Gespräch"/>
+      <string key="id" value="sid-47422B2D-5D26-41DB-B127-0615FC7D32FD"/>
+      <string key="sourceRef" value="sid-8B133E30-63CD-4F51-9054-2128FAA3AE77"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Besichtigung"/>
+      <string key="id" value="sid-E4488B23-225F-450A-A883-49E9EB7FD866"/>
+      <string key="sourceRef" value="sid-8EA9E66A-FD82-451E-8458-B4E0A6B0410A"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Wohnung abgelehnt"/>
+      <string key="id" value="sid-A8A5AA32-6339-48DB-A399-FE69B576C63A"/>
+      <string key="sourceRef" value="sid-284A3027-4CF4-4FB2-92F1-E78901FA7FC0"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Instance Data Change"/>
+      <string key="id" value="Instance Data Change"/>
+      <string key="sourceRef" value="sid-942990EF-5FB7-45AA-A6F9-19F0B710BBB3"/>
+      <boolean key="conditions" value="0"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Wohnung"/>
+      <string key="id" value="sid-90E1E0CC-4697-4AF5-98CB-B0DDA7792ED4"/>
+      <string key="sourceRef" value="sid-13C6ACD3-6178-4F67-9BB8-F436F4FEB36C"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Gespräch"/>
+      <string key="id" value="sid-47422B2D-5D26-41DB-B127-0615FC7D32FD"/>
+      <string key="sourceRef" value="sid-8B133E30-63CD-4F51-9054-2128FAA3AE77"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Besichtigung"/>
+      <string key="id" value="sid-E4488B23-225F-450A-A883-49E9EB7FD866"/>
+      <string key="sourceRef" value="sid-8EA9E66A-FD82-451E-8458-B4E0A6B0410A"/>
+      <boolean key="conditions" value="1"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Wohnung angenommen"/>
+      <string key="id" value="sid-4398A998-AB97-4E2E-82AE-44E22B35EC42"/>
+      <string key="sourceRef" value="sid-CD775C64-A4DB-4C3E-B6CB-E2040EAF114E"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Kredit"/>
+      <string key="id" value="sid-F278FFA9-D781-428C-9061-460B36BB8DC8"/>
+      <string key="sourceRef" value="sid-942990EF-5FB7-45AA-A6F9-19F0B710BBB3"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Kein Kredit"/>
+      <string key="id" value="sid-5831EEC3-4682-46D2-A619-5E6920AE6F1F"/>
+      <string key="sourceRef" value="sid-E916F18E-55C8-450D-B8C2-208E4682B278"/>
+    </event>
+  </trace>
+  <trace>
+    <event>
+      <string key="concept:name" value="Wohnung"/>
+      <string key="id" value="sid-90E1E0CC-4697-4AF5-98CB-B0DDA7792ED4"/>
+      <string key="sourceRef" value="sid-13C6ACD3-6178-4F67-9BB8-F436F4FEB36C"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Gespräch"/>
+      <string key="id" value="sid-47422B2D-5D26-41DB-B127-0615FC7D32FD"/>
+      <string key="sourceRef" value="sid-8B133E30-63CD-4F51-9054-2128FAA3AE77"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Besichtigung"/>
+      <string key="id" value="sid-E4488B23-225F-450A-A883-49E9EB7FD866"/>
+      <string key="sourceRef" value="sid-8EA9E66A-FD82-451E-8458-B4E0A6B0410A"/>
+      <boolean key="conditions" value="1"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Wohnung angenommen"/>
+      <string key="id" value="sid-4398A998-AB97-4E2E-82AE-44E22B35EC42"/>
+      <string key="sourceRef" value="sid-CD775C64-A4DB-4C3E-B6CB-E2040EAF114E"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Kredit"/>
+      <string key="id" value="sid-F278FFA9-D781-428C-9061-460B36BB8DC8"/>
+      <string key="sourceRef" value="sid-942990EF-5FB7-45AA-A6F9-19F0B710BBB3"/>
+      <boolean key="conditions" value="2"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Kredit geben"/>
+      <string key="id" value="sid-905ABD45-2BED-4426-84B1-6A5AA93CCBF1"/>
+      <string key="sourceRef" value="sid-A28477C4-E927-43E7-917A-82FB5927368A"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Unterschreiben des Vertrags"/>
+      <string key="id" value="sid-93BAFAD4-8005-4C6C-8D2E-0717C32C60D7"/>
+      <string key="sourceRef" value="sid-AB2F2F14-A9C0-45CF-862F-01EA4614C301"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Eintragung"/>
+      <string key="id" value="sid-EE223F01-9025-4791-8371-FA708DA6D6AF"/>
+      <string key="sourceRef" value="sid-46404607-BAC7-4D2A-83A7-C0DD65848D37"/>
+    </event>
+  </trace>
+  <trace>
+    <event>
+      <string key="concept:name" value="Wohnung"/>
+      <string key="id" value="sid-90E1E0CC-4697-4AF5-98CB-B0DDA7792ED4"/>
+      <string key="sourceRef" value="sid-13C6ACD3-6178-4F67-9BB8-F436F4FEB36C"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Gespräch"/>
+      <string key="id" value="sid-47422B2D-5D26-41DB-B127-0615FC7D32FD"/>
+      <string key="sourceRef" value="sid-8B133E30-63CD-4F51-9054-2128FAA3AE77"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Besichtigung"/>
+      <string key="id" value="sid-E4488B23-225F-450A-A883-49E9EB7FD866"/>
+      <string key="sourceRef" value="sid-8EA9E66A-FD82-451E-8458-B4E0A6B0410A"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Wohnung abgelehnt"/>
+      <string key="id" value="sid-A8A5AA32-6339-48DB-A399-FE69B576C63A"/>
+      <string key="sourceRef" value="sid-284A3027-4CF4-4FB2-92F1-E78901FA7FC0"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Instance Data Change"/>
+      <string key="id" value="Instance Data Change"/>
+      <string key="sourceRef" value="sid-942990EF-5FB7-45AA-A6F9-19F0B710BBB3"/>
+      <boolean key="conditions" value="0"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Wohnung"/>
+      <string key="id" value="sid-90E1E0CC-4697-4AF5-98CB-B0DDA7792ED4"/>
+      <string key="sourceRef" value="sid-13C6ACD3-6178-4F67-9BB8-F436F4FEB36C"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Gespräch"/>
+      <string key="id" value="sid-47422B2D-5D26-41DB-B127-0615FC7D32FD"/>
+      <string key="sourceRef" value="sid-8B133E30-63CD-4F51-9054-2128FAA3AE77"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Besichtigung"/>
+      <string key="id" value="sid-E4488B23-225F-450A-A883-49E9EB7FD866"/>
+      <string key="sourceRef" value="sid-8EA9E66A-FD82-451E-8458-B4E0A6B0410A"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Wohnung abgelehnt"/>
+      <string key="id" value="sid-A8A5AA32-6339-48DB-A399-FE69B576C63A"/>
+      <string key="sourceRef" value="sid-284A3027-4CF4-4FB2-92F1-E78901FA7FC0"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Instance Data Change"/>
+      <string key="id" value="Instance Data Change"/>
+      <string key="sourceRef" value="sid-942990EF-5FB7-45AA-A6F9-19F0B710BBB3"/>
+      <boolean key="conditions" value="0"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Wohnung"/>
+      <string key="id" value="sid-90E1E0CC-4697-4AF5-98CB-B0DDA7792ED4"/>
+      <string key="sourceRef" value="sid-13C6ACD3-6178-4F67-9BB8-F436F4FEB36C"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Gespräch"/>
+      <string key="id" value="sid-47422B2D-5D26-41DB-B127-0615FC7D32FD"/>
+      <string key="sourceRef" value="sid-8B133E30-63CD-4F51-9054-2128FAA3AE77"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Besichtigung"/>
+      <string key="id" value="sid-E4488B23-225F-450A-A883-49E9EB7FD866"/>
+      <string key="sourceRef" value="sid-8EA9E66A-FD82-451E-8458-B4E0A6B0410A"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Wohnung abgelehnt"/>
+      <string key="id" value="sid-A8A5AA32-6339-48DB-A399-FE69B576C63A"/>
+      <string key="sourceRef" value="sid-284A3027-4CF4-4FB2-92F1-E78901FA7FC0"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Instance Data Change"/>
+      <string key="id" value="Instance Data Change"/>
+      <string key="sourceRef" value="sid-942990EF-5FB7-45AA-A6F9-19F0B710BBB3"/>
+      <boolean key="conditions" value="0"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Wohnung"/>
+      <string key="id" value="sid-90E1E0CC-4697-4AF5-98CB-B0DDA7792ED4"/>
+      <string key="sourceRef" value="sid-13C6ACD3-6178-4F67-9BB8-F436F4FEB36C"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Gespräch"/>
+      <string key="id" value="sid-47422B2D-5D26-41DB-B127-0615FC7D32FD"/>
+      <string key="sourceRef" value="sid-8B133E30-63CD-4F51-9054-2128FAA3AE77"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Besichtigung"/>
+      <string key="id" value="sid-E4488B23-225F-450A-A883-49E9EB7FD866"/>
+      <string key="sourceRef" value="sid-8EA9E66A-FD82-451E-8458-B4E0A6B0410A"/>
+      <boolean key="conditions" value="1"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Wohnung angenommen"/>
+      <string key="id" value="sid-4398A998-AB97-4E2E-82AE-44E22B35EC42"/>
+      <string key="sourceRef" value="sid-CD775C64-A4DB-4C3E-B6CB-E2040EAF114E"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Kredit"/>
+      <string key="id" value="sid-F278FFA9-D781-428C-9061-460B36BB8DC8"/>
+      <string key="sourceRef" value="sid-942990EF-5FB7-45AA-A6F9-19F0B710BBB3"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Kein Kredit"/>
+      <string key="id" value="sid-5831EEC3-4682-46D2-A619-5E6920AE6F1F"/>
+      <string key="sourceRef" value="sid-E916F18E-55C8-450D-B8C2-208E4682B278"/>
+    </event>
+  </trace>
+  <trace>
+    <event>
+      <string key="concept:name" value="Wohnung"/>
+      <string key="id" value="sid-90E1E0CC-4697-4AF5-98CB-B0DDA7792ED4"/>
+      <string key="sourceRef" value="sid-13C6ACD3-6178-4F67-9BB8-F436F4FEB36C"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Gespräch"/>
+      <string key="id" value="sid-47422B2D-5D26-41DB-B127-0615FC7D32FD"/>
+      <string key="sourceRef" value="sid-8B133E30-63CD-4F51-9054-2128FAA3AE77"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Besichtigung"/>
+      <string key="id" value="sid-E4488B23-225F-450A-A883-49E9EB7FD866"/>
+      <string key="sourceRef" value="sid-8EA9E66A-FD82-451E-8458-B4E0A6B0410A"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Wohnung abgelehnt"/>
+      <string key="id" value="sid-A8A5AA32-6339-48DB-A399-FE69B576C63A"/>
+      <string key="sourceRef" value="sid-284A3027-4CF4-4FB2-92F1-E78901FA7FC0"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Instance Data Change"/>
+      <string key="id" value="Instance Data Change"/>
+      <string key="sourceRef" value="sid-942990EF-5FB7-45AA-A6F9-19F0B710BBB3"/>
+      <boolean key="conditions" value="0"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Wohnung"/>
+      <string key="id" value="sid-90E1E0CC-4697-4AF5-98CB-B0DDA7792ED4"/>
+      <string key="sourceRef" value="sid-13C6ACD3-6178-4F67-9BB8-F436F4FEB36C"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Gespräch"/>
+      <string key="id" value="sid-47422B2D-5D26-41DB-B127-0615FC7D32FD"/>
+      <string key="sourceRef" value="sid-8B133E30-63CD-4F51-9054-2128FAA3AE77"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Besichtigung"/>
+      <string key="id" value="sid-E4488B23-225F-450A-A883-49E9EB7FD866"/>
+      <string key="sourceRef" value="sid-8EA9E66A-FD82-451E-8458-B4E0A6B0410A"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Wohnung abgelehnt"/>
+      <string key="id" value="sid-A8A5AA32-6339-48DB-A399-FE69B576C63A"/>
+      <string key="sourceRef" value="sid-284A3027-4CF4-4FB2-92F1-E78901FA7FC0"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Instance Data Change"/>
+      <string key="id" value="Instance Data Change"/>
+      <string key="sourceRef" value="sid-942990EF-5FB7-45AA-A6F9-19F0B710BBB3"/>
+      <boolean key="conditions" value="0"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Wohnung"/>
+      <string key="id" value="sid-90E1E0CC-4697-4AF5-98CB-B0DDA7792ED4"/>
+      <string key="sourceRef" value="sid-13C6ACD3-6178-4F67-9BB8-F436F4FEB36C"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Gespräch"/>
+      <string key="id" value="sid-47422B2D-5D26-41DB-B127-0615FC7D32FD"/>
+      <string key="sourceRef" value="sid-8B133E30-63CD-4F51-9054-2128FAA3AE77"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Besichtigung"/>
+      <string key="id" value="sid-E4488B23-225F-450A-A883-49E9EB7FD866"/>
+      <string key="sourceRef" value="sid-8EA9E66A-FD82-451E-8458-B4E0A6B0410A"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Wohnung abgelehnt"/>
+      <string key="id" value="sid-A8A5AA32-6339-48DB-A399-FE69B576C63A"/>
+      <string key="sourceRef" value="sid-284A3027-4CF4-4FB2-92F1-E78901FA7FC0"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Instance Data Change"/>
+      <string key="id" value="Instance Data Change"/>
+      <string key="sourceRef" value="sid-942990EF-5FB7-45AA-A6F9-19F0B710BBB3"/>
+      <boolean key="conditions" value="0"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Wohnung"/>
+      <string key="id" value="sid-90E1E0CC-4697-4AF5-98CB-B0DDA7792ED4"/>
+      <string key="sourceRef" value="sid-13C6ACD3-6178-4F67-9BB8-F436F4FEB36C"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Gespräch"/>
+      <string key="id" value="sid-47422B2D-5D26-41DB-B127-0615FC7D32FD"/>
+      <string key="sourceRef" value="sid-8B133E30-63CD-4F51-9054-2128FAA3AE77"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Besichtigung"/>
+      <string key="id" value="sid-E4488B23-225F-450A-A883-49E9EB7FD866"/>
+      <string key="sourceRef" value="sid-8EA9E66A-FD82-451E-8458-B4E0A6B0410A"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Wohnung abgelehnt"/>
+      <string key="id" value="sid-A8A5AA32-6339-48DB-A399-FE69B576C63A"/>
+      <string key="sourceRef" value="sid-284A3027-4CF4-4FB2-92F1-E78901FA7FC0"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Instance Data Change"/>
+      <string key="id" value="Instance Data Change"/>
+      <string key="sourceRef" value="sid-942990EF-5FB7-45AA-A6F9-19F0B710BBB3"/>
+      <boolean key="conditions" value="0"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Wohnung"/>
+      <string key="id" value="sid-90E1E0CC-4697-4AF5-98CB-B0DDA7792ED4"/>
+      <string key="sourceRef" value="sid-13C6ACD3-6178-4F67-9BB8-F436F4FEB36C"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Gespräch"/>
+      <string key="id" value="sid-47422B2D-5D26-41DB-B127-0615FC7D32FD"/>
+      <string key="sourceRef" value="sid-8B133E30-63CD-4F51-9054-2128FAA3AE77"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Besichtigung"/>
+      <string key="id" value="sid-E4488B23-225F-450A-A883-49E9EB7FD866"/>
+      <string key="sourceRef" value="sid-8EA9E66A-FD82-451E-8458-B4E0A6B0410A"/>
+      <boolean key="conditions" value="1"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Wohnung angenommen"/>
+      <string key="id" value="sid-4398A998-AB97-4E2E-82AE-44E22B35EC42"/>
+      <string key="sourceRef" value="sid-CD775C64-A4DB-4C3E-B6CB-E2040EAF114E"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Kredit"/>
+      <string key="id" value="sid-F278FFA9-D781-428C-9061-460B36BB8DC8"/>
+      <string key="sourceRef" value="sid-942990EF-5FB7-45AA-A6F9-19F0B710BBB3"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Kein Kredit"/>
+      <string key="id" value="sid-5831EEC3-4682-46D2-A619-5E6920AE6F1F"/>
+      <string key="sourceRef" value="sid-E916F18E-55C8-450D-B8C2-208E4682B278"/>
+    </event>
+  </trace>
+  <trace>
+    <event>
+      <string key="concept:name" value="Wohnung"/>
+      <string key="id" value="sid-90E1E0CC-4697-4AF5-98CB-B0DDA7792ED4"/>
+      <string key="sourceRef" value="sid-13C6ACD3-6178-4F67-9BB8-F436F4FEB36C"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Gespräch"/>
+      <string key="id" value="sid-47422B2D-5D26-41DB-B127-0615FC7D32FD"/>
+      <string key="sourceRef" value="sid-8B133E30-63CD-4F51-9054-2128FAA3AE77"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Besichtigung"/>
+      <string key="id" value="sid-E4488B23-225F-450A-A883-49E9EB7FD866"/>
+      <string key="sourceRef" value="sid-8EA9E66A-FD82-451E-8458-B4E0A6B0410A"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Wohnung abgelehnt"/>
+      <string key="id" value="sid-A8A5AA32-6339-48DB-A399-FE69B576C63A"/>
+      <string key="sourceRef" value="sid-284A3027-4CF4-4FB2-92F1-E78901FA7FC0"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Instance Data Change"/>
+      <string key="id" value="Instance Data Change"/>
+      <string key="sourceRef" value="sid-942990EF-5FB7-45AA-A6F9-19F0B710BBB3"/>
+      <boolean key="conditions" value="0"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Wohnung"/>
+      <string key="id" value="sid-90E1E0CC-4697-4AF5-98CB-B0DDA7792ED4"/>
+      <string key="sourceRef" value="sid-13C6ACD3-6178-4F67-9BB8-F436F4FEB36C"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Gespräch"/>
+      <string key="id" value="sid-47422B2D-5D26-41DB-B127-0615FC7D32FD"/>
+      <string key="sourceRef" value="sid-8B133E30-63CD-4F51-9054-2128FAA3AE77"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Besichtigung"/>
+      <string key="id" value="sid-E4488B23-225F-450A-A883-49E9EB7FD866"/>
+      <string key="sourceRef" value="sid-8EA9E66A-FD82-451E-8458-B4E0A6B0410A"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Wohnung abgelehnt"/>
+      <string key="id" value="sid-A8A5AA32-6339-48DB-A399-FE69B576C63A"/>
+      <string key="sourceRef" value="sid-284A3027-4CF4-4FB2-92F1-E78901FA7FC0"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Instance Data Change"/>
+      <string key="id" value="Instance Data Change"/>
+      <string key="sourceRef" value="sid-942990EF-5FB7-45AA-A6F9-19F0B710BBB3"/>
+      <boolean key="conditions" value="0"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Wohnung"/>
+      <string key="id" value="sid-90E1E0CC-4697-4AF5-98CB-B0DDA7792ED4"/>
+      <string key="sourceRef" value="sid-13C6ACD3-6178-4F67-9BB8-F436F4FEB36C"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Gespräch"/>
+      <string key="id" value="sid-47422B2D-5D26-41DB-B127-0615FC7D32FD"/>
+      <string key="sourceRef" value="sid-8B133E30-63CD-4F51-9054-2128FAA3AE77"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Besichtigung"/>
+      <string key="id" value="sid-E4488B23-225F-450A-A883-49E9EB7FD866"/>
+      <string key="sourceRef" value="sid-8EA9E66A-FD82-451E-8458-B4E0A6B0410A"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Wohnung abgelehnt"/>
+      <string key="id" value="sid-A8A5AA32-6339-48DB-A399-FE69B576C63A"/>
+      <string key="sourceRef" value="sid-284A3027-4CF4-4FB2-92F1-E78901FA7FC0"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Instance Data Change"/>
+      <string key="id" value="Instance Data Change"/>
+      <string key="sourceRef" value="sid-942990EF-5FB7-45AA-A6F9-19F0B710BBB3"/>
+      <boolean key="conditions" value="0"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Wohnung"/>
+      <string key="id" value="sid-90E1E0CC-4697-4AF5-98CB-B0DDA7792ED4"/>
+      <string key="sourceRef" value="sid-13C6ACD3-6178-4F67-9BB8-F436F4FEB36C"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Gespräch"/>
+      <string key="id" value="sid-47422B2D-5D26-41DB-B127-0615FC7D32FD"/>
+      <string key="sourceRef" value="sid-8B133E30-63CD-4F51-9054-2128FAA3AE77"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Besichtigung"/>
+      <string key="id" value="sid-E4488B23-225F-450A-A883-49E9EB7FD866"/>
+      <string key="sourceRef" value="sid-8EA9E66A-FD82-451E-8458-B4E0A6B0410A"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Wohnung abgelehnt"/>
+      <string key="id" value="sid-A8A5AA32-6339-48DB-A399-FE69B576C63A"/>
+      <string key="sourceRef" value="sid-284A3027-4CF4-4FB2-92F1-E78901FA7FC0"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Instance Data Change"/>
+      <string key="id" value="Instance Data Change"/>
+      <string key="sourceRef" value="sid-942990EF-5FB7-45AA-A6F9-19F0B710BBB3"/>
+      <boolean key="conditions" value="0"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Wohnung"/>
+      <string key="id" value="sid-90E1E0CC-4697-4AF5-98CB-B0DDA7792ED4"/>
+      <string key="sourceRef" value="sid-13C6ACD3-6178-4F67-9BB8-F436F4FEB36C"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Gespräch"/>
+      <string key="id" value="sid-47422B2D-5D26-41DB-B127-0615FC7D32FD"/>
+      <string key="sourceRef" value="sid-8B133E30-63CD-4F51-9054-2128FAA3AE77"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Besichtigung"/>
+      <string key="id" value="sid-E4488B23-225F-450A-A883-49E9EB7FD866"/>
+      <string key="sourceRef" value="sid-8EA9E66A-FD82-451E-8458-B4E0A6B0410A"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Wohnung abgelehnt"/>
+      <string key="id" value="sid-A8A5AA32-6339-48DB-A399-FE69B576C63A"/>
+      <string key="sourceRef" value="sid-284A3027-4CF4-4FB2-92F1-E78901FA7FC0"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Instance Data Change"/>
+      <string key="id" value="Instance Data Change"/>
+      <string key="sourceRef" value="sid-942990EF-5FB7-45AA-A6F9-19F0B710BBB3"/>
+      <boolean key="conditions" value="0"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Wohnung"/>
+      <string key="id" value="sid-90E1E0CC-4697-4AF5-98CB-B0DDA7792ED4"/>
+      <string key="sourceRef" value="sid-13C6ACD3-6178-4F67-9BB8-F436F4FEB36C"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Gespräch"/>
+      <string key="id" value="sid-47422B2D-5D26-41DB-B127-0615FC7D32FD"/>
+      <string key="sourceRef" value="sid-8B133E30-63CD-4F51-9054-2128FAA3AE77"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Besichtigung"/>
+      <string key="id" value="sid-E4488B23-225F-450A-A883-49E9EB7FD866"/>
+      <string key="sourceRef" value="sid-8EA9E66A-FD82-451E-8458-B4E0A6B0410A"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Wohnung abgelehnt"/>
+      <string key="id" value="sid-A8A5AA32-6339-48DB-A399-FE69B576C63A"/>
+      <string key="sourceRef" value="sid-284A3027-4CF4-4FB2-92F1-E78901FA7FC0"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Instance Data Change"/>
+      <string key="id" value="Instance Data Change"/>
+      <string key="sourceRef" value="sid-942990EF-5FB7-45AA-A6F9-19F0B710BBB3"/>
+      <boolean key="conditions" value="0"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Wohnung"/>
+      <string key="id" value="sid-90E1E0CC-4697-4AF5-98CB-B0DDA7792ED4"/>
+      <string key="sourceRef" value="sid-13C6ACD3-6178-4F67-9BB8-F436F4FEB36C"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Gespräch"/>
+      <string key="id" value="sid-47422B2D-5D26-41DB-B127-0615FC7D32FD"/>
+      <string key="sourceRef" value="sid-8B133E30-63CD-4F51-9054-2128FAA3AE77"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Besichtigung"/>
+      <string key="id" value="sid-E4488B23-225F-450A-A883-49E9EB7FD866"/>
+      <string key="sourceRef" value="sid-8EA9E66A-FD82-451E-8458-B4E0A6B0410A"/>
+      <boolean key="conditions" value="1"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Wohnung angenommen"/>
+      <string key="id" value="sid-4398A998-AB97-4E2E-82AE-44E22B35EC42"/>
+      <string key="sourceRef" value="sid-CD775C64-A4DB-4C3E-B6CB-E2040EAF114E"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Kredit"/>
+      <string key="id" value="sid-F278FFA9-D781-428C-9061-460B36BB8DC8"/>
+      <string key="sourceRef" value="sid-942990EF-5FB7-45AA-A6F9-19F0B710BBB3"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Kein Kredit"/>
+      <string key="id" value="sid-5831EEC3-4682-46D2-A619-5E6920AE6F1F"/>
+      <string key="sourceRef" value="sid-E916F18E-55C8-450D-B8C2-208E4682B278"/>
+    </event>
+  </trace>
+  <trace>
+    <event>
+      <string key="concept:name" value="Wohnung"/>
+      <string key="id" value="sid-90E1E0CC-4697-4AF5-98CB-B0DDA7792ED4"/>
+      <string key="sourceRef" value="sid-13C6ACD3-6178-4F67-9BB8-F436F4FEB36C"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Gespräch"/>
+      <string key="id" value="sid-47422B2D-5D26-41DB-B127-0615FC7D32FD"/>
+      <string key="sourceRef" value="sid-8B133E30-63CD-4F51-9054-2128FAA3AE77"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Besichtigung"/>
+      <string key="id" value="sid-E4488B23-225F-450A-A883-49E9EB7FD866"/>
+      <string key="sourceRef" value="sid-8EA9E66A-FD82-451E-8458-B4E0A6B0410A"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Wohnung abgelehnt"/>
+      <string key="id" value="sid-A8A5AA32-6339-48DB-A399-FE69B576C63A"/>
+      <string key="sourceRef" value="sid-284A3027-4CF4-4FB2-92F1-E78901FA7FC0"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Instance Data Change"/>
+      <string key="id" value="Instance Data Change"/>
+      <string key="sourceRef" value="sid-942990EF-5FB7-45AA-A6F9-19F0B710BBB3"/>
+      <boolean key="conditions" value="0"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Wohnung"/>
+      <string key="id" value="sid-90E1E0CC-4697-4AF5-98CB-B0DDA7792ED4"/>
+      <string key="sourceRef" value="sid-13C6ACD3-6178-4F67-9BB8-F436F4FEB36C"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Gespräch"/>
+      <string key="id" value="sid-47422B2D-5D26-41DB-B127-0615FC7D32FD"/>
+      <string key="sourceRef" value="sid-8B133E30-63CD-4F51-9054-2128FAA3AE77"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Besichtigung"/>
+      <string key="id" value="sid-E4488B23-225F-450A-A883-49E9EB7FD866"/>
+      <string key="sourceRef" value="sid-8EA9E66A-FD82-451E-8458-B4E0A6B0410A"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Wohnung abgelehnt"/>
+      <string key="id" value="sid-A8A5AA32-6339-48DB-A399-FE69B576C63A"/>
+      <string key="sourceRef" value="sid-284A3027-4CF4-4FB2-92F1-E78901FA7FC0"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Instance Data Change"/>
+      <string key="id" value="Instance Data Change"/>
+      <string key="sourceRef" value="sid-942990EF-5FB7-45AA-A6F9-19F0B710BBB3"/>
+      <boolean key="conditions" value="0"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Wohnung"/>
+      <string key="id" value="sid-90E1E0CC-4697-4AF5-98CB-B0DDA7792ED4"/>
+      <string key="sourceRef" value="sid-13C6ACD3-6178-4F67-9BB8-F436F4FEB36C"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Gespräch"/>
+      <string key="id" value="sid-47422B2D-5D26-41DB-B127-0615FC7D32FD"/>
+      <string key="sourceRef" value="sid-8B133E30-63CD-4F51-9054-2128FAA3AE77"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Besichtigung"/>
+      <string key="id" value="sid-E4488B23-225F-450A-A883-49E9EB7FD866"/>
+      <string key="sourceRef" value="sid-8EA9E66A-FD82-451E-8458-B4E0A6B0410A"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Wohnung abgelehnt"/>
+      <string key="id" value="sid-A8A5AA32-6339-48DB-A399-FE69B576C63A"/>
+      <string key="sourceRef" value="sid-284A3027-4CF4-4FB2-92F1-E78901FA7FC0"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Instance Data Change"/>
+      <string key="id" value="Instance Data Change"/>
+      <string key="sourceRef" value="sid-942990EF-5FB7-45AA-A6F9-19F0B710BBB3"/>
+      <boolean key="conditions" value="0"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Wohnung"/>
+      <string key="id" value="sid-90E1E0CC-4697-4AF5-98CB-B0DDA7792ED4"/>
+      <string key="sourceRef" value="sid-13C6ACD3-6178-4F67-9BB8-F436F4FEB36C"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Gespräch"/>
+      <string key="id" value="sid-47422B2D-5D26-41DB-B127-0615FC7D32FD"/>
+      <string key="sourceRef" value="sid-8B133E30-63CD-4F51-9054-2128FAA3AE77"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Besichtigung"/>
+      <string key="id" value="sid-E4488B23-225F-450A-A883-49E9EB7FD866"/>
+      <string key="sourceRef" value="sid-8EA9E66A-FD82-451E-8458-B4E0A6B0410A"/>
+      <boolean key="conditions" value="1"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Wohnung angenommen"/>
+      <string key="id" value="sid-4398A998-AB97-4E2E-82AE-44E22B35EC42"/>
+      <string key="sourceRef" value="sid-CD775C64-A4DB-4C3E-B6CB-E2040EAF114E"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Kredit"/>
+      <string key="id" value="sid-F278FFA9-D781-428C-9061-460B36BB8DC8"/>
+      <string key="sourceRef" value="sid-942990EF-5FB7-45AA-A6F9-19F0B710BBB3"/>
+      <boolean key="conditions" value="2"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Kredit geben"/>
+      <string key="id" value="sid-905ABD45-2BED-4426-84B1-6A5AA93CCBF1"/>
+      <string key="sourceRef" value="sid-A28477C4-E927-43E7-917A-82FB5927368A"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Unterschreiben des Vertrags"/>
+      <string key="id" value="sid-93BAFAD4-8005-4C6C-8D2E-0717C32C60D7"/>
+      <string key="sourceRef" value="sid-AB2F2F14-A9C0-45CF-862F-01EA4614C301"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Eintragung"/>
+      <string key="id" value="sid-EE223F01-9025-4791-8371-FA708DA6D6AF"/>
+      <string key="sourceRef" value="sid-46404607-BAC7-4D2A-83A7-C0DD65848D37"/>
+    </event>
+  </trace>
+  <trace>
+    <event>
+      <string key="concept:name" value="Wohnung"/>
+      <string key="id" value="sid-90E1E0CC-4697-4AF5-98CB-B0DDA7792ED4"/>
+      <string key="sourceRef" value="sid-13C6ACD3-6178-4F67-9BB8-F436F4FEB36C"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Gespräch"/>
+      <string key="id" value="sid-47422B2D-5D26-41DB-B127-0615FC7D32FD"/>
+      <string key="sourceRef" value="sid-8B133E30-63CD-4F51-9054-2128FAA3AE77"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Besichtigung"/>
+      <string key="id" value="sid-E4488B23-225F-450A-A883-49E9EB7FD866"/>
+      <string key="sourceRef" value="sid-8EA9E66A-FD82-451E-8458-B4E0A6B0410A"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Wohnung abgelehnt"/>
+      <string key="id" value="sid-A8A5AA32-6339-48DB-A399-FE69B576C63A"/>
+      <string key="sourceRef" value="sid-284A3027-4CF4-4FB2-92F1-E78901FA7FC0"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Instance Data Change"/>
+      <string key="id" value="Instance Data Change"/>
+      <string key="sourceRef" value="sid-942990EF-5FB7-45AA-A6F9-19F0B710BBB3"/>
+      <boolean key="conditions" value="0"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Wohnung"/>
+      <string key="id" value="sid-90E1E0CC-4697-4AF5-98CB-B0DDA7792ED4"/>
+      <string key="sourceRef" value="sid-13C6ACD3-6178-4F67-9BB8-F436F4FEB36C"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Gespräch"/>
+      <string key="id" value="sid-47422B2D-5D26-41DB-B127-0615FC7D32FD"/>
+      <string key="sourceRef" value="sid-8B133E30-63CD-4F51-9054-2128FAA3AE77"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Besichtigung"/>
+      <string key="id" value="sid-E4488B23-225F-450A-A883-49E9EB7FD866"/>
+      <string key="sourceRef" value="sid-8EA9E66A-FD82-451E-8458-B4E0A6B0410A"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Wohnung abgelehnt"/>
+      <string key="id" value="sid-A8A5AA32-6339-48DB-A399-FE69B576C63A"/>
+      <string key="sourceRef" value="sid-284A3027-4CF4-4FB2-92F1-E78901FA7FC0"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Instance Data Change"/>
+      <string key="id" value="Instance Data Change"/>
+      <string key="sourceRef" value="sid-942990EF-5FB7-45AA-A6F9-19F0B710BBB3"/>
+      <boolean key="conditions" value="0"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Wohnung"/>
+      <string key="id" value="sid-90E1E0CC-4697-4AF5-98CB-B0DDA7792ED4"/>
+      <string key="sourceRef" value="sid-13C6ACD3-6178-4F67-9BB8-F436F4FEB36C"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Gespräch"/>
+      <string key="id" value="sid-47422B2D-5D26-41DB-B127-0615FC7D32FD"/>
+      <string key="sourceRef" value="sid-8B133E30-63CD-4F51-9054-2128FAA3AE77"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Besichtigung"/>
+      <string key="id" value="sid-E4488B23-225F-450A-A883-49E9EB7FD866"/>
+      <string key="sourceRef" value="sid-8EA9E66A-FD82-451E-8458-B4E0A6B0410A"/>
+      <boolean key="conditions" value="1"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Wohnung angenommen"/>
+      <string key="id" value="sid-4398A998-AB97-4E2E-82AE-44E22B35EC42"/>
+      <string key="sourceRef" value="sid-CD775C64-A4DB-4C3E-B6CB-E2040EAF114E"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Kredit"/>
+      <string key="id" value="sid-F278FFA9-D781-428C-9061-460B36BB8DC8"/>
+      <string key="sourceRef" value="sid-942990EF-5FB7-45AA-A6F9-19F0B710BBB3"/>
+      <boolean key="conditions" value="2"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Kredit geben"/>
+      <string key="id" value="sid-905ABD45-2BED-4426-84B1-6A5AA93CCBF1"/>
+      <string key="sourceRef" value="sid-A28477C4-E927-43E7-917A-82FB5927368A"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Unterschreiben des Vertrags"/>
+      <string key="id" value="sid-93BAFAD4-8005-4C6C-8D2E-0717C32C60D7"/>
+      <string key="sourceRef" value="sid-AB2F2F14-A9C0-45CF-862F-01EA4614C301"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Eintragung"/>
+      <string key="id" value="sid-EE223F01-9025-4791-8371-FA708DA6D6AF"/>
+      <string key="sourceRef" value="sid-46404607-BAC7-4D2A-83A7-C0DD65848D37"/>
+    </event>
+  </trace>
+  <trace>
+    <event>
+      <string key="concept:name" value="Wohnung"/>
+      <string key="id" value="sid-90E1E0CC-4697-4AF5-98CB-B0DDA7792ED4"/>
+      <string key="sourceRef" value="sid-13C6ACD3-6178-4F67-9BB8-F436F4FEB36C"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Gespräch"/>
+      <string key="id" value="sid-47422B2D-5D26-41DB-B127-0615FC7D32FD"/>
+      <string key="sourceRef" value="sid-8B133E30-63CD-4F51-9054-2128FAA3AE77"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Besichtigung"/>
+      <string key="id" value="sid-E4488B23-225F-450A-A883-49E9EB7FD866"/>
+      <string key="sourceRef" value="sid-8EA9E66A-FD82-451E-8458-B4E0A6B0410A"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Wohnung abgelehnt"/>
+      <string key="id" value="sid-A8A5AA32-6339-48DB-A399-FE69B576C63A"/>
+      <string key="sourceRef" value="sid-284A3027-4CF4-4FB2-92F1-E78901FA7FC0"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Instance Data Change"/>
+      <string key="id" value="Instance Data Change"/>
+      <string key="sourceRef" value="sid-942990EF-5FB7-45AA-A6F9-19F0B710BBB3"/>
+      <boolean key="conditions" value="0"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Wohnung"/>
+      <string key="id" value="sid-90E1E0CC-4697-4AF5-98CB-B0DDA7792ED4"/>
+      <string key="sourceRef" value="sid-13C6ACD3-6178-4F67-9BB8-F436F4FEB36C"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Gespräch"/>
+      <string key="id" value="sid-47422B2D-5D26-41DB-B127-0615FC7D32FD"/>
+      <string key="sourceRef" value="sid-8B133E30-63CD-4F51-9054-2128FAA3AE77"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Besichtigung"/>
+      <string key="id" value="sid-E4488B23-225F-450A-A883-49E9EB7FD866"/>
+      <string key="sourceRef" value="sid-8EA9E66A-FD82-451E-8458-B4E0A6B0410A"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Wohnung abgelehnt"/>
+      <string key="id" value="sid-A8A5AA32-6339-48DB-A399-FE69B576C63A"/>
+      <string key="sourceRef" value="sid-284A3027-4CF4-4FB2-92F1-E78901FA7FC0"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Instance Data Change"/>
+      <string key="id" value="Instance Data Change"/>
+      <string key="sourceRef" value="sid-942990EF-5FB7-45AA-A6F9-19F0B710BBB3"/>
+      <boolean key="conditions" value="0"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Wohnung"/>
+      <string key="id" value="sid-90E1E0CC-4697-4AF5-98CB-B0DDA7792ED4"/>
+      <string key="sourceRef" value="sid-13C6ACD3-6178-4F67-9BB8-F436F4FEB36C"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Gespräch"/>
+      <string key="id" value="sid-47422B2D-5D26-41DB-B127-0615FC7D32FD"/>
+      <string key="sourceRef" value="sid-8B133E30-63CD-4F51-9054-2128FAA3AE77"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Besichtigung"/>
+      <string key="id" value="sid-E4488B23-225F-450A-A883-49E9EB7FD866"/>
+      <string key="sourceRef" value="sid-8EA9E66A-FD82-451E-8458-B4E0A6B0410A"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Wohnung abgelehnt"/>
+      <string key="id" value="sid-A8A5AA32-6339-48DB-A399-FE69B576C63A"/>
+      <string key="sourceRef" value="sid-284A3027-4CF4-4FB2-92F1-E78901FA7FC0"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Instance Data Change"/>
+      <string key="id" value="Instance Data Change"/>
+      <string key="sourceRef" value="sid-942990EF-5FB7-45AA-A6F9-19F0B710BBB3"/>
+      <boolean key="conditions" value="0"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Wohnung"/>
+      <string key="id" value="sid-90E1E0CC-4697-4AF5-98CB-B0DDA7792ED4"/>
+      <string key="sourceRef" value="sid-13C6ACD3-6178-4F67-9BB8-F436F4FEB36C"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Gespräch"/>
+      <string key="id" value="sid-47422B2D-5D26-41DB-B127-0615FC7D32FD"/>
+      <string key="sourceRef" value="sid-8B133E30-63CD-4F51-9054-2128FAA3AE77"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Besichtigung"/>
+      <string key="id" value="sid-E4488B23-225F-450A-A883-49E9EB7FD866"/>
+      <string key="sourceRef" value="sid-8EA9E66A-FD82-451E-8458-B4E0A6B0410A"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Wohnung abgelehnt"/>
+      <string key="id" value="sid-A8A5AA32-6339-48DB-A399-FE69B576C63A"/>
+      <string key="sourceRef" value="sid-284A3027-4CF4-4FB2-92F1-E78901FA7FC0"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Instance Data Change"/>
+      <string key="id" value="Instance Data Change"/>
+      <string key="sourceRef" value="sid-942990EF-5FB7-45AA-A6F9-19F0B710BBB3"/>
+      <boolean key="conditions" value="0"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Wohnung"/>
+      <string key="id" value="sid-90E1E0CC-4697-4AF5-98CB-B0DDA7792ED4"/>
+      <string key="sourceRef" value="sid-13C6ACD3-6178-4F67-9BB8-F436F4FEB36C"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Gespräch"/>
+      <string key="id" value="sid-47422B2D-5D26-41DB-B127-0615FC7D32FD"/>
+      <string key="sourceRef" value="sid-8B133E30-63CD-4F51-9054-2128FAA3AE77"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Besichtigung"/>
+      <string key="id" value="sid-E4488B23-225F-450A-A883-49E9EB7FD866"/>
+      <string key="sourceRef" value="sid-8EA9E66A-FD82-451E-8458-B4E0A6B0410A"/>
+      <boolean key="conditions" value="1"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Wohnung angenommen"/>
+      <string key="id" value="sid-4398A998-AB97-4E2E-82AE-44E22B35EC42"/>
+      <string key="sourceRef" value="sid-CD775C64-A4DB-4C3E-B6CB-E2040EAF114E"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Kredit"/>
+      <string key="id" value="sid-F278FFA9-D781-428C-9061-460B36BB8DC8"/>
+      <string key="sourceRef" value="sid-942990EF-5FB7-45AA-A6F9-19F0B710BBB3"/>
+      <boolean key="conditions" value="2"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Kredit geben"/>
+      <string key="id" value="sid-905ABD45-2BED-4426-84B1-6A5AA93CCBF1"/>
+      <string key="sourceRef" value="sid-A28477C4-E927-43E7-917A-82FB5927368A"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Unterschreiben des Vertrags"/>
+      <string key="id" value="sid-93BAFAD4-8005-4C6C-8D2E-0717C32C60D7"/>
+      <string key="sourceRef" value="sid-AB2F2F14-A9C0-45CF-862F-01EA4614C301"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Eintragung"/>
+      <string key="id" value="sid-EE223F01-9025-4791-8371-FA708DA6D6AF"/>
+      <string key="sourceRef" value="sid-46404607-BAC7-4D2A-83A7-C0DD65848D37"/>
+    </event>
+  </trace>
+</log>
