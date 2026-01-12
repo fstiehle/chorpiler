@@ -1,39 +1,39 @@
-import SolDefaultContractGenerator from './Generator/target/Sol/DefaultGenerator';
-import SolStateChannelContractGenerator from './Generator/target/Sol/StateChannelGenerator';
-import TSDefaultFuncGenerator from './Generator/target/Typescript/DefaultFuncGenerator';
-import { INetFastXMLParser } from './Parser/FastXMLParser';
-import { Simulator } from './Simulator/Simulator';
-import { EventLog, Event } from './util/EventLog/EventLog';
-import { Trace } from './util/EventLog/Trace';
-import { XESFastXMLParser } from './util/EventLog/XESFastXMLParser';
+import SolDefaultContractGenerator from "./Generator/target/Sol/DefaultGenerator.js";
+import SolStateChannelContractGenerator from "./Generator/target/Sol/StateChannelGenerator.js";
+import TSDefaultFuncGenerator from "./Generator/target/Typescript/DefaultFuncGenerator.js";
+import { INetFastXMLParser } from "./Parser/FastXMLParser.js";
+import { Simulator } from "./Simulator/Simulator.js";
+import { EventLog, Event } from "./util/EventLog/EventLog.js";
+import { Trace } from "./util/EventLog/Trace.js";
+import { XESFastXMLParser } from "./util/EventLog/XESFastXMLParser.js";
 
 export default {
   Parser: INetFastXMLParser,
   generators: {
     sol: {
       DefaultContractGenerator: SolDefaultContractGenerator,
-      StateChannelContractGenerator: SolStateChannelContractGenerator
+      StateChannelContractGenerator: SolStateChannelContractGenerator,
     },
     ts: {
-       DefaultFunctionGenerator: TSDefaultFuncGenerator
-    }
+      DefaultFunctionGenerator: TSDefaultFuncGenerator,
+    },
   },
   utils: {
     Simulator,
     EventLog,
     Trace,
     Event,
-    XESParser: XESFastXMLParser
-  }
-}
+    XESParser: XESFastXMLParser,
+  },
+};
 
-export * from './Generator/Encoding/TriggerEncoding';
-export * from './Generator/Encoder'
-export * from './Generator/TemplateEngine'
+export * from "./Generator/Encoding/TriggerEncoding.js";
+export * from "./Generator/Encoder.js";
+export * from "./Generator/TemplateEngine.js";
 
-export * from './Parser/Element'
-export * from './Parser/InteractionNet'
-export * from './Parser/Parser'
-export * from './Parser/InteractionNet'
+export * from "./Parser/Element.js";
+export * from "./Parser/InteractionNet.js";
+export * from "./Parser/Parser.js";
+export * from "./Parser/InteractionNet.js";
 
-export * from './util/EventLog/XESParser'
+export * from "./util/EventLog/XESParser.js";

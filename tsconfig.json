@@ -1,21 +1,16 @@
 {
   "compilerOptions": {
     "strict": true,
-    "module": "commonjs",
+    "module": "node16",
     "esModuleInterop": true,
     "declaration": true,
     "target": "es2020",
     "skipLibCheck": true,
     "resolveJsonModule": true,
     "forceConsistentCasingInFileNames": true,
-    "moduleResolution": "node",
+    "moduleResolution": "node16",
     "outDir": "lib",
   },
-  "ts-node": {
-    "files": true
-  },
-  "files": [
-    "src/index.ts"
-  ],
-  "exclude": ["src/Generator/templates"]
+  "include": ["./**/*.ts"],
+  "exclude": ["src/Generator/templates", "node_modules", "lib"],
 }

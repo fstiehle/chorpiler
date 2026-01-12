@@ -1,5 +1,5 @@
-import { InitiatedTransition, MainProcess, Transition } from "./Encoding";
-import { IFromEncoding } from "./IFromEncoding";
+import { InitiatedTransition, MainProcess, Transition } from "./Encoding.js";
+import { IFromEncoding } from "./IFromEncoding.js";
 
 /**
  * Represents the encoding of the process with information needed for
@@ -14,35 +14,48 @@ export class TriggerEncoding implements IFromEncoding {
     public processID: number,
     public tasks: Map<string, number> = new Map(),
     public participants: Map<string, number> = new Map(),
-    public subModels: Map<string, SubProcessEncoding> | null = null
+    public subModels: Map<string, SubProcessEncoding> | null = null,
   ) {}
 
   static fromEncoding(encoding: MainProcess): TriggerEncoding {
     const processID = encoding.id ?? "";
-    const tasks = TriggerEncoding.IDsFromTransitions(Array.from(encoding.transitions.values()));
-    const participants = new Map(
-      [...encoding.participants.values()].map(({ modelID, id }) => [modelID, Number(id)])
+    const tasks = TriggerEncoding.IDsFromTransitions(
+      Array.from(encoding.transitions.values()),
     );
-    const subModels = encoding.subProcesses.size > 0
-      ? new Map(
-          [...encoding.subProcesses.values()].map(subProcess => [
-            subProcess.modelID,
-            new SubProcessEncoding(
-              subProcess.id,
-              TriggerEncoding.IDsFromTransitions(Array.from(subProcess.transitions.values()))
-            )
-          ])
-        )
-      : null;
+    const participants = new Map(
+      [...encoding.participants.values()].map(({ modelID, id }) => [
+        modelID,
+        Number(id),
+      ]),
+    );
+    const subModels =
+      encoding.subProcesses.size > 0
+        ? new Map(
+            [...encoding.subProcesses.values()].map((subProcess) => [
+              subProcess.modelID,
+              new SubProcessEncoding(
+                subProcess.id,
+                TriggerEncoding.IDsFromTransitions(
+                  Array.from(subProcess.transitions.values()),
+                ),
+              ),
+            ]),
+          )
+        : null;
 
     return new TriggerEncoding(processID, tasks, participants, subModels);
   }
 
-  private static IDsFromTransitions(transitions: Transition[]): Map<string, number> {
+  private static IDsFromTransitions(
+    transitions: Transition[],
+  ): Map<string, number> {
     return new Map(
       transitions
-        .filter(transition => transition instanceof InitiatedTransition)
-        .map(transition => [(transition as InitiatedTransition).modelID, Number((transition as InitiatedTransition).taskID)])
+        .filter((transition) => transition instanceof InitiatedTransition)
+        .map((transition) => [
+          (transition as InitiatedTransition).modelID,
+          Number((transition as InitiatedTransition).taskID),
+        ]),
     );
   }
 
@@ -55,8 +68,8 @@ export class TriggerEncoding implements IFromEncoding {
         ? Object.fromEntries(
             [...encoding.subModels].map(([key, subProcess]) => [
               key,
-              SubProcessEncoding.toJSON(subProcess)
-            ])
+              SubProcessEncoding.toJSON(subProcess),
+            ]),
           )
         : undefined,
     };
@@ -76,10 +89,10 @@ export class TriggerEncoding implements IFromEncoding {
         ? new Map(
             Object.entries(object.subModels).map(([key, subProcess]) => [
               key,
-              SubProcessEncoding.fromJSON(subProcess)
-            ])
+              SubProcessEncoding.fromJSON(subProcess),
+            ]),
           )
-        : null
+        : null,
     );
   }
 }
@@ -87,7 +100,7 @@ export class TriggerEncoding implements IFromEncoding {
 class SubProcessEncoding {
   constructor(
     public id: number,
-    public tasks: Map<string, number>
+    public tasks: Map<string, number>,
   ) {}
 
   static toJSON(subProcess: SubProcessEncoding) {
@@ -97,7 +110,13 @@ class SubProcessEncoding {
     };
   }
 
-  static fromJSON(object: { id: number; tasks: { [k: string]: number } }): SubProcessEncoding {
-    return new SubProcessEncoding(object.id, new Map(Object.entries(object.tasks)));
+  static fromJSON(object: {
+    id: number;
+    tasks: { [k: string]: number };
+  }): SubProcessEncoding {
+    return new SubProcessEncoding(
+      object.id,
+      new Map(Object.entries(object.tasks)),
+    );
   }
 }

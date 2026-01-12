@@ -1,33 +1,39 @@
-import { Guard, Place, TaskLabel, Transition } from "../Parser/Element";
-import { INetFastXMLParser } from "../Parser/FastXMLParser";
-import { INetParser } from "../Parser/Parser";
-import { XESFastXMLParser } from "../util/EventLog/XESFastXMLParser";
-import { IXESParser } from "../util/EventLog/XESParser";
-import { Event, EventLog, InstanceDataChange } from "../util/EventLog/EventLog"
-import fs from 'fs';
-import path from 'path';
+import fs from "fs";
 import Mustache from "mustache";
-import { Trace } from "../util/EventLog/Trace";
-import { TemplateEngine } from "../Generator/TemplateEngine";
-import { TriggerEncoding } from "../Generator/Encoding/TriggerEncoding";
-import { CaseVariable } from "../Generator/Encoding/Encoding";
-import SolDefaultContractGenerator from "../Generator/target/Sol/DefaultGenerator";
-import { GeneratorConstructor } from "../Generator/Generator";
+import path from "path";
+import { CaseVariable } from "../Generator/Encoding/Encoding.js";
+import { TriggerEncoding } from "../Generator/Encoding/TriggerEncoding.js";
+import { GeneratorConstructor } from "../Generator/Generator.js";
+import SolDefaultContractGenerator from "../Generator/target/Sol/DefaultGenerator.js";
+import { TemplateEngine } from "../Generator/TemplateEngine.js";
+import { Guard, Place, TaskLabel, Transition } from "../Parser/Element.js";
+import { INetFastXMLParser } from "../Parser/FastXMLParser.js";
+import { INetParser } from "../Parser/Parser.js";
+import {
+  Event,
+  EventLog,
+  InstanceDataChange,
+} from "../util/EventLog/EventLog.js";
+import { Trace } from "../util/EventLog/Trace.js";
+import { XESFastXMLParser } from "../util/EventLog/XESFastXMLParser.js";
+import { IXESParser } from "../util/EventLog/XESParser.js";
 
 const LOGGING_ENABLED = false; // Toggleable logging
 
-type options = { 
-  unfoldSubNets?: boolean, 
-  loopProtection?: boolean, 
-  parseConditions?: boolean 
-}
+type options = {
+  unfoldSubNets?: boolean;
+  loopProtection?: boolean;
+  parseConditions?: boolean;
+};
 
 export interface ISimulation {
-  generate(generator: TemplateEngine): Promise<{ traces: Trace[], contract: { target: string, encoding: TriggerEncoding } | null }>;
+  generate(generator: TemplateEngine): Promise<{
+    traces: Trace[];
+    contract: { target: string; encoding: TriggerEncoding } | null;
+  }>;
 }
 
 export class Simulator {
-
   constructor(
     public workdir: string = ".",
     public bpmnDir: string = path.join(workdir + "/data/bpmn"),
@@ -35,11 +41,13 @@ export class Simulator {
     public xesDir: string = path.join(workdir + "/data/generated"),
     public xesParser: IXESParser = new XESFastXMLParser(),
     public contractDir: string = path.join(workdir + "/data/generated"),
-    public generatorType: GeneratorConstructor = SolDefaultContractGenerator
+    public generatorType: GeneratorConstructor = SolDefaultContractGenerator,
   ) {}
 
   async generate(prePend = "", sim: Simulation): Promise<void> {
-    const bpmnFiles = fs.readdirSync(this.bpmnDir).filter(file => file.endsWith('.bpmn'));
+    const bpmnFiles = fs
+      .readdirSync(this.bpmnDir)
+      .filter((file) => file.endsWith(".bpmn"));
 
     for (const file of bpmnFiles) {
       console.log(`Simulation for ${file}`);
@@ -49,7 +57,9 @@ export class Simulator {
       const iNet = nets[0]; // only support one model
       iNet.id = prePend + iNet.id;
       const generator = new this.generatorType(iNet);
-      generator.addCaseVariable(new CaseVariable("conditions", "uint", "uint public conditions;", true));
+      generator.addCaseVariable(
+        new CaseVariable("conditions", "uint", "uint public conditions;", true),
+      );
 
       const simRes = await sim.generate(generator);
       if (simRes.contract === null || simRes.traces.length === 0) {
@@ -58,16 +68,36 @@ export class Simulator {
       }
 
       const log = new EventLog([...simRes.traces.values()]);
-      const template = fs.readFileSync(path.join(__dirname, "./templates/xes", "log.mustache.xes"), "utf-8");
+      const template = fs.readFileSync(
+        path.join(__dirname, "./templates/xes", "log.mustache.xes"),
+        "utf-8",
+      );
       const renderedLog = Mustache.render(template, log);
 
-      if (!fs.existsSync(this.contractDir)) fs.mkdirSync(this.contractDir, { recursive: true });
-      if (!fs.existsSync(this.xesDir)) fs.mkdirSync(this.xesDir, { recursive: true });
+      if (!fs.existsSync(this.contractDir))
+        fs.mkdirSync(this.contractDir, { recursive: true });
+      if (!fs.existsSync(this.xesDir))
+        fs.mkdirSync(this.xesDir, { recursive: true });
 
-      fs.writeFileSync(path.join(this.xesDir, `${path.basename(file, '.bpmn')}`) + ".xes", renderedLog, "utf-8");
-      fs.writeFileSync(path.join(this.contractDir, `${path.basename(file, '.bpmn')}`) + ".sol", simRes.contract.target, "utf-8");
-      fs.writeFileSync(path.join(this.contractDir, `${path.basename(file, '.bpmn')}`) + ".json", JSON.stringify(TriggerEncoding.toJSON(simRes.contract.encoding)), "utf-8");
-      console.log(`Generated log and contract (${path.basename(file, '.bpmn')}) written to ${this.xesDir} and ${this.contractDir}`);
+      fs.writeFileSync(
+        path.join(this.xesDir, `${path.basename(file, ".bpmn")}`) + ".xes",
+        renderedLog,
+        "utf-8",
+      );
+      fs.writeFileSync(
+        path.join(this.contractDir, `${path.basename(file, ".bpmn")}`) + ".sol",
+        simRes.contract.target,
+        "utf-8",
+      );
+      fs.writeFileSync(
+        path.join(this.contractDir, `${path.basename(file, ".bpmn")}`) +
+          ".json",
+        JSON.stringify(TriggerEncoding.toJSON(simRes.contract.encoding)),
+        "utf-8",
+      );
+      console.log(
+        `Generated log and contract (${path.basename(file, ".bpmn")}) written to ${this.xesDir} and ${this.contractDir}`,
+      );
     }
   }
 }
@@ -76,44 +106,56 @@ export class Simulation implements ISimulation {
   public loggingEnabled = false; // Toggleable logging
 
   constructor(
-    public options: options = { 
-      unfoldSubNets: true, 
+    public options: options = {
+      unfoldSubNets: true,
       loopProtection: false,
-      parseConditions: false
-    }) {}
+      parseConditions: false,
+    },
+  ) {}
 
-  async generate(contractGenerator: TemplateEngine): Promise<{ traces: Trace[], contract: { target: string, encoding: TriggerEncoding } | null }> {
+  async generate(contractGenerator: TemplateEngine): Promise<{
+    traces: Trace[];
+    contract: { target: string; encoding: TriggerEncoding } | null;
+  }> {
     const traces = this.replay(contractGenerator);
     const contract = await this.generateContract(contractGenerator, traces);
     return { traces, contract };
   }
 
-  async generateContract(contractGenerator: TemplateEngine, traces: Trace[]): Promise<{ target: string, encoding: TriggerEncoding } | null> {
+  async generateContract(
+    contractGenerator: TemplateEngine,
+    traces: Trace[],
+  ): Promise<{ target: string; encoding: TriggerEncoding } | null> {
     if (traces.length === 0) {
       console.warn(`No trace generated for ${contractGenerator.iNet.id}`);
       return null;
     }
-    const contract = await contractGenerator.compile(this.options.unfoldSubNets, this.options.loopProtection);
+    const contract = await contractGenerator.compile(
+      this.options.unfoldSubNets,
+      this.options.loopProtection,
+    );
     return contract;
   }
 
   replay(contractGenerator: TemplateEngine): Trace[] {
     const traces: Trace[] = [];
-    const conditions = new Map<string, number>(); 
+    const conditions = new Map<string, number>();
 
     // New: Track visited transitions for loop detection and flushing
     let visited: Transition[] = [];
 
     const addConditionToLog = (
-      currentTrace: Trace, 
-      conditionName: string, 
+      currentTrace: Trace,
+      conditionName: string,
       conditionID: number,
-      addNext = false
+      addNext = false,
     ) => {
       const lastEvent = currentTrace.events.at(-1);
       if (lastEvent && !addNext) {
         lastEvent.dataChange = lastEvent.dataChange || [];
-        lastEvent.dataChange.push(new InstanceDataChange(conditionName, conditionID));
+        lastEvent.dataChange.push(
+          new InstanceDataChange(conditionName, conditionID),
+        );
       } else {
         currentTrace.events.push(
           new Event(
@@ -121,11 +163,11 @@ export class Simulation implements ISimulation {
             "Instance Data Change",
             [...contractGenerator.iNet.participants.values()][0]!.id,
             "",
-            [new InstanceDataChange(conditionName, conditionID)]
-          )
+            [new InstanceDataChange(conditionName, conditionID)],
+          ),
         );
       }
-    }
+    };
 
     const extractUniqueBitmaskNumbers = (expression: string): number[] => {
       const regex = /&\s*(\d+)/g;
@@ -137,11 +179,11 @@ export class Simulation implements ISimulation {
       }
 
       return Array.from(numbers);
-    }
+    };
 
     const processTransition = (
       transitionCandidate: Transition,
-      currentTrace: Trace
+      currentTrace: Trace,
     ) => {
       // If the transition has been visited before in this trace, flush visited and reset
       if (visited.includes(transitionCandidate)) {
@@ -149,7 +191,7 @@ export class Simulation implements ISimulation {
         if (visited.length > 0) {
           addConditionToLog(currentTrace, "conditions", 0, true);
           logIfEnabled(
-            `Loop detected: Flushing visited transitions [${visited.map(t => t.id).join(", ")}] and resetting visited.`
+            `Loop detected: Flushing visited transitions [${visited.map((t) => t.id).join(", ")}] and resetting visited.`,
           );
           visited = [];
         }
@@ -162,11 +204,11 @@ export class Simulation implements ISimulation {
           new Event(
             transitionCandidate.label.name,
             transitionCandidate.id,
-            transitionCandidate.label.sender.id
-          )
+            transitionCandidate.label.sender.id,
+          ),
         );
       }
-    
+
       // Handle conditions for the transition
       const condition = this.getCondition(transitionCandidate);
 
@@ -188,19 +230,23 @@ export class Simulation implements ISimulation {
 
           // Update the guard for the transition
           const guard = new Guard(`conditions[${conditionID}] == true`);
-          guard.conditions.set("", `conditions & ${conditionID} == ${conditionID}`);
+          guard.conditions.set(
+            "",
+            `conditions & ${conditionID} == ${conditionID}`,
+          );
           transitionCandidate.label.guard = guard;
         }
       }
-    }
+    };
 
     const initial = contractGenerator.iNet.initial!;
     const end = contractGenerator.iNet.end!;
     const enabled: Place[] = [initial]; // Start with the initial place
     const candidates: Transition[] = [...initial.target]; // Initial candidates are the transitions from the initial place
     const executed: Transition[] = [];
-    const toExecute: Transition[] = [...contractGenerator.iNet.elements.values()]
-      .filter((t): t is Transition => t instanceof Transition);
+    const toExecute: Transition[] = [
+      ...contractGenerator.iNet.elements.values(),
+    ].filter((t): t is Transition => t instanceof Transition);
     const maxTraces = 2500; // Threshold for maximum log entries
     const log = new EventLog([]); // Initialize the log variable
     let currentTrace = new Trace([]);
@@ -210,10 +256,16 @@ export class Simulation implements ISimulation {
       if (LOGGING_ENABLED) console.log(...args);
     };
 
-    logIfEnabled("To Execute", toExecute.map((t) => t.id));
+    logIfEnabled(
+      "To Execute",
+      toExecute.map((t) => t.id),
+    );
     logIfEnabled("Starting replay...");
     logIfEnabled(`Initial place: ${initial.id}, End place: ${end.id}`);
-    logIfEnabled("Initial candidates:", candidates.map((t) => t.id));
+    logIfEnabled(
+      "Initial candidates:",
+      candidates.map((t) => t.id),
+    );
 
     while (log.traces.length < maxTraces) {
       if (toExecute.every((t) => executed.includes(t))) {
@@ -223,7 +275,7 @@ export class Simulation implements ISimulation {
 
       // Check for execution candidates
       const executableCandidates = candidates.filter((t) =>
-        t.source.every((p) => enabled.includes(p))
+        t.source.every((p) => enabled.includes(p)),
       );
       if (executableCandidates.length === 0) {
         console.error("Deadlock detected: No executable transitions.");
@@ -231,11 +283,19 @@ export class Simulation implements ISimulation {
       }
 
       // Prioritize transitions that are both in toExecute and candidates
-      const prioritizedCandidates = executableCandidates.filter((t) => toExecute.includes(t));
-      const availableCandidates = prioritizedCandidates.length > 0 ? prioritizedCandidates : executableCandidates;
+      const prioritizedCandidates = executableCandidates.filter((t) =>
+        toExecute.includes(t),
+      );
+      const availableCandidates =
+        prioritizedCandidates.length > 0
+          ? prioritizedCandidates
+          : executableCandidates;
 
       // Pick a random candidate
-      const transitionCandidate = availableCandidates[Math.floor(Math.random() * availableCandidates.length)];
+      const transitionCandidate =
+        availableCandidates[
+          Math.floor(Math.random() * availableCandidates.length)
+        ];
       logIfEnabled("Selected transition candidate:", transitionCandidate.id);
 
       // Process the transition
@@ -255,13 +315,22 @@ export class Simulation implements ISimulation {
       candidates.splice(candidates.indexOf(transitionCandidate), 1); // Remove from candidates
       executed.push(transitionCandidate); // Add to executed
 
-      logIfEnabled("Enabled places after execution:", enabled.map((p) => p.id));
-      logIfEnabled("Executed transitions:", executed.map((t) => t.id));
+      logIfEnabled(
+        "Enabled places after execution:",
+        enabled.map((p) => p.id),
+      );
+      logIfEnabled(
+        "Executed transitions:",
+        executed.map((t) => t.id),
+      );
 
       if (transitionCandidate.target.includes(end)) {
         logIfEnabled("End place reached. Flushing trace to log.");
         log.traces.push(currentTrace);
-        logIfEnabled("Trace added to log:", currentTrace.events.map((e) => e.name));
+        logIfEnabled(
+          "Trace added to log:",
+          currentTrace.events.map((e) => e.name),
+        );
 
         // Reset state for the next trace
         enabled.length = 0;
@@ -282,23 +351,33 @@ export class Simulation implements ISimulation {
         });
       });
 
-      logIfEnabled("Updated candidates:", candidates.map((t) => t.id));
+      logIfEnabled(
+        "Updated candidates:",
+        candidates.map((t) => t.id),
+      );
     }
 
     // Remove duplicate traces from the log
-    log.traces = log.traces.filter((trace, index, self) =>
-      index === self.findIndex((t) =>
-        t.events.map((e) => e.id).join(",") === trace.events.map((e) => e.id).join(",")
-      )
+    log.traces = log.traces.filter(
+      (trace, index, self) =>
+        index ===
+        self.findIndex(
+          (t) =>
+            t.events.map((e: any) => e.id).join(",") ===
+            trace.events.map((e: any) => e.id).join(","),
+        ),
     );
 
-    logIfEnabled("Generated log:", log.traces.map((trace) => trace.events.map((e) => e.name)));
+    logIfEnabled(
+      "Generated log:",
+      log.traces.map((trace) => trace.events.map((e: any) => e.name)),
+    );
     traces.push(...log.traces);
     return traces;
   }
 
   private getCondition(transition: Transition) {
-    if (transition.label.guard && transition.label.guard.conditions.size > 0) 
+    if (transition.label.guard && transition.label.guard.conditions.size > 0)
       return [...transition.label.guard.conditions.values()].join(" && ");
   }
 }
