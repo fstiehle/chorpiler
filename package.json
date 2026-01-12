@@ -9,12 +9,11 @@
     "lib/**/*"
   ],
   "scripts": {
-    "test": "mocha tests/index.test.ts && mocha tests/compiler && npx hardhat compile && mocha tests/output",
-    "dev": "mocha tests/compiler -g 'Incident Management' && npx hardhat compile && mocha tests/output -g 'Incident Management'",
-    "debug": "mocha tests/simulator --inspect",
-    "test/compiler": "mocha tests/compiler",
+    "test": "npm run test test/compiler && npm run test test/output",
+    "test/package": "node --import tsx/esm --test tests/index.test.ts",
+    "test/compiler": "node --import tsx/esm --test tests/compiler/*.test.ts",
     "test/output": "mocha tests/output",
-    "test/sim": "mocha tests/simulator",
+    "test/sim": "node --import tsx/esm --test tests/simulator/*.test.ts",
     "build": "tsc -p tsconfig.build.json && ncp ./src/Generator/templates ./lib/Generator/templates && ncp ./src/Simulator/templates ./lib/Simulator/templates",
     "prepublishOnly": "npm run build",
     "preversion": "npm run build",
@@ -23,23 +22,23 @@
   "author": "Fabian Stiehle",
   "license": "ISC",
   "devDependencies": {
-    "@openzeppelin/contracts": "^4.9.5",
-    "@types/chai": "^4.3.11",
-    "@types/chai-as-promised": "^7.1.8",
-    "@types/mocha": "^10.0.6",
-    "@types/node": "^18.19.17",
-    "chai": "^4.4.1",
-    "chai-as-promised": "^7.1.1",
+    "@nomicfoundation/hardhat-network-helpers": "^3.0.3",
+    "@nomicfoundation/hardhat-node-test-runner": "^3.0.8",
+    "@nomicfoundation/hardhat-viem": "^3.0.1",
+    "@nomicfoundation/hardhat-viem-assertions": "^3.0.4",
+    "@openzeppelin/contracts": "^5.4.0",
+    "@types/mocha": "^10.0.10",
+    "@types/node": "^25.0.6",
     "hardhat": "^3.1.3",
-    "mocha": "^10.3.0",
     "ncp": "^2.0.0",
-    "tsx": "^4.19.4",
-    "typescript": "^4.9.5"
+    "tsx": "^4.21.0",
+    "typescript": "^5.9.3",
+    "viem": "^2.44.1"
   },
   "dependencies": {
-    "@types/mustache": "^4.2.5",
+    "@types/mustache": "^4.2.6",
     "@types/seed-random": "^2.2.4",
-    "fast-xml-parser": "^4.3.4",
+    "fast-xml-parser": "^5.3.3",
     "mustache": "^4.2.0",
     "seed-random": "^2.2.0"
   }

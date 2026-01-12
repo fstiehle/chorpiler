@@ -1,6 +1,10 @@
 import fs from "fs";
 import Mustache from "mustache";
 import path from "path";
+import { fileURLToPath } from "url";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 import { CaseVariable } from "../Generator/Encoding/Encoding.js";
 import { TriggerEncoding } from "../Generator/Encoding/TriggerEncoding.js";
 import { GeneratorConstructor } from "../Generator/Generator.js";

@@ -1,7 +1,7 @@
-import { use } from "chai";
+import { describe, it, before, beforeEach } from "node:test";
+import { strict as assert } from "node:assert";
 import * as fs from "fs";
 import { INetParser } from "../../src/Parser/Parser.js";
-import chaiAsPromised from "chai-as-promised";
 import util from "util";
 import { TemplateEngine } from "../../src/Generator/TemplateEngine.js";
 import path from "path";
@@ -14,7 +14,6 @@ import { CaseVariable } from "../../src/Generator/Encoding/Encoding.js";
 
 const readFile = util.promisify(fs.readFile);
 const writeFile = util.promisify(fs.writeFile);
-use(chaiAsPromised);
 
 const compileCase = async (
   generator: TemplateEngine,
@@ -47,110 +46,116 @@ describe("Test Parsing and Generation", () => {
   });
 
   describe("Parse correct BPMN and generate Sol Contracts", () => {
-    it("Compile model with simple seq flow ", () => {
-      return readFile(path.join(BPMN_PATH, "seq-flow.bpmn")).then(
-        async (data) => {
-          const iNet = await parser.fromXML(data);
-          return await new SolDefaultContractGenerator(iNet[0]).compile();
-        },
+    it("Compile model with simple seq flow", async () => {
+      const data = await readFile(path.join(BPMN_PATH, "seq-flow.bpmn"));
+      const iNet = await parser.fromXML(data);
+      const result = await new SolDefaultContractGenerator(iNet[0]).compile();
+      assert.ok(result, "Should successfully compile seq flow model");
+      assert.ok(result.target, "Should generate target contract code");
+    });
+
+    it("Compile model with XOR that allows to skip to the end event to Sol contract", async () => {
+      const data = await readFile(path.join(BPMN_PATH, "xor-skip.bpmn"));
+      const iNet = await parser.fromXML(data);
+      const result = await new SolDefaultContractGenerator(iNet[0]).compile();
+      assert.ok(result, "Should successfully compile XOR skip model");
+      assert.ok(result.target, "Should generate target contract code");
+    });
+
+    it("Compile model with AND to Sol contract", async () => {
+      const data = await readFile(path.join(BPMN_PATH, "and.bpmn"));
+      const iNet = await parser.fromXML(data);
+      const result = await new SolDefaultContractGenerator(iNet[0]).compile();
+      assert.ok(result, "Should successfully compile AND model");
+      assert.ok(result.target, "Should generate target contract code");
+    });
+
+    it("Compile model with XOR to Sol contract", async () => {
+      const data = await readFile(path.join(BPMN_PATH, "xor.bpmn"));
+      const iNet = await parser.fromXML(data);
+      const result = await new SolDefaultContractGenerator(iNet[0]).compile();
+      assert.ok(result, "Should successfully compile XOR model");
+      assert.ok(result.target, "Should generate target contract code");
+    });
+
+    it("Compile model with long (7 consecutive) seq flows to Sol contract", async () => {
+      const data = await readFile(path.join(BPMN_PATH, "seq-flow-7.bpmn"));
+      const iNet = await parser.fromXML(data);
+      const result = await new SolDefaultContractGenerator(iNet[0]).compile();
+      assert.ok(result, "Should successfully compile seq-flow-7 model");
+      assert.ok(result.target, "Should generate target contract code");
+    });
+
+    it("Compile model with uncontrolled merge of seq flows to Sol contract", async () => {
+      const data = await readFile(
+        path.join(BPMN_PATH, "uncontrolled-flow.bpmn"),
       );
+      const iNet = await parser.fromXML(data);
+      const result = await new SolDefaultContractGenerator(iNet[0]).compile();
+      assert.ok(result, "Should successfully compile uncontrolled flow model");
+      assert.ok(result.target, "Should generate target contract code");
     });
 
-    it("Compile model with XOR that allows to skip to the end event to Sol contract", () => {
-      return readFile(path.join(BPMN_PATH, "xor-skip.bpmn")).then(
-        async (data) => {
-          const iNet = await parser.fromXML(data);
-          return await new SolDefaultContractGenerator(iNet[0]).compile();
-        },
+    it("Compile model with sub choreographies to Sol contract", async () => {
+      const data = await readFile(
+        path.join(BPMN_PATH, "sub-choreography.bpmn"),
       );
+      const iNet = await parser.fromXML(data);
+      const result = await new SolDefaultContractGenerator(iNet[0]).compile();
+      assert.ok(result, "Should successfully compile sub choreography model");
+      assert.ok(result.target, "Should generate target contract code");
     });
 
-    it("Compile model with AND to Sol contract", () => {
-      return readFile(path.join(BPMN_PATH, "and.bpmn")).then(async (data) => {
-        const iNet = await parser.fromXML(data);
-        return await new SolDefaultContractGenerator(iNet[0]).compile();
-      });
-    });
-
-    it("Compile model with XOR to Sol contract", () => {
-      return readFile(path.join(BPMN_PATH, "xor.bpmn")).then(async (data) => {
-        const iNet = await parser.fromXML(data);
-        return await new SolDefaultContractGenerator(iNet[0]).compile();
-      });
-    });
-
-    it("Compile model with long (7 consecutive) seq flows to Sol contract", () => {
-      return readFile(path.join(BPMN_PATH, "seq-flow-7.bpmn")).then(
-        async (data) => {
-          const iNet = await parser.fromXML(data);
-          return await new SolDefaultContractGenerator(iNet[0]).compile();
-        },
+    it("Compile model with sub choreographies to Sol contract that separates the instance state (unfold=false)", async () => {
+      const data = await readFile(
+        path.join(BPMN_PATH, "sub-choreography2.bpmn"),
       );
-    });
-
-    it("Compile model with uncontrolled merge of seq flows to Sol contract", () => {
-      return readFile(path.join(BPMN_PATH, "uncontrolled-flow.bpmn")).then(
-        async (data) => {
-          const iNet = await parser.fromXML(data);
-          return await new SolDefaultContractGenerator(iNet[0]).compile();
-        },
+      const iNet = await parser.fromXML(data);
+      const result = await new SolDefaultContractGenerator(iNet[0]).compile(
+        false,
       );
+      assert.ok(result, "Should successfully compile sub choreography2 model");
+      assert.ok(result.target, "Should generate target contract code");
     });
 
-    it("Compile model with sub choreographies to Sol contract", () => {
-      return readFile(path.join(BPMN_PATH, "sub-choreography.bpmn")).then(
-        async (data) => {
-          const iNet = await parser.fromXML(data);
-          return await new SolDefaultContractGenerator(iNet[0]).compile();
-        },
-      );
-    });
-
-    it("Compile model with sub choreographies to Sol contract that seperates the instance state (unfold=false)", () => {
-      return readFile(path.join(BPMN_PATH, "sub-choreography2.bpmn")).then(
-        async (data) => {
-          const iNet = await parser.fromXML(data);
-          return await new SolDefaultContractGenerator(iNet[0]).compile(false);
-        },
-      );
-    });
-
-    it("Compile model with XOR followed by AND to Sol contract", () => {
+    it("Compile model with XOR followed by AND to Sol contract", async () => {
       // Should be reduced properly, according to Rule (i)
-      return readFile(path.join(BPMN_PATH, "xor-and.bpmn")).then(
-        async (data) => {
-          const iNet = await parser.fromXML(data);
-          return await new SolDefaultContractGenerator(iNet[0]).compile();
-        },
-      );
+      const data = await readFile(path.join(BPMN_PATH, "xor-and.bpmn"));
+      const iNet = await parser.fromXML(data);
+      const result = await new SolDefaultContractGenerator(iNet[0]).compile();
+      assert.ok(result, "Should successfully compile XOR-AND model");
+      assert.ok(result.target, "Should generate target contract code");
     });
 
-    it("Compile model with event-based gateway", () => {
-      return readFile(path.join(BPMN_PATH, "event.bpmn")).then(async (data) => {
-        const iNet = await parser.fromXML(data);
-        return await new SolDefaultContractGenerator(iNet[0]).compile();
-      });
+    it("Compile model with event-based gateway", async () => {
+      const data = await readFile(path.join(BPMN_PATH, "event.bpmn"));
+      const iNet = await parser.fromXML(data);
+      const result = await new SolDefaultContractGenerator(iNet[0]).compile();
+      assert.ok(result, "Should successfully compile event model");
+      assert.ok(result.target, "Should generate target contract code");
     });
 
-    it("Compile model with a Loop to Sol contract", () => {
-      return readFile(path.join(BPMN_PATH, "loop.bpmn")).then(async (data) => {
-        const iNet = await parser.fromXML(data);
-        return await new SolDefaultContractGenerator(iNet[0]).compile();
-      });
+    it("Compile model with a Loop to Sol contract", async () => {
+      const data = await readFile(path.join(BPMN_PATH, "loop.bpmn"));
+      const iNet = await parser.fromXML(data);
+      const result = await new SolDefaultContractGenerator(iNet[0]).compile();
+      assert.ok(result, "Should successfully compile loop model");
+      assert.ok(result.target, "Should generate target contract code");
     });
 
-    it("Compile model with a lot of XOR skips to Sol contract", () => {
-      return readFile(path.join(BPMN_PATH, "skip.bpmn")).then(async (data) => {
-        const iNet = await parser.fromXML(data);
-        return await new SolDefaultContractGenerator(iNet[0]).compile();
-      });
+    it("Compile model with a lot of XOR skips to Sol contract", async () => {
+      const data = await readFile(path.join(BPMN_PATH, "skip.bpmn"));
+      const iNet = await parser.fromXML(data);
+      const result = await new SolDefaultContractGenerator(iNet[0]).compile();
+      assert.ok(result, "Should successfully compile skip model");
+      assert.ok(result.target, "Should generate target contract code");
     });
   });
 
   describe("Parse and compile Pizza Case", () => {
     before(() => {
       if (!fs.existsSync(path.join(OUTPUT_PATH, "pizza"))) {
-        fs.mkdirSync(path.join(OUTPUT_PATH, "pizza"));
+        fs.mkdirSync(path.join(OUTPUT_PATH, "pizza"), { recursive: true });
       }
     });
 
@@ -165,10 +170,24 @@ describe("Test Parsing and Generation", () => {
         new CaseVariable("items", "bool", "bool public items = false;", true),
       );
 
-      return compileCase(
+      await compileCase(
         contract,
         path.join(OUTPUT_PATH, "/pizza/PIZZA_ProcessExecution.sol"),
         "PIZZA_",
+      );
+
+      // Verify the files were created
+      assert.ok(
+        fs.existsSync(
+          path.join(OUTPUT_PATH, "/pizza/PIZZA_ProcessExecution.sol"),
+        ),
+        "Pizza contract file should be created",
+      );
+      assert.ok(
+        fs.existsSync(
+          path.join(OUTPUT_PATH, "/pizza/PIZZA_ProcessExecution_encoding.json"),
+        ),
+        "Pizza encoding file should be created",
       );
     });
   });
@@ -176,7 +195,9 @@ describe("Test Parsing and Generation", () => {
   describe("Parse and compile pharmacy (out of order xml file) case", () => {
     before(() => {
       if (!fs.existsSync(path.join(OUTPUT_PATH, "out-of-order"))) {
-        fs.mkdirSync(path.join(OUTPUT_PATH, "out-of-order"));
+        fs.mkdirSync(path.join(OUTPUT_PATH, "out-of-order"), {
+          recursive: true,
+        });
       }
     });
 
@@ -185,10 +206,27 @@ describe("Test Parsing and Generation", () => {
         path.join(BPMN_PATH, "/cases/out-of-order/out-of-order-xml.bpmn"),
       );
 
-      return compileCase(
+      await compileCase(
         new SolDefaultContractGenerator((await parser.fromXML(data))[0]),
         path.join(OUTPUT_PATH, "/out-of-order/PH_ProcessExecution.sol"),
         "PH_",
+      );
+
+      // Verify the files were created
+      assert.ok(
+        fs.existsSync(
+          path.join(OUTPUT_PATH, "/out-of-order/PH_ProcessExecution.sol"),
+        ),
+        "PH contract file should be created",
+      );
+      assert.ok(
+        fs.existsSync(
+          path.join(
+            OUTPUT_PATH,
+            "/out-of-order/PH_ProcessExecution_encoding.json",
+          ),
+        ),
+        "PH encoding file should be created",
       );
     });
 
@@ -197,7 +235,7 @@ describe("Test Parsing and Generation", () => {
         path.join(BPMN_PATH, "/cases/out-of-order/out-of-order-xml.bpmn"),
       );
 
-      return compileCase(
+      await compileCase(
         new SolStateChannelContractGenerator((await parser.fromXML(data))[0]),
         path.join(OUTPUT_PATH, "/out-of-order/PH_ProcessChannel.sol"),
         "PH_",
@@ -208,7 +246,9 @@ describe("Test Parsing and Generation", () => {
   describe("Parse and compile supply chain case", () => {
     before(() => {
       if (!fs.existsSync(path.join(OUTPUT_PATH, "supply-chain"))) {
-        fs.mkdirSync(path.join(OUTPUT_PATH, "supply-chain"));
+        fs.mkdirSync(path.join(OUTPUT_PATH, "supply-chain"), {
+          recursive: true,
+        });
       }
     });
 
@@ -217,10 +257,27 @@ describe("Test Parsing and Generation", () => {
         path.join(BPMN_PATH, "/cases/supply-chain/supply-chain.bpmn"),
       );
 
-      return compileCase(
+      await compileCase(
         new SolDefaultContractGenerator((await parser.fromXML(data))[0]),
         path.join(OUTPUT_PATH, "/supply-chain/SC_ProcessExecution.sol"),
         "SC_",
+      );
+
+      // Verify the files were created
+      assert.ok(
+        fs.existsSync(
+          path.join(OUTPUT_PATH, "/supply-chain/SC_ProcessExecution.sol"),
+        ),
+        "SC contract file should be created",
+      );
+      assert.ok(
+        fs.existsSync(
+          path.join(
+            OUTPUT_PATH,
+            "/supply-chain/SC_ProcessExecution_encoding.json",
+          ),
+        ),
+        "SC encoding file should be created",
       );
     });
 
@@ -229,7 +286,7 @@ describe("Test Parsing and Generation", () => {
         path.join(BPMN_PATH, "/cases/supply-chain/supply-chain.bpmn"),
       );
 
-      return compileCase(
+      await compileCase(
         new SolStateChannelContractGenerator((await parser.fromXML(data))[0]),
         path.join(OUTPUT_PATH, "/supply-chain/SC_ProcessChannel.sol"),
         "SC_",
@@ -240,7 +297,9 @@ describe("Test Parsing and Generation", () => {
   describe("Parse and compile Incident Management Case", () => {
     before(() => {
       if (!fs.existsSync(path.join(OUTPUT_PATH, "incident-management"))) {
-        fs.mkdirSync(path.join(OUTPUT_PATH, "incident-management"));
+        fs.mkdirSync(path.join(OUTPUT_PATH, "incident-management"), {
+          recursive: true,
+        });
       }
     });
 
@@ -264,10 +323,30 @@ describe("Test Parsing and Generation", () => {
         ),
       );
 
-      return compileCase(
+      await compileCase(
         contract,
         path.join(OUTPUT_PATH, "/incident-management/IM_ProcessExecution.sol"),
         "IM_",
+      );
+
+      // Verify the files were created
+      assert.ok(
+        fs.existsSync(
+          path.join(
+            OUTPUT_PATH,
+            "/incident-management/IM_ProcessExecution.sol",
+          ),
+        ),
+        "IM contract file should be created",
+      );
+      assert.ok(
+        fs.existsSync(
+          path.join(
+            OUTPUT_PATH,
+            "/incident-management/IM_ProcessExecution_encoding.json",
+          ),
+        ),
+        "IM encoding file should be created",
       );
     });
 
@@ -279,7 +358,7 @@ describe("Test Parsing and Generation", () => {
         ),
       );
 
-      return compileCase(
+      await compileCase(
         new SolStateChannelContractGenerator((await parser.fromXML(data))[0]),
         path.join(OUTPUT_PATH, "/incident-management/IM_ProcessChannel.sol"),
         "IM_",
@@ -290,7 +369,9 @@ describe("Test Parsing and Generation", () => {
   describe("Parse and compile Rental Agreement Case", () => {
     before(() => {
       if (!fs.existsSync(path.join(OUTPUT_PATH, "rental-agreement"))) {
-        fs.mkdirSync(path.join(OUTPUT_PATH, "rental-agreement"));
+        fs.mkdirSync(path.join(OUTPUT_PATH, "rental-agreement"), {
+          recursive: true,
+        });
       }
     });
 
@@ -313,10 +394,27 @@ describe("Test Parsing and Generation", () => {
         ),
       );
 
-      return compileCase(
+      await compileCase(
         contract,
         path.join(OUTPUT_PATH, "/rental-agreement/RA_ProcessExecution.sol"),
         "RA_",
+      );
+
+      // Verify the files were created
+      assert.ok(
+        fs.existsSync(
+          path.join(OUTPUT_PATH, "/rental-agreement/RA_ProcessExecution.sol"),
+        ),
+        "RA contract file should be created",
+      );
+      assert.ok(
+        fs.existsSync(
+          path.join(
+            OUTPUT_PATH,
+            "/rental-agreement/RA_ProcessExecution_encoding.json",
+          ),
+        ),
+        "RA encoding file should be created",
       );
     });
   });
@@ -324,7 +422,7 @@ describe("Test Parsing and Generation", () => {
   describe("Parse and compile xor-and Case", () => {
     before(() => {
       if (!fs.existsSync(path.join(OUTPUT_PATH, "xor-and"))) {
-        fs.mkdirSync(path.join(OUTPUT_PATH, "xor-and"));
+        fs.mkdirSync(path.join(OUTPUT_PATH, "xor-and"), { recursive: true });
       }
     });
 
@@ -339,10 +437,24 @@ describe("Test Parsing and Generation", () => {
         new CaseVariable("items", "bool", "bool public items = false;", true),
       );
 
-      return compileCase(
+      await compileCase(
         contract,
         path.join(OUTPUT_PATH, "/xor-and/XA_ProcessExecution.sol"),
         "XA_",
+      );
+
+      // Verify the files were created
+      assert.ok(
+        fs.existsSync(
+          path.join(OUTPUT_PATH, "/xor-and/XA_ProcessExecution.sol"),
+        ),
+        "XA contract file should be created",
+      );
+      assert.ok(
+        fs.existsSync(
+          path.join(OUTPUT_PATH, "/xor-and/XA_ProcessExecution_encoding.json"),
+        ),
+        "XA encoding file should be created",
       );
     });
   });

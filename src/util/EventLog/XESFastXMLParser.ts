@@ -1,11 +1,11 @@
-import { XMLParser } from 'fast-xml-parser';
-import { EventLog, Event, InstanceDataChange } from './EventLog';
-import assert from 'assert';
-import { Trace } from './Trace';
+import { XMLParser } from "fast-xml-parser";
+import { EventLog, Event, InstanceDataChange } from "./EventLog.js";
+import assert from "assert";
+import { Trace } from "./Trace.js";
 
 enum Props {
-  key = '@_key',
-  val = '@_value'
+  key = "@_key",
+  val = "@_value",
 }
 
 export class XESFastXMLParser {
@@ -13,63 +13,65 @@ export class XESFastXMLParser {
     ignoreAttributes: false,
     isArray: (_, __, ___, isAttribute) => {
       return !isAttribute;
-    }
+    },
   });
 
   fromXML(xml: Buffer) {
     return new Promise<EventLog>((resolve, reject) => {
       try {
         const parsed = this.parser.parse(xml.toString());
-        const log = parsed['log'];
+        const log = parsed["log"];
         const traces = new Array<Trace>();
 
         if (log.length > 1) {
           console.warn("More than one log, others are ignored...");
         }
 
-        for (const trace of log[0]['trace']) {
+        for (const trace of log[0]["trace"]) {
           const events = new Array<Event>();
 
-          for (const event of trace['event']) {
+          for (const event of trace["event"]) {
             let name = null;
             let id = null;
             let from = null;
             let to = null;
 
-            for (const stringEntry of event['string']) {
-
-              if (stringEntry[Props.key] === 'concept:name') {
+            for (const stringEntry of event["string"]) {
+              if (stringEntry[Props.key] === "concept:name") {
                 name = stringEntry[Props.val];
                 continue;
               }
-              if (stringEntry[Props.key] === 'id') {
+              if (stringEntry[Props.key] === "id") {
                 id = stringEntry[Props.val];
                 continue;
               }
-              if (stringEntry[Props.key] === 'sourceRef') {
+              if (stringEntry[Props.key] === "sourceRef") {
                 from = stringEntry[Props.val];
                 continue;
               }
-              if (stringEntry[Props.key] === 'targetRef') {
+              if (stringEntry[Props.key] === "targetRef") {
                 to = stringEntry[Props.val];
                 continue;
               }
-
             }
 
             // parse instance data
             // TODO: so far we just assume bool and int equals instance data
             const data = new Array<InstanceDataChange>();
-            if ('boolean' in event) {
-              for (const entry of event['boolean']) {
+            if ("boolean" in event) {
+              for (const entry of event["boolean"]) {
                 assert(entry[Props.key] && entry[Props.val]);
-                data.push(new InstanceDataChange(entry[Props.key], entry[Props.val]));
+                data.push(
+                  new InstanceDataChange(entry[Props.key], entry[Props.val]),
+                );
               }
             }
-            if ('int' in event) {
-              for (const entry of event['int']) {
+            if ("int" in event) {
+              for (const entry of event["int"]) {
                 assert(entry[Props.key] && entry[Props.val]);
-                data.push(new InstanceDataChange(entry[Props.key], entry[Props.val]));
+                data.push(
+                  new InstanceDataChange(entry[Props.key], entry[Props.val]),
+                );
               }
             }
 
@@ -87,5 +89,4 @@ export class XESFastXMLParser {
       }
     });
   }
-
 }

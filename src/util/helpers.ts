@@ -1,16 +1,24 @@
-import { Place, TaskLabel, Transition, Element, PlaceType, Label, LabelType } from "../Parser/Element";
-import { InteractionNet } from "../Parser/InteractionNet";
+import {
+  Place,
+  TaskLabel,
+  Transition,
+  Element,
+  PlaceType,
+  Label,
+  LabelType,
+} from "../Parser/Element.js";
+import { InteractionNet } from "../Parser/InteractionNet.js";
 
 export const deleteFromArray = (array: Array<any>, key: any) => {
   const index = array.indexOf(key, 0);
   if (index > -1) {
     array.splice(index, 1);
   }
-}
+};
 
 export const capitalize = (name: string): string => {
   return name.charAt(0).toUpperCase() + name.slice(1);
-}
+};
 
 export const printInet = (iNet: InteractionNet): void => {
   console.log(`Interaction Net: ${iNet.id}`);
@@ -49,7 +57,9 @@ export const printInet = (iNet: InteractionNet): void => {
 
       // Print guards if they exist
       if (element.label.guard) {
-        const guardDetails = Array.from(element.label.guard.conditions.entries())
+        const guardDetails = Array.from(
+          element.label.guard.conditions.entries(),
+        )
           .map(([_, guard]) => `${guard || "defaultflow"}`)
           .join(", ");
         transitionDetails += ` !Guards: ${guardDetails}`;
@@ -66,4 +76,4 @@ export const printInet = (iNet: InteractionNet): void => {
   for (const subNet of iNet.subNets.values()) {
     printInet(subNet);
   }
-}
+};

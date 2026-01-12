@@ -1,4 +1,5 @@
-import { assert } from "chai";
+import { describe, it, after } from "node:test";
+import { strict as assert } from "node:assert";
 // also test some imports
 import chorpiler, {
   InteractionNet,
@@ -13,13 +14,13 @@ import { CaseVariable } from "../src/Generator/Encoding/Encoding.js";
 
 describe("NPM Package", () => {
   it("should be an object", () => {
-    assert.isObject(chorpiler);
+    assert.strictEqual(typeof chorpiler, "object");
   });
 
   it("should have Parser, generators, and utils property", () => {
-    assert.property(chorpiler, "Parser");
-    assert.property(chorpiler, "generators");
-    assert.property(chorpiler, "utils");
+    assert.ok("Parser" in chorpiler);
+    assert.ok("generators" in chorpiler);
+    assert.ok("utils" in chorpiler);
   });
 
   it("should allow importing interfaces", () => {
@@ -41,26 +42,29 @@ describe("NPM Package", () => {
   describe("Parser", () => {
     it("should conform to parser interface", () => {
       const parser = new chorpiler.Parser();
-      assert.isObject(parser);
-      assert.isFunction(parser.fromXML);
+      assert.strictEqual(typeof parser, "object");
+      assert.strictEqual(typeof parser.fromXML, "function");
     });
   });
 
   describe("generators", () => {
     it("should have sol property", () => {
       const gens = chorpiler.generators;
-      assert.property(gens, "sol");
-      assert.property(gens.sol, "DefaultContractGenerator");
-      assert.property(gens.sol, "StateChannelContractGenerator");
+      assert.ok("sol" in gens);
+      assert.ok("DefaultContractGenerator" in gens.sol);
+      assert.ok("StateChannelContractGenerator" in gens.sol);
     });
 
     it("should conform to template engine interface", () => {
-      assert.isFunction(
-        chorpiler.generators.sol.DefaultContractGenerator.prototype.compile,
-      );
-      assert.isFunction(
-        chorpiler.generators.sol.StateChannelContractGenerator.prototype
+      assert.strictEqual(
+        typeof chorpiler.generators.sol.DefaultContractGenerator.prototype
           .compile,
+        "function",
+      );
+      assert.strictEqual(
+        typeof chorpiler.generators.sol.StateChannelContractGenerator.prototype
+          .compile,
+        "function",
       );
     });
   });
@@ -91,7 +95,7 @@ describe("readme code", () => {
   });
 
   it("should generate Process.sol", () => {
-    assert.isOk(fs.existsSync("Process.sol"));
+    assert.ok(fs.existsSync("Process.sol"));
   });
 
   after(() => {

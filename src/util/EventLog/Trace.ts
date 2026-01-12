@@ -1,7 +1,6 @@
-import { Event } from './EventLog';
+import { Event } from "./EventLog.js";
 
 export class Trace implements IterableIterator<Event> {
-
   private pointer = 0;
 
   constructor(public events: Event[]) {}
@@ -10,13 +9,13 @@ export class Trace implements IterableIterator<Event> {
     if (this.pointer < this.events.length) {
       return {
         done: false,
-        value: this.events[this.pointer++]
-      }
+        value: this.events[this.pointer++],
+      };
     } else {
       return {
         done: true,
-        value: null
-      }
+        value: null,
+      };
     }
   }
 

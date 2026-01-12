@@ -2,6 +2,10 @@ import { InteractionNet } from "../../../Parser/InteractionNet.js";
 import { CaseVariable } from "../../Encoding/Encoding.js";
 import { TemplateEngine } from "../../TemplateEngine.js";
 import path from "path";
+import { fileURLToPath } from "url";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 export default class SolDefaultContractGenerator extends TemplateEngine {
   constructor(
