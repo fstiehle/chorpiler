@@ -1,16 +1,16 @@
 import { describe, it, before, beforeEach } from "node:test";
 import { strict as assert } from "node:assert";
 import * as fs from "fs";
-import { INetParser } from "../../src/Parser/Parser.js";
+import { INetParser } from "../src/Parser/Parser.js";
 import util from "util";
-import { TemplateEngine } from "../../src/Generator/TemplateEngine.js";
+import { TemplateEngine } from "../src/Generator/TemplateEngine.js";
 import path from "path";
-import { BPMN_PATH, OUTPUT_PATH } from "../config.js";
-import { INetFastXMLParser } from "../../src/Parser/FastXMLParser.js";
-import SolDefaultContractGenerator from "../../src/Generator/target/Sol/DefaultGenerator.js";
-import SolStateChannelContractGenerator from "../../src/Generator/target/Sol/StateChannelGenerator.js";
-import { TriggerEncoding } from "../../src/Generator/Encoding/TriggerEncoding.js";
-import { CaseVariable } from "../../src/Generator/Encoding/Encoding.js";
+import { BPMN_PATH, CONTRACTS_PATH } from "./config.js";
+import { INetFastXMLParser } from "../src/Parser/FastXMLParser.js";
+import SolDefaultContractGenerator from "../src/Generator/target/Sol/DefaultGenerator.js";
+import SolStateChannelContractGenerator from "../src/Generator/target/Sol/StateChannelGenerator.js";
+import { TriggerEncoding } from "../src/Generator/Encoding/TriggerEncoding.js";
+import { CaseVariable } from "../src/Generator/Encoding/Encoding.js";
 
 const readFile = util.promisify(fs.readFile);
 const writeFile = util.promisify(fs.writeFile);
@@ -154,8 +154,8 @@ describe("Test Parsing and Generation", () => {
 
   describe("Parse and compile Pizza Case", () => {
     before(() => {
-      if (!fs.existsSync(path.join(OUTPUT_PATH, "pizza"))) {
-        fs.mkdirSync(path.join(OUTPUT_PATH, "pizza"), { recursive: true });
+      if (!fs.existsSync(path.join(CONTRACTS_PATH, "pizza"))) {
+        fs.mkdirSync(path.join(CONTRACTS_PATH, "pizza"), { recursive: true });
       }
     });
 
@@ -172,20 +172,23 @@ describe("Test Parsing and Generation", () => {
 
       await compileCase(
         contract,
-        path.join(OUTPUT_PATH, "/pizza/PIZZA_ProcessExecution.sol"),
+        path.join(CONTRACTS_PATH, "/pizza/PIZZA_ProcessExecution.sol"),
         "PIZZA_",
       );
 
       // Verify the files were created
       assert.ok(
         fs.existsSync(
-          path.join(OUTPUT_PATH, "/pizza/PIZZA_ProcessExecution.sol"),
+          path.join(CONTRACTS_PATH, "/pizza/PIZZA_ProcessExecution.sol"),
         ),
         "Pizza contract file should be created",
       );
       assert.ok(
         fs.existsSync(
-          path.join(OUTPUT_PATH, "/pizza/PIZZA_ProcessExecution_encoding.json"),
+          path.join(
+            CONTRACTS_PATH,
+            "/pizza/PIZZA_ProcessExecution_encoding.json",
+          ),
         ),
         "Pizza encoding file should be created",
       );
@@ -194,8 +197,8 @@ describe("Test Parsing and Generation", () => {
 
   describe("Parse and compile pharmacy (out of order xml file) case", () => {
     before(() => {
-      if (!fs.existsSync(path.join(OUTPUT_PATH, "out-of-order"))) {
-        fs.mkdirSync(path.join(OUTPUT_PATH, "out-of-order"), {
+      if (!fs.existsSync(path.join(CONTRACTS_PATH, "out-of-order"))) {
+        fs.mkdirSync(path.join(CONTRACTS_PATH, "out-of-order"), {
           recursive: true,
         });
       }
@@ -208,21 +211,21 @@ describe("Test Parsing and Generation", () => {
 
       await compileCase(
         new SolDefaultContractGenerator((await parser.fromXML(data))[0]),
-        path.join(OUTPUT_PATH, "/out-of-order/PH_ProcessExecution.sol"),
+        path.join(CONTRACTS_PATH, "/out-of-order/PH_ProcessExecution.sol"),
         "PH_",
       );
 
       // Verify the files were created
       assert.ok(
         fs.existsSync(
-          path.join(OUTPUT_PATH, "/out-of-order/PH_ProcessExecution.sol"),
+          path.join(CONTRACTS_PATH, "/out-of-order/PH_ProcessExecution.sol"),
         ),
         "PH contract file should be created",
       );
       assert.ok(
         fs.existsSync(
           path.join(
-            OUTPUT_PATH,
+            CONTRACTS_PATH,
             "/out-of-order/PH_ProcessExecution_encoding.json",
           ),
         ),
@@ -237,7 +240,7 @@ describe("Test Parsing and Generation", () => {
 
       await compileCase(
         new SolStateChannelContractGenerator((await parser.fromXML(data))[0]),
-        path.join(OUTPUT_PATH, "/out-of-order/PH_ProcessChannel.sol"),
+        path.join(CONTRACTS_PATH, "/out-of-order/PH_ProcessChannel.sol"),
         "PH_",
       );
     });
@@ -245,8 +248,8 @@ describe("Test Parsing and Generation", () => {
 
   describe("Parse and compile supply chain case", () => {
     before(() => {
-      if (!fs.existsSync(path.join(OUTPUT_PATH, "supply-chain"))) {
-        fs.mkdirSync(path.join(OUTPUT_PATH, "supply-chain"), {
+      if (!fs.existsSync(path.join(CONTRACTS_PATH, "supply-chain"))) {
+        fs.mkdirSync(path.join(CONTRACTS_PATH, "supply-chain"), {
           recursive: true,
         });
       }
@@ -259,21 +262,21 @@ describe("Test Parsing and Generation", () => {
 
       await compileCase(
         new SolDefaultContractGenerator((await parser.fromXML(data))[0]),
-        path.join(OUTPUT_PATH, "/supply-chain/SC_ProcessExecution.sol"),
+        path.join(CONTRACTS_PATH, "/supply-chain/SC_ProcessExecution.sol"),
         "SC_",
       );
 
       // Verify the files were created
       assert.ok(
         fs.existsSync(
-          path.join(OUTPUT_PATH, "/supply-chain/SC_ProcessExecution.sol"),
+          path.join(CONTRACTS_PATH, "/supply-chain/SC_ProcessExecution.sol"),
         ),
         "SC contract file should be created",
       );
       assert.ok(
         fs.existsSync(
           path.join(
-            OUTPUT_PATH,
+            CONTRACTS_PATH,
             "/supply-chain/SC_ProcessExecution_encoding.json",
           ),
         ),
@@ -288,7 +291,7 @@ describe("Test Parsing and Generation", () => {
 
       await compileCase(
         new SolStateChannelContractGenerator((await parser.fromXML(data))[0]),
-        path.join(OUTPUT_PATH, "/supply-chain/SC_ProcessChannel.sol"),
+        path.join(CONTRACTS_PATH, "/supply-chain/SC_ProcessChannel.sol"),
         "SC_",
       );
     });
@@ -296,8 +299,8 @@ describe("Test Parsing and Generation", () => {
 
   describe("Parse and compile Incident Management Case", () => {
     before(() => {
-      if (!fs.existsSync(path.join(OUTPUT_PATH, "incident-management"))) {
-        fs.mkdirSync(path.join(OUTPUT_PATH, "incident-management"), {
+      if (!fs.existsSync(path.join(CONTRACTS_PATH, "incident-management"))) {
+        fs.mkdirSync(path.join(CONTRACTS_PATH, "incident-management"), {
           recursive: true,
         });
       }
@@ -325,7 +328,10 @@ describe("Test Parsing and Generation", () => {
 
       await compileCase(
         contract,
-        path.join(OUTPUT_PATH, "/incident-management/IM_ProcessExecution.sol"),
+        path.join(
+          CONTRACTS_PATH,
+          "/incident-management/IM_ProcessExecution.sol",
+        ),
         "IM_",
       );
 
@@ -333,7 +339,7 @@ describe("Test Parsing and Generation", () => {
       assert.ok(
         fs.existsSync(
           path.join(
-            OUTPUT_PATH,
+            CONTRACTS_PATH,
             "/incident-management/IM_ProcessExecution.sol",
           ),
         ),
@@ -342,7 +348,7 @@ describe("Test Parsing and Generation", () => {
       assert.ok(
         fs.existsSync(
           path.join(
-            OUTPUT_PATH,
+            CONTRACTS_PATH,
             "/incident-management/IM_ProcessExecution_encoding.json",
           ),
         ),
@@ -360,7 +366,7 @@ describe("Test Parsing and Generation", () => {
 
       await compileCase(
         new SolStateChannelContractGenerator((await parser.fromXML(data))[0]),
-        path.join(OUTPUT_PATH, "/incident-management/IM_ProcessChannel.sol"),
+        path.join(CONTRACTS_PATH, "/incident-management/IM_ProcessChannel.sol"),
         "IM_",
       );
     });
@@ -368,8 +374,8 @@ describe("Test Parsing and Generation", () => {
 
   describe("Parse and compile Rental Agreement Case", () => {
     before(() => {
-      if (!fs.existsSync(path.join(OUTPUT_PATH, "rental-agreement"))) {
-        fs.mkdirSync(path.join(OUTPUT_PATH, "rental-agreement"), {
+      if (!fs.existsSync(path.join(CONTRACTS_PATH, "rental-agreement"))) {
+        fs.mkdirSync(path.join(CONTRACTS_PATH, "rental-agreement"), {
           recursive: true,
         });
       }
@@ -396,21 +402,24 @@ describe("Test Parsing and Generation", () => {
 
       await compileCase(
         contract,
-        path.join(OUTPUT_PATH, "/rental-agreement/RA_ProcessExecution.sol"),
+        path.join(CONTRACTS_PATH, "/rental-agreement/RA_ProcessExecution.sol"),
         "RA_",
       );
 
       // Verify the files were created
       assert.ok(
         fs.existsSync(
-          path.join(OUTPUT_PATH, "/rental-agreement/RA_ProcessExecution.sol"),
+          path.join(
+            CONTRACTS_PATH,
+            "/rental-agreement/RA_ProcessExecution.sol",
+          ),
         ),
         "RA contract file should be created",
       );
       assert.ok(
         fs.existsSync(
           path.join(
-            OUTPUT_PATH,
+            CONTRACTS_PATH,
             "/rental-agreement/RA_ProcessExecution_encoding.json",
           ),
         ),
@@ -421,8 +430,8 @@ describe("Test Parsing and Generation", () => {
 
   describe("Parse and compile xor-and Case", () => {
     before(() => {
-      if (!fs.existsSync(path.join(OUTPUT_PATH, "xor-and"))) {
-        fs.mkdirSync(path.join(OUTPUT_PATH, "xor-and"), { recursive: true });
+      if (!fs.existsSync(path.join(CONTRACTS_PATH, "xor-and"))) {
+        fs.mkdirSync(path.join(CONTRACTS_PATH, "xor-and"), { recursive: true });
       }
     });
 
@@ -439,20 +448,23 @@ describe("Test Parsing and Generation", () => {
 
       await compileCase(
         contract,
-        path.join(OUTPUT_PATH, "/xor-and/XA_ProcessExecution.sol"),
+        path.join(CONTRACTS_PATH, "/xor-and/XA_ProcessExecution.sol"),
         "XA_",
       );
 
       // Verify the files were created
       assert.ok(
         fs.existsSync(
-          path.join(OUTPUT_PATH, "/xor-and/XA_ProcessExecution.sol"),
+          path.join(CONTRACTS_PATH, "/xor-and/XA_ProcessExecution.sol"),
         ),
         "XA contract file should be created",
       );
       assert.ok(
         fs.existsSync(
-          path.join(OUTPUT_PATH, "/xor-and/XA_ProcessExecution_encoding.json"),
+          path.join(
+            CONTRACTS_PATH,
+            "/xor-and/XA_ProcessExecution_encoding.json",
+          ),
         ),
         "XA encoding file should be created",
       );

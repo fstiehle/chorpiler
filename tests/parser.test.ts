@@ -2,10 +2,10 @@ import { describe, it, beforeEach } from "node:test";
 import { strict as assert } from "node:assert";
 import util from "util";
 import * as fs from "fs";
-import { INetParser } from "../../src/Parser/Parser.js";
+import { INetParser } from "../src/Parser/Parser.js";
 import path from "path";
-import { BPMN_PATH } from "../config.js";
-import { INetFastXMLParser } from "../../src/Parser/FastXMLParser.js";
+import { BPMN_PATH } from "./config.js";
+import { INetFastXMLParser } from "../src/Parser/FastXMLParser.js";
 
 const readFile = util.promisify(fs.readFile);
 

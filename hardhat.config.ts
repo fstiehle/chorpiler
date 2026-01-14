@@ -4,7 +4,7 @@ import hardhatViemAssertions from "@nomicfoundation/hardhat-viem-assertions";
 import hardhatNodeTestRunner from "@nomicfoundation/hardhat-node-test-runner";
 import hardhatNetworkHelpers from "@nomicfoundation/hardhat-network-helpers";
 
-const OUTPUT_PATH = "./tests/output";
+const SOURCES_PATH = "./tests/output";
 
 const config: HardhatUserConfig = {
   solidity: {
@@ -17,10 +17,10 @@ const config: HardhatUserConfig = {
     },
   },
   paths: {
-    sources: OUTPUT_PATH + "/contracts",
-    tests: OUTPUT_PATH,
-    cache: OUTPUT_PATH + "/cache",
-    artifacts: OUTPUT_PATH + "/artifacts",
+    sources: SOURCES_PATH + "/contracts",
+    tests: SOURCES_PATH,
+    cache: SOURCES_PATH + "/cache",
+    artifacts: SOURCES_PATH + "/artifacts",
   },
   plugins: [
     hardhatViem,

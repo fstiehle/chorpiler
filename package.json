@@ -10,13 +10,13 @@
   ],
   "scripts": {
     "test": "npm run test test/compiler && npm run test test/output",
-    "test/package": "node --import tsx/esm --test tests/index.test.ts",
-    "test/compiler": "node --import tsx/esm --test tests/compiler/*.test.ts",
-    "test/output": "mocha tests/output",
-    "test/sim": "node --import tsx/esm --test tests/simulator/*.test.ts",
+    "test/pckg": "node --import tsx/esm --test tests/index.test.ts",
+    "test/comp": "node --import tsx/esm --test tests/parser.test.ts && node --import tsx/esm --test tests/generator.test.ts",
+    "test/exec": "mocha tests/execution.test.ts",
+    "test/simu": "node --import tsx/esm --test tests/simulator/*.test.ts",
     "build": "tsc -p tsconfig.build.json && ncp ./src/Generator/templates ./lib/Generator/templates && ncp ./src/Simulator/templates ./lib/Simulator/templates",
     "prepublishOnly": "npm run build",
-    "preversion": "npm run build",
+    "preversion": "npm run build && npm run test/pckg",
     "clean": "rm -rf lib"
   },
   "author": "Fabian Stiehle",
