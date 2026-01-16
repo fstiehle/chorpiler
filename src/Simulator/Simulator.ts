@@ -24,124 +24,223 @@ import { IXESParser } from "../util/EventLog/XESParser.js";
 
 const LOGGING_ENABLED = false; // Toggleable logging
 
-type options = {
+export interface LogGenerationOptions {
+  parseConditions?: boolean;
+  maxTraces?: number;
+}
+
+export interface ContractGenerationOptions {
   unfoldSubNets?: boolean;
   loopProtection?: boolean;
   parseConditions?: boolean;
-};
+  maxTraces?: number;
+}
 
-export interface ISimulation {
-  generate(generator: TemplateEngine): Promise<{
-    traces: Trace[];
-    contract: { target: string; encoding: TriggerEncoding } | null;
-  }>;
+export interface SimulatorConfig {
+  workdir?: string;
+  bpmnDir?: string;
+  bpmnParser?: INetParser;
+  xesDir?: string;
+  xesParser?: IXESParser;
+  contractDir?: string;
+  generatorType?: GeneratorConstructor;
+  fileFilter?: (filename: string) => boolean;
+  outputFormat?: {
+    xes?: boolean;
+    contract?: boolean;
+    encoding?: boolean;
+  };
+  logging?: {
+    enabled?: boolean;
+    level?: "error" | "warn" | "info" | "debug";
+  };
 }
 
 export class Simulator {
-  constructor(
-    public workdir: string = ".",
-    public bpmnDir: string = path.join(workdir + "/data/bpmn"),
-    public bpmnParser: INetParser = new INetFastXMLParser(),
-    public xesDir: string = path.join(workdir + "/data/generated"),
-    public xesParser: IXESParser = new XESFastXMLParser(),
-    public contractDir: string = path.join(workdir + "/data/generated"),
-    public generatorType: GeneratorConstructor = SolDefaultContractGenerator,
-  ) {}
+  public readonly workdir: string;
+  public readonly bpmnDir: string;
+  public readonly bpmnParser: INetParser;
+  public readonly xesDir: string;
+  public readonly xesParser: IXESParser;
+  public readonly contractDir: string;
+  public readonly generatorType: GeneratorConstructor;
+  public readonly fileFilter: (filename: string) => boolean;
+  public readonly logging: boolean;
 
-  async generate(prePend = "", sim: Simulation): Promise<void> {
-    const bpmnFiles = fs
-      .readdirSync(this.bpmnDir)
-      .filter((file) => file.endsWith(".bpmn"));
+  constructor(config: SimulatorConfig = {}) {
+    this.workdir = config.workdir ?? ".";
+    this.bpmnDir = config.bpmnDir ?? path.join(this.workdir, "data", "bpmn");
+    this.bpmnParser = config.bpmnParser ?? new INetFastXMLParser();
+    this.xesDir = config.xesDir ?? path.join(this.workdir, "data", "generated");
+    this.xesParser = config.xesParser ?? new XESFastXMLParser();
+    this.contractDir =
+      config.contractDir ?? path.join(this.workdir, "data", "generated");
+    this.generatorType = config.generatorType ?? SolDefaultContractGenerator;
+    this.fileFilter =
+      config.fileFilter ?? ((filename: string) => filename.endsWith(".bpmn"));
+    this.logging = config.logging?.enabled ?? true;
+  }
+
+  async generateLog(
+    prePend = "",
+    options: LogGenerationOptions = {},
+  ): Promise<void> {
+    const bpmnFiles = fs.readdirSync(this.bpmnDir).filter(this.fileFilter);
 
     for (const file of bpmnFiles) {
-      console.log(`Simulation for ${file}`);
+      if (this.logging) console.log(`Log generation for ${file}`);
       const filePath = path.join(this.bpmnDir, file);
       const model = fs.readFileSync(filePath);
-      const nets = await this.bpmnParser!.fromXML(model);
-      const iNet = nets[0]; // only support one model
-      iNet.id = prePend + iNet.id;
-      const generator = new this.generatorType(iNet);
-      generator.addCaseVariable(
-        new CaseVariable("conditions", "uint", "uint public conditions;", true),
-      );
 
-      const simRes = await sim.generate(generator);
-      if (simRes.contract === null || simRes.traces.length === 0) {
-        console.warn(`No contract or traces generated for ${file}, skipping.`);
+      try {
+        const nets = await this.bpmnParser!.fromXML(model);
+        const iNet = nets[0]; // only support one model
+        iNet.id = prePend + iNet.id;
+        const generator = new this.generatorType(iNet);
+        generator.addCaseVariable(
+          new CaseVariable(
+            "conditions",
+            "uint",
+            "uint public conditions;",
+            true,
+          ),
+        );
+
+        const traces = this.replay(generator, options);
+        if (traces.length === 0) {
+          console.warn(`No traces generated for ${file}, skipping.`);
+          continue;
+        }
+
+        const baseName = prePend + path.basename(file, ".bpmn");
+        this.writeLogFile(traces, baseName);
+
+        console.log(`Generated log (${baseName}) written to ${this.xesDir}`);
+      } catch (error) {
+        console.error(
+          `Failed to generate log for ${file}: ${error instanceof Error ? error.message : String(error)}`,
+        );
         continue;
       }
-
-      const log = new EventLog([...simRes.traces.values()]);
-      const template = fs.readFileSync(
-        path.join(__dirname, "./templates/xes", "log.mustache.xes"),
-        "utf-8",
-      );
-      const renderedLog = Mustache.render(template, log);
-
-      if (!fs.existsSync(this.contractDir))
-        fs.mkdirSync(this.contractDir, { recursive: true });
-      if (!fs.existsSync(this.xesDir))
-        fs.mkdirSync(this.xesDir, { recursive: true });
-
-      fs.writeFileSync(
-        path.join(this.xesDir, `${path.basename(file, ".bpmn")}`) + ".xes",
-        renderedLog,
-        "utf-8",
-      );
-      fs.writeFileSync(
-        path.join(this.contractDir, `${path.basename(file, ".bpmn")}`) + ".sol",
-        simRes.contract.target,
-        "utf-8",
-      );
-      fs.writeFileSync(
-        path.join(this.contractDir, `${path.basename(file, ".bpmn")}`) +
-          ".json",
-        JSON.stringify(TriggerEncoding.toJSON(simRes.contract.encoding)),
-        "utf-8",
-      );
-      console.log(
-        `Generated log and contract (${path.basename(file, ".bpmn")}) written to ${this.xesDir} and ${this.contractDir}`,
-      );
     }
-  }
-}
-
-export class Simulation implements ISimulation {
-  public loggingEnabled = false; // Toggleable logging
-
-  constructor(
-    public options: options = {
-      unfoldSubNets: true,
-      loopProtection: false,
-      parseConditions: false,
-    },
-  ) {}
-
-  async generate(contractGenerator: TemplateEngine): Promise<{
-    traces: Trace[];
-    contract: { target: string; encoding: TriggerEncoding } | null;
-  }> {
-    const traces = this.replay(contractGenerator);
-    const contract = await this.generateContract(contractGenerator, traces);
-    return { traces, contract };
   }
 
   async generateContract(
+    prePend = "",
+    options: ContractGenerationOptions = {},
+  ): Promise<void> {
+    const bpmnFiles = fs.readdirSync(this.bpmnDir).filter(this.fileFilter);
+
+    for (const file of bpmnFiles) {
+      if (this.logging) console.log(`Contract generation for ${file}`);
+      const filePath = path.join(this.bpmnDir, file);
+      const model = fs.readFileSync(filePath);
+
+      try {
+        const nets = await this.bpmnParser!.fromXML(model);
+        const iNet = nets[0]; // only support one model
+        iNet.id = prePend + iNet.id;
+        const generator = new this.generatorType(iNet);
+        generator.addCaseVariable(
+          new CaseVariable(
+            "conditions",
+            "uint",
+            "uint public conditions;",
+            true,
+          ),
+        );
+
+        const traces = this.replay(generator, options);
+        if (traces.length === 0) {
+          console.warn(
+            `No traces generated for ${file}, skipping contract generation.`,
+          );
+          continue;
+        }
+
+        const contract = await this.compileContract(generator, traces, options);
+        if (!contract) {
+          console.warn(`No contract generated for ${file}, skipping.`);
+          continue;
+        }
+
+        const baseName = prePend + path.basename(file, ".bpmn");
+        this.writeContractFiles(contract, baseName);
+
+        console.log(
+          `Generated contract (${baseName}) written to ${this.contractDir}`,
+        );
+      } catch (error) {
+        console.error(
+          `Failed to generate contract for ${file}: ${error instanceof Error ? error.message : String(error)}`,
+        );
+        continue;
+      }
+    }
+  }
+
+  private writeLogFile(traces: Trace[], baseName: string): void {
+    const log = new EventLog([...traces.values()]);
+    const template = fs.readFileSync(
+      path.join(__dirname, "./templates/xes", "log.mustache.xes"),
+      "utf-8",
+    );
+    const renderedLog = Mustache.render(template, log);
+
+    if (!fs.existsSync(this.xesDir)) {
+      fs.mkdirSync(this.xesDir, { recursive: true });
+    }
+
+    fs.writeFileSync(
+      path.join(this.xesDir, `${baseName}.xes`),
+      renderedLog,
+      "utf-8",
+    );
+  }
+
+  private writeContractFiles(
+    contract: { target: string; encoding: TriggerEncoding },
+    baseName: string,
+  ): void {
+    if (!fs.existsSync(this.contractDir)) {
+      fs.mkdirSync(this.contractDir, { recursive: true });
+    }
+
+    // Write contract file
+    fs.writeFileSync(
+      path.join(this.contractDir, `${baseName}.sol`),
+      contract.target,
+      "utf-8",
+    );
+
+    // Write encoding file
+    fs.writeFileSync(
+      path.join(this.contractDir, `${baseName}.json`),
+      JSON.stringify(TriggerEncoding.toJSON(contract.encoding)),
+      "utf-8",
+    );
+  }
+
+  private async compileContract(
     contractGenerator: TemplateEngine,
     traces: Trace[],
+    options: ContractGenerationOptions,
   ): Promise<{ target: string; encoding: TriggerEncoding } | null> {
     if (traces.length === 0) {
       console.warn(`No trace generated for ${contractGenerator.iNet.id}`);
       return null;
     }
     const contract = await contractGenerator.compile(
-      this.options.unfoldSubNets,
-      this.options.loopProtection,
+      options.unfoldSubNets ?? true,
+      options.loopProtection ?? false,
     );
     return contract;
   }
 
-  replay(contractGenerator: TemplateEngine): Trace[] {
+  private replay(
+    contractGenerator: TemplateEngine,
+    options: LogGenerationOptions | ContractGenerationOptions = {},
+  ): Trace[] {
     const traces: Trace[] = [];
     const conditions = new Map<string, number>();
 
@@ -217,7 +316,7 @@ export class Simulation implements ISimulation {
       const condition = this.getCondition(transitionCandidate);
 
       if (condition) {
-        if (this.options.parseConditions) {
+        if (options.parseConditions) {
           // parse numbers from the condition, for each add it to the log
           const conditionIDs = extractUniqueBitmaskNumbers(condition);
           for (const id of conditionIDs) {
@@ -251,7 +350,7 @@ export class Simulation implements ISimulation {
     const toExecute: Transition[] = [
       ...contractGenerator.iNet.elements.values(),
     ].filter((t): t is Transition => t instanceof Transition);
-    const maxTraces = 2500; // Threshold for maximum log entries
+    const maxTraces = options.maxTraces ?? 2500; // Threshold for maximum log entries
     const log = new EventLog([]); // Initialize the log variable
     let currentTrace = new Trace([]);
 

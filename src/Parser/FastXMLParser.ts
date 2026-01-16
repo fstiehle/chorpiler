@@ -532,6 +532,8 @@ export class INetFastXMLParser implements INetParser {
   fromXML(xml: Buffer): Promise<InteractionNet[]> {
     return new Promise<InteractionNet[]>((resolve, reject) => {
       const parsed = this.parser.parse(xml.toString());
+      if (!(Elements.rootElements in parsed))
+        return reject(new Error("No root elements found, malformed XML?"));
       const rootElements = parsed[Elements.rootElements][0];
       if (
         !(Elements.choreographies in rootElements) ||

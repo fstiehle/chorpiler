@@ -3,8 +3,7 @@ import hardhatViem from "@nomicfoundation/hardhat-viem";
 import hardhatViemAssertions from "@nomicfoundation/hardhat-viem-assertions";
 import hardhatNodeTestRunner from "@nomicfoundation/hardhat-node-test-runner";
 import hardhatNetworkHelpers from "@nomicfoundation/hardhat-network-helpers";
-
-const SOURCES_PATH = "./tests/output";
+import { CONTRACTS_PATH, OUTPUT_PATH } from "./tests/config.js";
 
 const config: HardhatUserConfig = {
   solidity: {
@@ -17,10 +16,9 @@ const config: HardhatUserConfig = {
     },
   },
   paths: {
-    sources: SOURCES_PATH + "/contracts",
-    tests: SOURCES_PATH,
-    cache: SOURCES_PATH + "/cache",
-    artifacts: SOURCES_PATH + "/artifacts",
+    sources: CONTRACTS_PATH,
+    cache: OUTPUT_PATH + "/cache",
+    artifacts: OUTPUT_PATH + "/artifacts",
   },
   plugins: [
     hardhatViem,

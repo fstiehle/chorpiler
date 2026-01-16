@@ -19,64 +19,92 @@ describe("Test BPMN choreography parsing", () => {
       parser = new INetFastXMLParser();
     });
 
-    it("Parse model with XOR", async () => {
-      const data = await readFile(path.join(BPMN_PATH, "xor.bpmn"));
-      const result = await parser.fromXML(data);
-      assert.ok(result, "Should successfully parse XOR model");
-      assert.ok(
-        Array.isArray(result),
-        "Should return an array of interaction nets",
+    describe("Parse models that should succeed", () => {
+      const shouldSucceedPath = path.join(
+        BPMN_PATH,
+        "edgecases",
+        "shouldsucceed",
       );
+      const successFiles = fs
+        .readdirSync(shouldSucceedPath)
+        .filter((file) => file.endsWith(".bpmn"));
+
+      successFiles.forEach((bpmnFile) => {
+        it(`Parse ${bpmnFile} successfully`, async () => {
+          const data = await readFile(path.join(shouldSucceedPath, bpmnFile));
+          const result = await parser.fromXML(data);
+
+          const modelName = bpmnFile.replace(".bpmn", "");
+          assert.ok(result, `Should successfully parse ${modelName} model`);
+          assert.ok(
+            Array.isArray(result),
+            "Should return an array of interaction nets",
+          );
+          assert.ok(
+            result.length > 0,
+            "Should contain at least one interaction net",
+          );
+        });
+      });
     });
 
-    it("Parse model with AND", async () => {
-      const data = await readFile(path.join(BPMN_PATH, "and.bpmn"));
-      const result = await parser.fromXML(data);
-      assert.ok(result, "Should successfully parse AND model");
-      assert.ok(
-        Array.isArray(result),
-        "Should return an array of interaction nets",
-      );
-    });
+    describe("Parse models that should fail", () => {
+      const shouldFailPath = path.join(BPMN_PATH, "edgecases", "shouldfail");
+      const failFiles = fs
+        .readdirSync(shouldFailPath)
+        .filter((file) => file.endsWith(".bpmn"));
 
-    it("Parse model with XOR Skip", async () => {
-      const data = await readFile(path.join(BPMN_PATH, "xor-skip.bpmn"));
-      const result = await parser.fromXML(data);
-      assert.ok(result, "Should successfully parse XOR Skip model");
-      assert.ok(
-        Array.isArray(result),
-        "Should return an array of interaction nets",
-      );
-    });
+      failFiles.forEach((bpmnFile) => {
+        it(`Parse ${bpmnFile} and expect error`, async () => {
+          const data = await readFile(path.join(shouldFailPath, bpmnFile));
 
-    it("Parse model with call choreography and report missing support", async () => {
-      const data = await readFile(
-        path.join(BPMN_PATH, "call-choreography.bpmn"),
-      );
-
-      await assert.rejects(
-        async () => {
-          await parser.fromXML(data);
-        },
-        /Unsupported Element/,
-        "Should reject with 'Unsupported Element' error",
-      );
-    });
-
-    it("Parse malformed model and report error", async () => {
-      const data = await readFile(path.join(BPMN_PATH, "malformed.bpmn"));
-
-      await assert.rejects(async () => {
-        await parser.fromXML(data);
-      }, "Should reject when parsing malformed model");
-    });
-
-    it("Parse model with XOR with missing default sequence flow and report error", async () => {
-      const data = await readFile(path.join(BPMN_PATH, "xor-nodefault.bpmn"));
-
-      await assert.rejects(async () => {
-        await parser.fromXML(data);
-      }, "Should reject when XOR is missing default sequence flow");
+          try {
+            // Check for specific error types based on file name
+            if (bpmnFile.includes("call-choreography")) {
+              await assert.rejects(
+                async () => {
+                  await parser.fromXML(data);
+                },
+                /Unsupported Element/,
+                "Should reject with 'Unsupported Element' error",
+              );
+            } else if (bpmnFile.includes("xor-nodefault")) {
+              await assert.rejects(
+                async () => {
+                  await parser.fromXML(data);
+                },
+                /XOR without an outgoing default flow/,
+                "Should reject when XOR is missing default sequence flow",
+              );
+            } else if (bpmnFile.includes("malformed")) {
+              await assert.rejects(
+                async () => {
+                  await parser.fromXML(data);
+                },
+                /malformed XML/,
+                "Should reject when parsing malformed XML",
+              );
+            } else {
+              await assert.rejects(
+                async () => {
+                  await parser.fromXML(data);
+                },
+                `Should reject when parsing ${bpmnFile.replace(".bpmn", "")} model`,
+              );
+            }
+          } catch (error) {
+            console.error(`Unexpected error in test for ${bpmnFile}:`, error);
+            console.error(`Error details:`, {
+              message: error instanceof Error ? error.message : String(error),
+              stack: error instanceof Error ? error.stack : undefined,
+              name: error instanceof Error ? error.name : typeof error,
+            });
+            throw new Error(
+              `Test failed for ${bpmnFile}: ${error instanceof Error ? error.message : String(error)}`,
+            );
+          }
+        });
+      });
     });
   });
 });

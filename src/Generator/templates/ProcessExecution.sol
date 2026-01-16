@@ -1,7 +1,11 @@
 //SPDX-License-Identifier: MIT
 pragma solidity ^0.8.9;
 
-contract {{{modelID}}} {
+interface IProcessExecution {
+    function enact(uint id) external;
+}
+
+contract {{{modelID}}} is IProcessExecution {
   {{^hasSubProcesses}}
   uint public tokenState = 1;
   {{/hasSubProcesses}}

@@ -12,12 +12,13 @@
     "test": "npm run test test/compiler && npm run test test/output",
     "test/pckg": "node --import tsx/esm --test tests/index.test.ts",
     "test/comp": "node --import tsx/esm --test tests/parser.test.ts && node --import tsx/esm --test tests/generator.test.ts",
-    "test/exec": "mocha tests/execution.test.ts",
+    "test/exec": "node --import tsx/esm --test tests/execution.test.ts",
     "test/simu": "node --import tsx/esm --test tests/simulator/*.test.ts",
     "build": "tsc -p tsconfig.build.json && ncp ./src/Generator/templates ./lib/Generator/templates && ncp ./src/Simulator/templates ./lib/Simulator/templates",
     "prepublishOnly": "npm run build",
     "preversion": "npm run build && npm run test/pckg",
-    "clean": "rm -rf lib"
+    "clean": "rm -rf lib",
+    "script/gen": "node --import tsx/esm tests/scripts/generate-logs.ts"
   },
   "author": "Fabian Stiehle",
   "license": "ISC",
