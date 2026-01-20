@@ -15,10 +15,17 @@ const config: HardhatUserConfig = {
       },
     },
   },
+  networks: {
+    default: {
+      type: "edr-simulated",
+      chainType: "generic",
+    },
+  },
   paths: {
     sources: CONTRACTS_PATH,
     cache: OUTPUT_PATH + "/cache",
     artifacts: OUTPUT_PATH + "/artifacts",
+    tests: "tests",
   },
   plugins: [
     hardhatViem,

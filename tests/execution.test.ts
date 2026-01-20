@@ -2,23 +2,24 @@
  * Test suite for process execution functionality
  */
 import { network } from "hardhat";
-import { describe, it } from "node:test";
+import { afterEach, beforeEach, describe, it } from "node:test";
 import { strict as assert } from "node:assert";
 import {
-  prepareContracts,
   genNonConformingLogs,
   getTokenState,
   enact,
   dataSet,
-} from "./execution-helpers.js";
-import { Client } from "viem";
+  prepareContracts,
+} from "./helpers/execution-helpers.js";
 
 /**
  * Test suite for process execution functionality
  */
-const { viem, networkHelpers } = await network.connect();
+const { viem, networkHelpers, networkName } = await network.connect();
 const client = await viem.getPublicClient();
-const context = await prepareContracts();
+const testClient = await viem.getTestClient();
+const context = await prepareContracts(viem);
+console.log("Connected to client: " + networkName);
 
 describe("Execute all contracts by replaying xes logs in output/contracts", () => {
   async function contractsFixture() {
@@ -39,7 +40,14 @@ describe("Execute all contracts by replaying xes logs in output/contracts", () =
       describe(`should execute contract: ${contractData.contractName}`, async () => {
         await networkHelpers.loadFixture(contractsFixture);
         const { contractName, contract, encoding, log, wallets } = contractData;
-        console.log(contract.address);
+        assert(
+          contract != undefined && contract.address != undefined,
+          "contract is not set up, did you load the fixture?",
+        );
+
+        afterEach(async () => {
+          await networkHelpers.loadFixture(contractsFixture);
+        });
 
         log.traces.forEach((trace, i) => {
           it(`replay conforming trace ${i}`, async () => {
@@ -60,12 +68,19 @@ describe("Execute all contracts by replaying xes logs in output/contracts", () =
               }
 
               const taskID = encoding.tasks.get(event.id);
-              //console.debug(`source '${event.source}' event '${event.name}'`)
+              // console.debug(`source '${event.source}' event '${event.name}'`);
               if (taskID !== undefined) {
                 const preTokenState = await getTokenState(client, contract);
                 console.debug("Try to Enact Task:", event.name, "ID:", taskID);
-                await enact(client, wallets[participantID], contract, taskID);
+                const receipt = await enact(
+                  client,
+                  wallets[participantID],
+                  contract,
+                  taskID,
+                );
+
                 const postTokenState = await getTokenState(client, contract);
+                console.log(postTokenState);
                 // Expect that tokenState has changed!
                 assert.notEqual(
                   preTokenState,
