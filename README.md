@@ -2,10 +2,13 @@
 > 2.0 Pre-Release WIP Version
 
 [![Node.js CI](https://github.com/fstiehle/chorpiler/actions/workflows/node.js.yml/badge.svg)](https://github.com/fstiehle/chorpiler/actions/workflows/node.js.yml)
-- A compiler to transform BPMN 2.0 choreographies to efficient smart contract components, based on petri-net reductions.
+- A compiler to transform BPMN 2.0 models to efficient smart contract components, based on petri-net reductions.
 - Current targets supported: Solidity Smart Contracts, [Algorand TEAL Contracts](https://github.com/fstiehle/chorpiler-algorandvm)(v1)
 
 ## Overview
+
+Chorpiler is a tool to transform a BPMN choreography model into a Solidity smart contract that encodes the process. The contract will enforce the order of task execution, the authorisation (correct participant exeucting the task) based on bound blockchain-addresses, and data-based (XOR) decisions.
+Chorpiler has additional tools that help with testing and interacting with such contracts. Chorpiler supports the following choreography elements.
 
 | Element            | Supported  |
 |--------------------|------------|
@@ -23,9 +26,6 @@ Install and use through [npm](https://www.npmjs.com/package/chorpiler).
 ```
 npm install chorpiler
 ```
-
-Chorpiler is a tool to transform a BPMN process model into a Solidity smart contract that encodes the process. The contract will enforce the order of task execution, the authorisation (correct participant exeucting the task) based on bound blockchain-addresses, and data-based XOR decisions.
-Chorpiler has additional tools that help with testing and interacting with such contracts (see below: TODO)
 
 See below example.
 
