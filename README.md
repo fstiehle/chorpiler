@@ -24,9 +24,8 @@ Install and use through [npm](https://www.npmjs.com/package/chorpiler).
 npm install chorpiler
 ```
 
-Chorpiler offers two types of output that implement the process model: 
-(i) a smart contract that can be used directly to execute the process, and performs conformance checks (participant address, control flow, data-based decisions) on each task.
-(ii) a state channel smart contract (see an example usage of channels in [fstiehle/leafhopper](https://www.github.com/fstiehle/leafhopper)).
+Chorpiler is a tool to transform a BPMN process model into a Solidity smart contract that encodes the process. The contract will enforce the order of task execution, the authorisation (correct participant exeucting the task) based on bound blockchain-addresses, and data-based XOR decisions.
+Chorpiler has additional tools that help with testing and interacting with such contracts (see below: TODO)
 
 See below example.
 
@@ -61,22 +60,20 @@ return contractGenerator.compile().then((gen) => {
 
 For usage see also the tests defined in `tests/compiler`. For usage of the resulting smart contracts also see `tests/output`.
 
-### Case Variables
+### Case Variables & Data-Based Decisions
 
-> TODO
+> TODO:
+XOR Picture example plus corresponding XML code.
 
-## Run & Tests
+### Interacting with Contracts
 
-If you have node installed, a simple `npm install` is enough. To confirm, you can execute tests using `npm run test`. 
+> TODO: describe encodings and 
+isEnabled(), give VIM example
 
-Two groups of tests exist:
-- **Testing the parser and compiler**: By running `npm run test/compiler`, tests are executed confirming that the parser and compiler produce outputs from a range of correct and supported process models without reporting errors and rejects malformed and unsupported BPMN elements with reporting errors. These tests are found in `tests/compiler`.
-- **Testing the generated output:** By running `npm run test/output`, tests are executed confirming that the produced outputs are valid artefacts, by replaying conforming logs (which must lead to a valid execution) and non-conforming logs (which must be rejected). Gas cost are also reported for the conforming logs. These tests are found in `tests/output`.
-
-`npm run test` runs both test groups.
-
-## Theory
-
+### Advanced: Tools to Help Testing Your Contracts
+> TODO:
+Simulator howto
+ 
 ### Petri net generation
 
 Our approach is based on the optimised translation technique presented in Garćıa-Bañuelos et al. [1]: a process model is converted into a Petri net, and
