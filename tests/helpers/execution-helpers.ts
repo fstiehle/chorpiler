@@ -20,10 +20,9 @@ interface ContractData {
   contract: any;
   encoding: TriggerEncoding;
   log: EventLog;
+  nonLog?: EventLog;
   wallets: WalletClient[];
 }
-
-const NR_NON_CONFORMING_TRACES = 2500;
 
 export async function prepareContracts(viem: HardhatViemHelpers) {
   const parser = new XESFastXMLParser();
@@ -52,26 +51,34 @@ export async function prepareContracts(viem: HardhatViemHelpers) {
     );
     assert(log.traces.length !== 0);
 
+    let nonLog: EventLog | undefined;
+    try {
+      nonLog = await parser.fromXML(
+        readFileSync(
+          path.join(XES_PATH, "nonconforming", `non_${contractName}.xes`),
+        ),
+      );
+      assert(nonLog.traces.length !== 0);
+    } catch {
+      console.warn(
+        `Non-conforming log not found for ${contractName}. ` +
+          `Expected at: ${path.join(XES_PATH, "nonconforming", `non_${contractName}.xes`)}. ` +
+          `Consider generating it using the generate-nonlogs script.`,
+      );
+    }
+
     const contract: any | undefined = undefined;
     contracts.push({
       contractName,
       contract,
       encoding,
       log,
+      nonLog,
       wallets,
     });
   }
 
   return contracts;
-}
-
-export function genNonConformingLogs(log: EventLog, encoding: TriggerEncoding) {
-  const badLog = EventLog.genNonConformingLog(
-    log,
-    encoding,
-    NR_NON_CONFORMING_TRACES,
-  );
-  return badLog;
 }
 
 export async function getTokenState(client: PublicClient, contract: any) {
@@ -80,7 +87,7 @@ export async function getTokenState(client: PublicClient, contract: any) {
     abi: contract.abi,
     functionName: "tokenState",
   });
-  return val;
+  return Number(val);
 }
 
 export async function enact(
@@ -101,9 +108,6 @@ export async function enact(
   const hash = await wallet.writeContract(request);
   //console.log(`Transaction submitted with hash: ${hash}`);
 
-  // Wait a bit to see if transaction appears
-  await new Promise((resolve) => setTimeout(resolve, 1000));
-
   try {
     // Check if transaction exists before waiting
     const tx = await client.getTransaction({ hash });
@@ -111,7 +115,7 @@ export async function enact(
   } catch (error) {
     console.warn(`Transaction not found immediately: ${hash}`);
     // Try to resubmit or handle gracefully
-    throw new Error(
+    return new Error(
       `Transaction ${hash} was not found in the mempool. This may indicate a network issue or the transaction was rejected.`,
     );
   }
@@ -141,9 +145,7 @@ export async function dataSet(
   dataChange: InstanceDataChange[],
 ) {
   for (const el of dataChange) {
-    //console.log(`Setting ${el.variable} to ${el.val} (type: ${typeof el.val})`);
-
-    const { request } = await client.simulateContract({
+    const { result, request } = await client.simulateContract({
       address: contract.address,
       abi: contract.abi,
       functionName: "set" + capitalize(el.variable),
@@ -154,16 +156,13 @@ export async function dataSet(
     const hash = await wallet.writeContract(request);
     //console.log(`DataSet transaction submitted: ${hash}`);
 
-    // Wait a bit to see if transaction appears
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-
     try {
       // Check if transaction exists before waiting
       const tx = await client.getTransaction({ hash });
       //console.log(`DataSet transaction found: ${tx.hash}`);
     } catch (error) {
       console.warn(`DataSet transaction not found: ${hash}`);
-      throw new Error(
+      return new Error(
         `DataSet transaction ${hash} was not found in the mempool for variable ${el.variable}`,
       );
     }
@@ -185,4 +184,17 @@ export async function dataSet(
 
     //console.log(`DataSet transaction mined for ${el.variable}`);
   }
+}
+
+export async function isEnabled(
+  client: PublicClient,
+  contract: any,
+  encoding: TriggerEncoding,
+  taskModelId: string,
+) {
+  const state = await getTokenState(client, contract);
+  return (
+    encoding.states.has(state) &&
+    encoding.states.get(state)!.includes(taskModelId)
+  );
 }

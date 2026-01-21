@@ -21,7 +21,7 @@ break; // is end
 id = 0;
 {{/loopProtection}}
 {{/initiator}}
-continue; 
+continue;
 {{/isEnd}}
 {{#hasConditions}}
 }

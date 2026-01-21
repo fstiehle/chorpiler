@@ -14,6 +14,7 @@ export class TriggerEncoding implements IFromEncoding {
     public processID: number,
     public tasks: Map<string, number> = new Map(),
     public participants: Map<string, number> = new Map(),
+    public states: Map<number, string[]> = new Map(),
     public subModels: Map<string, SubProcessEncoding> | null = null,
   ) {}
 
@@ -27,6 +28,16 @@ export class TriggerEncoding implements IFromEncoding {
         modelID,
         Number(id),
       ]),
+    );
+    const states = new Map(
+      [...encoding.states.entries()]
+        .filter((entry) => entry[1] instanceof Array)
+        .map((entry) => [
+          entry[0],
+          entry[1]
+            .filter((e) => e instanceof InitiatedTransition)
+            .map((e) => e.modelID),
+        ]),
     );
     const subModels =
       encoding.subProcesses.size > 0
@@ -43,7 +54,13 @@ export class TriggerEncoding implements IFromEncoding {
           )
         : null;
 
-    return new TriggerEncoding(processID, tasks, participants, subModels);
+    return new TriggerEncoding(
+      processID,
+      tasks,
+      participants,
+      states,
+      subModels,
+    );
   }
 
   private static IDsFromTransitions(
@@ -64,6 +81,7 @@ export class TriggerEncoding implements IFromEncoding {
       processID: encoding.processID,
       tasks: Object.fromEntries(encoding.tasks),
       participants: Object.fromEntries(encoding.participants),
+      states: Object.fromEntries(encoding.states),
       subModels: encoding.subModels
         ? Object.fromEntries(
             [...encoding.subModels].map(([key, subProcess]) => [
@@ -79,12 +97,21 @@ export class TriggerEncoding implements IFromEncoding {
     processID: number;
     tasks: { [k: string]: number };
     participants: { [k: string]: number };
+    states?: { [k: string]: string[] };
     subModels?: { [k: string]: { id: number; tasks: { [k: string]: number } } };
   }): TriggerEncoding {
     return new TriggerEncoding(
       object.processID,
       new Map(Object.entries(object.tasks)),
       new Map(Object.entries(object.participants)),
+      object.states
+        ? new Map(
+            Object.entries(object.states).map(([key, value]) => [
+              Number(key),
+              value,
+            ]),
+          )
+        : new Map(),
       object.subModels
         ? new Map(
             Object.entries(object.subModels).map(([key, subProcess]) => [

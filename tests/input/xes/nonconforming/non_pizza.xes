@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<log xes.version="1.0">
+	<global scope="event">
+		<string key="concept:name" value="Task Name" />
+		<string key="sourceRef" value="Participant ID" />
+	</global>
+  <trace>
+    <event>
+      <string key="concept:name" value="order pizza" />
+      <string key="id" value="ChoreographyTask_0hy9n0g" />
+      <string key="sourceRef" value="Participant_06qakjv" />
+    </event>
+    <event>
+      <string key="concept:name" value="order pizza" />
+      <string key="id" value="ChoreographyTask_0hy9n0g" />
+      <string key="sourceRef" value="Participant_06qakjv" />
+      <boolean key="items" value="true" />
+    </event>
+    <event>
+      <string key="concept:name" value="Deliver Pizza" />
+      <string key="id" value="ChoreographyTask_1797ws1" />
+      <string key="sourceRef" value="Participant_0537iz2" />
+    </event>
+  </trace>
+</log>

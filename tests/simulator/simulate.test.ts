@@ -1,8 +1,9 @@
 import { describe, it, before } from "node:test";
 import { strict as assert } from "node:assert";
-import { Simulation, Simulator } from "../../src/Simulator/Simulator.js";
+import { Simulator } from "../../src/Simulator/Simulator.js";
 import { XESFastXMLParser } from "../../src/util/EventLog/XESFastXMLParser.js";
 import { EventLog } from "../../src/util/EventLog/EventLog.js";
+import { FuzzyLog } from "../../src/Simulator/FuzzyLog.js";
 import * as fs from "fs";
 import * as path from "path";
 import { TriggerEncoding } from "../../src/Generator/Encoding/TriggerEncoding.js";
@@ -12,17 +13,11 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 describe("Simulate...", () => {
-  const sim = new Simulator(__dirname);
+  const sim = new Simulator({ workdir: __dirname });
 
   before(async () => {
-    await sim.generate(
-      "test_",
-      new Simulation({
-        unfoldSubNets: true,
-        loopProtection: true,
-        parseConditions: true,
-      }),
-    );
+    await sim.generateContract();
+    await sim.generateLog();
   });
 
   it("should parse every XES in data/generated and generate a non-conforming log", async () => {
@@ -73,7 +68,8 @@ describe("Simulate...", () => {
       );
 
       // Generate a non-conforming log by shuffling events in each trace
-      const nonConformingLog = EventLog.genNonConformingLog(
+      const fuzzyLog = new FuzzyLog();
+      const nonConformingLog = fuzzyLog.genNonConformingLog(
         eventLog,
         triggerEncoding,
         30,

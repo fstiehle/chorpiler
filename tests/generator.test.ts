@@ -15,7 +15,7 @@ import { BPMN_PATH, CONTRACTS_PATH } from "./config.js";
 const readFile = util.promisify(fs.readFile);
 const writeFile = util.promisify(fs.writeFile);
 
-describe.skip("Generation of edge cases", () => {
+describe("Generation of edge cases", () => {
   let parser: INetParser;
 
   beforeEach(() => {

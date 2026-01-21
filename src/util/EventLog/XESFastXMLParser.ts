@@ -61,17 +61,17 @@ export class XESFastXMLParser {
             if ("boolean" in event) {
               for (const entry of event["boolean"]) {
                 assert(entry[Props.key] && entry[Props.val]);
-                data.push(
-                  new InstanceDataChange(entry[Props.key], entry[Props.val]),
-                );
+                // Convert string "true"/"false" to actual boolean
+                const boolVal = entry[Props.val] === "true";
+                data.push(new InstanceDataChange(entry[Props.key], boolVal));
               }
             }
             if ("int" in event) {
               for (const entry of event["int"]) {
                 assert(entry[Props.key] && entry[Props.val]);
-                data.push(
-                  new InstanceDataChange(entry[Props.key], entry[Props.val]),
-                );
+                // Convert string number to actual number
+                const intVal = parseInt(entry[Props.val], 10);
+                data.push(new InstanceDataChange(entry[Props.key], intVal));
               }
             }
 

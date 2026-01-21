@@ -1,7 +1,7 @@
 import fs from "fs";
 import path from "path";
-import { Simulator } from "../../src/Simulator/Simulator.js";
-import { BPMN_PATH, CONTRACTS_PATH, XES_PATH } from "../config.js";
+import { Simulator } from "../../../src/Simulator/Simulator.js";
+import { BPMN_PATH, CONTRACTS_PATH, XES_PATH } from "../../config.js";
 
 const PREPEND = "sim_";
 
@@ -88,6 +88,7 @@ async function generateForFile(filename: string) {
 
   let xesSuccess = false;
   let contractSuccess = false;
+  const baseName = PREPEND + path.basename(filename, ".bpmn");
 
   // Generate XES logs
   console.log("\nGenerating XES event logs...");
@@ -97,9 +98,8 @@ async function generateForFile(filename: string) {
     });
 
     // Check if XES file was generated
-    const baseName = path.basename(filename, ".bpmn");
-    const expectedXesFile = path.join(xesOutputDir, `${baseName}.xes`);
 
+    const expectedXesFile = path.join(xesOutputDir, `${baseName}.xes`);
     if (fs.existsSync(expectedXesFile)) {
       const stats = fs.statSync(expectedXesFile);
       console.log(
@@ -126,17 +126,8 @@ async function generateForFile(filename: string) {
     });
 
     // Check if contract files were generated
-    const baseName = path.basename(filename, ".bpmn");
-    const expectedSolFile = path.join(
-      contractOutputDir,
-      PREPEND,
-      `${baseName}.sol`,
-    );
-    const expectedJsonFile = path.join(
-      contractOutputDir,
-      PREPEND,
-      `${baseName}.json`,
-    );
+    const expectedSolFile = path.join(contractOutputDir, `${baseName}.sol`);
+    const expectedJsonFile = path.join(contractOutputDir, `${baseName}.json`);
 
     if (fs.existsSync(expectedSolFile)) {
       const stats = fs.statSync(expectedSolFile);

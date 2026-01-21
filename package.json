@@ -9,7 +9,7 @@
     "lib/**/*"
   ],
   "scripts": {
-    "test": "npm run test test/compiler && npm run test test/output",
+    "test": "npm run test/pckg && npm run test/simu && npm run test/comp && npx hardhat compile && npm run test/exec",
     "test/pckg": "node --import tsx/esm --test tests/index.test.ts",
     "test/comp": "node --import tsx/esm --test tests/parser.test.ts && node --import tsx/esm --test tests/generator.test.ts",
     "test/exec": "node --import tsx/esm --test tests/execution.test.ts",
@@ -18,7 +18,8 @@
     "prepublishOnly": "npm run build",
     "preversion": "npm run build && npm run test/pckg",
     "clean": "rm -rf lib",
-    "script/gen": "node --import tsx/esm tests/scripts/generate-logs.ts"
+    "script/simu": "node --import tsx/esm tests/helpers/scripts/generate-logs.ts",
+    "script/fuzz": "node --import tsx/esm tests/helpers/scripts/generate-nonlogs.ts"
   },
   "author": "Fabian Stiehle",
   "license": "ISC",

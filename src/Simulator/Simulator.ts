@@ -81,6 +81,9 @@ export class Simulator {
     this.logging = config.logging?.enabled ?? true;
   }
 
+  // The log generator will generate a conditions array,
+  // where each XOR gateway is represented by a binary i = 0 | 1.
+  // This is necessary to generate mock conditions.
   async generateLog(
     prePend = "",
     options: LogGenerationOptions = {},

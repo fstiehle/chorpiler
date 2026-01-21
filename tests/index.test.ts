@@ -74,7 +74,9 @@ describe("readme code", () => {
   it("should run", async () => {
     const parser = new chorpiler.Parser();
 
-    const bpmnXML = fs.readFileSync(path.join(BPMN_PATH, "xor.bpmn"));
+    const bpmnXML = fs.readFileSync(
+      path.join(BPMN_PATH, "/edgecases/shouldsucceed/xor.bpmn"),
+    );
     // parse BPMN file into petri net
     const iNet = await parser.fromXML(bpmnXML);
 
