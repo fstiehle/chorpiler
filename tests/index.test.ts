@@ -74,10 +74,8 @@ describe("readme code", () => {
   it("should run", async () => {
     const parser = new chorpiler.Parser();
 
-    const bpmnXML = fs.readFileSync(
-      path.join(BPMN_PATH, "/edgecases/shouldsucceed/xor.bpmn"),
-    );
-    // parse BPMN file into petri net
+    const bpmnXML = fs.readFileSync(path.join("./docs/examples/pizza.bpmn"));
+    // parse BPMN file
     const iNet = await parser.fromXML(bpmnXML);
 
     const contractGenerator =
@@ -88,10 +86,11 @@ describe("readme code", () => {
       .compile()
       .then((gen) => {
         fs.writeFileSync("Process.sol", gen.target, { flag: "w+" });
-        console.log("Process.sol generated.");
+        // console.log("Process.sol generated.");
+        assert(TriggerEncoding.toJSON(gen.encoding));
         // log encoding of participants and tasks,
+        // console.log(TriggerEncoding.toJSON(gen.encoding));
         // can also be written to a .json file
-        console.log(TriggerEncoding.toJSON(gen.encoding));
       })
       .catch((err) => console.error(err));
   });
