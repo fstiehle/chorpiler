@@ -14,7 +14,7 @@ export class TriggerEncoding implements IFromEncoding {
     public processID: number,
     public tasks: Map<string, number> = new Map(),
     public participants: Map<string, number> = new Map(),
-    public states: Map<number, string[]> = new Map(),
+    public states: Map<string, number> = new Map(),
     public subModels: Map<string, SubProcessEncoding> | null = null,
   ) {}
 
@@ -30,14 +30,9 @@ export class TriggerEncoding implements IFromEncoding {
       ]),
     );
     const states = new Map(
-      [...encoding.states.entries()]
-        .filter((entry) => entry[1] instanceof Array)
-        .map((entry) => [
-          entry[0],
-          entry[1]
-            .filter((e) => e instanceof InitiatedTransition)
-            .map((e) => e.modelID),
-        ]),
+      [...encoding.states.entries()].flatMap(([key, value]) =>
+        value.map((e) => [e.id, key]),
+      ),
     );
     const subModels =
       encoding.subProcesses.size > 0
@@ -97,7 +92,7 @@ export class TriggerEncoding implements IFromEncoding {
     processID: number;
     tasks: { [k: string]: number };
     participants: { [k: string]: number };
-    states?: { [k: string]: string[] };
+    states?: { [k: string]: number };
     subModels?: { [k: string]: { id: number; tasks: { [k: string]: number } } };
   }): TriggerEncoding {
     return new TriggerEncoding(
@@ -107,8 +102,8 @@ export class TriggerEncoding implements IFromEncoding {
       object.states
         ? new Map(
             Object.entries(object.states).map(([key, value]) => [
-              Number(key),
-              value,
+              key,
+              Number(value),
             ]),
           )
         : new Map(),

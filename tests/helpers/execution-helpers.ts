@@ -115,26 +115,28 @@ export async function enact(
   } catch (error) {
     console.warn(`Transaction not found immediately: ${hash}`);
     // Try to resubmit or handle gracefully
-    return new Error(
+    throw new Error(
       `Transaction ${hash} was not found in the mempool. This may indicate a network issue or the transaction was rejected.`,
     );
   }
-
-  const receipt = await Promise.race([
-    client.waitForTransactionReceipt({ hash }),
-    new Promise((_, reject) =>
-      setTimeout(
-        () =>
-          reject(
-            new Error(
-              `Transaction timeout: ${hash} not mined after 10 seconds`,
-            ),
-          ),
-        10000,
+  const receipt = await (async () => {
+    let timer: NodeJS.Timeout;
+    return Promise.race([
+      client.waitForTransactionReceipt({ hash }),
+      new Promise<null>(
+        (_, reject) =>
+          (timer = setTimeout(
+            () =>
+              reject(
+                new Error(
+                  `Transaction timeout: ${hash} not mined after 2 seconds`,
+                ),
+              ),
+            2000,
+          )),
       ),
-    ),
-  ]);
-
+    ]).finally(() => clearTimeout(timer));
+  })();
   return receipt;
 }
 
@@ -167,34 +169,65 @@ export async function dataSet(
       );
     }
 
-    await Promise.race([
-      client.waitForTransactionReceipt({ hash }),
-      new Promise((_, reject) =>
-        setTimeout(
-          () =>
-            reject(
-              new Error(
-                `DataSet timeout: ${hash} not mined after 10 seconds for ${el.variable}`,
-              ),
-            ),
-          10000,
+    const receipt = await (async () => {
+      let timer: NodeJS.Timeout;
+      return Promise.race([
+        client.waitForTransactionReceipt({ hash }),
+        new Promise<null>(
+          (_, reject) =>
+            (timer = setTimeout(
+              () =>
+                reject(
+                  new Error(
+                    `Transaction timeout: ${hash} not mined after 2 seconds`,
+                  ),
+                ),
+              2000,
+            )),
         ),
-      ),
-    ]);
+      ]).finally(() => clearTimeout(timer));
+    })();
 
     //console.log(`DataSet transaction mined for ${el.variable}`);
   }
 }
 
+// isEnabled will report false for a task if it is behind an automated gateway where the process is currently halted.
+// this can happen in two situations:
+//  1. The gateway is at the start of the process (bad practice: make the decision in the constructor if possible).
+//  2. The task is on an ELSE branch of the gateway, which will only gey activated when the task is enacted
+//    (bad practice: switch the default branch so it is the non-blocking branch).
+// (note: in the meantime the other alternative branch conditions could still become true).
+// In both cases, the task would get enabled "on the way" and suceed, even though isEnabled returns false.
+// This could be prevented by first simulating a NOOP transaction and then simulating the actual transaction,
+// if the tokenState changed after the second transaction, the task execution went through.
+// In practice, its easier to avoid these situations in the model.
 export async function isEnabled(
   client: PublicClient,
   contract: any,
   encoding: TriggerEncoding,
-  taskModelId: string,
+  modelID: string,
 ) {
   const state = await getTokenState(client, contract);
-  return (
-    encoding.states.has(state) &&
-    encoding.states.get(state)!.includes(taskModelId)
-  );
+  if (!encoding.states.has(modelID)) return false;
+  const req_state = encoding.states.get(modelID)!;
+  return (state & req_state) == req_state;
+}
+
+export async function getEnabled(
+  client: PublicClient,
+  contract: any,
+  encoding: TriggerEncoding,
+) {
+  const state = await getTokenState(client, contract);
+
+  const enabled: string[] = [];
+
+  for (const [modelID, req_state] of encoding.states) {
+    if ((state & req_state) === req_state) {
+      enabled.push(modelID);
+    }
+  }
+
+  return enabled;
 }

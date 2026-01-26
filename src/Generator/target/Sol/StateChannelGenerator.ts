@@ -18,12 +18,39 @@ export default class SolStateChannelContractGenerator extends TemplateEngine {
       _caseVariables,
       [
         {
+          partial: "conditionalTransition",
+          path: path.join(
+            __dirname,
+            "..",
+            "..",
+            "templates/partials/conditionalTransition.mustache.sol",
+          ),
+        },
+        {
           partial: "transition",
           path: path.join(
             __dirname,
             "..",
             "..",
-            "templates/transition.mustache.sol",
+            "templates/partials/transition.mustache.sol",
+          ),
+        },
+        {
+          partial: "condition",
+          path: path.join(
+            __dirname,
+            "..",
+            "..",
+            "templates/partials/condition.mustache.sol",
+          ),
+        },
+        {
+          partial: "execution",
+          path: path.join(
+            __dirname,
+            "..",
+            "..",
+            "templates/partials/execution.mustache.sol",
           ),
         },
       ],

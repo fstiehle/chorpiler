@@ -5,10 +5,18 @@ uint _tokenState = tokenState;
 uint _tokenState = tokenState[{{id}}];
 {{/hasSubProcesses}}
 
+{{#options.debug}}
+console.log(
+    "{{{modelID}}}: current token state is %d, sender %s trying to execute task %d",
+    _tokenState,
+    msg.sender,
+    id
+);
+{{/options.debug}}
 while(_tokenState != 0) {
   {{#states}}
   if (_tokenState & {{{consume}}} == {{{consume}}}) {
-    {{#transitions}} 
+    {{#transitions}}
     {{#isDecision}}
     {{^defaultBranch}}
     if ({{{decision}}}) {
@@ -16,11 +24,11 @@ while(_tokenState != 0) {
     {{#defaultBranch}}
     else {
     {{/defaultBranch}}
-      {{> transition }}
+        {{> conditionalTransition }}
     }
     {{/isDecision}}
     {{^isDecision}}
-    {{> transition }}
+    {{> conditionalTransition }}
     {{/isDecision}}
     {{/transitions}}
   }
@@ -34,3 +42,9 @@ tokenState = _tokenState;
 {{#hasSubProcesses}}
 tokenState[{{id}}] = _tokenState;
 {{/hasSubProcesses}}
+{{#options.debug}}
+console.log(
+    "{{{modelID}}}: new token state is %d",
+    _tokenState
+);
+{{/options.debug}}

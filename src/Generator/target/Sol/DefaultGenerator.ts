@@ -18,6 +18,15 @@ export default class SolDefaultContractGenerator extends TemplateEngine {
       _caseVariables,
       [
         {
+          partial: "conditionalTransition",
+          path: path.join(
+            __dirname,
+            "..",
+            "..",
+            "templates/partials/conditionalTransition.mustache.sol",
+          ),
+        },
+        {
           partial: "transition",
           path: path.join(
             __dirname,

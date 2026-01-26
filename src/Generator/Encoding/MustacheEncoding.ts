@@ -2,6 +2,7 @@ import { assert } from "console";
 import * as Encoding from "./Encoding.js";
 import { IFromEncoding } from "./IFromEncoding.js";
 import { capitalize } from "../../util/helpers.js";
+import { CompileOptions } from "../TemplateEngine.js";
 
 class MustacheProcessEncoding {
   constructor(
@@ -85,8 +86,8 @@ export class MustacheEncoding
   numberOfProcesses = () => (this.subProcesses.length + 1).toString();
 
   constructor(
+    public options: CompileOptions,
     public subProcesses: MustacheProcessEncoding[] = [],
-    public loopProtection = true,
     ...args: ConstructorParameters<typeof MustacheProcessEncoding>
   ) {
     super(...args);
@@ -101,8 +102,8 @@ export class MustacheEncoding
     //console.log(encoding.states);
 
     return new MustacheEncoding(
+      encoding.options,
       subProcesses,
-      encoding.loopProtection,
       main.id,
       main.modelID,
       main.participants,

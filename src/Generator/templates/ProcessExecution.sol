@@ -1,6 +1,10 @@
 //SPDX-License-Identifier: MIT
 pragma solidity ^0.8.9;
 
+{{#options.debug}}
+import "hardhat/console.sol";
+
+{{/options.debug}}
 interface IProcessExecution {
     function enact(uint id) external;
 }
@@ -13,6 +17,9 @@ contract {{{modelID}}} is IProcessExecution {
   uint[{{{numberOfProcesses}}}] public tokenState;
   {{/hasSubProcesses}}
   address[{{{numberOfParticipants}}}] public participants;
+  {{#options.events}}
+  event Task(uint id);
+  {{/options.events}}
   {{#caseVariables}}
   {{{expression}}}
   {{/caseVariables}}
@@ -21,6 +28,7 @@ contract {{{modelID}}} is IProcessExecution {
     participants = _participants;
   }
   {{#caseVariables}}
+
   {{#setters}}
   function {{{functionName}}}({{{type}}} _{{{name}}}) external {
     {{{name}}} = _{{{name}}};

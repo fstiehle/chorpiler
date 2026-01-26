@@ -33,11 +33,11 @@ describe("Generation of edge cases", () => {
         const data = await readFile(path.join(edgeCasesPath, bpmnFile));
         const iNet = await parser.fromXML(data);
 
-        // Special handling for sub-choreography2.bpmn which needs unfold=false
+        // Special handling for sub-choreography2.bpmn, which needs unfold=false
         const isSubChoreography2 = bpmnFile === "sub-choreography2.bpmn";
-        const result = await new SolDefaultContractGenerator(iNet[0]).compile(
-          !isSubChoreography2,
-        );
+        const result = await new SolDefaultContractGenerator(iNet[0]).compile({
+          unfoldSubNets: !isSubChoreography2,
+        });
 
         if (isSubChoreography2) {
           console.log(iNet);
@@ -56,7 +56,11 @@ describe("Generation of edge cases", () => {
       unfold: boolean = true,
       isStateChannel: boolean = false,
     ) => {
-      const output = await generator.compile(unfold);
+      const output = await generator.compile({
+        unfoldSubNets: unfold,
+        events: true,
+        debug: true,
+      });
 
       // Use default values if not provided
       const directory = CONTRACTS_PATH;

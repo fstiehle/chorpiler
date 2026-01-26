@@ -77,7 +77,15 @@ export class XESFastXMLParser {
 
             assert(name != null);
             if (!from) console.warn(`No initiator defined in event ${name}`);
-            events.push(new Event(name, id ?? name, from, to, data));
+            events.push(
+              new Event(
+                name,
+                id ?? name,
+                from,
+                to,
+                data.length > 0 ? data : undefined,
+              ),
+            );
           }
 
           traces.push(new Trace(events));

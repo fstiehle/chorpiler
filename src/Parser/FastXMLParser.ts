@@ -14,7 +14,7 @@ import {
   SubChoreographyTaskLabel,
 } from "./Element.js";
 import { INetParser } from "./Parser.js";
-import { deleteFromArray, printInet } from "../util/helpers.js";
+import { deleteFromArray } from "../util/helpers.js";
 
 enum Elements {
   rootElements = "definitions",

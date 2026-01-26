@@ -1,3 +1,5 @@
+import { CompileOptions } from "../TemplateEngine.js";
+
 export class Process {
   public participants = new Map<string, Participant>();
   public transitions = new Map<string, Transition>();
@@ -25,8 +27,12 @@ export class SubProcess extends Process {
 }
 
 export class MainProcess extends Process {
-  public loopProtection = true;
-
+  public options: CompileOptions = {
+    unfoldSubNets: false,
+    loopProtection: true,
+    events: false,
+    debug: false,
+  };
   constructor() {
     super(0);
   }
@@ -38,11 +44,12 @@ export class CaseVariable {
     public name: string,
     public type: string,
     public expression: string,
-    public setters: boolean
+    public setters: boolean,
   ) {}
 }
 
 interface TransitionParams {
+  id: string;
   consume: number;
   produce: number;
   condition?: string | null;
@@ -52,6 +59,7 @@ interface TransitionParams {
 }
 
 export class Transition {
+  public id: string;
   public consume: number;
   public produce: number;
   public condition: string | null;
@@ -60,13 +68,15 @@ export class Transition {
   public outTo: { id: number; produce: number } | null;
 
   constructor({
+    id,
     consume,
     produce,
     condition = null,
     isEnd = false,
     defaultBranch = false,
-    outTo = null
+    outTo = null,
   }: TransitionParams) {
+    this.id = id;
     this.consume = consume;
     this.produce = produce;
     this.condition = condition;
@@ -83,10 +93,7 @@ interface TaskTransitionParams extends TransitionParams {
 export class TaskTransition extends Transition {
   public taskID: number;
 
-  constructor({
-    taskID,
-    ...transitionParams
-  }: TaskTransitionParams) {
+  constructor({ taskID, ...transitionParams }: TaskTransitionParams) {
     super(transitionParams);
     this.taskID = taskID;
   }
@@ -121,6 +128,6 @@ export class Participant {
     public id: number, // ID in form 0...n assigned by generator
     public modelID: string, // ID as was found in model
     public name: string,
-    public address: string
+    public address: string,
   ) {}
 }

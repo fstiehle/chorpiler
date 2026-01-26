@@ -233,10 +233,10 @@ export class Simulator {
       console.warn(`No trace generated for ${contractGenerator.iNet.id}`);
       return null;
     }
-    const contract = await contractGenerator.compile(
-      options.unfoldSubNets ?? true,
-      options.loopProtection ?? false,
-    );
+    const contract = await contractGenerator.compile({
+      unfoldSubNets: options.unfoldSubNets ?? true,
+      loopProtection: options.loopProtection ?? false,
+    });
     return contract;
   }
 

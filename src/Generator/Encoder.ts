@@ -2,7 +2,7 @@
  * Generates a Encoding from an INet, by removing silent transitions and encoding tasks in a bit array fashion,
  * the template can be used to render the process token play by a TemplateEngine
  */
-import { deleteFromArray, printInet } from "../util/helpers.js";
+import { deleteFromArray } from "../util/helpers.js";
 import {
   Transition,
   Element,
@@ -16,26 +16,21 @@ import {
 import { InteractionNet } from "../Parser/InteractionNet.js";
 import * as Encoding from "./Encoding/Encoding.js";
 import { assert } from "console";
+import { CompileOptions } from "./TemplateEngine.js";
 
 const loggingEnabled = false; // Toggleable logging
 
 export class INetEncoder {
   private mainEncoded = new Encoding.MainProcess();
 
-  public generate(
-    _iNet: InteractionNet,
-    options: {
-      unfoldSubNets: boolean; // If true, sub choreographies are "folded" into the main choreography, i.e.,
-      // they are treated as visual option only with no consequence for the generated contract
-      loopProtection: boolean;
-    },
-  ) {
+  public generate(_iNet: InteractionNet, options: CompileOptions) {
     const iNet: InteractionNet = { ..._iNet };
     if (iNet.initial == null || iNet.end == null) {
       throw new Error("Invalid InteractionNet");
     }
     this.mainEncoded.modelID = iNet.id;
-    this.mainEncoded.loopProtection = options.loopProtection;
+    this.mainEncoded.options = options;
+    this.mainEncoded.options = options;
     // create participant template options and IDs
     [...iNet.participants.values()].forEach((par, encodedID) => {
       this.mainEncoded.participants.set(
@@ -160,7 +155,8 @@ export class INetEncoder {
     // transitions to ids
     const taskIDs = new Map<string, number>();
     const transitions = new Array<Transition>();
-    const taskIDoffset = this.mainEncoded.loopProtection === true ? 1 : 0; // keep 0 for noop, noop is required for loop protection,
+    const taskIDoffset =
+      this.mainEncoded.options.loopProtection === true ? 1 : 0; // keep 0 for noop, noop is required for loop protection,
     // loop protection: set taskID to noop, once it is executed once, to prevent endless execution loops.
 
     for (const element of iNet.elements.values()) {
@@ -233,6 +229,7 @@ export class INetEncoder {
         encoded.addTransition(
           element.id,
           new Encoding.Transition({
+            id: element.id,
             consume,
             produce,
             condition,
@@ -244,6 +241,7 @@ export class INetEncoder {
         encoded.addTransition(
           element.id,
           new Encoding.InitiatedTransition({
+            id: element.id,
             modelID: element.id,
             initiatorID: encoded.participants.get(element.label.sender.id)!.id,
             taskID: taskIDs.get(element.id)!,
