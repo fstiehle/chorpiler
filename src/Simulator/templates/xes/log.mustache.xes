@@ -6,7 +6,7 @@
 	</global>
 
   {{#traces}}
-  <trace>
+  <trace id="{{id}}">
     {{#events}}
     <event>
       <string key="concept:name" value="{{name}}" />

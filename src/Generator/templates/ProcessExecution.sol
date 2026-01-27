@@ -6,7 +6,7 @@ import "hardhat/console.sol";
 
 {{/options.debug}}
 interface IProcessExecution {
-    function enact(uint id) external;
+  function enact(uint id) external;
 }
 
 contract {{{modelID}}} is IProcessExecution {

@@ -133,6 +133,9 @@ describe("Execute all contracts by replaying xes logs in output/contracts", () =
 
         nonLog?.traces.forEach((trace, i) => {
           it(`replay non-conforming trace ${i}`, async () => {
+            debugLog(
+              `Starting replay of trace ${i} for ${contractData.contractName}`,
+            );
             let eventsRejected = 0;
             for (const event of trace) {
               // Perform data change first, the event name might be a dummy name
@@ -193,10 +196,13 @@ describe("Execute all contracts by replaying xes logs in output/contracts", () =
             }
             // Expect that at least one task was not enacted successfully (one non-conforming event)
             // or end event has not been reached (if only an event was removed, but no non-conforming was added)
+            const endTokenStat = await getTokenState(client, contract);
             assert(
-              eventsRejected > 0 ||
-                !((await getTokenState(client, contract)) == 0),
+              eventsRejected > 0 || endTokenStat != 0,
               "Expect that at least one task was rejected or end event has not been reached",
+            );
+            debugLog(
+              `✅ Non-Conforming log rejected. Rejected tasks: ${eventsRejected}, state: ${eventsRejected}`,
             );
           });
         });

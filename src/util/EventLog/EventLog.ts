@@ -1,6 +1,3 @@
-import assert from "assert";
-import seed from "seed-random";
-import { TriggerEncoding } from "../../Generator/Encoding/TriggerEncoding.js";
 import { Trace } from "./Trace.js";
 
 export class EventLog implements IterableIterator<Trace> {
@@ -23,6 +20,15 @@ export class EventLog implements IterableIterator<Trace> {
 
   [Symbol.iterator](): IterableIterator<Trace> {
     return this;
+  }
+
+  getEncoding() {
+    return {
+      traces: this.traces.map((e, i) => {
+        (e as any)["id"] = i;
+        return e;
+      }),
+    };
   }
 }
 

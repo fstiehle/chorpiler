@@ -218,7 +218,8 @@ export class FuzzyLog {
       path.join(__dirname, "./templates/xes", "log.mustache.xes"),
       "utf-8",
     );
-    const renderedLog = Mustache.render(template, log);
+    console.log(log.getEncoding());
+    const renderedLog = Mustache.render(template, log.getEncoding());
 
     if (!fs.existsSync(this.outputDir)) {
       fs.mkdirSync(this.outputDir, { recursive: true });
