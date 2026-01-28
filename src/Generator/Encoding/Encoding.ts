@@ -55,7 +55,8 @@ interface TransitionParams {
   condition?: string | null;
   isEnd?: boolean;
   defaultBranch?: boolean;
-  outTo?: { id: number; produce: number } | null;
+  outTo?: { id: number } | null;
+  inFrom?: { id: number } | null;
 }
 
 export class Transition {
@@ -65,7 +66,8 @@ export class Transition {
   public condition: string | null;
   public isEnd: boolean;
   public defaultBranch: boolean;
-  public outTo: { id: number; produce: number } | null;
+  public outTo: { id: number } | null;
+  public inFrom: { id: number } | null;
 
   constructor({
     id,
@@ -75,6 +77,7 @@ export class Transition {
     isEnd = false,
     defaultBranch = false,
     outTo = null,
+    inFrom = null,
   }: TransitionParams) {
     this.id = id;
     this.consume = consume;
@@ -83,6 +86,7 @@ export class Transition {
     this.isEnd = isEnd;
     this.defaultBranch = defaultBranch;
     this.outTo = outTo;
+    this.inFrom = inFrom;
   }
 }
 

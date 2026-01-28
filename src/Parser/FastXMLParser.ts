@@ -11,7 +11,8 @@ import {
   PlaceType,
   Guard,
   TaskType,
-  SubChoreographyTaskLabel,
+  Call,
+  CallType,
 } from "./Element.js";
 import { INetParser } from "./Parser.js";
 import { deleteFromArray } from "../util/helpers.js";
@@ -109,18 +110,9 @@ export class INetFastXMLParser implements INetParser {
 
         // translate sub choreography task
         const subTransition = this.addTransition(
-          new Transition(
-            subChoreography[Properties.id],
-            new SubChoreographyTaskLabel(
-              initiator,
-              respondents,
-              subNetID,
-              subNetID,
-              subChoreography[Properties.id],
-              TaskType.CallChoreography,
-            ),
-          ),
+          new Transition(subNetID, new Label(LabelType.SubChoreography)),
         );
+        subTransition.calls = [new Call(CallType.SubChoreography, subNetID)];
         this.translateIncomingFlows(
           subTransition,
           subChoreography[Elements.ins],

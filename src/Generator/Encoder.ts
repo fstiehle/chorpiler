@@ -11,7 +11,7 @@ import {
   Place,
   PlaceType,
   Guard,
-  SubChoreographyTaskLabel,
+  Call,
 } from "../Parser/Element.js";
 import { InteractionNet } from "../Parser/InteractionNet.js";
 import * as Encoding from "./Encoding/Encoding.js";
@@ -22,6 +22,7 @@ const loggingEnabled = false; // Toggleable logging
 
 export class INetEncoder {
   private mainEncoded = new Encoding.MainProcess();
+  private callList = new Map<string, string>();
 
   public generate(_iNet: InteractionNet, options: CompileOptions) {
     const iNet: InteractionNet = { ..._iNet };
@@ -29,7 +30,6 @@ export class INetEncoder {
       throw new Error("Invalid InteractionNet");
     }
     this.mainEncoded.modelID = iNet.id;
-    this.mainEncoded.options = options;
     this.mainEncoded.options = options;
     // create participant template options and IDs
     [...iNet.participants.values()].forEach((par, encodedID) => {
@@ -54,26 +54,15 @@ export class INetEncoder {
     return this.mainEncoded;
   }
 
-  private encodeNets(parent: Encoding.Process, iNet: InteractionNet) {
-    // encode all subnets before transforming (i.e., reducing) the interaction net to preserve subnet position
-    for (const subNet of iNet.subNets.values()) {
-      const subNetTransition = iNet.elements.get(subNet.id) as Transition;
-      if (!subNetTransition)
-        throw new Error(
-          `sub net (ID: ${subNet.id}) with no corresponding transition in parent net (ID: ${iNet.id}) found`,
-        );
+  private encodeNets(encoding: Encoding.Process, iNet: InteractionNet) {
+    this.removeSilentTransitions(iNet);
 
+    // Encode subnets
+    for (const subNet of iNet.subNets.values()) {
       const subEncoding = new Encoding.SubProcess(
         this.mainEncoded.subProcesses.size + 1,
       );
       subEncoding.modelID = subNet.id;
-      // record place of subnet transition
-      for (const outplace of subNetTransition.target)
-        for (const t of outplace.target) subEncoding.targetIDs.push(t.id);
-      for (const inPlace of subNetTransition.source)
-        for (const t of inPlace.source) subEncoding.sourceIDs.push(t.id);
-      this.deleteElement(iNet, subNetTransition);
-
       // parse subnet participants from mainnet
       for (const parID of subNet.participants.keys()) {
         if (!this.mainEncoded.participants.has(parID))
@@ -86,24 +75,10 @@ export class INetEncoder {
         );
       }
       this.mainEncoded.subProcesses.set(subEncoding.modelID, subEncoding);
+      this.encodeNets(subEncoding, subNet);
     }
 
-    this.removeSilentTransitions(iNet);
-    this.encodeTransitions(iNet, parent);
-
-    // transform and encode subnet
-    for (const subNet of iNet.subNets.values()) {
-      const subEncoding = this.mainEncoded.subProcesses.get(subNet.id)!;
-      this.removeSilentTransitions(subNet);
-      this.encodeTransitions(subNet, subEncoding);
-      this.encodeSubNetTransition(subNet, parent, subEncoding);
-
-      if (subNet.subNets.size > 0) {
-        this.encodeNets(subEncoding, subNet);
-      } else {
-        return;
-      }
-    }
+    this.encodeTransitions(iNet, encoding);
   }
 
   /**
@@ -111,7 +86,7 @@ export class INetEncoder {
    * For each sub choreography transition
    * @param iNet
    */
-  private unfoldSubNets(iNet: InteractionNet) {
+  public unfoldSubNets(iNet: InteractionNet) {
     for (const subNet of iNet.subNets.values()) {
       const subNetTransition = iNet.elements.get(subNet.id) as Transition;
       if (!subNetTransition)
@@ -138,6 +113,7 @@ export class INetEncoder {
       this.deleteElement(iNet, subNetTransition);
     }
     iNet.subNets.clear();
+    return iNet;
   }
 
   /**
@@ -159,9 +135,10 @@ export class INetEncoder {
       this.mainEncoded.options.loopProtection === true ? 1 : 0; // keep 0 for noop, noop is required for loop protection,
     // loop protection: set taskID to noop, once it is executed once, to prevent endless execution loops.
 
+    // Preparation: set up all relevant transitions
+    const subTransitions = Array<Transition>();
     for (const element of iNet.elements.values()) {
       if (!(element instanceof Transition)) {
-        // don't need extra IDs for other choreos
         continue;
       }
       if (element.source.length === 0 && element.target.length === 0) {
@@ -169,8 +146,13 @@ export class INetEncoder {
           `Unconnected transition in interaction net ${element.id}`,
         );
       }
-      if (!this.isSilentTransition(element)) {
-        // silent transitions don't need external IDs
+      if (this.isSubOrCallChoreographyTask(element)) {
+        subTransitions.push(element);
+      }
+      if (
+        !this.isSilentTransition(element) && // silent transitions don't need external IDs
+        !this.isSubOrCallChoreographyTask(element)
+      ) {
         taskIDs.set(element.id, taskIDs.size + taskIDoffset);
       }
       transitions.push(element);
@@ -225,7 +207,10 @@ export class INetEncoder {
         // console.log(produce)
       }
 
-      if (this.isSilentTransition(element)) {
+      if (
+        this.isSilentTransition(element) ||
+        this.isSubOrCallChoreographyTask(element)
+      ) {
         encoded.addTransition(
           element.id,
           new Encoding.Transition({
@@ -255,30 +240,65 @@ export class INetEncoder {
         );
       }
     }
+
+    for (const t of subTransitions) {
+      this.encodeSubNetTransition(encoded, t);
+    }
   }
 
   private encodeSubNetTransition(
-    subNet: InteractionNet,
-    parent_process: Encoding.Process,
-    subEncoded: Encoding.SubProcess,
+    encoded: Encoding.Process,
+    subTransition: Transition,
   ) {
-    const sources = subEncoded.sourceIDs;
-    // calculate produce of end event of subnet
-    let produce = 0;
-    for (const id of sources) {
-      produce += parent_process.transitions.get(id)!.produce;
-      // set outTo of parent net transition activating the subprocess
-      parent_process.transitions.get(id)!.outTo = {
-        id: subEncoded.id,
-        produce: 1,
-      };
+    for (const call of subTransition.calls) {
+      const subNetEncoding = this.mainEncoded.subProcesses.get(call.targetID);
+      if (!subNetEncoding)
+        throw new Error(
+          `Sub net transition (ID: ${subTransition.id}) with no corresponding net found in (ID: ${encoded.id}).`,
+        );
+      if (this.callList.has(call.targetID)) {
+        throw new Error(
+          `Sub net transition (ID: ${subTransition.id}) referencing already handled target (ID: ${call.targetID}).`,
+        );
+      }
+      this.callList.set(call.targetID, subTransition.id);
+
+      console.log(`Encoding sub transition for ${subTransition.id}`);
+      console.log(encoded.transitions);
+      const encodedTransition = encoded.transitions.get(subTransition.id)!;
+      encodedTransition.outTo = { id: subNetEncoding.id };
+
+      const inTrans = []; // leaving sub to go back to parent
+      for (const inPlace of subTransition.target) {
+        for (const inT of inPlace.target) {
+          console.log(inT);
+          const encodedTransition = encoded.transitions.get(inT.id)!;
+          encodedTransition.inFrom = { id: subNetEncoding.id };
+          inTrans.push(inT);
+        }
+      }
     }
-    // set end event outTo
-    for (const beforeEnd of subNet.end!.source)
-      subEncoded.transitions.get(beforeEnd.id)!.outTo = {
-        id: parent_process.id,
-        produce,
-      };
+    // const sources = subEncoded.sourceIDs;
+    // console.log(sources);
+    // console.log(parent_process.transitions);
+    // // calculate produce of end event of subnet
+    // let produce = 0;
+    // for (const id of sources) {
+    //   produce += parent_process.transitions.get(id)!.produce;
+    //   // set outTo of parent net transition activating the subprocess
+    //   parent_process.transitions.get(id)!.outTo = {
+    //     id: subEncoded.id,
+    //     produce: 1,
+    //   };
+    // }
+
+    // console.log(subEncoded.targetIDs);
+    // // set end event outTo
+    // for (const beforeEnd of subNet.end!.source)
+    //   subEncoded.transitions.get(beforeEnd.id)!.outTo = {
+    //     id: parent_process.id,
+    //     produce,
+    //   };
   }
 
   private buildCondition(guard: Guard) {
@@ -574,14 +594,15 @@ export class INetEncoder {
         el.label.type === LabelType.ParallelConverging ||
         el.label.type === LabelType.ParallelDiverging ||
         el.label.type === LabelType.Start ||
-        el.label.type === LabelType.End ||
-        this.isSubOrCallChoreographyTask(el))
+        el.label.type === LabelType.End)
     );
   }
 
   private isSubOrCallChoreographyTask(el: Transition) {
     return (
-      el instanceof Transition && el.label instanceof SubChoreographyTaskLabel
+      el instanceof Transition &&
+      (el.label.type === LabelType.SubChoreography ||
+        el.label.type === LabelType.CallChoreography)
     );
   }
 
@@ -632,12 +653,16 @@ export class INetEncoder {
         }
       }
     }
-    // adjust subnet source and target if necessary
-    for (const subNet of this.mainEncoded.subProcesses.values()) {
-      if (subNet.sourceIDs.includes(copyFrom.id)) {
-        deleteFromArray(subNet.sourceIDs, copyFrom.id);
-        subNet.sourceIDs.push(...copyTo.map((t) => t.id));
-      }
+
+    if (copyFrom.calls.length > 0) {
+      for (const to of copyTo) to.calls.push(...copyFrom.calls);
     }
+    // adjust subnet source and target if necessary
+    // for (const subNet of this.mainEncoded.subProcesses.values()) {
+    //   if (subNet.sourceIDs.includes(copyFrom.id)) {
+    //     deleteFromArray(subNet.sourceIDs, copyFrom.id);
+    //     subNet.sourceIDs.push(...copyTo.map((t) => t.id));
+    //   }
+    // }
   }
 }

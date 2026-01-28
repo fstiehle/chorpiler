@@ -8,22 +8,19 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 export default class SolDefaultContractGenerator extends TemplateEngine {
-  constructor(
-    _iNet: InteractionNet,
-    _caseVariables?: Map<string, CaseVariable>,
-  ) {
+  constructor(_iNet: InteractionNet, _caseVariables?: Map<string, CaseVariable>) {
     super(
       _iNet,
       path.join(__dirname, "..", "..", "templates/ProcessExecution.sol"),
       _caseVariables,
       [
         {
-          partial: "conditionalTransition",
+          partial: "conditional",
           path: path.join(
             __dirname,
             "..",
             "..",
-            "templates/partials/conditionalTransition.mustache.sol",
+            "templates/partials/conditional.mustache.sol",
           ),
         },
         {
@@ -33,15 +30,6 @@ export default class SolDefaultContractGenerator extends TemplateEngine {
             "..",
             "..",
             "templates/partials/transition.mustache.sol",
-          ),
-        },
-        {
-          partial: "condition",
-          path: path.join(
-            __dirname,
-            "..",
-            "..",
-            "templates/partials/condition.mustache.sol",
           ),
         },
         {

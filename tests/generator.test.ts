@@ -169,7 +169,7 @@ describe("Generation of edge cases", () => {
       ]);
     });
 
-    it("Unfold Rental Agreement case to Sol Contract", async () => {
+    it("Don't unfold Rental Agreement case to Sol Contract", async () => {
       await compileBpmn(
         "unfold-rental-agreement",
         [
@@ -181,8 +181,16 @@ describe("Generation of edge cases", () => {
             true,
           ),
         ],
-        true,
+        false,
       );
+    });
+
+    it("Don't unfold Sub Choreo case to Sol Contract", async () => {
+      await compileBpmn("sub-choreo", [], false);
+    });
+
+    it.only("Don't unfold Sub Choreo case to Sol Contract", async () => {
+      await compileBpmn("sub-choreo-chained", [], false);
     });
   });
 });

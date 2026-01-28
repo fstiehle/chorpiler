@@ -28,6 +28,7 @@ export enum PlaceType {
 export class Transition extends Element {
   source = new Array<Place>();
   target = new Array<Place>();
+  calls = new Array<Call>(); // calls another choreography
 
   constructor(
     id: string,
@@ -82,19 +83,6 @@ export class TaskLabel extends EventLabel {
   }
 }
 
-export class SubChoreographyTaskLabel extends TaskLabel {
-  constructor(
-    sender: Participant,
-    receiver: Participant[],
-    name: string,
-    modelID: string,
-    public chorID: number,
-    type: TaskType.SubChoreography | TaskType.CallChoreography,
-  ) {
-    super(sender, receiver, name, modelID, type);
-  }
-}
-
 // TODO: LabelTypes might be Reduntant?
 // Below cannot be relied upon anyway, as these could get reduced,
 // Task is its own class anyway, maybe LabelType Manual or Silent is enough
@@ -108,10 +96,24 @@ export enum LabelType {
   ParallelDiverging,
   EventExclusiveIncoming,
   EventExclusiveOutgoing,
+  SubChoreography,
+  CallChoreography,
 }
 
 export enum TaskType {
   Task,
+  SubChoreography,
+  CallChoreography,
+}
+
+export class Call {
+  constructor(
+    public type: CallType,
+    public targetID: string,
+  ) {}
+}
+
+export enum CallType {
   SubChoreography,
   CallChoreography,
 }

@@ -21,6 +21,8 @@ import {
 import { Trace } from "../util/EventLog/Trace.js";
 import { XESFastXMLParser } from "../util/EventLog/XESFastXMLParser.js";
 import { IXESParser } from "../util/EventLog/XESParser.js";
+import { INetEncoder } from "../Generator/Encoder.js";
+import { InteractionNet } from "../Parser/InteractionNet.js";
 
 const LOGGING_ENABLED = false; // Toggleable logging
 
@@ -97,19 +99,11 @@ export class Simulator {
 
       try {
         const nets = await this.bpmnParser!.fromXML(model);
-        const iNet = nets[0]; // only support one model
+        const encoder = new INetEncoder();
+        const iNet = encoder.unfoldSubNets(nets[0]); // only support one model
         iNet.id = prePend + iNet.id;
-        const generator = new this.generatorType(iNet);
-        generator.addCaseVariable(
-          new CaseVariable(
-            "conditions",
-            "uint",
-            "uint public conditions;",
-            true,
-          ),
-        );
 
-        const traces = this.replay(generator, options);
+        const traces = this.replay(iNet, options);
         if (traces.length === 0) {
           console.warn(`No traces generated for ${file}, skipping.`);
           continue;
@@ -141,7 +135,7 @@ export class Simulator {
 
       try {
         const nets = await this.bpmnParser!.fromXML(model);
-        const iNet = nets[0]; // only support one model
+        const iNet = nets[0];
         iNet.id = prePend + iNet.id;
         const generator = new this.generatorType(iNet);
         generator.addCaseVariable(
@@ -153,15 +147,7 @@ export class Simulator {
           ),
         );
 
-        const traces = this.replay(generator, options);
-        if (traces.length === 0) {
-          console.warn(
-            `No traces generated for ${file}, skipping contract generation.`,
-          );
-          continue;
-        }
-
-        const contract = await this.compileContract(generator, traces, options);
+        const contract = await this.compileContract(generator, options);
         if (!contract) {
           console.warn(`No contract generated for ${file}, skipping.`);
           continue;
@@ -226,13 +212,8 @@ export class Simulator {
 
   private async compileContract(
     contractGenerator: TemplateEngine,
-    traces: Trace[],
     options: ContractGenerationOptions,
   ): Promise<{ target: string; encoding: TriggerEncoding } | null> {
-    if (traces.length === 0) {
-      console.warn(`No trace generated for ${contractGenerator.iNet.id}`);
-      return null;
-    }
     const contract = await contractGenerator.compile({
       unfoldSubNets: options.unfoldSubNets ?? true,
       loopProtection: options.loopProtection ?? false,
@@ -241,7 +222,7 @@ export class Simulator {
   }
 
   private replay(
-    contractGenerator: TemplateEngine,
+    iNet: InteractionNet,
     options: LogGenerationOptions | ContractGenerationOptions = {},
   ): Trace[] {
     const traces: Trace[] = [];
@@ -267,7 +248,7 @@ export class Simulator {
           new Event(
             "Instance Data Change",
             "Instance Data Change",
-            [...contractGenerator.iNet.participants.values()][0]!.id,
+            [...iNet.participants.values()][0]!.id,
             "",
             [new InstanceDataChange(conditionName, conditionID)],
           ),
@@ -345,14 +326,14 @@ export class Simulator {
       }
     };
 
-    const initial = contractGenerator.iNet.initial!;
-    const end = contractGenerator.iNet.end!;
+    const initial = iNet.initial!;
+    const end = iNet.end!;
     const enabled: Place[] = [initial]; // Start with the initial place
     const candidates: Transition[] = [...initial.target]; // Initial candidates are the transitions from the initial place
     const executed: Transition[] = [];
-    const toExecute: Transition[] = [
-      ...contractGenerator.iNet.elements.values(),
-    ].filter((t): t is Transition => t instanceof Transition);
+    const toExecute: Transition[] = [...iNet.elements.values()].filter(
+      (t): t is Transition => t instanceof Transition,
+    );
     const maxTraces = options.maxTraces ?? 2500; // Threshold for maximum log entries
     const log = new EventLog([]); // Initialize the log variable
     let currentTrace = new Trace([]);

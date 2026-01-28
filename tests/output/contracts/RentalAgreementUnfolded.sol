@@ -4,11 +4,11 @@ pragma solidity ^0.8.9;
 import "hardhat/console.sol";
 
 interface IProcessExecution {
-    function enact(uint id) external;
+  function enact(uint id) external;
 }
 
 contract RentalAgreementUnfolded is IProcessExecution {
-  uint public tokenState = 1;
+  uint[2] public tokenState;
   address[3] public participants;
   event Task(uint id);
   int public bond = 4000;
@@ -18,13 +18,12 @@ contract RentalAgreementUnfolded is IProcessExecution {
     participants = _participants;
   }
 
-
   function setWeeklyRent(int _weeklyRent) external {
     weeklyRent = _weeklyRent;
   }
 
   function enact(uint id) external {
-    uint _tokenState = tokenState;
+    uint _tokenState = tokenState[0];
 
     console.log(
         "RentalAgreementUnfolded: current token state is %d, sender %s trying to execute task %d",
@@ -113,6 +112,7 @@ contract RentalAgreementUnfolded is IProcessExecution {
         else {
             // <---  auto transition  --->
             _tokenState &= ~uint(1);
+            tokenState[1] = 1;
             _tokenState |= 130;
             continue;
         }
@@ -123,34 +123,53 @@ contract RentalAgreementUnfolded is IProcessExecution {
         _tokenState |= 8;
         continue;
       }
-      if (_tokenState & 128 == 128) {
-        // <--- ChoreographyTask_1hddg8r pay rent --->
-        if (8 == id && msg.sender == participants[0]) {
-            // <--- custom code for task here --->
-            _tokenState &= ~uint(128);
-            _tokenState |= 128;
-            emit Task(8);
-            id = 0;
-            continue;
-        }
-        // <--- ChoreographyTask_07y6gqp end tenancy --->
-        if (9 == id && msg.sender == participants[0]) {
-            // <--- custom code for task here --->
-            _tokenState &= ~uint(128);
-            _tokenState |= 256;
-            emit Task(9);
-            id = 0;
-            continue;
-        }
-      }
       break;
     }
 
-    tokenState = _tokenState;
+    tokenState[0] = _tokenState;
     console.log(
         "RentalAgreementUnfolded: new token state is %d",
         _tokenState
     );
   }
 
+  function SubChoreography_1sp0n7o(uint id) external {
+    uint _tokenState = tokenState[1];
+
+    console.log(
+        "SubChoreography_1sp0n7o: current token state is %d, sender %s trying to execute task %d",
+        _tokenState,
+        msg.sender,
+        id
+    );
+    while(_tokenState != 0) {
+      if (_tokenState & 1 == 1) {
+        // <--- ChoreographyTask_1hddg8r pay rent --->
+        if (1 == id && msg.sender == participants[0]) {
+            // <--- custom code for task here --->
+            _tokenState &= ~uint(1);
+            _tokenState |= 1;
+            emit Task(1);
+            id = 0;
+            continue;
+        }
+        // <--- ChoreographyTask_07y6gqp end tenancy --->
+        if (2 == id && msg.sender == participants[0]) {
+            // <--- custom code for task here --->
+            _tokenState &= ~uint(1);
+            tokenState[0] = 130;
+            _tokenState |= 0;
+            emit Task(2);
+            break; // is end
+        }
+      }
+      break;
+    }
+
+    tokenState[1] = _tokenState;
+    console.log(
+        "SubChoreography_1sp0n7o: new token state is %d",
+        _tokenState
+    );
+  }
 }

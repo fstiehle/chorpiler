@@ -4,7 +4,7 @@ pragma solidity ^0.8.9;
 import "hardhat/console.sol";
 
 interface IProcessExecution {
-    function enact(uint id) external;
+  function enact(uint id) external;
 }
 
 contract XORAND is IProcessExecution {

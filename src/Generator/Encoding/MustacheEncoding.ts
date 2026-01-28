@@ -35,17 +35,13 @@ class MustacheProcessEncoding {
     );
   }
 
-  private static convertStates(
-    states: Map<number, Encoding.Transition[]>,
-  ): State[] {
-    const stateArray = Array.from(states.entries()).map(
-      ([consume, transitions]) => {
-        return new State(
-          consume.toString(),
-          transitions.map((t) => this.convertTransition(t)),
-        );
-      },
-    );
+  private static convertStates(states: Map<number, Encoding.Transition[]>): State[] {
+    const stateArray = Array.from(states.entries()).map(([consume, transitions]) => {
+      return new State(
+        consume.toString(),
+        transitions.map((t) => this.convertTransition(t)),
+      );
+    });
 
     if (stateArray.length > 0) {
       stateArray[stateArray.length - 1].last = true;
@@ -64,17 +60,13 @@ class MustacheProcessEncoding {
       t.condition ?? "",
       t.isEnd,
       t.defaultBranch,
-      t.outTo !== null
-        ? { id: t.outTo.id.toString(), produce: t.outTo.produce.toString() }
-        : null,
+      t.outTo !== null ? { id: t.outTo.id.toString() } : null,
+      t.inFrom !== null ? { id: t.inFrom.id.toString() } : null,
     );
   }
 }
 
-export class MustacheEncoding
-  extends MustacheProcessEncoding
-  implements IFromEncoding
-{
+export class MustacheEncoding extends MustacheProcessEncoding implements IFromEncoding {
   /**
    * Converts an `Encoding.Process` object to a Mustache template-ready object.
    *
@@ -116,6 +108,7 @@ export class MustacheEncoding
 // Mustache doesn't render the number 0 (falsy value), so we need to use strings
 class Transition {
   public conditions: any = [];
+  public conditionString: string = "";
 
   constructor(
     public consume: string,
@@ -127,22 +120,39 @@ class Transition {
     public decision: string,
     public isEnd: boolean,
     public defaultBranch: boolean,
-    public outTo: { id: string; produce: string } | null,
+    public outTo: { id: string } | null,
+    public inFrom: { id: string } | null,
   ) {
+    const conditionParts: string[] = [];
+
     if (this.taskID) {
+      conditionParts.push(`${this.taskID} == id`);
       this.conditions.push({ content: this.taskID, hasID: true, last: false });
     }
+    if (this.inFrom) {
+      conditionParts.push(`0 == tokenState[${this.inFrom.id}]`);
+      this.conditions.push({
+        content: this.inFrom.id,
+        hasInFrom: true,
+        last: false,
+      });
+    }
     if (this.initiator) {
+      conditionParts.push(`msg.sender == participants[${this.initiator}]`);
       this.conditions.push({
         content: this.initiator,
         hasInitiator: true,
         last: false,
       });
     }
+
+    this.conditionString = conditionParts.join(" && ");
+
     if (this.conditions.length > 0) {
       this.conditions[this.conditions.length - 1].last = true;
     }
   }
+
   hasConditions = () => {
     return this.conditions.length > 0;
   };

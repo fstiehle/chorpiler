@@ -28,8 +28,8 @@ contract {{{modelID}}} is IProcessExecution {
     participants = _participants;
   }
   {{#caseVariables}}
-
   {{#setters}}
+
   function {{{functionName}}}({{{type}}} _{{{name}}}) external {
     {{{name}}} = _{{{name}}};
   }
@@ -44,5 +44,6 @@ contract {{{modelID}}} is IProcessExecution {
   function {{modelID}}(uint id) external {
     {{> execution}}
   }
+
   {{/subProcesses}}
 }

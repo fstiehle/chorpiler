@@ -7,10 +7,10 @@ uint _tokenState = tokenState[{{id}}];
 
 {{#options.debug}}
 console.log(
-    "{{{modelID}}}: current token state is %d, sender %s trying to execute task %d",
-    _tokenState,
-    msg.sender,
-    id
+  "{{{modelID}}}: current token state is %d, sender %s trying to execute task %d",
+  _tokenState,
+  msg.sender,
+  id
 );
 {{/options.debug}}
 while(_tokenState != 0) {
@@ -24,11 +24,11 @@ while(_tokenState != 0) {
     {{#defaultBranch}}
     else {
     {{/defaultBranch}}
-        {{> conditionalTransition }}
+      {{> conditional }}
     }
     {{/isDecision}}
     {{^isDecision}}
-    {{> conditionalTransition }}
+    {{> conditional }}
     {{/isDecision}}
     {{/transitions}}
   }
@@ -44,7 +44,7 @@ tokenState[{{id}}] = _tokenState;
 {{/hasSubProcesses}}
 {{#options.debug}}
 console.log(
-    "{{{modelID}}}: new token state is %d",
-    _tokenState
+  "{{{modelID}}}: new token state is %d",
+   _tokenState
 );
 {{/options.debug}}

@@ -3,7 +3,7 @@
 {{/taskName}}
 _tokenState &= ~uint({{{consume}}});
 {{#outTo}}
-tokenState[{{outTo.id}}] = {{outTo.produce}};
+tokenState[{{outTo.id}}] = 1;
 {{/outTo}}
 {{#produce}}
 _tokenState |= {{{produce}}};

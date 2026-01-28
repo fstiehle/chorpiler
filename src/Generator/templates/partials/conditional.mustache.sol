@@ -1,7 +1,7 @@
 // <--- {{#modelID}}{{modelID}} {{taskName}}{{/modelID}}{{^modelID}} auto transition {{/modelID}} --->
 {{#hasConditions}}
-if ({{#conditions}}{{> condition}}{{/conditions}}) {
-    {{ > transition }}
+if ({{{conditionString}}}) {
+  {{ > transition }}
 }
 {{/hasConditions}}
 {{^hasConditions}}

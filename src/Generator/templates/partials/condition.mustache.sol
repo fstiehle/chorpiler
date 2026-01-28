@@ -1,1 +1,0 @@
-{{#hasID}}{{content}} == id{{/hasID}}{{#hasInitiator}}msg.sender == participants[{{{content}}}]{{/hasInitiator}}{{^last}} && {{/last}}
