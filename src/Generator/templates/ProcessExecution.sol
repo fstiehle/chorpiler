@@ -26,6 +26,9 @@ contract {{{modelID}}} is IProcessExecution {
 
   constructor(address[{{{numberOfParticipants}}}] memory _participants) {
     participants = _participants;
+    {{#subProcesses}}
+    tokenState[0] = 1;
+    {{/subProcesses}}
   }
   {{#caseVariables}}
   {{#setters}}

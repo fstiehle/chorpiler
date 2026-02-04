@@ -5,49 +5,79 @@ import { IFromEncoding } from "./IFromEncoding.js";
  * Represents the encoding of the process with information needed for
  * interacting with the process
  *
- * - `tasks`: Maps task IDs from the BPMN model (string) to their corresponding implementation IDs (number).
+ * - `tasks`: Maps task modelIDs from the BPMN model (string) to task objects with id, initiator, and processID.
  * - `participants`: Maps participant IDs from the BPMN model (string) to implementation IDs (number).
- * - `subModels`: Stores subprocess encodings mapped by their BPMN model IDs.
+ * - `subModels`: Maps subprocess processIDs (number) to subprocess objects with modelID and participants.
  */
 export class TriggerEncoding implements IFromEncoding {
   constructor(
     public processID: number,
-    public tasks: Map<string, number> = new Map(),
+    public tasks: Map<string, Task> = new Map(),
     public participants: Map<string, number> = new Map(),
     public states: Map<string, number> = new Map(),
-    public subModels: Map<string, SubProcessEncoding> | null = null,
+    public subModels: Map<number, SubModel> = new Map(),
   ) {}
 
   static fromEncoding(encoding: MainProcess): TriggerEncoding {
-    const processID = encoding.id ?? "";
-    const tasks = TriggerEncoding.IDsFromTransitions(
+    const processID = encoding.id ?? 0;
+
+    // Extract tasks with id, initiator, and processID from main process and all subprocesses
+    const tasks = new Map<string, Task>();
+
+    // Add tasks from main process
+    TriggerEncoding.extractTasks(
       Array.from(encoding.transitions.values()),
+      processID,
+      tasks,
     );
+
+    // Add tasks from all subprocesses
+    encoding.subProcesses.forEach((subProcess) => {
+      TriggerEncoding.extractTasks(
+        Array.from(subProcess.transitions.values()),
+        subProcess.id,
+        tasks,
+      );
+    });
+
     const participants = new Map(
       [...encoding.participants.values()].map(({ modelID, id }) => [
         modelID,
         Number(id),
       ]),
     );
+
     const states = new Map(
       [...encoding.states.entries()].flatMap(([key, value]) =>
         value.map((e) => [e.id, key]),
       ),
     );
-    const subModels =
-      encoding.subProcesses.size > 0
-        ? new Map(
-            [...encoding.subProcesses.values()].map((subProcess) => [
-              subProcess.modelID,
-              new SubProcessEncoding(
-                subProcess.id,
-                TriggerEncoding.IDsFromTransitions(
-                  Array.from(subProcess.transitions.values()),
-                ),
-              ),
-            ]),
-          )
-        : null;
+
+    // Extract subModels with processID as key, including their states
+    const subModels = new Map(
+      Array.from(encoding.subProcesses.values()).map((subProcess) => {
+        const subProcessStates = new Map(
+          [...subProcess.states.entries()].flatMap(([key, value]) =>
+            value.map((e) => [e.id, key]),
+          ),
+        );
+
+        return [
+          subProcess.id,
+          new SubModel(
+            subProcess.id,
+            subProcess.modelID,
+            new Map(
+              [...subProcess.participants.values()].map(({ modelID, id }) => [
+                modelID,
+                Number(id),
+              ]),
+            ),
+            subProcessStates,
+          ),
+        ];
+      }),
+    );
 
     return new TriggerEncoding(
       processID,
@@ -58,87 +88,116 @@ export class TriggerEncoding implements IFromEncoding {
     );
   }
 
-  private static IDsFromTransitions(
+  private static extractTasks(
     transitions: Transition[],
-  ): Map<string, number> {
-    return new Map(
-      transitions
-        .filter((transition) => transition instanceof InitiatedTransition)
-        .map((transition) => [
-          (transition as InitiatedTransition).modelID,
-          Number((transition as InitiatedTransition).taskID),
-        ]),
-    );
+    processID: number,
+    taskMap: Map<string, Task>,
+  ): void {
+    transitions
+      .filter((transition) => transition instanceof InitiatedTransition)
+      .forEach((transition) => {
+        const initiated = transition as InitiatedTransition;
+        taskMap.set(
+          initiated.modelID,
+          new Task(initiated.taskID, initiated.initiatorID, processID),
+        );
+      });
   }
 
   static toJSON(encoding: TriggerEncoding) {
     return {
       processID: encoding.processID,
-      tasks: Object.fromEntries(encoding.tasks),
+      tasks: Object.fromEntries(
+        Array.from(encoding.tasks.entries()).map(([modelID, task]) => [
+          modelID,
+          {
+            id: task.encoding,
+            initiator: task.initiator,
+            processID: task.processID,
+          },
+        ]),
+      ),
       participants: Object.fromEntries(encoding.participants),
       states: Object.fromEntries(encoding.states),
-      subModels: encoding.subModels
-        ? Object.fromEntries(
-            [...encoding.subModels].map(([key, subProcess]) => [
-              key,
-              SubProcessEncoding.toJSON(subProcess),
-            ]),
-          )
-        : undefined,
+      subModels: Object.fromEntries(
+        Array.from(encoding.subModels.entries()).map(
+          ([processID, subModel]) => [
+            processID,
+            {
+              modelID: subModel.modelID,
+              processID: subModel.processID,
+              participants: Object.fromEntries(subModel.participants),
+              states: Object.fromEntries(subModel.states),
+            },
+          ],
+        ),
+      ),
     };
   }
 
   static fromJSON(object: {
     processID: number;
-    tasks: { [k: string]: number };
+    tasks: {
+      [modelID: string]: { id: number; initiator: number; processID: number };
+    };
     participants: { [k: string]: number };
     states?: { [k: string]: number };
-    subModels?: { [k: string]: { id: number; tasks: { [k: string]: number } } };
+    subModels: {
+      [processID: string]: {
+        modelID: string;
+        processID: number;
+        participants: { [k: string]: number };
+        states: { [k: string]: number };
+      };
+    };
   }): TriggerEncoding {
     return new TriggerEncoding(
       object.processID,
-      new Map(Object.entries(object.tasks)),
+      new Map(
+        Object.entries(object.tasks).map(([modelID, task]) => [
+          modelID,
+          new Task(task.id, task.initiator, task.processID),
+        ]),
+      ),
       new Map(Object.entries(object.participants)),
       object.states
         ? new Map(
-            Object.entries(object.states).map(([key, value]) => [
-              key,
-              Number(value),
-            ]),
+            Object.entries(object.states).map(([key, value]) => [key, value]),
           )
         : new Map(),
-      object.subModels
-        ? new Map(
-            Object.entries(object.subModels).map(([key, subProcess]) => [
-              key,
-              SubProcessEncoding.fromJSON(subProcess),
-            ]),
-          )
-        : null,
+      new Map(
+        Object.entries(object.subModels).map(([processID, subModel]) => [
+          Number(processID),
+          new SubModel(
+            subModel.processID,
+            subModel.modelID,
+            new Map(Object.entries(subModel.participants)),
+            new Map(
+              Object.entries(subModel.states).map(([key, value]) => [
+                key,
+                Number(value),
+              ]),
+            ),
+          ),
+        ]),
+      ),
     );
   }
 }
 
-class SubProcessEncoding {
+class Task {
   constructor(
-    public id: number,
-    public tasks: Map<string, number>,
+    public encoding: number,
+    public initiator: number,
+    public processID: number,
   ) {}
+}
 
-  static toJSON(subProcess: SubProcessEncoding) {
-    return {
-      id: subProcess.id,
-      tasks: Object.fromEntries(subProcess.tasks),
-    };
-  }
-
-  static fromJSON(object: {
-    id: number;
-    tasks: { [k: string]: number };
-  }): SubProcessEncoding {
-    return new SubProcessEncoding(
-      object.id,
-      new Map(Object.entries(object.tasks)),
-    );
-  }
+class SubModel {
+  constructor(
+    public processID: number,
+    public modelID: string,
+    public participants: Map<string, number>,
+    public states: Map<string, number> = new Map(),
+  ) {}
 }

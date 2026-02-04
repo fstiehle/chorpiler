@@ -14,14 +14,133 @@ import { XESFastXMLParser } from "../../src/util/EventLog/XESFastXMLParser.js";
 import { capitalize } from "../../src/util/helpers.js";
 import { CONTRACTS_PATH, XES_PATH } from "../config.js";
 import { HardhatViemHelpers } from "@nomicfoundation/hardhat-viem/types";
+import { DEBUG_MODE } from "./../config.js";
+import { NetworkHelpers } from "@nomicfoundation/hardhat-network-helpers/types";
 
-interface ContractData {
+export interface ContractData {
   contractName: string;
   contract: any;
   encoding: TriggerEncoding;
   log: EventLog;
   nonLog?: EventLog;
   wallets: WalletClient[];
+}
+
+// Modular event processing functions
+export interface EventProcessingContext {
+  client: PublicClient;
+  wallets: WalletClient[];
+  contract: any;
+  encoding: TriggerEncoding;
+  networkHelpers: NetworkHelpers<"generic">;
+}
+
+export interface EventProcessingHooks {
+  beforeAssert?: (event: any, context: EventProcessingContext) => Promise<void>;
+  afterAssert?: (
+    event: any,
+    context: EventProcessingContext,
+    result: any,
+  ) => Promise<void>;
+}
+
+// Debug logging configuration
+const DEBUG =
+  DEBUG_MODE ||
+  process.env.DEBUG === "true" ||
+  process.env.NODE_ENV === "debug";
+export const debugLog = (...args: any[]) => {
+  if (DEBUG) console.log(...args);
+};
+
+export async function processEvent(
+  event: any,
+  context: EventProcessingContext,
+  hooks: EventProcessingHooks = {},
+): Promise<{
+  success: boolean;
+  receipt?: any;
+  preTokenState?: number;
+  postTokenState?: number;
+}> {
+  const { client, wallets, contract, encoding, networkHelpers } = context;
+
+  debugLog(
+    `Replaying event: ${event.name} (ID: ${event.id}) from participant: ${event.source}`,
+  );
+
+  const participantID = encoding.participants.get(event.source);
+  assert(
+    participantID !== undefined,
+    `source (participant) '${event.source}' for event '${event.name}' not found`,
+  );
+
+  await networkHelpers.setBalance(
+    wallets[participantID].account!.address,
+    10n ** 18n,
+  );
+
+  // Perform data change first, the event name might be a dummy name
+  if (event.dataChange) {
+    debugLog(`Processing ${event.dataChange.length} data changes`);
+    await dataSet(client, wallets[participantID], contract, event.dataChange);
+  }
+
+  const task = encoding.tasks.get(event.id);
+  if (!task) {
+    console.warn(`event '${event.name}' not found!'`);
+    return { success: false };
+  }
+
+  let functionName = "enact";
+  const processID = task.processID;
+  if (processID != 0) {
+    // task is in a subChoreo, call it instead
+    const subModuleName = encoding.subModels.get(Number(processID));
+    if (subModuleName) {
+      functionName = subModuleName.modelID;
+    } else {
+      console.warn(
+        `SubModule with processID ${processID} not found, falling back to 'enact'`,
+      );
+    }
+  }
+
+  const preTokenState = await getTokenState(
+    client,
+    contract,
+    hasSubChoreos(encoding) ? task.processID : null,
+  );
+  debugLog(
+    `Trying to enact task: ${event.name} (Task ID: ${task.encoding}, Process ID: ${task.processID}), Pre-state: ${preTokenState}`,
+  );
+
+  if (hooks.beforeAssert) {
+    await hooks.beforeAssert(event, context);
+  }
+
+  const receipt = await enact(
+    client,
+    wallets[participantID],
+    contract,
+    functionName,
+    task.encoding,
+  );
+
+  const postTokenState = await getTokenState(
+    client,
+    contract,
+    hasSubChoreos(encoding) ? task.processID : null,
+  );
+  debugLog(`Post-state: ${postTokenState} (changed from ${preTokenState})`);
+
+  const result = { receipt, preTokenState, postTokenState };
+
+  if (hooks.afterAssert) {
+    await hooks.afterAssert(event, context, result);
+  }
+
+  return { success: true, ...result };
 }
 
 export async function prepareContracts(viem: HardhatViemHelpers) {
@@ -81,25 +200,40 @@ export async function prepareContracts(viem: HardhatViemHelpers) {
   return contracts;
 }
 
-export async function getTokenState(client: PublicClient, contract: any) {
-  const val = await client.readContract({
-    address: contract.address,
-    abi: contract.abi,
-    functionName: "tokenState",
-  });
-  return Number(val);
+export async function getTokenState(
+  client: PublicClient,
+  contract: any,
+  processID: number | null,
+) {
+  if (processID) {
+    const val = await client.readContract({
+      address: contract.address,
+      abi: contract.abi,
+      functionName: "tokenState",
+      args: [processID],
+    });
+    return Number(val);
+  } else {
+    const val = await client.readContract({
+      address: contract.address,
+      abi: contract.abi,
+      functionName: "tokenState",
+    });
+    return Number(val);
+  }
 }
 
 export async function enact(
   client: PublicClient,
   wallet: WalletClient,
   contract: any,
+  functionName: string,
   taskID: number,
 ) {
   const { request } = await client.simulateContract({
     address: contract.address,
     abi: contract.abi,
-    functionName: "enact",
+    functionName,
     args: [taskID],
     account: wallet.account,
   });
@@ -206,20 +340,38 @@ export async function isEnabled(
   client: PublicClient,
   contract: any,
   encoding: TriggerEncoding,
-  modelID: string,
+  taskModelID: string,
 ) {
-  const state = await getTokenState(client, contract);
-  if (!encoding.states.has(modelID)) return false;
-  const req_state = encoding.states.get(modelID)!;
+  const task = encoding.tasks.get(taskModelID);
+  if (!task) throw Error(`Task ${taskModelID} not found`);
+  const state = await getTokenState(
+    client,
+    contract,
+    hasSubChoreos(encoding) ? task.processID : null,
+  );
+  if (hasSubChoreos(encoding)) {
+    const subModel = encoding.subModels.get(task.processID);
+    if (!subModel) throw Error(`SubModel ${task.processID} not found`);
+    if (!subModel.states.has(taskModelID)) return false;
+    const req_state = subModel.states.get(taskModelID)!;
+    return (state & req_state) == req_state;
+  }
+  if (!encoding.states.has(taskModelID)) return false;
+  const req_state = encoding.states.get(taskModelID)!;
   return (state & req_state) == req_state;
+}
+
+export function hasSubChoreos(encoding: TriggerEncoding) {
+  return encoding.subModels && encoding.subModels.size > 0;
 }
 
 export async function getEnabled(
   client: PublicClient,
   contract: any,
   encoding: TriggerEncoding,
+  subChoreography: number | null = null,
 ) {
-  const state = await getTokenState(client, contract);
+  const state = await getTokenState(client, contract, subChoreography);
 
   const enabled: string[] = [];
 
