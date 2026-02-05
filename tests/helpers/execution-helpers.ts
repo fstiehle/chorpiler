@@ -80,6 +80,17 @@ export async function processEvent(
     10n ** 18n,
   );
 
+  if (event.name == "NooP") {
+    const receipt = await enact(
+      client,
+      wallets[participantID],
+      contract,
+      "enact",
+      0,
+    );
+    return { success: false };
+  }
+
   // Perform data change first, the event name might be a dummy name
   if (event.dataChange) {
     debugLog(`Processing ${event.dataChange.length} data changes`);
@@ -205,7 +216,7 @@ export async function getTokenState(
   contract: any,
   processID: number | null,
 ) {
-  if (processID) {
+  if (processID != null) {
     const val = await client.readContract({
       address: contract.address,
       abi: contract.abi,

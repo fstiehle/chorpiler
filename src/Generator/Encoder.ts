@@ -240,7 +240,6 @@ export class INetEncoder {
         );
       }
     }
-
     for (const t of subTransitions) {
       this.encodeSubNetTransition(encoded, t);
     }
@@ -263,21 +262,21 @@ export class INetEncoder {
       }
       this.callList.set(call.targetID, subTransition.id);
 
-      console.log(`Encoding sub transition for ${subTransition.id}`);
-      console.log(encoded.transitions);
+      if (loggingEnabled)
+        console.log(`Encoding sub transition for ${subTransition.id}`);
       const encodedTransition = encoded.transitions.get(subTransition.id)!;
       encodedTransition.outTo = { id: subNetEncoding.id };
 
       const inTrans = []; // leaving sub to go back to parent
       for (const inPlace of subTransition.target) {
         for (const inT of inPlace.target) {
-          console.log(inT);
           const encodedTransition = encoded.transitions.get(inT.id)!;
           encodedTransition.inFrom = { id: subNetEncoding.id };
           inTrans.push(inT);
         }
       }
     }
+
     // const sources = subEncoded.sourceIDs;
     // console.log(sources);
     // console.log(parent_process.transitions);

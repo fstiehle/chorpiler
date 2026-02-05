@@ -153,13 +153,7 @@ describe("Generation of edge cases", () => {
 
     it("Rental Agreement case to Sol Contract", async () => {
       await compileBpmn("rental-agreement", [
-        new CaseVariable("bond", "int", "int public bond = 4000;", false),
-        new CaseVariable(
-          "weeklyRent",
-          "int",
-          "int public weeklyRent = 1000;",
-          true,
-        ),
+        new CaseVariable("conditions", "uint", "uint public conditions;", true),
       ]);
     });
 
@@ -173,11 +167,10 @@ describe("Generation of edge cases", () => {
       await compileBpmn(
         "unfold-rental-agreement",
         [
-          new CaseVariable("bond", "int", "int public bond = 4000;", false),
           new CaseVariable(
-            "weeklyRent",
-            "int",
-            "int public weeklyRent = 1000;",
+            "conditions",
+            "uint",
+            "uint public conditions;",
             true,
           ),
         ],

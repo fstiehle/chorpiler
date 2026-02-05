@@ -5,13 +5,29 @@
 		<string key="sourceRef" value="Participant ID" />
 	</global>
 
-  <trace id="">
+  <trace id="0">
+    <event>
+      <string key="concept:name" value="pay rent" />
+      <string key="id" value="ChoreographyTask_1hddg8r" />
+      <string key="sourceRef" value="Participant_1yaj41t" />
+    </event>
     <event>
       <string key="concept:name" value="pay bond" />
       <string key="id" value="ChoreographyTask_19lvxvh" />
       <string key="sourceRef" value="Participant_1yaj41t" />
     </event>
     <event>
+      <string key="concept:name" value="Instance Data Change" />
+      <string key="id" value="Instance Data Change" />
+      <string key="sourceRef" value="Participant_1yaj41t" />
+      <boolean key="conditions" value="false" />
+    </event>
+    <event>
+      <string key="concept:name" value="end tenancy" />
+      <string key="id" value="ChoreographyTask_07y6gqp" />
+      <string key="sourceRef" value="Participant_1mi7ck0" />
+    </event>
+    <event>
       <string key="concept:name" value="pay rent" />
       <string key="id" value="ChoreographyTask_1hddg8r" />
       <string key="sourceRef" value="Participant_1yaj41t" />
@@ -20,7 +36,7 @@
       <string key="concept:name" value="Instance Data Change" />
       <string key="id" value="Instance Data Change" />
       <string key="sourceRef" value="Participant_1yaj41t" />
-      <boolean key="conditions" value="0" />
+      <boolean key="conditions" value="false" />
     </event>
     <event>
       <string key="concept:name" value="pay rent" />
@@ -31,7 +47,7 @@
       <string key="concept:name" value="Instance Data Change" />
       <string key="id" value="Instance Data Change" />
       <string key="sourceRef" value="Participant_1yaj41t" />
-      <boolean key="conditions" value="0" />
+      <boolean key="conditions" value="false" />
     </event>
     <event>
       <string key="concept:name" value="pay rent" />
@@ -59,7 +75,7 @@
       <string key="sourceRef" value="Participant_1dtzugx" />
     </event>
   </trace>
-  <trace id="">
+  <trace id="2">
     <event>
       <string key="concept:name" value="pay bond" />
       <string key="id" value="ChoreographyTask_19lvxvh" />
@@ -68,6 +84,141 @@
     <event>
       <string key="concept:name" value="end tenancy" />
       <string key="id" value="ChoreographyTask_07y6gqp" />
+      <string key="sourceRef" value="Participant_1yaj41t" />
+    </event>
+    <event>
+      <string key="concept:name" value="file claim for bond" />
+      <string key="id" value="ChoreographyTask_001w5ww" />
+      <string key="sourceRef" value="Participant_1mi7ck0" />
+    </event>
+    <event>
+      <string key="concept:name" value="refund bond to tenant" />
+      <string key="id" value="ChoreographyTask_07z22w1" />
+      <string key="sourceRef" value="Participant_1dtzugx" />
+    </event>
+    <event>
+      <string key="concept:name" value="file dispute" />
+      <string key="id" value="ChoreographyTask_1h13qrq" />
+      <string key="sourceRef" value="Participant_1yaj41t" />
+    </event>
+  </trace>
+  <trace id="3">
+    <event>
+      <string key="concept:name" value="pay rent" />
+      <string key="id" value="ChoreographyTask_1hddg8r" />
+      <string key="sourceRef" value="Participant_1yaj41t" />
+    </event>
+    <event>
+      <string key="concept:name" value="pay bond" />
+      <string key="id" value="ChoreographyTask_19lvxvh" />
+      <string key="sourceRef" value="Participant_1yaj41t" />
+    </event>
+    <event>
+      <string key="concept:name" value="Instance Data Change" />
+      <string key="id" value="Instance Data Change" />
+      <string key="sourceRef" value="Participant_1yaj41t" />
+      <boolean key="conditions" value="false" />
+    </event>
+    <event>
+      <string key="concept:name" value="pay rent" />
+      <string key="id" value="ChoreographyTask_1hddg8r" />
+      <string key="sourceRef" value="Participant_1yaj41t" />
+    </event>
+    <event>
+      <string key="concept:name" value="Instance Data Change" />
+      <string key="id" value="Instance Data Change" />
+      <string key="sourceRef" value="Participant_1yaj41t" />
+      <boolean key="conditions" value="false" />
+    </event>
+    <event>
+      <string key="concept:name" value="pay rent" />
+      <string key="id" value="ChoreographyTask_1hddg8r" />
+      <string key="sourceRef" value="Participant_1yaj41t" />
+    </event>
+    <event>
+      <string key="concept:name" value="transfer bond to landlord" />
+      <string key="id" value="ChoreographyTask_0235k4i" />
+      <string key="sourceRef" value="Participant_1dtzugx" />
+    </event>
+    <event>
+      <string key="concept:name" value="file claim for bond" />
+      <string key="id" value="ChoreographyTask_001w5ww" />
+      <string key="sourceRef" value="Participant_1mi7ck0" />
+    </event>
+    <event>
+      <string key="concept:name" value="accept claim" />
+      <string key="id" value="ChoreographyTask_0946is9" />
+      <string key="sourceRef" value="Participant_1yaj41t" />
+    </event>
+    <event>
+      <string key="concept:name" value="end tenancy" />
+      <string key="id" value="ChoreographyTask_07y6gqp" />
+      <string key="sourceRef" value="Participant_1yaj41t" />
+    </event>
+  </trace>
+  <trace id="4">
+    <event>
+      <string key="concept:name" value="pay bond" />
+      <string key="id" value="ChoreographyTask_19lvxvh" />
+      <string key="sourceRef" value="Participant_1yaj41t" />
+    </event>
+    <event>
+      <string key="concept:name" value="pay rent" />
+      <string key="id" value="ChoreographyTask_1hddg8r" />
+      <string key="sourceRef" value="Participant_1yaj41t" />
+    </event>
+    <event>
+      <string key="concept:name" value="Instance Data Change" />
+      <string key="id" value="Instance Data Change" />
+      <string key="sourceRef" value="Participant_1yaj41t" />
+      <boolean key="conditions" value="false" />
+    </event>
+    <event>
+      <string key="concept:name" value="pay rent" />
+      <string key="id" value="ChoreographyTask_1hddg8r" />
+      <string key="sourceRef" value="Participant_1yaj41t" />
+    </event>
+    <event>
+      <string key="concept:name" value="Instance Data Change" />
+      <string key="id" value="Instance Data Change" />
+      <string key="sourceRef" value="Participant_1yaj41t" />
+      <boolean key="conditions" value="false" />
+    </event>
+    <event>
+      <string key="concept:name" value="pay rent" />
+      <string key="id" value="ChoreographyTask_1hddg8r" />
+      <string key="sourceRef" value="Participant_1yaj41t" />
+    </event>
+    <event>
+      <string key="concept:name" value="end tenancy" />
+      <string key="id" value="ChoreographyTask_07y6gqp" />
+      <string key="sourceRef" value="Participant_1yaj41t" />
+    </event>
+    <event>
+      <string key="concept:name" value="refund bond to tenant" />
+      <string key="id" value="ChoreographyTask_07z22w1" />
+      <string key="sourceRef" value="Participant_1dtzugx" />
+    </event>
+  </trace>
+  <trace id="5">
+    <event>
+      <string key="concept:name" value="pay rent" />
+      <string key="id" value="ChoreographyTask_1hddg8r" />
+      <string key="sourceRef" value="Participant_1yaj41t" />
+    </event>
+    <event>
+      <string key="concept:name" value="end tenancy" />
+      <string key="id" value="ChoreographyTask_07y6gqp" />
+      <string key="sourceRef" value="Participant_1yaj41t" />
+    </event>
+    <event>
+      <string key="concept:name" value="pay bond" />
+      <string key="id" value="ChoreographyTask_19lvxvh" />
+      <string key="sourceRef" value="Participant_1yaj41t" />
+    </event>
+    <event>
+      <string key="concept:name" value="transfer bond to landlord" />
+      <string key="id" value="ChoreographyTask_0235k4i" />
       <string key="sourceRef" value="Participant_1yaj41t" />
     </event>
     <event>
@@ -81,11 +232,49 @@
       <string key="sourceRef" value="Participant_1dtzugx" />
     </event>
   </trace>
-  <trace id="">
+  <trace id="6">
+    <event>
+      <string key="concept:name" value="pay rent" />
+      <string key="id" value="ChoreographyTask_1hddg8r" />
+      <string key="sourceRef" value="Participant_1yaj41t" />
+    </event>
+    <event>
+      <string key="concept:name" value="pay bond" />
+      <string key="id" value="ChoreographyTask_19lvxvh" />
+      <string key="sourceRef" value="Participant_1dtzugx" />
+    </event>
     <event>
       <string key="concept:name" value="pay bond" />
       <string key="id" value="ChoreographyTask_19lvxvh" />
       <string key="sourceRef" value="Participant_1yaj41t" />
+    </event>
+    <event>
+      <string key="concept:name" value="Instance Data Change" />
+      <string key="id" value="Instance Data Change" />
+      <string key="sourceRef" value="Participant_1yaj41t" />
+      <boolean key="conditions" value="false" />
+    </event>
+    <event>
+      <string key="concept:name" value="pay rent" />
+      <string key="id" value="ChoreographyTask_1hddg8r" />
+      <string key="sourceRef" value="Participant_1yaj41t" />
+    </event>
+    <event>
+      <string key="concept:name" value="Instance Data Change" />
+      <string key="id" value="Instance Data Change" />
+      <string key="sourceRef" value="Participant_1yaj41t" />
+      <boolean key="conditions" value="false" />
+    </event>
+    <event>
+      <string key="concept:name" value="pay rent" />
+      <string key="id" value="ChoreographyTask_1hddg8r" />
+      <string key="sourceRef" value="Participant_1yaj41t" />
+    </event>
+    <event>
+      <string key="concept:name" value="Instance Data Change" />
+      <string key="id" value="Instance Data Change" />
+      <string key="sourceRef" value="Participant_1yaj41t" />
+      <boolean key="conditions" value="false" />
     </event>
     <event>
       <string key="concept:name" value="pay rent" />
@@ -113,33 +302,87 @@
       <string key="sourceRef" value="Participant_1dtzugx" />
     </event>
   </trace>
-  <trace id="">
+  <trace id="7">
+    <event>
+      <string key="concept:name" value="refund bond to tenant" />
+      <string key="id" value="ChoreographyTask_07z22w1" />
+      <string key="sourceRef" value="Participant_1dtzugx" />
+    </event>
+    <event>
+      <string key="concept:name" value="end tenancy" />
+      <string key="id" value="ChoreographyTask_07y6gqp" />
+      <string key="sourceRef" value="Participant_1yaj41t" />
+    </event>
     <event>
       <string key="concept:name" value="pay bond" />
       <string key="id" value="ChoreographyTask_19lvxvh" />
       <string key="sourceRef" value="Participant_1yaj41t" />
     </event>
     <event>
-      <string key="concept:name" value="pay rent" />
-      <string key="id" value="ChoreographyTask_1hddg8r" />
+      <string key="concept:name" value="release bond" />
+      <string key="id" value="ChoreographyTask_00l7an5" />
+      <string key="sourceRef" value="Participant_1mi7ck0" />
+    </event>
+    <event>
+      <string key="concept:name" value="refund bond to tenant" />
+      <string key="id" value="ChoreographyTask_07z22w1" />
+      <string key="sourceRef" value="Participant_1dtzugx" />
+    </event>
+  </trace>
+  <trace id="8">
+    <event>
+      <string key="concept:name" value="transfer bond to landlord" />
+      <string key="id" value="ChoreographyTask_0235k4i" />
+      <string key="sourceRef" value="Participant_1dtzugx" />
+    </event>
+    <event>
+      <string key="concept:name" value="pay bond" />
+      <string key="id" value="ChoreographyTask_19lvxvh" />
       <string key="sourceRef" value="Participant_1yaj41t" />
     </event>
     <event>
-      <string key="concept:name" value="Instance Data Change" />
-      <string key="id" value="Instance Data Change" />
-      <string key="sourceRef" value="Participant_1yaj41t" />
-      <boolean key="conditions" value="0" />
+      <string key="concept:name" value="file claim for bond" />
+      <string key="id" value="ChoreographyTask_001w5ww" />
+      <string key="sourceRef" value="Participant_1mi7ck0" />
     </event>
     <event>
-      <string key="concept:name" value="pay rent" />
-      <string key="id" value="ChoreographyTask_1hddg8r" />
+      <string key="concept:name" value="accept claim" />
+      <string key="id" value="ChoreographyTask_0946is9" />
       <string key="sourceRef" value="Participant_1yaj41t" />
     </event>
     <event>
-      <string key="concept:name" value="Instance Data Change" />
-      <string key="id" value="Instance Data Change" />
+      <string key="concept:name" value="end tenancy" />
+      <string key="id" value="ChoreographyTask_07y6gqp" />
       <string key="sourceRef" value="Participant_1yaj41t" />
-      <boolean key="conditions" value="0" />
+    </event>
+  </trace>
+  <trace id="9">
+    <event>
+      <string key="concept:name" value="end tenancy" />
+      <string key="id" value="ChoreographyTask_07y6gqp" />
+      <string key="sourceRef" value="Participant_1yaj41t" />
+    </event>
+    <event>
+      <string key="concept:name" value="pay bond" />
+      <string key="id" value="ChoreographyTask_19lvxvh" />
+      <string key="sourceRef" value="Participant_1yaj41t" />
+    </event>
+    <event>
+      <string key="concept:name" value="refund bond to tenant" />
+      <string key="id" value="ChoreographyTask_07z22w1" />
+      <string key="sourceRef" value="Participant_1dtzugx" />
+    </event>
+  </trace>
+  <trace id="10">
+    <event>
+      <string key="concept:name" value="pay bond" />
+      <string key="id" value="ChoreographyTask_19lvxvh" />
+      <string key="sourceRef" value="Participant_1yaj41t" />
+    </event>
+    <event>
+      <string key="concept:name" value="refund bond to tenant" />
+      <string key="id" value="ChoreographyTask_07z22w1" />
+      <string key="sourceRef" value="Participant_1mi7ck0" />
     </event>
     <event>
       <string key="concept:name" value="pay rent" />
@@ -162,7 +405,7 @@
       <string key="sourceRef" value="Participant_1dtzugx" />
     </event>
   </trace>
-  <trace id="">
+  <trace id="11">
     <event>
       <string key="concept:name" value="pay rent" />
       <string key="id" value="ChoreographyTask_1hddg8r" />
@@ -177,7 +420,7 @@
       <string key="concept:name" value="Instance Data Change" />
       <string key="id" value="Instance Data Change" />
       <string key="sourceRef" value="Participant_1yaj41t" />
-      <boolean key="conditions" value="0" />
+      <boolean key="conditions" value="false" />
     </event>
     <event>
       <string key="concept:name" value="pay rent" />
@@ -188,7 +431,7 @@
       <string key="concept:name" value="Instance Data Change" />
       <string key="id" value="Instance Data Change" />
       <string key="sourceRef" value="Participant_1yaj41t" />
-      <boolean key="conditions" value="0" />
+      <boolean key="conditions" value="false" />
     </event>
     <event>
       <string key="concept:name" value="pay rent" />
@@ -199,7 +442,164 @@
       <string key="concept:name" value="Instance Data Change" />
       <string key="id" value="Instance Data Change" />
       <string key="sourceRef" value="Participant_1yaj41t" />
-      <boolean key="conditions" value="0" />
+      <boolean key="conditions" value="false" />
+    </event>
+    <event>
+      <string key="concept:name" value="pay rent" />
+      <string key="id" value="ChoreographyTask_1hddg8r" />
+      <string key="sourceRef" value="Participant_1yaj41t" />
+    </event>
+    <event>
+      <string key="concept:name" value="end tenancy" />
+      <string key="id" value="ChoreographyTask_07y6gqp" />
+      <string key="sourceRef" value="Participant_1yaj41t" />
+    </event>
+    <event>
+      <string key="concept:name" value="file claim for bond" />
+      <string key="id" value="ChoreographyTask_001w5ww" />
+      <string key="sourceRef" value="Participant_1mi7ck0" />
+    </event>
+    <event>
+      <string key="concept:name" value="pay rent" />
+      <string key="id" value="ChoreographyTask_1hddg8r" />
+      <string key="sourceRef" value="Participant_1dtzugx" />
+    </event>
+    <event>
+      <string key="concept:name" value="accept claim" />
+      <string key="id" value="ChoreographyTask_0946is9" />
+      <string key="sourceRef" value="Participant_1yaj41t" />
+    </event>
+    <event>
+      <string key="concept:name" value="transfer bond to landlord" />
+      <string key="id" value="ChoreographyTask_0235k4i" />
+      <string key="sourceRef" value="Participant_1dtzugx" />
+    </event>
+  </trace>
+  <trace id="12">
+    <event>
+      <string key="concept:name" value="end tenancy" />
+      <string key="id" value="ChoreographyTask_07y6gqp" />
+      <string key="sourceRef" value="Participant_1yaj41t" />
+    </event>
+    <event>
+      <string key="concept:name" value="release bond" />
+      <string key="id" value="ChoreographyTask_00l7an5" />
+      <string key="sourceRef" value="Participant_1mi7ck0" />
+    </event>
+    <event>
+      <string key="concept:name" value="refund bond to tenant" />
+      <string key="id" value="ChoreographyTask_07z22w1" />
+      <string key="sourceRef" value="Participant_1dtzugx" />
+    </event>
+  </trace>
+  <trace id="13">
+    <event>
+      <string key="concept:name" value="file claim for bond" />
+      <string key="id" value="ChoreographyTask_001w5ww" />
+      <string key="sourceRef" value="Participant_1mi7ck0" />
+    </event>
+    <event>
+      <string key="concept:name" value="pay bond" />
+      <string key="id" value="ChoreographyTask_19lvxvh" />
+      <string key="sourceRef" value="Participant_1yaj41t" />
+    </event>
+    <event>
+      <string key="concept:name" value="pay rent" />
+      <string key="id" value="ChoreographyTask_1hddg8r" />
+      <string key="sourceRef" value="Participant_1yaj41t" />
+    </event>
+    <event>
+      <string key="concept:name" value="Instance Data Change" />
+      <string key="id" value="Instance Data Change" />
+      <string key="sourceRef" value="Participant_1yaj41t" />
+      <boolean key="conditions" value="false" />
+    </event>
+    <event>
+      <string key="concept:name" value="pay rent" />
+      <string key="id" value="ChoreographyTask_1hddg8r" />
+      <string key="sourceRef" value="Participant_1yaj41t" />
+    </event>
+    <event>
+      <string key="concept:name" value="end tenancy" />
+      <string key="id" value="ChoreographyTask_07y6gqp" />
+      <string key="sourceRef" value="Participant_1yaj41t" />
+    </event>
+    <event>
+      <string key="concept:name" value="accept claim" />
+      <string key="id" value="ChoreographyTask_0946is9" />
+      <string key="sourceRef" value="Participant_1yaj41t" />
+    </event>
+    <event>
+      <string key="concept:name" value="transfer bond to landlord" />
+      <string key="id" value="ChoreographyTask_0235k4i" />
+      <string key="sourceRef" value="Participant_1dtzugx" />
+    </event>
+  </trace>
+  <trace id="14">
+    <event>
+      <string key="concept:name" value="pay bond" />
+      <string key="id" value="ChoreographyTask_19lvxvh" />
+      <string key="sourceRef" value="Participant_1yaj41t" />
+    </event>
+    <event>
+      <string key="concept:name" value="pay rent" />
+      <string key="id" value="ChoreographyTask_1hddg8r" />
+      <string key="sourceRef" value="Participant_1yaj41t" />
+    </event>
+    <event>
+      <string key="concept:name" value="Instance Data Change" />
+      <string key="id" value="Instance Data Change" />
+      <string key="sourceRef" value="Participant_1yaj41t" />
+      <boolean key="conditions" value="false" />
+    </event>
+    <event>
+      <string key="concept:name" value="pay rent" />
+      <string key="id" value="ChoreographyTask_1hddg8r" />
+      <string key="sourceRef" value="Participant_1yaj41t" />
+    </event>
+    <event>
+      <string key="concept:name" value="Instance Data Change" />
+      <string key="id" value="Instance Data Change" />
+      <string key="sourceRef" value="Participant_1yaj41t" />
+      <boolean key="conditions" value="false" />
+    </event>
+    <event>
+      <string key="concept:name" value="pay rent" />
+      <string key="id" value="ChoreographyTask_1hddg8r" />
+      <string key="sourceRef" value="Participant_1yaj41t" />
+    </event>
+    <event>
+      <string key="concept:name" value="release bond" />
+      <string key="id" value="ChoreographyTask_00l7an5" />
+      <string key="sourceRef" value="Participant_1mi7ck0" />
+    </event>
+    <event>
+      <string key="concept:name" value="end tenancy" />
+      <string key="id" value="ChoreographyTask_07y6gqp" />
+      <string key="sourceRef" value="Participant_1yaj41t" />
+    </event>
+    <event>
+      <string key="concept:name" value="refund bond to tenant" />
+      <string key="id" value="ChoreographyTask_07z22w1" />
+      <string key="sourceRef" value="Participant_1dtzugx" />
+    </event>
+  </trace>
+  <trace id="15">
+    <event>
+      <string key="concept:name" value="pay bond" />
+      <string key="id" value="ChoreographyTask_19lvxvh" />
+      <string key="sourceRef" value="Participant_1yaj41t" />
+    </event>
+    <event>
+      <string key="concept:name" value="pay rent" />
+      <string key="id" value="ChoreographyTask_1hddg8r" />
+      <string key="sourceRef" value="Participant_1yaj41t" />
+    </event>
+    <event>
+      <string key="concept:name" value="Instance Data Change" />
+      <string key="id" value="Instance Data Change" />
+      <string key="sourceRef" value="Participant_1yaj41t" />
+      <boolean key="conditions" value="false" />
     </event>
     <event>
       <string key="concept:name" value="pay rent" />
@@ -222,12 +622,17 @@
       <string key="sourceRef" value="Participant_1yaj41t" />
     </event>
     <event>
+      <string key="concept:name" value="pay bond" />
+      <string key="id" value="ChoreographyTask_19lvxvh" />
+      <string key="sourceRef" value="Participant_1yaj41t" />
+    </event>
+    <event>
       <string key="concept:name" value="transfer bond to landlord" />
       <string key="id" value="ChoreographyTask_0235k4i" />
       <string key="sourceRef" value="Participant_1dtzugx" />
     </event>
   </trace>
-  <trace id="">
+  <trace id="16">
     <event>
       <string key="concept:name" value="pay bond" />
       <string key="id" value="ChoreographyTask_19lvxvh" />
@@ -236,44 +641,6 @@
     <event>
       <string key="concept:name" value="pay rent" />
       <string key="id" value="ChoreographyTask_1hddg8r" />
-      <string key="sourceRef" value="Participant_1yaj41t" />
-    </event>
-    <event>
-      <string key="concept:name" value="Instance Data Change" />
-      <string key="id" value="Instance Data Change" />
-      <string key="sourceRef" value="Participant_1yaj41t" />
-      <boolean key="conditions" value="0" />
-    </event>
-    <event>
-      <string key="concept:name" value="pay rent" />
-      <string key="id" value="ChoreographyTask_1hddg8r" />
-      <string key="sourceRef" value="Participant_1yaj41t" />
-    </event>
-    <event>
-      <string key="concept:name" value="end tenancy" />
-      <string key="id" value="ChoreographyTask_07y6gqp" />
-      <string key="sourceRef" value="Participant_1yaj41t" />
-    </event>
-    <event>
-      <string key="concept:name" value="release bond" />
-      <string key="id" value="ChoreographyTask_00l7an5" />
-      <string key="sourceRef" value="Participant_1mi7ck0" />
-    </event>
-    <event>
-      <string key="concept:name" value="refund bond to tenant" />
-      <string key="id" value="ChoreographyTask_07z22w1" />
-      <string key="sourceRef" value="Participant_1dtzugx" />
-    </event>
-  </trace>
-  <trace id="">
-    <event>
-      <string key="concept:name" value="pay bond" />
-      <string key="id" value="ChoreographyTask_19lvxvh" />
-      <string key="sourceRef" value="Participant_1yaj41t" />
-    </event>
-    <event>
-      <string key="concept:name" value="end tenancy" />
-      <string key="id" value="ChoreographyTask_07y6gqp" />
       <string key="sourceRef" value="Participant_1yaj41t" />
     </event>
     <event>
@@ -286,286 +653,10 @@
       <string key="id" value="ChoreographyTask_1h13qrq" />
       <string key="sourceRef" value="Participant_1yaj41t" />
     </event>
-  </trace>
-  <trace id="">
-    <event>
-      <string key="concept:name" value="pay bond" />
-      <string key="id" value="ChoreographyTask_19lvxvh" />
-      <string key="sourceRef" value="Participant_1yaj41t" />
-    </event>
     <event>
       <string key="concept:name" value="end tenancy" />
       <string key="id" value="ChoreographyTask_07y6gqp" />
       <string key="sourceRef" value="Participant_1yaj41t" />
-    </event>
-    <event>
-      <string key="concept:name" value="file claim for bond" />
-      <string key="id" value="ChoreographyTask_001w5ww" />
-      <string key="sourceRef" value="Participant_1mi7ck0" />
-    </event>
-    <event>
-      <string key="concept:name" value="accept claim" />
-      <string key="id" value="ChoreographyTask_0946is9" />
-      <string key="sourceRef" value="Participant_1yaj41t" />
-    </event>
-    <event>
-      <string key="concept:name" value="transfer bond to landlord" />
-      <string key="id" value="ChoreographyTask_0235k4i" />
-      <string key="sourceRef" value="Participant_1dtzugx" />
-    </event>
-  </trace>
-  <trace id="">
-    <event>
-      <string key="concept:name" value="pay bond" />
-      <string key="id" value="ChoreographyTask_19lvxvh" />
-      <string key="sourceRef" value="Participant_1yaj41t" />
-    </event>
-    <event>
-      <string key="concept:name" value="pay rent" />
-      <string key="id" value="ChoreographyTask_1hddg8r" />
-      <string key="sourceRef" value="Participant_1yaj41t" />
-    </event>
-    <event>
-      <string key="concept:name" value="Instance Data Change" />
-      <string key="id" value="Instance Data Change" />
-      <string key="sourceRef" value="Participant_1yaj41t" />
-      <boolean key="conditions" value="0" />
-    </event>
-    <event>
-      <string key="concept:name" value="pay rent" />
-      <string key="id" value="ChoreographyTask_1hddg8r" />
-      <string key="sourceRef" value="Participant_1yaj41t" />
-    </event>
-    <event>
-      <string key="concept:name" value="end tenancy" />
-      <string key="id" value="ChoreographyTask_07y6gqp" />
-      <string key="sourceRef" value="Participant_1yaj41t" />
-    </event>
-    <event>
-      <string key="concept:name" value="file claim for bond" />
-      <string key="id" value="ChoreographyTask_001w5ww" />
-      <string key="sourceRef" value="Participant_1mi7ck0" />
-    </event>
-    <event>
-      <string key="concept:name" value="accept claim" />
-      <string key="id" value="ChoreographyTask_0946is9" />
-      <string key="sourceRef" value="Participant_1yaj41t" />
-    </event>
-    <event>
-      <string key="concept:name" value="transfer bond to landlord" />
-      <string key="id" value="ChoreographyTask_0235k4i" />
-      <string key="sourceRef" value="Participant_1dtzugx" />
-    </event>
-  </trace>
-  <trace id="">
-    <event>
-      <string key="concept:name" value="pay bond" />
-      <string key="id" value="ChoreographyTask_19lvxvh" />
-      <string key="sourceRef" value="Participant_1yaj41t" />
-    </event>
-    <event>
-      <string key="concept:name" value="pay rent" />
-      <string key="id" value="ChoreographyTask_1hddg8r" />
-      <string key="sourceRef" value="Participant_1yaj41t" />
-    </event>
-    <event>
-      <string key="concept:name" value="end tenancy" />
-      <string key="id" value="ChoreographyTask_07y6gqp" />
-      <string key="sourceRef" value="Participant_1yaj41t" />
-    </event>
-    <event>
-      <string key="concept:name" value="release bond" />
-      <string key="id" value="ChoreographyTask_00l7an5" />
-      <string key="sourceRef" value="Participant_1mi7ck0" />
-    </event>
-    <event>
-      <string key="concept:name" value="refund bond to tenant" />
-      <string key="id" value="ChoreographyTask_07z22w1" />
-      <string key="sourceRef" value="Participant_1dtzugx" />
-    </event>
-  </trace>
-  <trace id="">
-    <event>
-      <string key="concept:name" value="pay rent" />
-      <string key="id" value="ChoreographyTask_1hddg8r" />
-      <string key="sourceRef" value="Participant_1yaj41t" />
-    </event>
-    <event>
-      <string key="concept:name" value="pay bond" />
-      <string key="id" value="ChoreographyTask_19lvxvh" />
-      <string key="sourceRef" value="Participant_1yaj41t" />
-    </event>
-    <event>
-      <string key="concept:name" value="end tenancy" />
-      <string key="id" value="ChoreographyTask_07y6gqp" />
-      <string key="sourceRef" value="Participant_1yaj41t" />
-    </event>
-    <event>
-      <string key="concept:name" value="release bond" />
-      <string key="id" value="ChoreographyTask_00l7an5" />
-      <string key="sourceRef" value="Participant_1mi7ck0" />
-    </event>
-    <event>
-      <string key="concept:name" value="refund bond to tenant" />
-      <string key="id" value="ChoreographyTask_07z22w1" />
-      <string key="sourceRef" value="Participant_1dtzugx" />
-    </event>
-  </trace>
-  <trace id="">
-    <event>
-      <string key="concept:name" value="end tenancy" />
-      <string key="id" value="ChoreographyTask_07y6gqp" />
-      <string key="sourceRef" value="Participant_1yaj41t" />
-    </event>
-    <event>
-      <string key="concept:name" value="pay bond" />
-      <string key="id" value="ChoreographyTask_19lvxvh" />
-      <string key="sourceRef" value="Participant_1yaj41t" />
-    </event>
-    <event>
-      <string key="concept:name" value="file claim for bond" />
-      <string key="id" value="ChoreographyTask_001w5ww" />
-      <string key="sourceRef" value="Participant_1mi7ck0" />
-    </event>
-    <event>
-      <string key="concept:name" value="accept claim" />
-      <string key="id" value="ChoreographyTask_0946is9" />
-      <string key="sourceRef" value="Participant_1yaj41t" />
-    </event>
-    <event>
-      <string key="concept:name" value="transfer bond to landlord" />
-      <string key="id" value="ChoreographyTask_0235k4i" />
-      <string key="sourceRef" value="Participant_1dtzugx" />
-    </event>
-  </trace>
-  <trace id="">
-    <event>
-      <string key="concept:name" value="pay rent" />
-      <string key="id" value="ChoreographyTask_1hddg8r" />
-      <string key="sourceRef" value="Participant_1yaj41t" />
-    </event>
-    <event>
-      <string key="concept:name" value="pay bond" />
-      <string key="id" value="ChoreographyTask_19lvxvh" />
-      <string key="sourceRef" value="Participant_1yaj41t" />
-    </event>
-    <event>
-      <string key="concept:name" value="Instance Data Change" />
-      <string key="id" value="Instance Data Change" />
-      <string key="sourceRef" value="Participant_1yaj41t" />
-      <boolean key="conditions" value="0" />
-    </event>
-    <event>
-      <string key="concept:name" value="pay rent" />
-      <string key="id" value="ChoreographyTask_1hddg8r" />
-      <string key="sourceRef" value="Participant_1yaj41t" />
-    </event>
-    <event>
-      <string key="concept:name" value="Instance Data Change" />
-      <string key="id" value="Instance Data Change" />
-      <string key="sourceRef" value="Participant_1yaj41t" />
-      <boolean key="conditions" value="0" />
-    </event>
-    <event>
-      <string key="concept:name" value="pay rent" />
-      <string key="id" value="ChoreographyTask_1hddg8r" />
-      <string key="sourceRef" value="Participant_1yaj41t" />
-    </event>
-    <event>
-      <string key="concept:name" value="end tenancy" />
-      <string key="id" value="ChoreographyTask_07y6gqp" />
-      <string key="sourceRef" value="Participant_1yaj41t" />
-    </event>
-    <event>
-      <string key="concept:name" value="file claim for bond" />
-      <string key="id" value="ChoreographyTask_001w5ww" />
-      <string key="sourceRef" value="Participant_1mi7ck0" />
-    </event>
-    <event>
-      <string key="concept:name" value="accept claim" />
-      <string key="id" value="ChoreographyTask_0946is9" />
-      <string key="sourceRef" value="Participant_1yaj41t" />
-    </event>
-    <event>
-      <string key="concept:name" value="transfer bond to landlord" />
-      <string key="id" value="ChoreographyTask_0235k4i" />
-      <string key="sourceRef" value="Participant_1dtzugx" />
-    </event>
-  </trace>
-  <trace id="">
-    <event>
-      <string key="concept:name" value="pay bond" />
-      <string key="id" value="ChoreographyTask_19lvxvh" />
-      <string key="sourceRef" value="Participant_1yaj41t" />
-    </event>
-    <event>
-      <string key="concept:name" value="pay rent" />
-      <string key="id" value="ChoreographyTask_1hddg8r" />
-      <string key="sourceRef" value="Participant_1yaj41t" />
-    </event>
-    <event>
-      <string key="concept:name" value="end tenancy" />
-      <string key="id" value="ChoreographyTask_07y6gqp" />
-      <string key="sourceRef" value="Participant_1yaj41t" />
-    </event>
-    <event>
-      <string key="concept:name" value="file claim for bond" />
-      <string key="id" value="ChoreographyTask_001w5ww" />
-      <string key="sourceRef" value="Participant_1mi7ck0" />
-    </event>
-    <event>
-      <string key="concept:name" value="file dispute" />
-      <string key="id" value="ChoreographyTask_1h13qrq" />
-      <string key="sourceRef" value="Participant_1yaj41t" />
-    </event>
-  </trace>
-  <trace id="">
-    <event>
-      <string key="concept:name" value="pay rent" />
-      <string key="id" value="ChoreographyTask_1hddg8r" />
-      <string key="sourceRef" value="Participant_1yaj41t" />
-    </event>
-    <event>
-      <string key="concept:name" value="end tenancy" />
-      <string key="id" value="ChoreographyTask_07y6gqp" />
-      <string key="sourceRef" value="Participant_1yaj41t" />
-    </event>
-    <event>
-      <string key="concept:name" value="pay bond" />
-      <string key="id" value="ChoreographyTask_19lvxvh" />
-      <string key="sourceRef" value="Participant_1yaj41t" />
-    </event>
-    <event>
-      <string key="concept:name" value="release bond" />
-      <string key="id" value="ChoreographyTask_00l7an5" />
-      <string key="sourceRef" value="Participant_1mi7ck0" />
-    </event>
-    <event>
-      <string key="concept:name" value="refund bond to tenant" />
-      <string key="id" value="ChoreographyTask_07z22w1" />
-      <string key="sourceRef" value="Participant_1dtzugx" />
-    </event>
-  </trace>
-  <trace id="">
-    <event>
-      <string key="concept:name" value="end tenancy" />
-      <string key="id" value="ChoreographyTask_07y6gqp" />
-      <string key="sourceRef" value="Participant_1yaj41t" />
-    </event>
-    <event>
-      <string key="concept:name" value="pay bond" />
-      <string key="id" value="ChoreographyTask_19lvxvh" />
-      <string key="sourceRef" value="Participant_1yaj41t" />
-    </event>
-    <event>
-      <string key="concept:name" value="release bond" />
-      <string key="id" value="ChoreographyTask_00l7an5" />
-      <string key="sourceRef" value="Participant_1mi7ck0" />
-    </event>
-    <event>
-      <string key="concept:name" value="refund bond to tenant" />
-      <string key="id" value="ChoreographyTask_07z22w1" />
-      <string key="sourceRef" value="Participant_1dtzugx" />
     </event>
   </trace>
 </log>

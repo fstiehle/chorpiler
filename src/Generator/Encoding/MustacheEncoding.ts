@@ -35,13 +35,17 @@ class MustacheProcessEncoding {
     );
   }
 
-  private static convertStates(states: Map<number, Encoding.Transition[]>): State[] {
-    const stateArray = Array.from(states.entries()).map(([consume, transitions]) => {
-      return new State(
-        consume.toString(),
-        transitions.map((t) => this.convertTransition(t)),
-      );
-    });
+  private static convertStates(
+    states: Map<number, Encoding.Transition[]>,
+  ): State[] {
+    const stateArray = Array.from(states.entries()).map(
+      ([consume, transitions]) => {
+        return new State(
+          consume.toString(),
+          transitions.map((t) => this.convertTransition(t)),
+        );
+      },
+    );
 
     if (stateArray.length > 0) {
       stateArray[stateArray.length - 1].last = true;
@@ -66,7 +70,10 @@ class MustacheProcessEncoding {
   }
 }
 
-export class MustacheEncoding extends MustacheProcessEncoding implements IFromEncoding {
+export class MustacheEncoding
+  extends MustacheProcessEncoding
+  implements IFromEncoding
+{
   /**
    * Converts an `Encoding.Process` object to a Mustache template-ready object.
    *

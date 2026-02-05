@@ -174,7 +174,7 @@ export class Simulator {
       path.join(__dirname, "./templates/xes", "log.mustache.xes"),
       "utf-8",
     );
-    const renderedLog = Mustache.render(template, log);
+    const renderedLog = Mustache.render(template, log.getEncoding());
 
     if (!fs.existsSync(this.xesDir)) {
       fs.mkdirSync(this.xesDir, { recursive: true });

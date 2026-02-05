@@ -7,15 +7,14 @@ interface IProcessExecution {
   function enact(uint id) external;
 }
 
-contract RentalAgreementUnfolded is IProcessExecution {
-  uint[2] public tokenState;
+contract RentalAgreement is IProcessExecution {
+  uint public tokenState = 1;
   address[3] public participants;
   event Task(uint id);
   uint public conditions;
 
   constructor(address[3] memory _participants) {
     participants = _participants;
-    tokenState[0] = 1;
   }
 
   function setConditions(uint _conditions) external {
@@ -23,10 +22,10 @@ contract RentalAgreementUnfolded is IProcessExecution {
   }
 
   function enact(uint id) external {
-    uint _tokenState = tokenState[0];
+    uint _tokenState = tokenState;
 
     console.log(
-      "RentalAgreementUnfolded: current token state is %d, sender %s trying to execute task %d",
+      "RentalAgreement: current token state is %d, sender %s trying to execute task %d",
       _tokenState,
       msg.sender,
       id
@@ -102,13 +101,6 @@ contract RentalAgreementUnfolded is IProcessExecution {
           break; // is end
         }
       }
-      if (_tokenState & 128 == 128) {
-        // <---  auto transition  --->
-        _tokenState &= ~uint(128);
-        tokenState[1] = 1;
-        _tokenState |= 256;
-        continue;
-      }
       if (_tokenState & 1 == 1) {
         if (conditions & 1 == 1) {
           // <---  auto transition  --->
@@ -125,57 +117,36 @@ contract RentalAgreementUnfolded is IProcessExecution {
       }
       if (_tokenState & 260 == 260) {
         // <---  auto transition  --->
-        if (0 == tokenState[1]) {
-          _tokenState &= ~uint(260);
-          _tokenState |= 8;
-          continue;
-        }
+        _tokenState &= ~uint(260);
+        _tokenState |= 8;
+        continue;
       }
-      break;
-    }
-
-    tokenState[0] = _tokenState;
-    console.log(
-      "RentalAgreementUnfolded: new token state is %d",
-       _tokenState
-    );
-  }
-
-  function SubChoreography_1sp0n7o(uint id) external {
-    uint _tokenState = tokenState[1];
-
-    console.log(
-      "SubChoreography_1sp0n7o: current token state is %d, sender %s trying to execute task %d",
-      _tokenState,
-      msg.sender,
-      id
-    );
-    while(_tokenState != 0) {
-      if (_tokenState & 1 == 1) {
+      if (_tokenState & 128 == 128) {
         // <--- ChoreographyTask_1hddg8r pay rent --->
-        if (1 == id && msg.sender == participants[0]) {
+        if (8 == id && msg.sender == participants[0]) {
           // <--- custom code for task here --->
-          _tokenState &= ~uint(1);
-          _tokenState |= 1;
-          emit Task(1);
+          _tokenState &= ~uint(128);
+          _tokenState |= 128;
+          emit Task(8);
           id = 0;
           continue;
         }
         // <--- ChoreographyTask_07y6gqp end tenancy --->
-        if (2 == id && msg.sender == participants[0]) {
+        if (9 == id && msg.sender == participants[0]) {
           // <--- custom code for task here --->
-          _tokenState &= ~uint(1);
-          _tokenState |= 0;
-          emit Task(2);
-          break; // is end
+          _tokenState &= ~uint(128);
+          _tokenState |= 256;
+          emit Task(9);
+          id = 0;
+          continue;
         }
       }
       break;
     }
 
-    tokenState[1] = _tokenState;
+    tokenState = _tokenState;
     console.log(
-      "SubChoreography_1sp0n7o: new token state is %d",
+      "RentalAgreement: new token state is %d",
        _tokenState
     );
   }

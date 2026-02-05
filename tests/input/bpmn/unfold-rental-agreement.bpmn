@@ -104,7 +104,7 @@
       <bpmn2:conditionExpression
                 xsi:type="bpmn2:tFormalExpression"
                 language="Solidity"
-            >bond &gt; 4 * weeklyRent</bpmn2:conditionExpression>
+            >conditions &amp; 1 == 1</bpmn2:conditionExpression>
     </bpmn2:sequenceFlow>
     <bpmn2:parallelGateway id="Gateway_0wwn56l">
       <bpmn2:incoming>Flow_0ivtqus</bpmn2:incoming>
