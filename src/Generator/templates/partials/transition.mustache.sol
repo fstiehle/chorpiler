@@ -3,7 +3,12 @@
 {{/taskName}}
 _tokenState &= ~uint({{{consume}}});
 {{#outTo}}
+{{#isSub}}
 tokenState[{{outTo.id}}] = 1;
+{{/isSub}}
+{{#isCall}}
+ICalledProcessExecution(callList[{{outTo.id}}]).initiate();
+{{/isCall}}
 {{/outTo}}
 {{#produce}}
 _tokenState |= {{{produce}}};

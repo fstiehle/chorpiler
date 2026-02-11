@@ -3,6 +3,7 @@ import { Element, Place } from "./Element.js";
 
 export class InteractionNet {
   id: string = "";
+  isCalled: boolean = false; // called by other choreography?
   subNets = new Map<string, InteractionNet>();
   participants = new Map<string, Participant>();
   elements = new Map<string, Element>();

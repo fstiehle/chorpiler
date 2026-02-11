@@ -3,18 +3,22 @@ import * as Encoding from "./Encoding.js";
 import { IFromEncoding } from "./IFromEncoding.js";
 import { capitalize } from "../../util/helpers.js";
 import { CompileOptions } from "../TemplateEngine.js";
+import { CallType } from "../../Parser/Element.js";
 
 class MustacheProcessEncoding {
   constructor(
     public id: string, // ID in form 0...n assigned by generator
     public modelID: string, // ID as was found in model
     public participants: Participant[],
+    public callContracts: number[],
     public caseVariables: CaseVariable[],
     public states: State[],
   ) {}
 
   hasStates = () => this.states.length > 0;
+  hasCalls = () => this.callContracts.length > 0;
   numberOfParticipants = () => this.participants.length.toString();
+  numberOfCalls = () => this.callContracts.length.toString();
 
   static fromEncoding(encoding: Encoding.Process) {
     const states = new Map<number, Encoding.Transition[]>();
@@ -28,6 +32,7 @@ class MustacheProcessEncoding {
       Array.from(encoding.participants.values()).map(
         (p) => new Participant(p.id.toString(), p.modelID, p.name, p.address),
       ),
+      Array.from(encoding.callList.values()).map((v) => v),
       Array.from(encoding.caseVariables.values()).map(
         (c) => new CaseVariable(c.name, c.type, c.expression, c.setters),
       ),
@@ -64,8 +69,26 @@ class MustacheProcessEncoding {
       t.condition ?? "",
       t.isEnd,
       t.defaultBranch,
-      t.outTo !== null ? { id: t.outTo.id.toString() } : null,
-      t.inFrom !== null ? { id: t.inFrom.id.toString() } : null,
+      t.outTo !== null
+        ? {
+            id: t.outTo.id.toString(),
+            callType: t.outTo.callType,
+            isCall: t.outTo.callType === CallType.CallChoreography,
+            isSub: t.outTo.callType === CallType.SubChoreography,
+          }
+        : null,
+      t.inFrom !== null
+        ? {
+            id: t.inFrom.id.toString(),
+            callType: t.inFrom.callType,
+            isCall: t.inFrom.callType === CallType.CallChoreography,
+            isSub: t.inFrom.callType === CallType.SubChoreography,
+          }
+        : null,
+      t.outTo?.callType === CallType.CallChoreography ||
+        t.inFrom?.callType === CallType.CallChoreography,
+      t.outTo?.callType === CallType.SubChoreography ||
+        t.inFrom?.callType === CallType.SubChoreography,
     );
   }
 }
@@ -86,6 +109,7 @@ export class MustacheEncoding
 
   constructor(
     public options: CompileOptions,
+    public isCalled: boolean = false,
     public subProcesses: MustacheProcessEncoding[] = [],
     ...args: ConstructorParameters<typeof MustacheProcessEncoding>
   ) {
@@ -102,10 +126,12 @@ export class MustacheEncoding
 
     return new MustacheEncoding(
       encoding.options,
+      encoding.isCalled,
       subProcesses,
       main.id,
       main.modelID,
       main.participants,
+      main.callContracts,
       main.caseVariables,
       main.states,
     );
@@ -127,8 +153,20 @@ class Transition {
     public decision: string,
     public isEnd: boolean,
     public defaultBranch: boolean,
-    public outTo: { id: string } | null,
-    public inFrom: { id: string } | null,
+    public outTo: {
+      id: string;
+      callType?: CallType;
+      isCall?: boolean;
+      isSub?: boolean;
+    } | null,
+    public inFrom: {
+      id: string;
+      callType?: CallType;
+      isCall?: boolean;
+      isSub?: boolean;
+    } | null,
+    public isCall: boolean,
+    public isSub: boolean,
   ) {
     const conditionParts: string[] = [];
 
@@ -136,7 +174,7 @@ class Transition {
       conditionParts.push(`${this.taskID} == id`);
       this.conditions.push({ content: this.taskID, hasID: true, last: false });
     }
-    if (this.inFrom) {
+    if (this.inFrom && this.inFrom.isSub) {
       conditionParts.push(`0 == tokenState[${this.inFrom.id}]`);
       this.conditions.push({
         content: this.inFrom.id,
@@ -144,11 +182,32 @@ class Transition {
         last: false,
       });
     }
+
+    if (this.inFrom && !this.inFrom.isSub && !this.inFrom.isCall) {
+      conditionParts.push(`0 == tokenState[${this.inFrom.id}]`);
+      this.conditions.push({
+        content: this.inFrom.id,
+        hasInFrom: true,
+        last: false,
+      });
+    }
+
     if (this.initiator) {
       conditionParts.push(`msg.sender == participants[${this.initiator}]`);
       this.conditions.push({
         content: this.initiator,
         hasInitiator: true,
+        last: false,
+      });
+    }
+
+    if (this.inFrom && this.inFrom.isCall) {
+      conditionParts.push(
+        `0 == ICalledProcessExecution(callList[${this.inFrom.id}]).tokenState()`,
+      );
+      this.conditions.push({
+        content: this.inFrom.id,
+        hasInFrom: true,
         last: false,
       });
     }

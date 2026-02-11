@@ -21,6 +21,7 @@ enum Elements {
   rootElements = "definitions",
   choreographies = "choreography",
   subChoreographies = "subChoreography",
+  callChoreographies = "callChoreography",
   participants = "participant",
   tasks = "choreographyTask",
   flows = "sequenceFlow",
@@ -42,6 +43,7 @@ enum Properties {
   default = "@_default",
   language = "@_language",
   initiator = "@_initiatingParticipantRef",
+  calledChor = "@_calledChoreographyRef",
 }
 
 export class INetFastXMLParser implements INetParser {
@@ -86,8 +88,9 @@ export class INetFastXMLParser implements INetParser {
         .parseFlows(choreography[Elements.flows])
         .translateStartEvent(choreography[Elements.startEvent])
         .translateEndEvent(choreography[Elements.endEvent])
-        .translateTasks(choreography[Elements.tasks]);
-      this.translateSubChoreography(choreography[Elements.subChoreographies])
+        .translateTasks(choreography[Elements.tasks])
+        .translateSubChoreography(choreography[Elements.subChoreographies])
+        .translateCallChoreography(choreography[Elements.callChoreographies])
         // translate events before gateways
         .translateExclusiveGateways(choreography[Elements.exclusiveGateway])
         .translateParallelGateways(choreography[Elements.parallelGateway])
@@ -97,6 +100,28 @@ export class INetFastXMLParser implements INetParser {
         .checkFlows();
 
       return this.iNet;
+    }
+
+    private translateCallChoreography(callChoreographies: any) {
+      if (!callChoreographies) return this;
+      for (const callChoreography of callChoreographies) {
+        const callNetID = callChoreography[Properties.calledChor];
+
+        // translate sub choreography task
+        const subTransition = this.addTransition(
+          new Transition(callNetID, new Label(LabelType.CallChoreography)),
+        );
+        subTransition.calls = [new Call(CallType.CallChoreography, callNetID)];
+        this.translateIncomingFlows(
+          subTransition,
+          callChoreography[Elements.ins],
+        );
+        this.translateOutgoingFlows(
+          subTransition,
+          callChoreography[Elements.outs],
+        );
+      }
+      return this;
     }
 
     // check if there are sub choreographies, if:
@@ -533,11 +558,16 @@ export class INetFastXMLParser implements INetParser {
       ) {
         return reject(new Error("No choreography found"));
       }
+
+      const callList = this.extractCallGraph(
+        rootElements[Elements.choreographies],
+      );
       const iNets = new Array<InteractionNet>();
       for (const choreography of rootElements[Elements.choreographies]) {
         const iNetTranslator = new INetFastXMLParser.INetTranslator();
         try {
           const iNet = iNetTranslator.translate(choreography);
+          if (callList.includes(iNet.id)) iNet.isCalled = true;
           iNets.push(iNet);
         } catch (error) {
           return reject(error);
@@ -546,5 +576,19 @@ export class INetFastXMLParser implements INetParser {
       //console.log(iNets);
       return resolve(iNets);
     });
+  }
+
+  extractCallGraph(choreographies: any) {
+    const callList = new Array<string>();
+
+    for (const choreography of choreographies) {
+      if (!choreography[Elements.callChoreographies]) continue;
+      for (const callChoreography of choreography[
+        Elements.callChoreographies
+      ]) {
+        callList.push(callChoreography[Properties.calledChor]);
+      }
+    }
+    return callList;
   }
 }

@@ -1,7 +1,9 @@
+import { CallType } from "../../Parser/Element.js";
 import { CompileOptions } from "../TemplateEngine.js";
 
 export class Process {
   public participants = new Map<string, Participant>();
+  public callList = new Map<string, number>();
   public transitions = new Map<string, Transition>();
   public states = new Map<number, Transition[]>();
   caseVariables = new Map<string, CaseVariable>();
@@ -37,6 +39,7 @@ export class MainProcess extends Process {
     super(0);
   }
   subProcesses = new Map<string, SubProcess>();
+  isCalled = false;
 }
 
 export class CaseVariable {
@@ -55,8 +58,8 @@ interface TransitionParams {
   condition?: string | null;
   isEnd?: boolean;
   defaultBranch?: boolean;
-  outTo?: { id: number } | null;
-  inFrom?: { id: number } | null;
+  outTo?: { id: number; callType: CallType } | null;
+  inFrom?: { id: number; callType: CallType } | null;
 }
 
 export class Transition {
@@ -66,8 +69,8 @@ export class Transition {
   public condition: string | null;
   public isEnd: boolean;
   public defaultBranch: boolean;
-  public outTo: { id: number } | null;
-  public inFrom: { id: number } | null;
+  public outTo: { id: number; callType: CallType } | null;
+  public inFrom: { id: number; callType: CallType } | null;
 
   constructor({
     id,

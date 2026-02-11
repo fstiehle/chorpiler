@@ -31,21 +31,24 @@ describe("Generation of edge cases", () => {
     bpmnFiles.forEach((bpmnFile) => {
       it(`${bpmnFile} should compile to Sol contract`, async () => {
         const data = await readFile(path.join(edgeCasesPath, bpmnFile));
-        const iNet = await parser.fromXML(data);
+        const iNets = await parser.fromXML(data);
 
         // Special handling for sub-choreography2.bpmn, which needs unfold=false
         const isSubChoreography2 = bpmnFile === "sub-choreography2.bpmn";
-        const result = await new SolDefaultContractGenerator(iNet[0]).compile({
-          unfoldSubNets: !isSubChoreography2,
-        });
 
         if (isSubChoreography2) {
-          console.log(iNet);
+          console.log(iNets);
         }
 
-        const modelName = bpmnFile.replace(".bpmn", "");
-        assert.ok(result, `Should successfully compile ${modelName} model`);
-        assert.ok(result.target, "Should generate target contract code");
+        for (const iNet of iNets) {
+          const result = await new SolDefaultContractGenerator(iNet).compile({
+            unfoldSubNets: !isSubChoreography2,
+          });
+
+          const modelName = bpmnFile.replace(".bpmn", "");
+          assert.ok(result, `Should successfully compile ${modelName} model`);
+          assert.ok(result.target, "Should generate target contract code");
+        }
       });
     });
   });
@@ -98,20 +101,26 @@ describe("Generation of edge cases", () => {
       isStateChannel: boolean = false,
     ) => {
       const data = await readFile(path.join(BPMN_PATH, `${name}.bpmn`));
-      const iNet = await parser.fromXML(data);
+      const iNets = await parser.fromXML(data);
 
-      const generator = isStateChannel
-        ? new SolStateChannelContractGenerator(iNet[0])
-        : new SolDefaultContractGenerator(iNet[0]);
+      const results = [];
+      for (const iNet of iNets) {
+        const generator = isStateChannel
+          ? new SolStateChannelContractGenerator(iNet)
+          : new SolDefaultContractGenerator(iNet);
 
-      // Add case variables if provided
-      if (caseVariables && generator instanceof SolDefaultContractGenerator) {
-        caseVariables.forEach((variable) =>
-          generator.addCaseVariable(variable),
-        );
+        // Add case variables if provided
+        if (caseVariables && generator instanceof SolDefaultContractGenerator) {
+          caseVariables.forEach((variable) =>
+            generator.addCaseVariable(variable),
+          );
+        }
+
+        const result = await compileCase(generator, unfold, isStateChannel);
+        results.push(result);
       }
 
-      return compileCase(generator, unfold, isStateChannel);
+      return results;
     };
 
     it("XOR-AND case to Sol Contract", async () => {
@@ -182,8 +191,12 @@ describe("Generation of edge cases", () => {
       await compileBpmn("sub-choreo", [], false);
     });
 
-    it.only("Don't unfold Sub Choreo case to Sol Contract", async () => {
+    it("Don't unfold Sub Choreo case to Sol Contract", async () => {
       await compileBpmn("sub-choreo-chained", [], false);
+    });
+
+    it.only("Call choreograhy to Sol Contract", async () => {
+      await compileBpmn("call-choreo", [], false);
     });
   });
 });

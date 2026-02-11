@@ -12,6 +12,7 @@ import {
   PlaceType,
   Guard,
   Call,
+  CallType,
 } from "../Parser/Element.js";
 import { InteractionNet } from "../Parser/InteractionNet.js";
 import * as Encoding from "./Encoding/Encoding.js";
@@ -22,7 +23,6 @@ const loggingEnabled = false; // Toggleable logging
 
 export class INetEncoder {
   private mainEncoded = new Encoding.MainProcess();
-  private callList = new Map<string, string>();
 
   public generate(_iNet: InteractionNet, options: CompileOptions) {
     const iNet: InteractionNet = { ..._iNet };
@@ -31,6 +31,7 @@ export class INetEncoder {
     }
     this.mainEncoded.modelID = iNet.id;
     this.mainEncoded.options = options;
+    this.mainEncoded.isCalled = iNet.isCalled;
     // create participant template options and IDs
     [...iNet.participants.values()].forEach((par, encodedID) => {
       this.mainEncoded.participants.set(
@@ -250,29 +251,55 @@ export class INetEncoder {
     subTransition: Transition,
   ) {
     for (const call of subTransition.calls) {
-      const subNetEncoding = this.mainEncoded.subProcesses.get(call.targetID);
-      if (!subNetEncoding)
-        throw new Error(
-          `Sub net transition (ID: ${subTransition.id}) with no corresponding net found in (ID: ${encoded.id}).`,
-        );
-      if (this.callList.has(call.targetID)) {
-        throw new Error(
-          `Sub net transition (ID: ${subTransition.id}) referencing already handled target (ID: ${call.targetID}).`,
-        );
-      }
-      this.callList.set(call.targetID, subTransition.id);
+      if (call.type == CallType.CallChoreography) {
+        if (loggingEnabled)
+          console.log(`Encoding call transition for ${subTransition.id}`);
 
-      if (loggingEnabled)
-        console.log(`Encoding sub transition for ${subTransition.id}`);
-      const encodedTransition = encoded.transitions.get(subTransition.id)!;
-      encodedTransition.outTo = { id: subNetEncoding.id };
+        let callID = this.mainEncoded.callList.get(call.targetID);
+        if (callID == undefined) {
+          callID = this.mainEncoded.callList.size;
+          this.mainEncoded.callList.set(call.targetID, callID);
+        }
+        const encodedTransition = encoded.transitions.get(subTransition.id)!;
+        encodedTransition.outTo = { id: callID, callType: call.type };
 
-      const inTrans = []; // leaving sub to go back to parent
-      for (const inPlace of subTransition.target) {
-        for (const inT of inPlace.target) {
-          const encodedTransition = encoded.transitions.get(inT.id)!;
-          encodedTransition.inFrom = { id: subNetEncoding.id };
-          inTrans.push(inT);
+        const inTrans = []; // leaving sub to go back to parent
+        for (const inPlace of subTransition.target) {
+          for (const inT of inPlace.target) {
+            const encodedTransition = encoded.transitions.get(inT.id)!;
+            encodedTransition.inFrom = {
+              id: callID,
+              callType: call.type,
+            };
+            inTrans.push(inT);
+          }
+        }
+      } else if (call.type == CallType.SubChoreography) {
+        if (loggingEnabled)
+          console.log(`Encoding sub transition for ${subTransition.id}`);
+
+        const subNetEncoding = this.mainEncoded.subProcesses.get(call.targetID);
+        if (!subNetEncoding)
+          throw new Error(
+            `Sub net transition (ID: ${subTransition.id}) with no corresponding net found in (ID: ${encoded.id}).`,
+          );
+
+        const encodedTransition = encoded.transitions.get(subTransition.id)!;
+        encodedTransition.outTo = {
+          id: subNetEncoding.id,
+          callType: call.type,
+        };
+
+        const inTrans = []; // leaving sub to go back to parent
+        for (const inPlace of subTransition.target) {
+          for (const inT of inPlace.target) {
+            const encodedTransition = encoded.transitions.get(inT.id)!;
+            encodedTransition.inFrom = {
+              id: subNetEncoding.id,
+              callType: call.type,
+            };
+            inTrans.push(inT);
+          }
         }
       }
     }
