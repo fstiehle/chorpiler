@@ -1,8 +1,18 @@
 {{^hasSubProcesses}}
+{{^isInstanced}}
 uint _tokenState = tokenState;
+{{/isInstanced}}
+{{#isInstanced}}
+uint _tokenState = processData[instance].tokenState;
+{{/isInstanced}}
 {{/hasSubProcesses}}
 {{#hasSubProcesses}}
+{{^isInstanced}}
 uint _tokenState = tokenState[{{id}}];
+{{/isInstanced}}
+{{#isInstanced}}
+uint _tokenState = processData[instance].tokenState[{{id}}];
+{{/isInstanced}}
 {{/hasSubProcesses}}
 
 {{#options.debug}}
@@ -37,10 +47,20 @@ while(_tokenState != 0) {
 }
 
 {{^hasSubProcesses}}
+{{^isInstanced}}
 tokenState = _tokenState;
+{{/isInstanced}}
+{{#isInstanced}}
+processData[instance].tokenState = _tokenState;;
+{{/isInstanced}}
 {{/hasSubProcesses}}
 {{#hasSubProcesses}}
+{{^isInstanced}}
 tokenState[{{id}}] = _tokenState;
+{{/isInstanced}}
+{{#isInstanced}}
+processData[instance].tokenState[{{id}}] = _tokenState;;
+{{/isInstanced}}
 {{/hasSubProcesses}}
 {{#options.debug}}
 console.log(

@@ -37,6 +37,7 @@ export abstract class TemplateEngine implements ITemplateEngine {
     private templatePath: string,
     private caseVariables = new Map<string, CaseVariable>(),
     private templatePartials = new Array<{ partial: string; path: string }>(),
+    private isInstanced: boolean = false,
   ) {}
 
   async compile(_options?: {
@@ -65,7 +66,7 @@ export abstract class TemplateEngine implements ITemplateEngine {
     );
 
     const encoder = new INetEncoder();
-    const gen = encoder.generate(iNet, options);
+    const gen = encoder.generate(iNet, options, this.isInstanced);
     gen.caseVariables = this.caseVariables;
 
     return {

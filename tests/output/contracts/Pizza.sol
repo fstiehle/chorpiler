@@ -5,20 +5,27 @@ import "hardhat/console.sol";
 
 interface IProcessExecution {
   function enact(uint id) external;
+  function getTokenState() external view returns (uint);
 }
 
 contract Pizza is IProcessExecution {
-  uint public tokenState = 1;
+  uint private tokenState = 1;
   address[3] public participants;
   event Task(uint id);
   bool public items = false;
 
-  constructor(address[3] memory _participants) {
+  constructor(
+    address[3] memory _participants
+  ) {
     participants = _participants;
   }
 
   function setItems(bool _items) external {
     items = _items;
+  }
+
+  function getTokenState() external view returns (uint) {
+    return tokenState;
   }
 
   function enact(uint id) external {

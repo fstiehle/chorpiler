@@ -154,10 +154,13 @@ export async function processEvent(
   return { success: true, ...result };
 }
 
-export async function prepareContracts(viem: HardhatViemHelpers) {
+export async function prepareContracts(
+  viem: HardhatViemHelpers,
+  contractPath: string,
+) {
   const parser = new XESFastXMLParser();
 
-  const contractNames = readdirSync(CONTRACTS_PATH, { withFileTypes: true })
+  const contractNames = readdirSync(contractPath, { withFileTypes: true })
     .filter((dirent) => dirent.isFile() && dirent.name.endsWith(".sol"))
     .map((dirent) => dirent.name.replace(".sol", ""));
 
@@ -166,7 +169,7 @@ export async function prepareContracts(viem: HardhatViemHelpers) {
     const encoding = TriggerEncoding.fromJSON(
       JSON.parse(
         readFileSync(
-          path.join(CONTRACTS_PATH, `${contractName}.json`),
+          path.join(contractPath, `${contractName}.json`),
         ).toString(),
       ),
     );
@@ -220,15 +223,15 @@ export async function getTokenState(
     const val = await client.readContract({
       address: contract.address,
       abi: contract.abi,
-      functionName: "tokenState",
-      args: [processID],
+      functionName: "getTokenState",
+      // args: [processID], could be used in the future, if sub chore state is made accessible
     });
     return Number(val);
   } else {
     const val = await client.readContract({
       address: contract.address,
       abi: contract.abi,
-      functionName: "tokenState",
+      functionName: "getTokenState",
     });
     return Number(val);
   }

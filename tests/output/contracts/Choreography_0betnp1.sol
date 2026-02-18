@@ -5,30 +5,23 @@ import "hardhat/console.sol";
 
 interface IProcessExecution {
   function enact(uint id) external;
-  function tokenState() external returns (uint);
+  function getTokenState() external view returns (uint);
 }
 
 contract Choreography_0betnp1 is IProcessExecution {
-  address private calledBy;
-  uint public tokenState;
+  uint private tokenState = 1;
   address[2] public participants;
   event Task(uint id);
 
   constructor(
-    address[2] memory _participants,
-    address _calledBy
+    address[2] memory _participants
   ) {
     participants = _participants;
-    calledBy = _calledBy;
+    callList = _callList;
   }
 
-  modifier onlyCalled() {
-    require(msg.sender == calledBy);
-    _;
-  }
-
-  function initiate() external onlyCalled {
-    tokenState = 1;
+  function getTokenState() external view returns (uint) {
+    return tokenState;
   }
 
   function enact(uint id) external {

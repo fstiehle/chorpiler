@@ -12,6 +12,8 @@ import { IFromEncoding } from "./IFromEncoding.js";
 export class TriggerEncoding implements IFromEncoding {
   constructor(
     public processID: number,
+    public isCalled: boolean = false,
+    public isInstanced: boolean = false,
     public tasks: Map<string, Task> = new Map(),
     public participants: Map<string, number> = new Map(),
     public states: Map<string, number> = new Map(),
@@ -82,10 +84,17 @@ export class TriggerEncoding implements IFromEncoding {
 
     return new TriggerEncoding(
       processID,
+      encoding.isCalled,
+      encoding.isInstanced,
       tasks,
       participants,
       states,
-      encoding.callList,
+      new Map(
+        Array.from(encoding.callList.entries()).map(([key, call]) => [
+          key,
+          call.id,
+        ]),
+      ),
       subModels,
     );
   }
@@ -109,6 +118,8 @@ export class TriggerEncoding implements IFromEncoding {
   static toJSON(encoding: TriggerEncoding) {
     return {
       processID: encoding.processID,
+      isCalled: encoding.isCalled,
+      isInstanced: encoding.isInstanced,
       tasks: Object.fromEntries(
         Array.from(encoding.tasks.entries()).map(([modelID, task]) => [
           modelID,
@@ -140,6 +151,8 @@ export class TriggerEncoding implements IFromEncoding {
 
   static fromJSON(object: {
     processID: number;
+    isCalled?: boolean;
+    isInstanced?: boolean;
     tasks: {
       [modelID: string]: { id: number; initiator: number; processID: number };
     };
@@ -157,6 +170,8 @@ export class TriggerEncoding implements IFromEncoding {
   }): TriggerEncoding {
     return new TriggerEncoding(
       object.processID,
+      object.isCalled ?? false,
+      object.isInstanced ?? false,
       new Map(
         Object.entries(object.tasks).map(([modelID, task]) => [
           modelID,

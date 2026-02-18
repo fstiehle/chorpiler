@@ -18,13 +18,18 @@ import { InteractionNet } from "../Parser/InteractionNet.js";
 import * as Encoding from "./Encoding/Encoding.js";
 import { assert } from "console";
 import { CompileOptions } from "./TemplateEngine.js";
+import { Participant } from "../Parser/Participant.js";
 
 const loggingEnabled = false; // Toggleable logging
 
 export class INetEncoder {
   private mainEncoded = new Encoding.MainProcess();
 
-  public generate(_iNet: InteractionNet, options: CompileOptions) {
+  public generate(
+    _iNet: InteractionNet,
+    options: CompileOptions,
+    isInstanced = false,
+  ) {
     const iNet: InteractionNet = { ..._iNet };
     if (iNet.initial == null || iNet.end == null) {
       throw new Error("Invalid InteractionNet");
@@ -32,18 +37,9 @@ export class INetEncoder {
     this.mainEncoded.modelID = iNet.id;
     this.mainEncoded.options = options;
     this.mainEncoded.isCalled = iNet.isCalled;
+    this.mainEncoded.isInstanced = isInstanced;
     // create participant template options and IDs
-    [...iNet.participants.values()].forEach((par, encodedID) => {
-      this.mainEncoded.participants.set(
-        par.id,
-        new Encoding.Participant(
-          encodedID, // encoded ID from 0..N
-          par.id, // ID as in Model
-          par.name,
-          "[template]", // TODO: Make this settable in the TemplateEngine
-        ),
-      );
-    });
+    this.mainEncoded.participants = this.encodeParticipants(iNet.participants);
 
     if (options.unfoldSubNets) {
       // sub choreographies are "folded" into the main choreography, i.e.,
@@ -80,6 +76,24 @@ export class INetEncoder {
     }
 
     this.encodeTransitions(iNet, encoding);
+  }
+
+  private encodeParticipants(
+    participants: Map<string, Participant>,
+  ): Map<string, Encoding.Participant> {
+    const encodedParticipants = new Map<string, Encoding.Participant>();
+    [...participants.values()].forEach((par, encodedID) => {
+      encodedParticipants.set(
+        par.id,
+        new Encoding.Participant(
+          encodedID, // encoded ID from 0..N
+          par.id, // ID as in Model
+          par.name,
+          "[template]", // TODO: Make this settable in the TemplateEngine
+        ),
+      );
+    });
+    return encodedParticipants;
   }
 
   /**
@@ -242,11 +256,12 @@ export class INetEncoder {
       }
     }
     for (const t of subTransitions) {
-      this.encodeSubNetTransition(encoded, t);
+      this.encodeSubNetTransition(iNet, encoded, t);
     }
   }
 
   private encodeSubNetTransition(
+    iNet: InteractionNet,
     encoded: Encoding.Process,
     subTransition: Transition,
   ) {
@@ -255,22 +270,64 @@ export class INetEncoder {
         if (loggingEnabled)
           console.log(`Encoding call transition for ${subTransition.id}`);
 
-        let callID = this.mainEncoded.callList.get(call.targetID);
-        if (callID == undefined) {
-          callID = this.mainEncoded.callList.size;
-          this.mainEncoded.callList.set(call.targetID, callID);
-        }
-        const encodedTransition = encoded.transitions.get(subTransition.id)!;
-        encodedTransition.outTo = { id: callID, callType: call.type };
+        const calledNet = iNet.callList.get(call.targetID);
+        if (calledNet == undefined)
+          throw new Error(
+            `Call transition (ID: ${subTransition.id}) with no corresponding called net found in (ID: ${iNet.id}).`,
+          );
+        const subEncoded = this.encodeParticipants(calledNet.participants);
 
+        let existingCall = this.mainEncoded.callList.get(call.targetID);
+        let callID: number;
+
+        if (existingCall == undefined) {
+          // set new callID to highest existing ID + 1
+          const existingIds = Array.from(
+            this.mainEncoded.callList.values(),
+          ).map((call) => call.id);
+          callID = existingIds.length > 0 ? Math.max(...existingIds) + 1 : 0;
+        }
+        // map main participants to called choreography
+        const mapping = call.participantsMapping;
+        const pars = new Array<Encoding.Participant>();
+        for (const [main, sub] of mapping!.entries()) {
+          const subPar = subEncoded.get(sub)!;
+          if (!subPar) {
+            throw new Error(
+              `Participant Mapping Error (Call ID: ${subTransition.id}): Sub participant '${sub}' not found in called choreography`,
+            );
+          }
+          const mainParticipant = this.mainEncoded.participants.get(main);
+          if (!mainParticipant) {
+            throw new Error(
+              `Participant Mapping Error (Call ID: ${subTransition.id}): Main participant '${main}' not found in calling choreography`,
+            );
+          }
+          pars[subPar.id] = mainParticipant;
+        }
+
+        if (pars.length != subEncoded.size)
+          throw new Error(
+            `Participant Mapping Error (Call ID: ${subTransition.id}): Not all participants are mapped`,
+          );
+
+        const encodedTransition = encoded.transitions.get(subTransition.id)!;
+        encodedTransition.outTo = new Encoding.Call(
+          call.targetID,
+          callID,
+          call.type,
+          pars,
+        );
         const inTrans = []; // leaving sub to go back to parent
         for (const inPlace of subTransition.target) {
           for (const inT of inPlace.target) {
             const encodedTransition = encoded.transitions.get(inT.id)!;
-            encodedTransition.inFrom = {
-              id: callID,
-              callType: call.type,
-            };
+            encodedTransition.inFrom = new Encoding.Call(
+              call.targetID,
+              callID,
+              call.type,
+              pars,
+            );
             inTrans.push(inT);
           }
         }
@@ -285,19 +342,23 @@ export class INetEncoder {
           );
 
         const encodedTransition = encoded.transitions.get(subTransition.id)!;
-        encodedTransition.outTo = {
-          id: subNetEncoding.id,
-          callType: call.type,
-        };
+        encodedTransition.outTo = new Encoding.Call(
+          subTransition.id,
+          subNetEncoding.id,
+          call.type,
+          null,
+        );
 
         const inTrans = []; // leaving sub to go back to parent
         for (const inPlace of subTransition.target) {
           for (const inT of inPlace.target) {
             const encodedTransition = encoded.transitions.get(inT.id)!;
-            encodedTransition.inFrom = {
-              id: subNetEncoding.id,
-              callType: call.type,
-            };
+            encodedTransition.inFrom = new Encoding.Call(
+              subTransition.id,
+              subNetEncoding.id,
+              call.type,
+              null,
+            );
             inTrans.push(inT);
           }
         }

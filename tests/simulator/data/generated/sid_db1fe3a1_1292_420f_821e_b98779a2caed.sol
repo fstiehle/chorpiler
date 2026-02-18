@@ -3,19 +3,26 @@ pragma solidity ^0.8.9;
 
 interface IProcessExecution {
   function enact(uint id) external;
+  function getTokenState() external view returns (uint);
 }
 
 contract sid_db1fe3a1_1292_420f_821e_b98779a2caed is IProcessExecution {
-  uint public tokenState = 1;
+  uint private tokenState = 1;
   address[4] public participants;
   uint public conditions;
 
-  constructor(address[4] memory _participants) {
+  constructor(
+    address[4] memory _participants
+  ) {
     participants = _participants;
   }
 
   function setConditions(uint _conditions) external {
     conditions = _conditions;
+  }
+
+  function getTokenState() external view returns (uint) {
+    return tokenState;
   }
 
   function enact(uint id) external {

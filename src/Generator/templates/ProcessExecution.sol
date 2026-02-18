@@ -7,31 +7,27 @@ import "hardhat/console.sol";
 {{/options.debug}}
 interface IProcessExecution {
   function enact(uint id) external;
-  function tokenState() external returns (uint);
+  function getTokenState() external view returns (uint);
 }
 {{#hasCalls}}
 
-interface ICalledProcessExecution is IProcessExecution {
-  function initiate() external;
+interface ICalledProcessExecution {
+  function instance(address[] memory participants) external returns (uint);
+  function enact(uint instance, uint id) external;
+  function getTokenState(uint instance) external view returns (uint);
 }
 {{/hasCalls}}
 
 contract {{{modelID}}} is IProcessExecution {
+  {{#hasCalls}}
+  uint[{{{numberOfCalls}}}] private callList; // instance
+  {{/hasCalls}}
   {{^hasSubProcesses}}
-  {{^isCalled}}
-  uint public tokenState = 1;
-  {{/isCalled}}
-  {{#isCalled}}
-  address private calledBy;
-  uint public tokenState;
-  {{/isCalled}}
+  uint private tokenState = 1;
   {{/hasSubProcesses}}
   {{#hasSubProcesses}}
   uint[{{{numberOfProcesses}}}] public tokenState;
   {{/hasSubProcesses}}
-  {{#hasCalls}}
-  address[{{{numberOfCalls}}}] private callList;
-  {{/hasCalls}}
   address[{{{numberOfParticipants}}}] public participants;
   {{#options.events}}
   event Task(uint id);
@@ -42,21 +38,15 @@ contract {{{modelID}}} is IProcessExecution {
 
   constructor(
     address[{{{numberOfParticipants}}}] memory _participants{{#hasCalls}},
-    address[{{{numberOfCalls}}}] memory _callList{{/hasCalls}}{{#isCalled}},
-    address _calledBy{{/isCalled}}
+    address[{{{numberOfCalls}}}] memory _callList{{/hasCalls}}
   ) {
     participants = _participants;
     {{#callContracts}}
     callList = _callList;
     {{/callContracts}}
-    {{^isCalled}}
     {{#hasSubProcesses}}
     tokenState[0] = 1;
     {{/hasSubProcesses}}
-    {{/isCalled}}
-    {{#isCalled}}
-    calledBy = _calledBy;
-    {{/isCalled}}
   }
   {{#caseVariables}}
   {{#setters}}
@@ -66,22 +56,15 @@ contract {{{modelID}}} is IProcessExecution {
   }
   {{/setters}}
   {{/caseVariables}}
-  {{#isCalled}}
 
-  modifier onlyCalled() {
-    require(msg.sender == calledBy);
-    _;
-  }
-
-  function initiate() external onlyCalled {
+  function getTokenState() external view returns (uint) {
     {{^hasSubProcesses}}
-    tokenState = 1;
+    return tokenState;
     {{/hasSubProcesses}}
     {{#hasSubProcesses}}
-    tokenState[0] = 1;
+    return tokenState[0];
     {{/hasSubProcesses}}
   }
-  {{/isCalled}}
 
   function enact(uint id) external {
     {{> execution}}

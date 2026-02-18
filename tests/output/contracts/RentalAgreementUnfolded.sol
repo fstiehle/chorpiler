@@ -5,6 +5,7 @@ import "hardhat/console.sol";
 
 interface IProcessExecution {
   function enact(uint id) external;
+  function getTokenState() external view returns (uint);
 }
 
 contract RentalAgreementUnfolded is IProcessExecution {
@@ -13,13 +14,19 @@ contract RentalAgreementUnfolded is IProcessExecution {
   event Task(uint id);
   uint public conditions;
 
-  constructor(address[3] memory _participants) {
+  constructor(
+    address[3] memory _participants
+  ) {
     participants = _participants;
     tokenState[0] = 1;
   }
 
   function setConditions(uint _conditions) external {
     conditions = _conditions;
+  }
+
+  function getTokenState() external view returns (uint) {
+    return tokenState[0];
   }
 
   function enact(uint id) external {

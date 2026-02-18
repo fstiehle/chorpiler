@@ -5,6 +5,7 @@ import "hardhat/console.sol";
 
 interface IProcessExecution {
   function enact(uint id) external;
+  function getTokenState() external view returns (uint);
 }
 
 contract SubChoreo is IProcessExecution {
@@ -12,9 +13,15 @@ contract SubChoreo is IProcessExecution {
   address[3] public participants;
   event Task(uint id);
 
-  constructor(address[3] memory _participants) {
+  constructor(
+    address[3] memory _participants
+  ) {
     participants = _participants;
     tokenState[0] = 1;
+  }
+
+  function getTokenState() external view returns (uint) {
+    return tokenState[0];
   }
 
   function enact(uint id) external {

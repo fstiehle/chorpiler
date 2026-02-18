@@ -10,29 +10,29 @@ class MustacheProcessEncoding {
     public id: string, // ID in form 0...n assigned by generator
     public modelID: string, // ID as was found in model
     public participants: Participant[],
-    public callContracts: number[],
+    public callContracts: Map<string, number>,
     public caseVariables: CaseVariable[],
     public states: State[],
   ) {}
 
-  hasStates = () => this.states.length > 0;
-  hasCalls = () => this.callContracts.length > 0;
-  numberOfParticipants = () => this.participants.length.toString();
-  numberOfCalls = () => this.callContracts.length.toString();
+  // Template helper methods
+  hasStates = (): boolean => this.states.length > 0;
+  hasCalls = (): boolean => this.callContracts.size > 0;
+  numberOfParticipants = (): string => this.participants.length.toString();
+  numberOfCalls = (): string => this.callContracts.size.toString();
 
   static fromEncoding(encoding: Encoding.Process) {
     const states = new Map<number, Encoding.Transition[]>();
     encoding.states.forEach((transitions, consume) => {
       states.set(consume, transitions);
     });
-
     return new MustacheProcessEncoding(
       encoding.id.toString(),
       encoding.modelID,
       Array.from(encoding.participants.values()).map(
         (p) => new Participant(p.id.toString(), p.modelID, p.name, p.address),
       ),
-      Array.from(encoding.callList.values()).map((v) => v),
+      encoding.callList,
       Array.from(encoding.caseVariables.values()).map(
         (c) => new CaseVariable(c.name, c.type, c.expression, c.setters),
       ),
@@ -69,27 +69,47 @@ class MustacheProcessEncoding {
       t.condition ?? "",
       t.isEnd,
       t.defaultBranch,
-      t.outTo !== null
-        ? {
-            id: t.outTo.id.toString(),
-            callType: t.outTo.callType,
-            isCall: t.outTo.callType === CallType.CallChoreography,
-            isSub: t.outTo.callType === CallType.SubChoreography,
-          }
-        : null,
-      t.inFrom !== null
-        ? {
-            id: t.inFrom.id.toString(),
-            callType: t.inFrom.callType,
-            isCall: t.inFrom.callType === CallType.CallChoreography,
-            isSub: t.inFrom.callType === CallType.SubChoreography,
-          }
-        : null,
-      t.outTo?.callType === CallType.CallChoreography ||
-        t.inFrom?.callType === CallType.CallChoreography,
-      t.outTo?.callType === CallType.SubChoreography ||
-        t.inFrom?.callType === CallType.SubChoreography,
+      t.outTo ? MustacheProcessEncoding.buildTransitionTarget(t.outTo) : null,
+      t.inFrom ? MustacheProcessEncoding.buildTransitionTarget(t.inFrom) : null,
+      (t.outTo ? this.isCallChoreography(t.outTo) : false) ||
+        (t.inFrom ? this.isCallChoreography(t.inFrom) : false),
+      (t.outTo ? this.isSubChoreography(t.outTo) : false) ||
+        (t.inFrom ? this.isSubChoreography(t.inFrom) : false),
     );
+  }
+
+  private static buildTransitionTarget(
+    call: Encoding.Call,
+  ): TransitionTarget | null {
+    const isCall = this.isCallChoreography(call);
+    const isSub = this.isSubChoreography(call);
+
+    // Generate Solidity call string for call targets
+    let callString: string | undefined = undefined;
+    if (isCall) {
+      if (call && call.participants) {
+        const participantIds = call.participants
+          .map((p) => `participants[${p.id}]`)
+          .join(", ");
+        callString = `callList[${call.id}].instance = callList[${call.id}].contract.instance([${participantIds}]);`;
+      }
+    }
+    console.log(isCall, isSub);
+    return new TransitionTarget(call.name, isCall, isSub, callString);
+  }
+
+  /**
+   * Helper function to check if a transition target is a call choreography
+   */
+  private static isCallChoreography(call: Encoding.Call): boolean {
+    return call?.type === CallType.CallChoreography;
+  }
+
+  /**
+   * Helper function to check if a transition target is a sub choreography
+   */
+  private static isSubChoreography(call: Encoding.Call): boolean {
+    return call?.type === CallType.SubChoreography;
   }
 }
 
@@ -104,18 +124,19 @@ export class MustacheEncoding
    * @returns A new `MustacheEncoding` object.
    */
 
-  hasSubProcesses = () => this.subProcesses.length > 0;
-  numberOfProcesses = () => (this.subProcesses.length + 1).toString();
-
   constructor(
     public options: CompileOptions,
     public isCalled: boolean = false,
+    public isInstanced: boolean = false,
     public subProcesses: MustacheProcessEncoding[] = [],
     ...args: ConstructorParameters<typeof MustacheProcessEncoding>
   ) {
     super(...args);
     //console.log(JSON.stringify(this.states));
   }
+
+  hasSubProcesses = () => this.subProcesses.length > 0;
+  numberOfProcesses = () => (this.subProcesses.length + 1).toString();
 
   static fromEncoding(encoding: Encoding.MainProcess): MustacheEncoding {
     const main = MustacheProcessEncoding.fromEncoding(encoding);
@@ -127,6 +148,7 @@ export class MustacheEncoding
     return new MustacheEncoding(
       encoding.options,
       encoding.isCalled,
+      encoding.isInstanced,
       subProcesses,
       main.id,
       main.modelID,
@@ -153,18 +175,8 @@ class Transition {
     public decision: string,
     public isEnd: boolean,
     public defaultBranch: boolean,
-    public outTo: {
-      id: string;
-      callType?: CallType;
-      isCall?: boolean;
-      isSub?: boolean;
-    } | null,
-    public inFrom: {
-      id: string;
-      callType?: CallType;
-      isCall?: boolean;
-      isSub?: boolean;
-    } | null,
+    public outTo: TransitionTarget | null,
+    public inFrom: TransitionTarget | null,
     public isCall: boolean,
     public isSub: boolean,
   ) {
@@ -259,7 +271,21 @@ class Participant {
   ) {}
 }
 
+class TransitionTarget {
+  constructor(
+    public id: string,
+    public isCall?: boolean,
+    public isSub?: boolean,
+    public callString?: string,
+  ) {}
+}
+
+/**
+ * Represents a case variable that can be used in the generated contract
+ */
 class CaseVariable {
+  public functionName: string;
+
   constructor(
     public name: string,
     public type: string,
@@ -268,6 +294,4 @@ class CaseVariable {
   ) {
     this.functionName = "set" + capitalize(name);
   }
-
-  public functionName: string;
 }

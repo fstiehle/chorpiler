@@ -7,7 +7,7 @@ _tokenState &= ~uint({{{consume}}});
 tokenState[{{outTo.id}}] = 1;
 {{/isSub}}
 {{#isCall}}
-ICalledProcessExecution(callList[{{outTo.id}}]).initiate();
+{{{callString}}}
 {{/isCall}}
 {{/outTo}}
 {{#produce}}

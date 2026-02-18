@@ -6,6 +6,7 @@ import util from "util";
 import { CaseVariable } from "../src/Generator/Encoding/Encoding.js";
 import { TriggerEncoding } from "../src/Generator/Encoding/TriggerEncoding.js";
 import SolDefaultContractGenerator from "../src/Generator/target/Sol/DefaultGenerator.js";
+import SolInstanceGenerator from "../src/Generator/target/Sol/InstanceGenerator.js";
 import SolStateChannelContractGenerator from "../src/Generator/target/Sol/StateChannelGenerator.js";
 import { TemplateEngine } from "../src/Generator/TemplateEngine.js";
 import { INetFastXMLParser } from "../src/Parser/FastXMLParser.js";
@@ -41,7 +42,11 @@ describe("Generation of edge cases", () => {
         }
 
         for (const iNet of iNets) {
-          const result = await new SolDefaultContractGenerator(iNet).compile({
+          const generator = iNet.isCalled
+            ? new SolInstanceGenerator(iNet)
+            : new SolDefaultContractGenerator(iNet);
+
+          const result = await generator.compile({
             unfoldSubNets: !isSubChoreography2,
           });
 
@@ -65,8 +70,13 @@ describe("Generation of edge cases", () => {
         debug: true,
       });
 
-      // Use default values if not provided
-      const directory = CONTRACTS_PATH;
+      let directory = CONTRACTS_PATH;
+      if (
+        (output.encoding.calls && output.encoding.calls.size > 0) ||
+        output.encoding.isCalled
+      ) {
+        directory = path.join(directory, "callchoreos");
+      }
 
       const solFilePath = path.join(directory, `${generator.iNet.id}.sol`);
       const jsonFilePath = path.join(directory, `${generator.iNet.id}.json`);
@@ -105,9 +115,14 @@ describe("Generation of edge cases", () => {
 
       const results = [];
       for (const iNet of iNets) {
-        const generator = isStateChannel
-          ? new SolStateChannelContractGenerator(iNet)
-          : new SolDefaultContractGenerator(iNet);
+        let generator;
+        if (isStateChannel) {
+          generator = new SolStateChannelContractGenerator(iNet);
+        } else if (iNet.isCalled) {
+          generator = new SolInstanceGenerator(iNet);
+        } else {
+          generator = new SolDefaultContractGenerator(iNet);
+        }
 
         // Add case variables if provided
         if (caseVariables && generator instanceof SolDefaultContractGenerator) {

@@ -26,6 +26,7 @@ enum Elements {
   tasks = "choreographyTask",
   flows = "sequenceFlow",
   participantsRef = "participantRef",
+  participantsMapping = "participantAssociation",
   startEvent = "startEvent",
   endEvent = "endEvent",
   exclusiveGateway = "exclusiveGateway",
@@ -44,6 +45,8 @@ enum Properties {
   language = "@_language",
   initiator = "@_initiatingParticipantRef",
   calledChor = "@_calledChoreographyRef",
+  innerPar = "@_innerParticipantRef",
+  outerPar = "@_outerParticipantRef",
 }
 
 export class INetFastXMLParser implements INetParser {
@@ -58,6 +61,7 @@ export class INetFastXMLParser implements INetParser {
   private static INetTranslator = class {
     iNet = new InteractionNet();
     flows = new Map<string, { flow: any; place: Place | null }>();
+    callList = new Map<string, string[]>();
 
     translate(choreography: any): InteractionNet {
       // need to parse participants first, so we can reference them
@@ -111,7 +115,32 @@ export class INetFastXMLParser implements INetParser {
         const subTransition = this.addTransition(
           new Transition(callNetID, new Label(LabelType.CallChoreography)),
         );
-        subTransition.calls = [new Call(CallType.CallChoreography, callNetID)];
+        const callingId = this.iNet.id; // Current choreography ID
+        const calls = this.callList.get(callingId);
+        if (calls == undefined)
+          throw new Error(
+            `Calling choreography (${callingId}) not found in call graph`,
+          );
+        if (!calls.includes(callNetID))
+          throw new Error(
+            `Call to choreography (${callNetID}) not found in call list of calling choreography (${callingId})`,
+          );
+        // extract participant participantsMapping
+        const participantsMapping = new Map<string, string>();
+        const mappings = callChoreography[Elements.participantsMapping];
+        if (!mappings)
+          throw new Error(
+            `Call Choreography (${callNetID}) without participant associations`,
+          );
+        for (const map of mappings) {
+          participantsMapping.set(
+            map[Properties.outerPar],
+            map[Properties.innerPar],
+          );
+        }
+        subTransition.calls = [
+          new Call(CallType.CallChoreography, callNetID, participantsMapping),
+        ];
         this.translateIncomingFlows(
           subTransition,
           callChoreography[Elements.ins],
@@ -137,7 +166,9 @@ export class INetFastXMLParser implements INetParser {
         const subTransition = this.addTransition(
           new Transition(subNetID, new Label(LabelType.SubChoreography)),
         );
-        subTransition.calls = [new Call(CallType.SubChoreography, subNetID)];
+        subTransition.calls = [
+          new Call(CallType.SubChoreography, subNetID, null),
+        ];
         this.translateIncomingFlows(
           subTransition,
           subChoreography[Elements.ins],
@@ -562,31 +593,49 @@ export class INetFastXMLParser implements INetParser {
       const callList = this.extractCallGraph(
         rootElements[Elements.choreographies],
       );
-      const iNets = new Array<InteractionNet>();
+      const iNets = new Map<string, InteractionNet>();
       for (const choreography of rootElements[Elements.choreographies]) {
         const iNetTranslator = new INetFastXMLParser.INetTranslator();
+        iNetTranslator.callList = callList;
         try {
           const iNet = iNetTranslator.translate(choreography);
-          if (callList.includes(iNet.id)) iNet.isCalled = true;
-          iNets.push(iNet);
+          iNets.set(iNet.id, iNet);
         } catch (error) {
           return reject(error);
         }
       }
+      for (const iNet of iNets.values()) {
+        const calls = callList.get(iNet.id);
+        if (calls != undefined) {
+          for (const callID of calls) {
+            const calledNet = iNets.get(callID)!;
+            iNet.callList.set(callID, calledNet);
+            calledNet.isCalled = true;
+          }
+        }
+      }
       //console.log(iNets);
-      return resolve(iNets);
+      return resolve([...iNets.values()]);
     });
   }
 
   extractCallGraph(choreographies: any) {
-    const callList = new Array<string>();
+    const callList = new Map<string, string[]>();
 
     for (const choreography of choreographies) {
+      const callingId = choreography[Properties.id];
       if (!choreography[Elements.callChoreographies]) continue;
+
+      const calls: string[] = [];
       for (const callChoreography of choreography[
         Elements.callChoreographies
       ]) {
-        callList.push(callChoreography[Properties.calledChor]);
+        const calledId = callChoreography[Properties.calledChor];
+        calls.push(calledId);
+      }
+
+      if (calls.length > 0) {
+        callList.set(callingId, calls);
       }
     }
     return callList;

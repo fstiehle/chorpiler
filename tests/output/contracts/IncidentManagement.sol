@@ -5,20 +5,27 @@ import "hardhat/console.sol";
 
 interface IProcessExecution {
   function enact(uint id) external;
+  function getTokenState() external view returns (uint);
 }
 
 contract IncidentManagement is IProcessExecution {
-  uint public tokenState = 1;
+  uint private tokenState = 1;
   address[5] public participants;
   event Task(uint id);
   bool public resolved = false;
 
-  constructor(address[5] memory _participants) {
+  constructor(
+    address[5] memory _participants
+  ) {
     participants = _participants;
   }
 
   function setResolved(bool _resolved) external {
     resolved = _resolved;
+  }
+
+  function getTokenState() external view returns (uint) {
+    return tokenState;
   }
 
   function enact(uint id) external {

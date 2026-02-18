@@ -5,16 +5,18 @@ import "hardhat/console.sol";
 
 interface IProcessExecution {
   function enact(uint id) external;
-  function tokenState() external returns (uint);
+  function getTokenState() external view returns (uint);
 }
 
-interface ICalledProcessExecution is IProcessExecution {
-  function initiate() external;
+interface ICalledProcessExecution {
+  function instance(address[] memory participants) external returns (uint);
+  function enact(uint instance, uint id) external;
+  function getTokenState(uint instance) external view returns (uint);
 }
 
 contract CallChoreo is IProcessExecution {
-  uint public tokenState = 1;
-  address[1] private callList;
+  uint[1] private callList; // instance
+  uint private tokenState = 1;
   address[3] public participants;
   event Task(uint id);
 
@@ -24,6 +26,10 @@ contract CallChoreo is IProcessExecution {
   ) {
     participants = _participants;
     callList = _callList;
+  }
+
+  function getTokenState() external view returns (uint) {
+    return tokenState;
   }
 
   function enact(uint id) external {
@@ -49,7 +55,7 @@ contract CallChoreo is IProcessExecution {
       }
       if (_tokenState & 4 == 4) {
         // <--- ChoreographyTask_175oxwe deliver pizza --->
-        if (2 == id && msg.sender == participants[2] && 0 == ICalledProcessExecution(callList[0]).tokenState()) {
+        if (2 == id && msg.sender == participants[2] && 0 == ICalledProcessExecution(callList[Choreography_0betnp1]).tokenState()) {
           // <--- custom code for task here --->
           _tokenState &= ~uint(4);
           _tokenState |= 0;
@@ -60,7 +66,7 @@ contract CallChoreo is IProcessExecution {
       if (_tokenState & 2 == 2) {
         // <---  auto transition  --->
         _tokenState &= ~uint(2);
-        ICalledProcessExecution(callList[0]).initiate();
+        callList[0].instance = callList[0].contract.instance([participants[0], participants[1]]);
         _tokenState |= 4;
         continue;
       }

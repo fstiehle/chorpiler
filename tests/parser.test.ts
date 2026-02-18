@@ -60,15 +60,7 @@ describe("Test BPMN choreography parsing", () => {
 
           try {
             // Check for specific error types based on file name
-            if (bpmnFile.includes("call-choreography")) {
-              await assert.rejects(
-                async () => {
-                  await parser.fromXML(data);
-                },
-                /Unsupported Element/,
-                "Should reject with 'Unsupported Element' error",
-              );
-            } else if (bpmnFile.includes("xor-nodefault")) {
+            if (bpmnFile.includes("xor-nodefault")) {
               await assert.rejects(
                 async () => {
                   await parser.fromXML(data);

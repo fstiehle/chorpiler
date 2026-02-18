@@ -5,14 +5,14 @@
 		<string key="sourceRef" value="Participant ID" />
 	</global>
 
-  <trace id="">
+  <trace id="0">
     <event>
       <string key="concept:name" value="qwe" />
       <string key="id" value="sid-B201CAE0-380C-4C35-BA32-26901B84BDC1" />
       <string key="sourceRef" value="sid-E311DA11-E527-4EBF-9DB8-516315E011A8" />
     </event>
   </trace>
-  <trace id="">
+  <trace id="1">
     <event>
       <string key="concept:name" value="Instance Data Change" />
       <string key="id" value="Instance Data Change" />

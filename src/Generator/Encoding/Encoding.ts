@@ -3,7 +3,7 @@ import { CompileOptions } from "../TemplateEngine.js";
 
 export class Process {
   public participants = new Map<string, Participant>();
-  public callList = new Map<string, number>();
+  public callList = new Map<string, Call>();
   public transitions = new Map<string, Transition>();
   public states = new Map<number, Transition[]>();
   caseVariables = new Map<string, CaseVariable>();
@@ -40,6 +40,16 @@ export class MainProcess extends Process {
   }
   subProcesses = new Map<string, SubProcess>();
   isCalled = false;
+  isInstanced = false;
+}
+
+export class Call {
+  constructor(
+    public name: string,
+    public id: number,
+    public type: CallType,
+    public participants: Participant[] | null,
+  ) {}
 }
 
 export class CaseVariable {
@@ -58,8 +68,8 @@ interface TransitionParams {
   condition?: string | null;
   isEnd?: boolean;
   defaultBranch?: boolean;
-  outTo?: { id: number; callType: CallType } | null;
-  inFrom?: { id: number; callType: CallType } | null;
+  outTo?: Call | null;
+  inFrom?: Call | null;
 }
 
 export class Transition {
@@ -69,8 +79,8 @@ export class Transition {
   public condition: string | null;
   public isEnd: boolean;
   public defaultBranch: boolean;
-  public outTo: { id: number; callType: CallType } | null;
-  public inFrom: { id: number; callType: CallType } | null;
+  public outTo: Call | null;
+  public inFrom: Call | null;
 
   constructor({
     id,

@@ -37,6 +37,8 @@
       <bpmn2:outgoing>Flow_05jtx05</bpmn2:outgoing>
       <bpmn2:participantRef>Participant_06qakjv</bpmn2:participantRef>
       <bpmn2:participantRef>Participant_0mgz9si</bpmn2:participantRef>
+      <bpmn2:participantAssociation innerParticipantRef="Participant_0t7ur06" outerParticipantRef="Participant_06qakjv" />
+      <bpmn2:participantAssociation innerParticipantRef="Participant_1x7055n" outerParticipantRef="Participant_0mgz9si" />
     </bpmn2:callChoreography>
     <bpmn2:sequenceFlow id="Flow_05jtx05" sourceRef="CallChoreography_1mfkhvq" targetRef="ChoreographyTask_175oxwe" />
   </bpmn2:choreography>
