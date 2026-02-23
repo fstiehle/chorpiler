@@ -16,6 +16,11 @@ import { BPMN_PATH, CONTRACTS_PATH } from "./config.js";
 const readFile = util.promisify(fs.readFile);
 const writeFile = util.promisify(fs.writeFile);
 
+interface AddressEntry {
+  callID: string;
+  address: string;
+}
+
 describe("Generation of edge cases", () => {
   let parser: INetParser;
 
@@ -107,6 +112,7 @@ describe("Generation of edge cases", () => {
     const compileBpmn = async (
       name: string,
       caseVariables?: CaseVariable[],
+      addressList?: AddressEntry[],
       unfold: boolean = true,
       isStateChannel: boolean = false,
     ) => {
@@ -131,6 +137,21 @@ describe("Generation of edge cases", () => {
           );
         }
 
+        // Add call addresses if provided
+        if (addressList) {
+          addressList.forEach((entry) => {
+            try {
+              generator.addCallAddress(entry.callID, entry.address);
+            } catch (error) {
+              if (
+                !(error instanceof Error) ||
+                !error.message.includes("does not exist in the InteractionNet")
+              )
+                throw error;
+            }
+          });
+        }
+
         const result = await compileCase(generator, unfold, isStateChannel);
         results.push(result);
       }
@@ -139,52 +160,69 @@ describe("Generation of edge cases", () => {
     };
 
     it("XOR-AND case to Sol Contract", async () => {
-      await compileBpmn("xor-and", [
-        new CaseVariable("items", "bool", "bool public items = false;", true),
-      ]);
+      await compileBpmn(
+        "xor-and",
+        [new CaseVariable("items", "bool", "bool public items = false;", true)],
+        [],
+      );
     });
 
     it("Pharmacy (out of order xml file) case to Sol Contract", async () => {
-      await compileBpmn("out-of-order-xml");
+      await compileBpmn("out-of-order-xml", [], []);
     });
 
     it.skip("Pharmacy case to State Channel Root", async () => {
-      await compileBpmn("out-of-order-xml", [], false, true);
+      await compileBpmn("out-of-order-xml", [], [], false, true);
     });
 
     it("Supply chain case to Sol Contract", async () => {
-      await compileBpmn("supply-chain");
+      await compileBpmn("supply-chain", [], []);
     });
 
     it.skip("Supply chain case to State Channel Root", async () => {
-      await compileBpmn("supply-chain", [], false, true);
+      await compileBpmn("supply-chain", [], [], false, true);
     });
 
     it("Incident Management case to Sol Contract", async () => {
-      await compileBpmn("incident-management", [
-        new CaseVariable(
-          "resolved",
-          "bool",
-          "bool public resolved = false;",
-          true,
-        ),
-      ]);
+      await compileBpmn(
+        "incident-management",
+        [
+          new CaseVariable(
+            "resolved",
+            "bool",
+            "bool public resolved = false;",
+            true,
+          ),
+        ],
+        [],
+      );
     });
 
     it.skip("Incident Management case to State Channel Root", async () => {
-      await compileBpmn("incident-management", [], false, true);
+      await compileBpmn("incident-management", [], [], false, true);
     });
 
     it("Rental Agreement case to Sol Contract", async () => {
-      await compileBpmn("rental-agreement", [
-        new CaseVariable("conditions", "uint", "uint public conditions;", true),
-      ]);
+      await compileBpmn(
+        "rental-agreement",
+        [
+          new CaseVariable(
+            "conditions",
+            "uint",
+            "uint public conditions;",
+            true,
+          ),
+        ],
+        [],
+      );
     });
 
     it("Pizza case to Sol Contract", async () => {
-      await compileBpmn("pizza", [
-        new CaseVariable("items", "bool", "bool public items = false;", true),
-      ]);
+      await compileBpmn(
+        "pizza",
+        [new CaseVariable("items", "bool", "bool public items = false;", true)],
+        [],
+      );
     });
 
     it("Don't unfold Rental Agreement case to Sol Contract", async () => {
@@ -198,20 +236,76 @@ describe("Generation of edge cases", () => {
             true,
           ),
         ],
+        [],
         false,
       );
     });
 
     it("Don't unfold Sub Choreo case to Sol Contract", async () => {
-      await compileBpmn("sub-choreo", [], false);
+      await compileBpmn("sub-choreo", [], [], false);
     });
 
     it("Don't unfold Sub Choreo case to Sol Contract", async () => {
-      await compileBpmn("sub-choreo-chained", [], false);
+      await compileBpmn("sub-choreo-chained", [], [], false);
     });
 
     it.only("Call choreograhy to Sol Contract", async () => {
-      await compileBpmn("call-choreo", [], false);
+      const results = await compileBpmn(
+        "call-choreo",
+        [],
+        [
+          {
+            callID: "Choreography_0betnp1",
+            address: "0x1234567890123456789012345678901234567890",
+          },
+        ],
+        false,
+      );
+
+      // Read and verify Choreography_0betnp1.json
+      const choreography0betnp1Path = path.join(
+        CONTRACTS_PATH,
+        "callchoreos",
+        "Choreography_0betnp1.json",
+      );
+      assert.ok(
+        fs.existsSync(choreography0betnp1Path),
+        "Choreography_0betnp1.json should exist in the callchoreos folder",
+      );
+
+      const choreography0betnp1Data = JSON.parse(
+        fs.readFileSync(choreography0betnp1Path, "utf8"),
+      );
+      assert.strictEqual(
+        choreography0betnp1Data.isCalled,
+        true,
+        "Choreography_0betnp1 should have isCalled: true",
+      );
+      assert.strictEqual(
+        choreography0betnp1Data.isInstanced,
+        true,
+        "Choreography_0betnp1 should have isInstanced: true",
+      );
+
+      // Read and verify CallChoreo.json
+      const callChoreoPath = path.join(
+        CONTRACTS_PATH,
+        "callchoreos",
+        "CallChoreo.json",
+      );
+      assert.ok(
+        fs.existsSync(callChoreoPath),
+        "CallChoreo.json should exist in the callchoreos folder",
+      );
+
+      const callChoreoData = JSON.parse(
+        fs.readFileSync(callChoreoPath, "utf8"),
+      );
+      assert.strictEqual(
+        Object.keys(callChoreoData.calls).length,
+        1,
+        "CallChoreo should have calls size of 1",
+      );
     });
   });
 });

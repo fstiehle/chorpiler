@@ -3,7 +3,8 @@ import { CompileOptions } from "../TemplateEngine.js";
 
 export class Process {
   public participants = new Map<string, Participant>();
-  public callList = new Map<string, Call>();
+  public callList = new Map<string, number>();
+  public addressList = new Map<string, string>();
   public transitions = new Map<string, Transition>();
   public states = new Map<number, Transition[]>();
   caseVariables = new Map<string, CaseVariable>();
@@ -49,6 +50,7 @@ export class Call {
     public id: number,
     public type: CallType,
     public participants: Participant[] | null,
+    public address: string = "",
   ) {}
 }
 

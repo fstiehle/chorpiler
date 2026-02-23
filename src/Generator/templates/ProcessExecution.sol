@@ -5,18 +5,22 @@ pragma solidity ^0.8.9;
 import "hardhat/console.sol";
 
 {{/options.debug}}
-interface IProcessExecution {
-  function enact(uint id) external;
-  function getTokenState() external view returns (uint);
-}
 {{#hasCalls}}
-
-interface ICalledProcessExecution {
+interface IInstanceExecution {
   function instance(address[] memory participants) external returns (uint);
   function enact(uint instance, uint id) external;
   function getTokenState(uint instance) external view returns (uint);
 }
+
+{{#addressList}}
+{{> callcontract}}
+
+{{/addressList}}
 {{/hasCalls}}
+interface IProcessExecution {
+  function enact(uint id) external;
+  function getTokenState() external view returns (uint);
+}
 
 contract {{{modelID}}} is IProcessExecution {
   {{#hasCalls}}
@@ -32,30 +36,17 @@ contract {{{modelID}}} is IProcessExecution {
   {{#options.events}}
   event Task(uint id);
   {{/options.events}}
-  {{#caseVariables}}
-  {{{expression}}}
-  {{/caseVariables}}
 
-  constructor(
-    address[{{{numberOfParticipants}}}] memory _participants{{#hasCalls}},
-    address[{{{numberOfCalls}}}] memory _callList{{/hasCalls}}
-  ) {
+  {{#caseVariables}}
+    {{> casevariable}}
+
+  {{/caseVariables}}
+  constructor(address[{{{numberOfParticipants}}}] memory _participants) {
     participants = _participants;
-    {{#callContracts}}
-    callList = _callList;
-    {{/callContracts}}
     {{#hasSubProcesses}}
     tokenState[0] = 1;
     {{/hasSubProcesses}}
   }
-  {{#caseVariables}}
-  {{#setters}}
-
-  function {{{functionName}}}({{{type}}} _{{{name}}}) external {
-    {{{name}}} = _{{{name}}};
-  }
-  {{/setters}}
-  {{/caseVariables}}
 
   function getTokenState() external view returns (uint) {
     {{^hasSubProcesses}}

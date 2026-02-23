@@ -1,0 +1,1 @@
+IInstanceExecution constant {{name}} = IInstanceExecution({{address}});

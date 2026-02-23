@@ -27,6 +27,24 @@ export default class SolInstanceGenerator extends TemplateEngine {
           ),
         },
         {
+          partial: "casevariable",
+          path: path.join(
+            __dirname,
+            "..",
+            "..",
+            "templates/partials/casevariable.mustache.sol",
+          ),
+        },
+        {
+          partial: "callcontract",
+          path: path.join(
+            __dirname,
+            "..",
+            "..",
+            "templates/partials/callcontract.mustache.sol",
+          ),
+        },
+        {
           partial: "transition",
           path: path.join(
             __dirname,

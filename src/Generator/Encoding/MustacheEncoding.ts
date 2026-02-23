@@ -11,6 +11,7 @@ class MustacheProcessEncoding {
     public modelID: string, // ID as was found in model
     public participants: Participant[],
     public callContracts: Map<string, number>,
+    public addressList: AddressEntry[],
     public caseVariables: CaseVariable[],
     public states: State[],
   ) {}
@@ -32,7 +33,12 @@ class MustacheProcessEncoding {
       Array.from(encoding.participants.values()).map(
         (p) => new Participant(p.id.toString(), p.modelID, p.name, p.address),
       ),
-      encoding.callList,
+      new Map(
+        Array.from(encoding.callList.entries()).map(([key, id]) => [key, id]),
+      ),
+      Array.from(encoding.addressList.entries()).map(
+        ([id, address]) => new AddressEntry(id, address),
+      ),
       Array.from(encoding.caseVariables.values()).map(
         (c) => new CaseVariable(c.name, c.type, c.expression, c.setters),
       ),
@@ -154,6 +160,7 @@ export class MustacheEncoding
       main.modelID,
       main.participants,
       main.callContracts,
+      main.addressList,
       main.caseVariables,
       main.states,
     );
@@ -294,4 +301,11 @@ class CaseVariable {
   ) {
     this.functionName = "set" + capitalize(name);
   }
+}
+
+class AddressEntry {
+  constructor(
+    public name: string,
+    public address: string,
+  ) {}
 }

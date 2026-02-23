@@ -23,6 +23,12 @@ interface IInstanceExecution {
   function instance(address[{{{numberOfParticipants}}}] memory participants) external returns (uint);
 }
 
+{{#hasCalls}}
+{{#addressList}}
+{{> callcontract}}
+
+{{/addressList}}
+{{/hasCalls}}
 contract {{{modelID}}} is IInstanceExecution {
   mapping(uint => IInstanceExecution.ProcessData) public processData;
   uint private nextId = 0;
@@ -32,23 +38,11 @@ contract {{{modelID}}} is IInstanceExecution {
   {{#options.events}}
   event Task(uint id);
   {{/options.events}}
-  {{#hasCalls}}
 
-  constructor(address[{{{numberOfCalls}}}] memory _callList) {
-    {{#callContracts}}
-    callList = _callList;
-    {{/callContracts}}
-  }
-  {{/hasCalls}}
   {{#caseVariables}}
-  {{#setters}}
+    {{> casevariable}}
 
-  function {{{functionName}}}(uint instance, {{{type}}} _{{{name}}}) external {
-    {{{name}}} = _{{{name}}};
-  }
-  {{/setters}}
   {{/caseVariables}}
-
   function instance(address[{{{numberOfParticipants}}}] memory _participants) external returns (uint) {
     uint newId = nextId;
     processData[newId] = IInstanceExecution.ProcessData({

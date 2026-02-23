@@ -3,15 +3,16 @@ pragma solidity ^0.8.9;
 
 import "hardhat/console.sol";
 
-interface IProcessExecution {
-  function enact(uint id) external;
-  function getTokenState() external view returns (uint);
-}
-
-interface ICalledProcessExecution {
+interface IInstanceExecution {
   function instance(address[] memory participants) external returns (uint);
   function enact(uint instance, uint id) external;
   function getTokenState(uint instance) external view returns (uint);
+}
+
+IInstanceExecution constant Choreography_0betnp1 = IInstanceExecution(0x1234567890123456789012345678901234567890);
+interface IProcessExecution {
+  function enact(uint id) external;
+  function getTokenState() external view returns (uint);
 }
 
 contract CallChoreo is IProcessExecution {
@@ -20,12 +21,8 @@ contract CallChoreo is IProcessExecution {
   address[3] public participants;
   event Task(uint id);
 
-  constructor(
-    address[3] memory _participants,
-    address[1] memory _callList
-  ) {
+  constructor(address[3] memory _participants) {
     participants = _participants;
-    callList = _callList;
   }
 
   function getTokenState() external view returns (uint) {
@@ -66,7 +63,7 @@ contract CallChoreo is IProcessExecution {
       if (_tokenState & 2 == 2) {
         // <---  auto transition  --->
         _tokenState &= ~uint(2);
-        callList[0].instance = callList[0].contract.instance([participants[0], participants[1]]);
+        callList[1].instance = callList[1].contract.instance([participants[0], participants[1]]);
         _tokenState |= 4;
         continue;
       }

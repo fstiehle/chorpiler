@@ -277,16 +277,13 @@ export class INetEncoder {
           );
         const subEncoded = this.encodeParticipants(calledNet.participants);
 
-        let existingCall = this.mainEncoded.callList.get(call.targetID);
-        let callID: number;
-
-        if (existingCall == undefined) {
+        let callID = this.mainEncoded.callList.get(call.targetID);
+        if (callID == undefined) {
           // set new callID to highest existing ID + 1
-          const existingIds = Array.from(
-            this.mainEncoded.callList.values(),
-          ).map((call) => call.id);
-          callID = existingIds.length > 0 ? Math.max(...existingIds) + 1 : 0;
+          callID = this.mainEncoded.callList.size + 1;
+          this.mainEncoded.callList.set(call.targetID, callID);
         }
+
         // map main participants to called choreography
         const mapping = call.participantsMapping;
         const pars = new Array<Encoding.Participant>();

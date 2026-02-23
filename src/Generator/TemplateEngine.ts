@@ -32,6 +32,8 @@ export interface ITemplateEngine {
 }
 
 export abstract class TemplateEngine implements ITemplateEngine {
+  private addressList = new Map<string, string>();
+
   constructor(
     public iNet: InteractionNet,
     private templatePath: string,
@@ -68,6 +70,13 @@ export abstract class TemplateEngine implements ITemplateEngine {
     const encoder = new INetEncoder();
     const gen = encoder.generate(iNet, options, this.isInstanced);
     gen.caseVariables = this.caseVariables;
+    gen.addressList = this.addressList;
+
+    if (gen.callList.size != gen.addressList.size) {
+      throw new Error(
+        "Some call contracts have not been assigned addresses, use addCallAddress(callID: string, address: string).",
+      );
+    }
 
     return {
       target: Mustache.render(
@@ -87,6 +96,19 @@ export abstract class TemplateEngine implements ITemplateEngine {
   }
   getCaseVariable(variableName: string) {
     return this.caseVariables.get(variableName);
+  }
+  addCallAddress(callID: string, address: string) {
+    if (!this.iNet.callList.has(callID))
+      throw new Error(
+        `Call Choreography with ID ${callID} does not exist in the InteractionNet`,
+      );
+    this.addressList.set(callID, address);
+  }
+  deleteCallAddress(callID: string) {
+    this.addressList.delete(callID);
+  }
+  getCallAddress(callID: string) {
+    this.addressList.get(callID);
   }
   setTemplatePath(path: string): void {
     this.templatePath = path;

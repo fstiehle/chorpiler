@@ -8,7 +8,10 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 export default class SolStateChannelContractGenerator extends TemplateEngine {
-  constructor(_iNet: InteractionNet, _caseVariables?: Map<string, CaseVariable>) {
+  constructor(
+    _iNet: InteractionNet,
+    _caseVariables?: Map<string, CaseVariable>,
+  ) {
     super(
       _iNet,
       path.join(__dirname, "..", "..", "templates/ProcessChannel.sol"),
