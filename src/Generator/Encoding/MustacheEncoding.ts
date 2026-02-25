@@ -10,19 +10,21 @@ class MustacheProcessEncoding {
     public id: string, // ID in form 0...n assigned by generator
     public modelID: string, // ID as was found in model
     public participants: Participant[],
-    public callContracts: Map<string, number>,
-    public addressList: AddressEntry[],
+    public callList: Encoding.Call[],
     public caseVariables: CaseVariable[],
     public states: State[],
   ) {}
 
   // Template helper methods
   hasStates = (): boolean => this.states.length > 0;
-  hasCalls = (): boolean => this.callContracts.size > 0;
+  hasCalls = (): boolean => this.callList.length > 0;
   numberOfParticipants = (): string => this.participants.length.toString();
-  numberOfCalls = (): string => this.callContracts.size.toString();
+  numberOfCalls = (): string => this.callList.length.toString();
 
-  static fromEncoding(encoding: Encoding.Process) {
+  static fromEncoding(
+    encoding: Encoding.Process,
+    isInstanced: boolean = false,
+  ) {
     const states = new Map<number, Encoding.Transition[]>();
     encoding.states.forEach((transitions, consume) => {
       states.set(consume, transitions);
@@ -33,27 +35,23 @@ class MustacheProcessEncoding {
       Array.from(encoding.participants.values()).map(
         (p) => new Participant(p.id.toString(), p.modelID, p.name, p.address),
       ),
-      new Map(
-        Array.from(encoding.callList.entries()).map(([key, id]) => [key, id]),
-      ),
-      Array.from(encoding.addressList.entries()).map(
-        ([id, address]) => new AddressEntry(id, address),
-      ),
+      Array.from(encoding.callList.values()),
       Array.from(encoding.caseVariables.values()).map(
         (c) => new CaseVariable(c.name, c.type, c.expression, c.setters),
       ),
-      MustacheProcessEncoding.convertStates(states),
+      MustacheProcessEncoding.convertStates(states, isInstanced),
     );
   }
 
   private static convertStates(
     states: Map<number, Encoding.Transition[]>,
+    isInstanced: boolean,
   ): State[] {
     const stateArray = Array.from(states.entries()).map(
       ([consume, transitions]) => {
         return new State(
           consume.toString(),
-          transitions.map((t) => this.convertTransition(t)),
+          transitions.map((t) => this.convertTransition(t, isInstanced)),
         );
       },
     );
@@ -64,7 +62,10 @@ class MustacheProcessEncoding {
     return stateArray;
   }
 
-  private static convertTransition(t: Encoding.Transition): Transition {
+  private static convertTransition(
+    t: Encoding.Transition,
+    isInstanced: boolean,
+  ): Transition {
     return new Transition(
       t.consume.toString(),
       t.produce.toString(),
@@ -77,45 +78,18 @@ class MustacheProcessEncoding {
       t.defaultBranch,
       t.outTo ? MustacheProcessEncoding.buildTransitionTarget(t.outTo) : null,
       t.inFrom ? MustacheProcessEncoding.buildTransitionTarget(t.inFrom) : null,
-      (t.outTo ? this.isCallChoreography(t.outTo) : false) ||
-        (t.inFrom ? this.isCallChoreography(t.inFrom) : false),
-      (t.outTo ? this.isSubChoreography(t.outTo) : false) ||
-        (t.inFrom ? this.isSubChoreography(t.inFrom) : false),
+      (t.outTo ? isCallChoreography(t.outTo) : false) ||
+        (t.inFrom ? isCallChoreography(t.inFrom) : false),
+      (t.outTo ? isSubChoreography(t.outTo) : false) ||
+        (t.inFrom ? isSubChoreography(t.inFrom) : false),
+      isInstanced,
     );
   }
 
   private static buildTransitionTarget(
     call: Encoding.Call,
   ): TransitionTarget | null {
-    const isCall = this.isCallChoreography(call);
-    const isSub = this.isSubChoreography(call);
-
-    // Generate Solidity call string for call targets
-    let callString: string | undefined = undefined;
-    if (isCall) {
-      if (call && call.participants) {
-        const participantIds = call.participants
-          .map((p) => `participants[${p.id}]`)
-          .join(", ");
-        callString = `callList[${call.id}].instance = callList[${call.id}].contract.instance([${participantIds}]);`;
-      }
-    }
-    console.log(isCall, isSub);
-    return new TransitionTarget(call.name, isCall, isSub, callString);
-  }
-
-  /**
-   * Helper function to check if a transition target is a call choreography
-   */
-  private static isCallChoreography(call: Encoding.Call): boolean {
-    return call?.type === CallType.CallChoreography;
-  }
-
-  /**
-   * Helper function to check if a transition target is a sub choreography
-   */
-  private static isSubChoreography(call: Encoding.Call): boolean {
-    return call?.type === CallType.SubChoreography;
+    return new TransitionTarget(call);
   }
 }
 
@@ -145,9 +119,13 @@ export class MustacheEncoding
   numberOfProcesses = () => (this.subProcesses.length + 1).toString();
 
   static fromEncoding(encoding: Encoding.MainProcess): MustacheEncoding {
-    const main = MustacheProcessEncoding.fromEncoding(encoding);
+    const main = MustacheProcessEncoding.fromEncoding(
+      encoding,
+      encoding.isInstanced,
+    );
     const subProcesses = Array.from(encoding.subProcesses.values()).map(
-      MustacheProcessEncoding.fromEncoding,
+      (subProcess) =>
+        MustacheProcessEncoding.fromEncoding(subProcess, encoding.isInstanced),
     );
     //console.log(encoding.states);
 
@@ -159,8 +137,7 @@ export class MustacheEncoding
       main.id,
       main.modelID,
       main.participants,
-      main.callContracts,
-      main.addressList,
+      main.callList,
       main.caseVariables,
       main.states,
     );
@@ -186,6 +163,7 @@ class Transition {
     public inFrom: TransitionTarget | null,
     public isCall: boolean,
     public isSub: boolean,
+    public isInstanced: boolean,
   ) {
     const conditionParts: string[] = [];
 
@@ -194,25 +172,22 @@ class Transition {
       this.conditions.push({ content: this.taskID, hasID: true, last: false });
     }
     if (this.inFrom && this.inFrom.isSub) {
-      conditionParts.push(`0 == tokenState[${this.inFrom.id}]`);
+      const tokenStateRef = this.isInstanced
+        ? `processData[instanceID].tokenState[${this.inFrom.call.id}]`
+        : `tokenState[${this.inFrom.call.id}]`;
+      conditionParts.push(`0 == ${tokenStateRef}`);
       this.conditions.push({
-        content: this.inFrom.id,
-        hasInFrom: true,
-        last: false,
-      });
-    }
-
-    if (this.inFrom && !this.inFrom.isSub && !this.inFrom.isCall) {
-      conditionParts.push(`0 == tokenState[${this.inFrom.id}]`);
-      this.conditions.push({
-        content: this.inFrom.id,
+        content: this.inFrom.call.id.toString(),
         hasInFrom: true,
         last: false,
       });
     }
 
     if (this.initiator) {
-      conditionParts.push(`msg.sender == participants[${this.initiator}]`);
+      const participantsRef = this.isInstanced
+        ? `processData[instanceID].participants[${this.initiator}]`
+        : `participants[${this.initiator}]`;
+      conditionParts.push(`msg.sender == ${participantsRef}`);
       this.conditions.push({
         content: this.initiator,
         hasInitiator: true,
@@ -222,10 +197,10 @@ class Transition {
 
     if (this.inFrom && this.inFrom.isCall) {
       conditionParts.push(
-        `0 == ICalledProcessExecution(callList[${this.inFrom.id}]).tokenState()`,
+        `0 == ${this.inFrom.call.name}.getTokenState(instanceList[${this.inFrom.call.id}])`,
       );
       this.conditions.push({
-        content: this.inFrom.id,
+        content: this.inFrom.call.id.toString(),
         hasInFrom: true,
         last: false,
       });
@@ -277,16 +252,26 @@ class Participant {
     public address: string,
   ) {}
 }
-
 class TransitionTarget {
-  constructor(
-    public id: string,
-    public isCall?: boolean,
-    public isSub?: boolean,
-    public callString?: string,
-  ) {}
-}
+  public isCall = false;
+  public isSub = false;
+  public callString: string | undefined = undefined;
 
+  constructor(public call: Encoding.Call) {
+    this.isCall = isCallChoreography(call);
+    this.isSub = isSubChoreography(call);
+
+    // Generate Solidity call string for call targets
+    if (this.isCall) {
+      if (call && call.participants) {
+        const participantIds = call.participants
+          .map((p) => `participants[${p.id}]`)
+          .join(", ");
+        this.callString = `instanceList[${call.id}] = ${call.name}.instance([${participantIds}]);`;
+      }
+    }
+  }
+}
 /**
  * Represents a case variable that can be used in the generated contract
  */
@@ -303,9 +288,10 @@ class CaseVariable {
   }
 }
 
-class AddressEntry {
-  constructor(
-    public name: string,
-    public address: string,
-  ) {}
+function isCallChoreography(call: Encoding.Call): boolean {
+  return call?.type === CallType.CallChoreography;
+}
+
+function isSubChoreography(call: Encoding.Call): boolean {
+  return call?.type === CallType.SubChoreography;
 }

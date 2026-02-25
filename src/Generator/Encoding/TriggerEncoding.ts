@@ -90,7 +90,7 @@ export class TriggerEncoding implements IFromEncoding {
       participants,
       states,
       new Map(
-        Array.from(encoding.callList.entries()).map(([key, id]) => [key, id]),
+        Array.from(encoding.callList.entries()).map(([key, c]) => [key, c.id]),
       ),
       subModels,
     );

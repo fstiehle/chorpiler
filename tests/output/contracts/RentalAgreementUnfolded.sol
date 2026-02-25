@@ -12,17 +12,17 @@ contract RentalAgreementUnfolded is IProcessExecution {
   uint[2] public tokenState;
   address[3] public participants;
   event Task(uint id);
-  uint public conditions;
 
-  constructor(
-    address[3] memory _participants
-  ) {
-    participants = _participants;
-    tokenState[0] = 1;
-  }
+  // Case Variable conditions
+  uint public conditions;
 
   function setConditions(uint _conditions) external {
     conditions = _conditions;
+  }
+
+  constructor(address[3] memory _participants) {
+    participants = _participants;
+    tokenState[0] = 1;
   }
 
   function getTokenState() external view returns (uint) {

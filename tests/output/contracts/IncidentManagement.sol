@@ -12,16 +12,16 @@ contract IncidentManagement is IProcessExecution {
   uint private tokenState = 1;
   address[5] public participants;
   event Task(uint id);
-  bool public resolved = false;
 
-  constructor(
-    address[5] memory _participants
-  ) {
-    participants = _participants;
-  }
+  // Case Variable resolved
+  bool public resolved = false;
 
   function setResolved(bool _resolved) external {
     resolved = _resolved;
+  }
+
+  constructor(address[5] memory _participants) {
+    participants = _participants;
   }
 
   function getTokenState() external view returns (uint) {

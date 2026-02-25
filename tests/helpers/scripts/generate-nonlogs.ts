@@ -52,17 +52,46 @@ async function generateForFile(filename: string) {
   }
 
   // Find the corresponding encoding file
-  const baseName = path.basename(filename, ".xes");
-  const encodingFilePath = path.join(CONTRACTS_PATH, `${baseName}.json`);
+  const baseXesName = path.basename(filename, ".xes");
 
-  if (!fs.existsSync(encodingFilePath)) {
-    console.error(`Error: Encoding file not found: ${encodingFilePath}`);
-    console.log(`Make sure the encoding file exists in: ${CONTRACTS_PATH}`);
+  // Look for encoding files that match the XES file pattern
+  // Since the Simulator now uses iNet.id for naming, we need to find the corresponding .json file
+  const encodingFiles = fs
+    .readdirSync(CONTRACTS_PATH)
+    .filter((file) => file.endsWith(".json") && !file.startsWith("sim_non_"))
+    .filter((file) => {
+      // Match files that could correspond to this XES file
+      const jsonBaseName = path.basename(file, ".json");
+      return (
+        jsonBaseName === baseXesName ||
+        baseXesName.includes(jsonBaseName) ||
+        jsonBaseName.includes(baseXesName.replace("sim_", ""))
+      );
+    });
+
+  if (encodingFiles.length === 0) {
+    console.error(`Error: No matching encoding files found for ${filename}`);
+    console.log(`Looked for .json files in: ${CONTRACTS_PATH}`);
+    console.log(
+      `Available .json files: ${fs
+        .readdirSync(CONTRACTS_PATH)
+        .filter((f) => f.endsWith(".json"))
+        .join(", ")}`,
+    );
     return false;
   }
 
+  if (encodingFiles.length > 1) {
+    console.warn(
+      `Multiple encoding files found: ${encodingFiles.join(", ")}. Using the first one.`,
+    );
+  }
+
+  const encodingFilePath = path.join(CONTRACTS_PATH, encodingFiles[0]);
+  const encodingBaseName = path.basename(encodingFiles[0], ".json");
+
   console.log(`Processing XES file: ${filename}`);
-  console.log(`Using encoding: ${baseName}.json`);
+  console.log(`Using encoding: ${encodingFiles[0]}`);
 
   let xesSuccess = false;
 
@@ -88,12 +117,12 @@ async function generateForFile(filename: string) {
     const nonConformingLog = fuzzyLog.generateAndWriteNonConformingLog(
       log,
       encoding,
-      `${PREPEND}${baseName}`,
+      `${PREPEND}${encodingBaseName}`,
       NR_NON_CONFORMING_TRACES,
     );
 
     // Check if the file was successfully generated
-    const outputFileName = `${PREPEND}${baseName}.xes`;
+    const outputFileName = `${PREPEND}${encodingBaseName}.xes`;
     const outputFilePath = path.join(XES_PATH, outputFileName);
 
     if (fs.existsSync(outputFilePath)) {
@@ -124,7 +153,7 @@ async function generateForFile(filename: string) {
   );
   console.log(`   • Output directory: ${XES_PATH}`);
   console.log(
-    `   • Output file: ${xesSuccess ? `${PREPEND}${baseName}.xes` : "N/A"}`,
+    `   • Output file: ${xesSuccess ? `${PREPEND}${encodingBaseName}.xes` : "N/A"}`,
   );
 
   return xesSuccess;

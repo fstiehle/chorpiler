@@ -88,7 +88,26 @@ async function generateForFile(filename: string) {
 
   let xesSuccess = false;
   let contractSuccess = false;
-  const baseName = PREPEND + path.basename(filename, ".bpmn");
+  let generatedXesFiles: string[] = [];
+  let generatedSolFiles: string[] = [];
+  let generatedJsonFiles: string[] = [];
+
+  // Get list of files before generation to compare
+  const xesFilesBefore = fs.existsSync(xesOutputDir)
+    ? fs
+        .readdirSync(xesOutputDir)
+        .filter((f) => f.endsWith(".xes") && f.startsWith(PREPEND))
+    : [];
+  const solFilesBefore = fs.existsSync(contractOutputDir)
+    ? fs
+        .readdirSync(contractOutputDir)
+        .filter((f) => f.endsWith(".sol") && f.startsWith(PREPEND))
+    : [];
+  const jsonFilesBefore = fs.existsSync(contractOutputDir)
+    ? fs
+        .readdirSync(contractOutputDir)
+        .filter((f) => f.endsWith(".json") && f.startsWith(PREPEND))
+    : [];
 
   // Generate XES logs
   console.log("\nGenerating XES event logs...");
@@ -97,17 +116,26 @@ async function generateForFile(filename: string) {
       maxTraces: 2500,
     });
 
-    // Check if XES file was generated
+    // Find newly generated XES files
+    const xesFilesAfter = fs.existsSync(xesOutputDir)
+      ? fs
+          .readdirSync(xesOutputDir)
+          .filter((f) => f.endsWith(".xes") && f.startsWith(PREPEND))
+      : [];
+    generatedXesFiles = xesFilesAfter.filter(
+      (f) => !xesFilesBefore.includes(f),
+    );
 
-    const expectedXesFile = path.join(xesOutputDir, `${baseName}.xes`);
-    if (fs.existsSync(expectedXesFile)) {
-      const stats = fs.statSync(expectedXesFile);
-      console.log(
-        `Generated XES file: ${baseName}.xes (${Math.round(stats.size / 1024)}KB)`,
-      );
+    if (generatedXesFiles.length > 0) {
       xesSuccess = true;
+      for (const xesFile of generatedXesFiles) {
+        const stats = fs.statSync(path.join(xesOutputDir, xesFile));
+        console.log(
+          `Generated XES file: ${xesFile} (${Math.round(stats.size / 1024)}KB)`,
+        );
+      }
     } else {
-      console.log(`XES file not found: ${baseName}.xes`);
+      console.log(`No new XES files found with prefix: ${PREPEND}`);
     }
   } catch (error) {
     console.error(
@@ -125,26 +153,45 @@ async function generateForFile(filename: string) {
       maxTraces: 2500,
     });
 
-    // Check if contract files were generated
-    const expectedSolFile = path.join(contractOutputDir, `${baseName}.sol`);
-    const expectedJsonFile = path.join(contractOutputDir, `${baseName}.json`);
+    // Find newly generated contract files
+    const solFilesAfter = fs.existsSync(contractOutputDir)
+      ? fs
+          .readdirSync(contractOutputDir)
+          .filter((f) => f.endsWith(".sol") && f.startsWith(PREPEND))
+      : [];
+    const jsonFilesAfter = fs.existsSync(contractOutputDir)
+      ? fs
+          .readdirSync(contractOutputDir)
+          .filter((f) => f.endsWith(".json") && f.startsWith(PREPEND))
+      : [];
 
-    if (fs.existsSync(expectedSolFile)) {
-      const stats = fs.statSync(expectedSolFile);
-      console.log(
-        `Generated contract: ${baseName}.sol (${Math.round(stats.size / 1024)}KB)`,
-      );
+    generatedSolFiles = solFilesAfter.filter(
+      (f) => !solFilesBefore.includes(f),
+    );
+    generatedJsonFiles = jsonFilesAfter.filter(
+      (f) => !jsonFilesBefore.includes(f),
+    );
 
-      if (fs.existsSync(expectedJsonFile)) {
-        const jsonStats = fs.statSync(expectedJsonFile);
-        console.log(
-          `Generated encoding: ${baseName}.json (${Math.round(jsonStats.size / 1024)}KB)`,
-        );
-      }
-
+    if (generatedSolFiles.length > 0) {
       contractSuccess = true;
+      for (const solFile of generatedSolFiles) {
+        const stats = fs.statSync(path.join(contractOutputDir, solFile));
+        console.log(
+          `Generated contract: ${solFile} (${Math.round(stats.size / 1024)}KB)`,
+        );
+
+        // Look for corresponding JSON file
+        const baseName = path.basename(solFile, ".sol");
+        const jsonFile = `${baseName}.json`;
+        if (generatedJsonFiles.includes(jsonFile)) {
+          const jsonStats = fs.statSync(path.join(contractOutputDir, jsonFile));
+          console.log(
+            `Generated encoding: ${jsonFile} (${Math.round(jsonStats.size / 1024)}KB)`,
+          );
+        }
+      }
     } else {
-      console.log(`Contract file not found: ${baseName}.sol`);
+      console.log(`No new contract files found with prefix: ${PREPEND}`);
     }
   } catch (error) {
     console.error(
@@ -162,6 +209,20 @@ async function generateForFile(filename: string) {
   );
   console.log(`   • XES output directory: ${xesOutputDir}`);
   console.log(`   • Contract output directory: ${contractOutputDir}`);
+
+  if (generatedXesFiles.length > 0) {
+    console.log(`   • Generated XES files: ${generatedXesFiles.join(", ")}`);
+  }
+  if (generatedSolFiles.length > 0) {
+    console.log(
+      `   • Generated contract files: ${generatedSolFiles.join(", ")}`,
+    );
+  }
+  if (generatedJsonFiles.length > 0) {
+    console.log(
+      `   • Generated encoding files: ${generatedJsonFiles.join(", ")}`,
+    );
+  }
 
   return xesSuccess || contractSuccess;
 }

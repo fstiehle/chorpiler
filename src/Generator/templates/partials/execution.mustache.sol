@@ -3,7 +3,7 @@
 uint _tokenState = tokenState;
 {{/isInstanced}}
 {{#isInstanced}}
-uint _tokenState = processData[instance].tokenState;
+uint _tokenState = processData[instanceID].tokenState;
 {{/isInstanced}}
 {{/hasSubProcesses}}
 {{#hasSubProcesses}}
@@ -11,7 +11,7 @@ uint _tokenState = processData[instance].tokenState;
 uint _tokenState = tokenState[{{id}}];
 {{/isInstanced}}
 {{#isInstanced}}
-uint _tokenState = processData[instance].tokenState[{{id}}];
+uint _tokenState = processData[instanceID].tokenState[{{id}}];
 {{/isInstanced}}
 {{/hasSubProcesses}}
 
@@ -51,7 +51,7 @@ while(_tokenState != 0) {
 tokenState = _tokenState;
 {{/isInstanced}}
 {{#isInstanced}}
-processData[instance].tokenState = _tokenState;;
+processData[instanceID].tokenState = _tokenState;
 {{/isInstanced}}
 {{/hasSubProcesses}}
 {{#hasSubProcesses}}
@@ -59,7 +59,7 @@ processData[instance].tokenState = _tokenState;;
 tokenState[{{id}}] = _tokenState;
 {{/isInstanced}}
 {{#isInstanced}}
-processData[instance].tokenState[{{id}}] = _tokenState;;
+processData[instanceID].tokenState[{{id}}] = _tokenState;
 {{/isInstanced}}
 {{/hasSubProcesses}}
 {{#options.debug}}

@@ -70,12 +70,19 @@ export abstract class TemplateEngine implements ITemplateEngine {
     const encoder = new INetEncoder();
     const gen = encoder.generate(iNet, options, this.isInstanced);
     gen.caseVariables = this.caseVariables;
-    gen.addressList = this.addressList;
 
-    if (gen.callList.size != gen.addressList.size) {
+    if (gen.callList.size != this.addressList.size) {
       throw new Error(
         "Some call contracts have not been assigned addresses, use addCallAddress(callID: string, address: string).",
       );
+    }
+
+    // add the address of each callAddresses to the Call class in callList, match them based on the key of the map
+    for (const [callID, address] of this.addressList.entries()) {
+      const call = gen.callList.get(callID);
+      if (call) {
+        call.address = address;
+      }
     }
 
     return {

@@ -12,16 +12,16 @@ contract Pizza is IProcessExecution {
   uint private tokenState = 1;
   address[3] public participants;
   event Task(uint id);
-  bool public items = false;
 
-  constructor(
-    address[3] memory _participants
-  ) {
-    participants = _participants;
-  }
+  // Case Variable items
+  bool public items = false;
 
   function setItems(bool _items) external {
     items = _items;
+  }
+
+  constructor(address[3] memory _participants) {
+    participants = _participants;
   }
 
   function getTokenState() external view returns (uint) {

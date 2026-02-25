@@ -9,16 +9,16 @@ interface IProcessExecution {
 contract sid_db1fe3a1_1292_420f_821e_b98779a2caed is IProcessExecution {
   uint private tokenState = 1;
   address[4] public participants;
-  uint public conditions;
 
-  constructor(
-    address[4] memory _participants
-  ) {
-    participants = _participants;
-  }
+  // Case Variable conditions
+  uint public conditions;
 
   function setConditions(uint _conditions) external {
     conditions = _conditions;
+  }
+
+  constructor(address[4] memory _participants) {
+    participants = _participants;
   }
 
   function getTokenState() external view returns (uint) {

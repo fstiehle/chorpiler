@@ -12,16 +12,16 @@ contract RentalAgreement is IProcessExecution {
   uint private tokenState = 1;
   address[3] public participants;
   event Task(uint id);
-  uint public conditions;
 
-  constructor(
-    address[3] memory _participants
-  ) {
-    participants = _participants;
-  }
+  // Case Variable conditions
+  uint public conditions;
 
   function setConditions(uint _conditions) external {
     conditions = _conditions;
+  }
+
+  constructor(address[3] memory _participants) {
+    participants = _participants;
   }
 
   function getTokenState() external view returns (uint) {

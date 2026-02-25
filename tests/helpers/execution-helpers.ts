@@ -164,7 +164,7 @@ export async function prepareContracts(
     .filter((dirent) => dirent.isFile() && dirent.name.endsWith(".sol"))
     .map((dirent) => dirent.name.replace(".sol", ""));
 
-  const contracts: ContractData[] = [];
+  const contracts: Map<string, ContractData> = new Map();
   for (const contractName of contractNames) {
     const encoding = TriggerEncoding.fromJSON(
       JSON.parse(
@@ -201,7 +201,7 @@ export async function prepareContracts(
     }
 
     const contract: any | undefined = undefined;
-    contracts.push({
+    contracts.set(contractName, {
       contractName,
       contract,
       encoding,

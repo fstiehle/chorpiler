@@ -4,7 +4,7 @@
 _tokenState &= ~uint({{{consume}}});
 {{#outTo}}
 {{#isSub}}
-tokenState[{{outTo.id}}] = 1;
+tokenState[{{outTo.call.id}}] = 1;
 {{/isSub}}
 {{#isCall}}
 {{{callString}}}

@@ -277,54 +277,47 @@ export class INetEncoder {
           );
         const subEncoded = this.encodeParticipants(calledNet.participants);
 
-        let callID = this.mainEncoded.callList.get(call.targetID);
-        if (callID == undefined) {
-          // set new callID to highest existing ID + 1
-          callID = this.mainEncoded.callList.size + 1;
-          this.mainEncoded.callList.set(call.targetID, callID);
+        let newCall = this.mainEncoded.callList.get(call.targetID);
+        if (newCall == undefined) {
+          // set new callID to highest existing ID
+          const callID = this.mainEncoded.callList.size;
+
+          // map main participants to called choreography
+          const mapping = call.participantsMapping;
+          const pars = new Array<Encoding.Participant>();
+          for (const [main, sub] of mapping!.entries()) {
+            const subPar = subEncoded.get(sub)!;
+            if (!subPar) {
+              throw new Error(
+                `Participant Mapping Error (Call ID: ${subTransition.id}): Sub participant '${sub}' not found in called choreography`,
+              );
+            }
+            const mainParticipant = this.mainEncoded.participants.get(main);
+            if (!mainParticipant) {
+              throw new Error(
+                `Participant Mapping Error (Call ID: ${subTransition.id}): Main participant '${main}' not found in calling choreography`,
+              );
+            }
+            pars[subPar.id] = mainParticipant;
+          }
+
+          if (pars.length != subEncoded.size)
+            throw new Error(
+              `Participant Mapping Error (Call ID: ${subTransition.id}): Not all participants are mapped`,
+            );
+
+          newCall = new Encoding.Call(call.targetID, callID, call.type, pars);
         }
 
-        // map main participants to called choreography
-        const mapping = call.participantsMapping;
-        const pars = new Array<Encoding.Participant>();
-        for (const [main, sub] of mapping!.entries()) {
-          const subPar = subEncoded.get(sub)!;
-          if (!subPar) {
-            throw new Error(
-              `Participant Mapping Error (Call ID: ${subTransition.id}): Sub participant '${sub}' not found in called choreography`,
-            );
-          }
-          const mainParticipant = this.mainEncoded.participants.get(main);
-          if (!mainParticipant) {
-            throw new Error(
-              `Participant Mapping Error (Call ID: ${subTransition.id}): Main participant '${main}' not found in calling choreography`,
-            );
-          }
-          pars[subPar.id] = mainParticipant;
-        }
-
-        if (pars.length != subEncoded.size)
-          throw new Error(
-            `Participant Mapping Error (Call ID: ${subTransition.id}): Not all participants are mapped`,
-          );
+        this.mainEncoded.callList.set(call.targetID, newCall);
 
         const encodedTransition = encoded.transitions.get(subTransition.id)!;
-        encodedTransition.outTo = new Encoding.Call(
-          call.targetID,
-          callID,
-          call.type,
-          pars,
-        );
+        encodedTransition.outTo = newCall;
         const inTrans = []; // leaving sub to go back to parent
         for (const inPlace of subTransition.target) {
           for (const inT of inPlace.target) {
             const encodedTransition = encoded.transitions.get(inT.id)!;
-            encodedTransition.inFrom = new Encoding.Call(
-              call.targetID,
-              callID,
-              call.type,
-              pars,
-            );
+            encodedTransition.inFrom = newCall;
             inTrans.push(inT);
           }
         }

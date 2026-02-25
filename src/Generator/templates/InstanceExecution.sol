@@ -18,8 +18,8 @@ interface IInstanceExecution {
     {{{expression}}}
     {{/caseVariables}}
   }
-  function enact(uint instance, uint id) external;
-  function getTokenState(uint instance) external view returns (uint);
+  function enact(uint instanceID, uint id) external;
+  function getTokenState(uint instanceID) external view returns (uint);
   function instance(address[{{{numberOfParticipants}}}] memory participants) external returns (uint);
 }
 
@@ -28,19 +28,20 @@ interface IInstanceExecution {
 {{> callcontract}}
 
 {{/addressList}}
+
 {{/hasCalls}}
 contract {{{modelID}}} is IInstanceExecution {
   mapping(uint => IInstanceExecution.ProcessData) public processData;
   uint private nextId = 0;
   {{#hasCalls}}
-  address[{{{numberOfCalls}}}] private callList;
+  address[{{{numberOfCalls}}}] private instanceList;
   {{/hasCalls}}
   {{#options.events}}
   event Task(uint id);
   {{/options.events}}
 
   {{#caseVariables}}
-    {{> casevariable}}
+  {{> casevariable}}
 
   {{/caseVariables}}
   function instance(address[{{{numberOfParticipants}}}] memory _participants) external returns (uint) {
@@ -48,30 +49,30 @@ contract {{{modelID}}} is IInstanceExecution {
     processData[newId] = IInstanceExecution.ProcessData({
       participants: _participants,
       {{^hasSubProcesses}}
-      tokenState: 1;
+      tokenState: 1
       {{/hasSubProcesses}}
       {{#hasSubProcesses}}
-      tokenState[0]: 1;
+      tokenState[0]: 1
       {{/hasSubProcesses}}
     });
     return newId;
   }
 
-  function getTokenState(uint instance) external view returns (uint) {
+  function getTokenState(uint instanceID) external view returns (uint) {
     {{^hasSubProcesses}}
-    return processData[instance].tokenState;
+    return processData[instanceID].tokenState;
     {{/hasSubProcesses}}
     {{#hasSubProcesses}}
-    return processData[instance].tokenState[0];
+    return processData[instanceID].tokenState[0];
     {{/hasSubProcesses}}
   }
 
-  function enact(uint instance, uint id) external {
+  function enact(uint instanceID, uint id) external {
     {{> execution}}
   }
 
   {{#subProcesses}}
-  function {{modelID}}(uint instance, uint id) external {
+  function {{modelID}}(uint instanceID, uint id) external {
     {{> execution}}
   }
 

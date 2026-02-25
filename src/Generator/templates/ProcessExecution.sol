@@ -12,10 +12,11 @@ interface IInstanceExecution {
   function getTokenState(uint instance) external view returns (uint);
 }
 
-{{#addressList}}
+{{#callList}}
 {{> callcontract}}
 
-{{/addressList}}
+{{/callList}}
+
 {{/hasCalls}}
 interface IProcessExecution {
   function enact(uint id) external;
@@ -24,7 +25,7 @@ interface IProcessExecution {
 
 contract {{{modelID}}} is IProcessExecution {
   {{#hasCalls}}
-  uint[{{{numberOfCalls}}}] private callList; // instance
+  uint[{{{numberOfCalls}}}] private instanceList; // instance
   {{/hasCalls}}
   {{^hasSubProcesses}}
   uint private tokenState = 1;
@@ -38,7 +39,7 @@ contract {{{modelID}}} is IProcessExecution {
   {{/options.events}}
 
   {{#caseVariables}}
-    {{> casevariable}}
+  {{> casevariable}}
 
   {{/caseVariables}}
   constructor(address[{{{numberOfParticipants}}}] memory _participants) {

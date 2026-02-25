@@ -13,9 +13,7 @@ contract ChainedSubChoreo is IProcessExecution {
   address[3] public participants;
   event Task(uint id);
 
-  constructor(
-    address[3] memory _participants
-  ) {
+  constructor(address[3] memory _participants) {
     participants = _participants;
     tokenState[0] = 1;
   }

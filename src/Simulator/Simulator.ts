@@ -100,19 +100,24 @@ export class Simulator {
       try {
         const nets = await this.bpmnParser!.fromXML(model);
         const encoder = new INetEncoder();
-        const iNet = encoder.unfoldSubNets(nets[0]); // only support one model
-        iNet.id = prePend + iNet.id;
 
-        const traces = this.replay(iNet, options);
-        if (traces.length === 0) {
-          console.warn(`No traces generated for ${file}, skipping.`);
-          continue;
+        for (let i = 0; i < nets.length; i++) {
+          const iNet = encoder.unfoldSubNets(nets[i]);
+          iNet.id = prePend + iNet.id;
+
+          const traces = this.replay(iNet, options);
+          if (traces.length === 0) {
+            console.warn(
+              `No traces generated for ${file} (net ${i}), skipping.`,
+            );
+            continue;
+          }
+
+          const baseName = iNet.id;
+          this.writeLogFile(traces, baseName);
+
+          console.log(`Generated log (${baseName}) written to ${this.xesDir}`);
         }
-
-        const baseName = prePend + path.basename(file, ".bpmn");
-        this.writeLogFile(traces, baseName);
-
-        console.log(`Generated log (${baseName}) written to ${this.xesDir}`);
       } catch (error) {
         console.error(
           `Failed to generate log for ${file}: ${error instanceof Error ? error.message : String(error)}`,
@@ -135,30 +140,35 @@ export class Simulator {
 
       try {
         const nets = await this.bpmnParser!.fromXML(model);
-        const iNet = nets[0];
-        iNet.id = prePend + iNet.id;
-        const generator = new this.generatorType(iNet);
-        generator.addCaseVariable(
-          new CaseVariable(
-            "conditions",
-            "uint",
-            "uint public conditions;",
-            true,
-          ),
-        );
 
-        const contract = await this.compileContract(generator, options);
-        if (!contract) {
-          console.warn(`No contract generated for ${file}, skipping.`);
-          continue;
+        for (let i = 0; i < nets.length; i++) {
+          const iNet = nets[i];
+          iNet.id = prePend + iNet.id;
+          const generator = new this.generatorType(iNet);
+          generator.addCaseVariable(
+            new CaseVariable(
+              "conditions",
+              "uint",
+              "uint public conditions;",
+              true,
+            ),
+          );
+
+          const contract = await this.compileContract(generator, options);
+          if (!contract) {
+            console.warn(
+              `No contract generated for ${file} (net ${i}), skipping.`,
+            );
+            continue;
+          }
+
+          const baseName = iNet.id;
+          this.writeContractFiles(contract, baseName);
+
+          console.log(
+            `Generated contract (${baseName}) written to ${this.contractDir}`,
+          );
         }
-
-        const baseName = prePend + path.basename(file, ".bpmn");
-        this.writeContractFiles(contract, baseName);
-
-        console.log(
-          `Generated contract (${baseName}) written to ${this.contractDir}`,
-        );
       } catch (error) {
         console.error(
           `Failed to generate contract for ${file}: ${error instanceof Error ? error.message : String(error)}`,

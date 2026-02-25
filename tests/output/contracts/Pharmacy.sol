@@ -13,9 +13,7 @@ contract Pharmacy is IProcessExecution {
   address[5] public participants;
   event Task(uint id);
 
-  constructor(
-    address[5] memory _participants
-  ) {
+  constructor(address[5] memory _participants) {
     participants = _participants;
   }
 

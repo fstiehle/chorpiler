@@ -12,14 +12,10 @@ import { TemplateEngine } from "../src/Generator/TemplateEngine.js";
 import { INetFastXMLParser } from "../src/Parser/FastXMLParser.js";
 import { INetParser } from "../src/Parser/Parser.js";
 import { BPMN_PATH, CONTRACTS_PATH } from "./config.js";
+import { compileBpmn } from "./helpers/compiler-helpers.js";
 
 const readFile = util.promisify(fs.readFile);
 const writeFile = util.promisify(fs.writeFile);
-
-interface AddressEntry {
-  callID: string;
-  address: string;
-}
 
 describe("Generation of edge cases", () => {
   let parser: INetParser;
@@ -64,103 +60,9 @@ describe("Generation of edge cases", () => {
   });
 
   describe("Parse and compile cases", () => {
-    const compileCase = async (
-      generator: TemplateEngine,
-      unfold: boolean = true,
-      isStateChannel: boolean = false,
-    ) => {
-      const output = await generator.compile({
-        unfoldSubNets: unfold,
-        events: true,
-        debug: true,
-      });
-
-      let directory = CONTRACTS_PATH;
-      if (
-        (output.encoding.calls && output.encoding.calls.size > 0) ||
-        output.encoding.isCalled
-      ) {
-        directory = path.join(directory, "callchoreos");
-      }
-
-      const solFilePath = path.join(directory, `${generator.iNet.id}.sol`);
-      const jsonFilePath = path.join(directory, `${generator.iNet.id}.json`);
-
-      // Write the contract file
-      await writeFile(solFilePath, output.target, { flag: "w+" });
-
-      // Write the encoding file
-      await writeFile(
-        jsonFilePath,
-        JSON.stringify(TriggerEncoding.toJSON(output.encoding)),
-        { flag: "w+" },
-      );
-
-      // Verify the files were created
-      assert.ok(
-        fs.existsSync(solFilePath),
-        `${generator.iNet.id} contract file should be created`,
-      );
-      assert.ok(
-        fs.existsSync(jsonFilePath),
-        `${generator.iNet.id} encoding file should be created`,
-      );
-
-      return output;
-    };
-
-    const compileBpmn = async (
-      name: string,
-      caseVariables?: CaseVariable[],
-      addressList?: AddressEntry[],
-      unfold: boolean = true,
-      isStateChannel: boolean = false,
-    ) => {
-      const data = await readFile(path.join(BPMN_PATH, `${name}.bpmn`));
-      const iNets = await parser.fromXML(data);
-
-      const results = [];
-      for (const iNet of iNets) {
-        let generator;
-        if (isStateChannel) {
-          generator = new SolStateChannelContractGenerator(iNet);
-        } else if (iNet.isCalled) {
-          generator = new SolInstanceGenerator(iNet);
-        } else {
-          generator = new SolDefaultContractGenerator(iNet);
-        }
-
-        // Add case variables if provided
-        if (caseVariables && generator instanceof SolDefaultContractGenerator) {
-          caseVariables.forEach((variable) =>
-            generator.addCaseVariable(variable),
-          );
-        }
-
-        // Add call addresses if provided
-        if (addressList) {
-          addressList.forEach((entry) => {
-            try {
-              generator.addCallAddress(entry.callID, entry.address);
-            } catch (error) {
-              if (
-                !(error instanceof Error) ||
-                !error.message.includes("does not exist in the InteractionNet")
-              )
-                throw error;
-            }
-          });
-        }
-
-        const result = await compileCase(generator, unfold, isStateChannel);
-        results.push(result);
-      }
-
-      return results;
-    };
-
     it("XOR-AND case to Sol Contract", async () => {
       await compileBpmn(
+        parser,
         "xor-and",
         [new CaseVariable("items", "bool", "bool public items = false;", true)],
         [],
@@ -168,23 +70,24 @@ describe("Generation of edge cases", () => {
     });
 
     it("Pharmacy (out of order xml file) case to Sol Contract", async () => {
-      await compileBpmn("out-of-order-xml", [], []);
+      await compileBpmn(parser, "out-of-order-xml", [], []);
     });
 
     it.skip("Pharmacy case to State Channel Root", async () => {
-      await compileBpmn("out-of-order-xml", [], [], false, true);
+      await compileBpmn(parser, "out-of-order-xml", [], [], false, true);
     });
 
     it("Supply chain case to Sol Contract", async () => {
-      await compileBpmn("supply-chain", [], []);
+      await compileBpmn(parser, "supply-chain", [], []);
     });
 
     it.skip("Supply chain case to State Channel Root", async () => {
-      await compileBpmn("supply-chain", [], [], false, true);
+      await compileBpmn(parser, "supply-chain", [], [], false, true);
     });
 
     it("Incident Management case to Sol Contract", async () => {
       await compileBpmn(
+        parser,
         "incident-management",
         [
           new CaseVariable(
@@ -199,11 +102,12 @@ describe("Generation of edge cases", () => {
     });
 
     it.skip("Incident Management case to State Channel Root", async () => {
-      await compileBpmn("incident-management", [], [], false, true);
+      await compileBpmn(parser, "incident-management", [], [], false, true);
     });
 
     it("Rental Agreement case to Sol Contract", async () => {
       await compileBpmn(
+        parser,
         "rental-agreement",
         [
           new CaseVariable(
@@ -219,6 +123,7 @@ describe("Generation of edge cases", () => {
 
     it("Pizza case to Sol Contract", async () => {
       await compileBpmn(
+        parser,
         "pizza",
         [new CaseVariable("items", "bool", "bool public items = false;", true)],
         [],
@@ -227,6 +132,7 @@ describe("Generation of edge cases", () => {
 
     it("Don't unfold Rental Agreement case to Sol Contract", async () => {
       await compileBpmn(
+        parser,
         "unfold-rental-agreement",
         [
           new CaseVariable(
@@ -242,21 +148,22 @@ describe("Generation of edge cases", () => {
     });
 
     it("Don't unfold Sub Choreo case to Sol Contract", async () => {
-      await compileBpmn("sub-choreo", [], [], false);
+      await compileBpmn(parser, "sub-choreo", [], [], false);
     });
 
     it("Don't unfold Sub Choreo case to Sol Contract", async () => {
-      await compileBpmn("sub-choreo-chained", [], [], false);
+      await compileBpmn(parser, "sub-choreo-chained", [], [], false);
     });
 
-    it.only("Call choreograhy to Sol Contract", async () => {
+    it("Call choreography to Sol Contract", async () => {
       const results = await compileBpmn(
+        parser,
         "call-choreo",
         [],
         [
           {
             callID: "Choreography_0betnp1",
-            address: "0x1234567890123456789012345678901234567890",
+            address: undefined,
           },
         ],
         false,
@@ -265,12 +172,11 @@ describe("Generation of edge cases", () => {
       // Read and verify Choreography_0betnp1.json
       const choreography0betnp1Path = path.join(
         CONTRACTS_PATH,
-        "callchoreos",
         "Choreography_0betnp1.json",
       );
       assert.ok(
         fs.existsSync(choreography0betnp1Path),
-        "Choreography_0betnp1.json should exist in the callchoreos folder",
+        "Choreography_0betnp1.json should exist",
       );
 
       const choreography0betnp1Data = JSON.parse(
@@ -288,15 +194,8 @@ describe("Generation of edge cases", () => {
       );
 
       // Read and verify CallChoreo.json
-      const callChoreoPath = path.join(
-        CONTRACTS_PATH,
-        "callchoreos",
-        "CallChoreo.json",
-      );
-      assert.ok(
-        fs.existsSync(callChoreoPath),
-        "CallChoreo.json should exist in the callchoreos folder",
-      );
+      const callChoreoPath = path.join(CONTRACTS_PATH, "CallChoreo.json");
+      assert.ok(fs.existsSync(callChoreoPath), "CallChoreo.json should exist");
 
       const callChoreoData = JSON.parse(
         fs.readFileSync(callChoreoPath, "utf8"),
