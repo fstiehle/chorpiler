@@ -17,7 +17,10 @@ export class TriggerEncoding implements IFromEncoding {
     public tasks: Map<string, Task> = new Map(),
     public participants: Map<string, number> = new Map(),
     public states: Map<string, number> = new Map(),
-    public calls: Map<string, number> = new Map(),
+    public calls: Map<
+      string,
+      { id: number; participants: Map<number, string> }
+    > = new Map(),
     public subModels: Map<number, SubModel> = new Map(),
   ) {}
 
@@ -90,7 +93,18 @@ export class TriggerEncoding implements IFromEncoding {
       participants,
       states,
       new Map(
-        Array.from(encoding.callList.entries()).map(([key, c]) => [key, c.id]),
+        Array.from(encoding.callList.entries()).map(([key, c]) => [
+          key,
+          {
+            id: c.id,
+            participants: new Map(
+              c.participants!.map((participant, index) => [
+                index,
+                participant.modelID,
+              ]),
+            ),
+          },
+        ]),
       ),
       subModels,
     );
@@ -129,7 +143,15 @@ export class TriggerEncoding implements IFromEncoding {
       ),
       participants: Object.fromEntries(encoding.participants),
       states: Object.fromEntries(encoding.states),
-      calls: Object.fromEntries(encoding.calls),
+      calls: Object.fromEntries(
+        Array.from(encoding.calls.entries()).map(([key, call]) => [
+          key,
+          {
+            id: call.id,
+            participants: Object.fromEntries(call.participants),
+          },
+        ]),
+      ),
       subModels: Object.fromEntries(
         Array.from(encoding.subModels.entries()).map(
           ([processID, subModel]) => [
@@ -154,7 +176,9 @@ export class TriggerEncoding implements IFromEncoding {
       [modelID: string]: { id: number; initiator: number; processID: number };
     };
     participants: { [k: string]: number };
-    calls?: { [k: string]: number };
+    calls?: {
+      [k: string]: { id: number; participants: { [k: string]: string } };
+    };
     states?: { [k: string]: number };
     subModels: {
       [processID: string]: {
@@ -181,7 +205,17 @@ export class TriggerEncoding implements IFromEncoding {
             Object.entries(object.states).map(([key, value]) => [key, value]),
           )
         : new Map(),
-      object.calls ? new Map(Object.entries(object.calls)) : new Map(),
+      object.calls
+        ? new Map(
+            Object.entries(object.calls).map(([key, call]) => [
+              key,
+              {
+                id: call.id,
+                participants: new Map(Object.entries(call.participants || {})),
+              },
+            ]),
+          )
+        : new Map(),
       new Map(
         Object.entries(object.subModels).map(([processID, subModel]) => [
           Number(processID),
