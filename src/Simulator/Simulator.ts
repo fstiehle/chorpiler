@@ -10,7 +10,13 @@ import { TriggerEncoding } from "../Generator/Encoding/TriggerEncoding.js";
 import { GeneratorConstructor } from "../Generator/Generator.js";
 import SolDefaultContractGenerator from "../Generator/target/Sol/DefaultGenerator.js";
 import { TemplateEngine } from "../Generator/TemplateEngine.js";
-import { Guard, Place, TaskLabel, Transition } from "../Parser/Element.js";
+import {
+  Guard,
+  LabelType,
+  Place,
+  TaskLabel,
+  Transition,
+} from "../Parser/Element.js";
 import { INetFastXMLParser } from "../Parser/FastXMLParser.js";
 import { INetParser } from "../Parser/Parser.js";
 import {
@@ -259,7 +265,7 @@ export class Simulator {
             "Instance Data Change",
             "Instance Data Change",
             [...iNet.participants.values()][0]!.id,
-            "",
+            [],
             [new InstanceDataChange(conditionName, conditionID)],
           ),
         );
@@ -302,6 +308,7 @@ export class Simulator {
             transitionCandidate.label.name,
             transitionCandidate.id,
             transitionCandidate.label.sender.id,
+            transitionCandidate.calls.flatMap((c) => c.targetID),
           ),
         );
       }

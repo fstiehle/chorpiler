@@ -24,6 +24,7 @@ contract Choreography_0betnp1 is IInstanceExecution {
       participants: _participants,
       tokenState: 1
     });
+    nextId = newId + 1;
     return newId;
   }
 

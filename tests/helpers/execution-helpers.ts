@@ -33,6 +33,7 @@ export interface EventProcessingContext {
   contract: any;
   encoding: TriggerEncoding;
   networkHelpers: NetworkHelpers<"generic">;
+  instance?: number;
 }
 
 export interface EventProcessingHooks {
@@ -87,6 +88,7 @@ export async function processEvent(
       contract,
       "enact",
       0,
+      context.instance,
     );
     return { success: false };
   }
@@ -121,6 +123,7 @@ export async function processEvent(
     client,
     contract,
     hasSubChoreos(encoding) ? task.processID : null,
+    context.instance,
   );
   debugLog(
     `Trying to enact task: ${event.name} (Task ID: ${task.encoding}, Process ID: ${task.processID}), Pre-state: ${preTokenState}`,
@@ -136,12 +139,14 @@ export async function processEvent(
     contract,
     functionName,
     task.encoding,
+    context.instance,
   );
 
   const postTokenState = await getTokenState(
     client,
     contract,
     hasSubChoreos(encoding) ? task.processID : null,
+    context.instance,
   );
   debugLog(`Post-state: ${postTokenState} (changed from ${preTokenState})`);
 
@@ -218,12 +223,16 @@ export async function getTokenState(
   client: PublicClient,
   contract: any,
   processID: number | null,
+  instanceID?: number,
 ) {
+  const args = instanceID !== undefined ? [instanceID] : [];
+
   if (processID != null) {
     const val = await client.readContract({
       address: contract.address,
       abi: contract.abi,
       functionName: "getTokenState",
+      args,
       // args: [processID], could be used in the future, if sub chore state is made accessible
     });
     return Number(val);
@@ -232,6 +241,7 @@ export async function getTokenState(
       address: contract.address,
       abi: contract.abi,
       functionName: "getTokenState",
+      args,
     });
     return Number(val);
   }
@@ -243,12 +253,15 @@ export async function enact(
   contract: any,
   functionName: string,
   taskID: number,
+  instanceID?: number,
 ) {
+  const args = instanceID !== undefined ? [instanceID, taskID] : [taskID];
+
   const { request } = await client.simulateContract({
     address: contract.address,
     abi: contract.abi,
     functionName,
-    args: [taskID],
+    args,
     account: wallet.account,
   });
 

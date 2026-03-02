@@ -13,6 +13,7 @@ import {
   TaskType,
   Call,
   CallType,
+  CallLabel,
 } from "./Element.js";
 import { INetParser } from "./Parser.js";
 import { deleteFromArray } from "../util/helpers.js";
@@ -113,7 +114,10 @@ export class INetFastXMLParser implements INetParser {
 
         // translate sub choreography task
         const subTransition = this.addTransition(
-          new Transition(callNetID, new Label(LabelType.CallChoreography)),
+          new Transition(
+            callNetID,
+            new CallLabel(`Call ${callNetID}`, callNetID),
+          ),
         );
         const callingId = this.iNet.id; // Current choreography ID
         const calls = this.callList.get(callingId);

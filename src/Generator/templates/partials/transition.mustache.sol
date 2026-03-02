@@ -8,6 +8,9 @@ tokenState[{{outTo.call.id}}] = 1;
 {{/isSub}}
 {{#isCall}}
 {{{callString}}}
+{{#options.events}}
+emit NewInstance({{{outTo.call.id}}}, instanceList[{{{outTo.call.id}}}]);
+{{/options.events}}
 {{/isCall}}
 {{/outTo}}
 {{#produce}}

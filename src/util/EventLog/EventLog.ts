@@ -33,18 +33,18 @@ export class EventLog implements IterableIterator<Trace> {
 }
 
 export class Event {
-  public target: string | null = null;
+  public targets: string[] | null = null;
   public dataChange: InstanceDataChange[] | null = null;
 
   constructor(
     public name: string,
     public id: string,
     public source: string,
-    _target?: string,
+    _targets?: string[],
     _dataChange?: InstanceDataChange[],
   ) {
     if (_dataChange) this.dataChange = _dataChange;
-    if (_target) this.target = _target;
+    if (_targets) this.targets = _targets;
   }
 }
 

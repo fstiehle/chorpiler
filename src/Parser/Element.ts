@@ -83,6 +83,16 @@ export class TaskLabel extends EventLabel {
   }
 }
 
+export class CallLabel extends Label {
+  constructor(
+    public name: string,
+    public targetID: string,
+    public taskType: TaskType = TaskType.CallChoreography,
+  ) {
+    super(LabelType.CallChoreography);
+  }
+}
+
 // TODO: LabelTypes might be Reduntant?
 // Below cannot be relied upon anyway, as these could get reduced,
 // Task is its own class anyway, maybe LabelType Manual or Silent is enough

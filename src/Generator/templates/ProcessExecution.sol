@@ -26,6 +26,7 @@ interface IProcessExecution {
 contract {{{modelID}}} is IProcessExecution {
   {{#hasCalls}}
   uint[{{{numberOfCalls}}}] private instanceList; // instance
+  event NewInstance(uint id, uint instanceID);
   {{/hasCalls}}
   {{^hasSubProcesses}}
   uint private tokenState = 1;

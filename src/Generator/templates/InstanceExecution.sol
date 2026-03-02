@@ -55,6 +55,7 @@ contract {{{modelID}}} is IInstanceExecution {
       tokenState[0]: 1
       {{/hasSubProcesses}}
     });
+    nextId = newId + 1;
     return newId;
   }
 

@@ -220,7 +220,10 @@ describe.only("Call Choreography Tests", () => {
             const checksummedAddress = getAddress(
               callContract.contract.address,
             );
-            const placeholder = `${callContractName}(0x0000000000000000000000000000000000000000)`;
+            const placeholder = new RegExp(
+              `${callContractName}\\s*\\(\\s*0x0000000000000000000000000000000000000000\\s*\\)`,
+              "g",
+            );
             const replacement = `${callContractName}(${checksummedAddress})`;
             updatedSolContent = updatedSolContent.replace(
               placeholder,
@@ -295,41 +298,115 @@ describe.only("Call Choreography Tests", () => {
           // make a NOOP call to confirm deployment and to trigger any automated decisions
           // NOTE: this is to account for models implementing anti-patterns,
           // automated decisions pre task execution should be moved into the constructor.
-          await enact(client, wallets[0], contract, "enact", 0);
+          await enact(client, wallets[0], updatedContract, "enact", 0);
 
-          const context: EventProcessingContext = {
+          const ccontext: EventProcessingContext = {
             client,
             wallets,
-            contract,
+            contract: updatedContract,
             encoding,
             networkHelpers,
           };
 
           for (const event of trace) {
-            const result = await processEvent(event, context, {
-              afterAssert: async (event, context, result) => {
+            const result = await processEvent(event, ccontext, {
+              afterAssert: async (event, ccontext, result) => {
                 // Conforming trace specific assertions
-                assert(
-                  result.receipt != undefined &&
-                    result.receipt.logs.length == 1,
-                );
-                const emit: any = decodeEventLog({
-                  abi: context.contract.abi,
-                  data: result.receipt.logs[0].data,
-                  topics: result.receipt.logs[0].topics,
-                });
-                assert(
-                  emit.eventName == "Task" &&
-                    Number(emit.args.id) ==
-                      context.encoding.tasks.get(event.id)!.encoding,
-                );
+                assert(result.receipt != undefined);
+
+                let taskEventFound = false;
+
+                for (const log of result.receipt.logs) {
+                  const emit: any = decodeEventLog({
+                    abi: ccontext.contract.abi,
+                    data: log.data,
+                    topics: log.topics,
+                  });
+
+                  if (emit.eventName == "Task") {
+                    assert(
+                      Number(emit.args.id) ==
+                        ccontext.encoding.tasks.get(event.id)!.encoding,
+                    );
+                    taskEventFound = true;
+                  } else if (emit.eventName == "NewInstance") {
+                    console.log("NewInstance event detected:", emit);
+                    const id = Number(emit.args.id);
+                    const instance = Number(emit.args.instanceID);
+
+                    // Find the contract name by looking up the ID in encoding.calls
+                    let contractName: string | undefined;
+                    for (const [name, callInfo] of ccontext.encoding.calls) {
+                      if (callInfo.id === id) {
+                        contractName = name;
+                        break;
+                      }
+                    }
+
+                    if (contractName) {
+                      console.log(
+                        `Found contract name for NewInstance: ${contractName}`,
+                      );
+
+                      // Get the contract data from the outer context
+                      const contractData = context.get(contractName);
+                      if (contractData) {
+                        console.log(
+                          `Starting replay of ${contractName} log with ${contractData.log.traces.length} traces`,
+                        );
+
+                        // Replay the contract's log until the end
+                        for (const trace of contractData.log.traces) {
+                          console.log(
+                            `Replaying trace with ${trace.events.length} events for ${contractName}`,
+                          );
+
+                          const instanceContext: EventProcessingContext = {
+                            client: ccontext.client,
+                            wallets: contractData.wallets, // TODO
+                            contract: contractData.contract,
+                            instance,
+                            encoding: contractData.encoding,
+                            networkHelpers: ccontext.networkHelpers,
+                          };
+
+                          for (const instanceEvent of trace) {
+                            try {
+                              await processEvent(
+                                instanceEvent,
+                                instanceContext,
+                              );
+                            } catch (error) {
+                              console.warn(
+                                `Error replaying event ${instanceEvent.name} in ${contractName}:`,
+                                error,
+                              );
+                            }
+                          }
+                        }
+
+                        console.log(`Completed replay of ${contractName} log`);
+                      } else {
+                        console.warn(
+                          `Contract data not found for: ${contractName}`,
+                        );
+                      }
+                    } else {
+                      console.warn(
+                        `Contract name not found for NewInstance ID: ${id}`,
+                      );
+                    }
+                  }
+                }
+
+                assert(taskEventFound, "Task event not found in logs");
               },
             });
           }
           assert.equal(
             await getTokenState(
               client,
-              contract,
+              updatedContract,
               hasSubChoreos(encoding) ? 0 : null,
             ),
             0,
@@ -339,7 +416,7 @@ describe.only("Call Choreography Tests", () => {
           if (hasSubChoreos(encoding)) {
             for (const [processID, subModel] of encoding.subModels) {
               assert.equal(
-                await getTokenState(client, contract, processID),
+                await getTokenState(client, updatedContract, processID),
                 0,
                 `subModel ${subModel.modelID} (processID: ${processID}) tokenState not 0!`,
               );
