@@ -16,6 +16,7 @@ Chorpiler has additional tools that help with testing and interacting with such 
 | Events             | Start, End |
 | Gateways           | XOR, EVENT, AND |
 | Sub-Choreographies           | ✔ |
+| Case Variables  | ✔          |
 | Looping behaviour  | ✔          |
 | Uncontrolled flow merge  | ✔          |
 
