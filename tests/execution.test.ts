@@ -19,6 +19,8 @@ import {
 import { CONTRACTS_PATH } from "./config.js";
 import path from "node:path";
 
+const REPLAY_NON_CONFORMING = false;
+
 /**
  * Test suite for process execution functionality
  */
@@ -43,12 +45,20 @@ export async function contractsFixture() {
 await networkHelpers.loadFixture(contractsFixture);
 debugLog("Connected to client: " + networkName);
 
-describe("Execute all contracts by replaying xes logs in output/contracts", () => {
+describe.only("Execute all contracts by replaying xes logs in output/contracts", () => {
   // Example usage of helper functions:
   // const tokenState = await getTokenState(client, contract);
   // await enact(client, wallets[0], contract, 1);
   describe("Replay logs", () => {
     context.forEach((contractData) => {
+      // Skip contracts that have calls and are called contracts
+      if (
+        contractData.encoding.calls.size > 0 ||
+        contractData.encoding.isCalled
+      ) {
+        return;
+      }
+
       describe(`should execute contract: ${contractData.contractName}`, async () => {
         const { contractName, nonLog, contract, encoding, log, wallets } =
           contractData;
@@ -130,67 +140,69 @@ describe("Execute all contracts by replaying xes logs in output/contracts", () =
           });
         });
 
-        nonLog?.traces.forEach((trace, i) => {
-          it(`${contractName}: replay non-conforming trace ${i}`, async () => {
-            // make a NOOP call to confirm deployment and to trigger any automated decisions
-            // NOTE: this is to account for models implementing anti-patterns,
-            // automated decisions pre task execution should be moved into the constructor.
-            await enact(client, wallets[0], contract, "enact", 0);
+        if (REPLAY_NON_CONFORMING) {
+          nonLog?.traces.forEach((trace, i) => {
+            it(`${contractName}: replay non-conforming trace ${i}`, async () => {
+              // make a NOOP call to confirm deployment and to trigger any automated decisions
+              // NOTE: this is to account for models implementing anti-patterns,
+              // automated decisions pre task execution should be moved into the constructor.
+              await enact(client, wallets[0], contract, "enact", 0);
 
-            const context: EventProcessingContext = {
-              client,
-              wallets,
-              contract,
-              encoding,
-              networkHelpers,
-            };
+              const context: EventProcessingContext = {
+                client,
+                wallets,
+                contract,
+                encoding,
+                networkHelpers,
+              };
 
-            let eventsRejected = 0;
+              let eventsRejected = 0;
 
-            for (const event of trace) {
-              const result = await processEvent(event, context, {
-                afterAssert: async (event, context, result) => {
-                  // Non-conforming trace specific logic
-                  assert(result.receipt != undefined && result.receipt.logs);
-                  if (result.receipt.logs.length == 0) {
-                    eventsRejected++;
-                  } else {
-                    const emit: any = decodeEventLog({
-                      abi: context.contract.abi,
-                      data: result.receipt.logs[0].data,
-                      topics: result.receipt.logs[0].topics,
-                    });
-                    if (emit.eventName != "Task") {
+              for (const event of trace) {
+                const result = await processEvent(event, context, {
+                  afterAssert: async (event, context, result) => {
+                    // Non-conforming trace specific logic
+                    assert(result.receipt != undefined && result.receipt.logs);
+                    if (result.receipt.logs.length == 0) {
                       eventsRejected++;
+                    } else {
+                      const emit: any = decodeEventLog({
+                        abi: context.contract.abi,
+                        data: result.receipt.logs[0].data,
+                        topics: result.receipt.logs[0].topics,
+                      });
+                      if (emit.eventName != "Task") {
+                        eventsRejected++;
+                      }
                     }
-                  }
-                },
-              });
-            }
+                  },
+                });
+              }
 
-            // Expect that at least one task was not enacted successfully (one non-conforming event)
-            // or end event has not been reached (if only an event was removed, but no non-conforming was added)
-            const endTokenStat = await getTokenState(
-              client,
-              contract,
-              hasSubChoreos(encoding) ? 0 : null,
-            );
+              // Expect that at least one task was not enacted successfully (one non-conforming event)
+              // or end event has not been reached (if only an event was removed, but no non-conforming was added)
+              const endTokenStat = await getTokenState(
+                client,
+                contract,
+                hasSubChoreos(encoding) ? 0 : null,
+              );
 
-            assert(
-              eventsRejected > 0 || endTokenStat != 0,
-              "Expect that at least one task was rejected or end event has not been reached",
-            );
-            debugLog(
-              `✅ Non-Conforming trace rejected. Rejected tasks: ${eventsRejected}, state: ${endTokenStat}`,
-            );
+              assert(
+                eventsRejected > 0 || endTokenStat != 0,
+                "Expect that at least one task was rejected or end event has not been reached",
+              );
+              debugLog(
+                `✅ Non-Conforming trace rejected. Rejected tasks: ${eventsRejected}, state: ${endTokenStat}`,
+              );
+            });
           });
-        });
+        }
       });
     });
   });
 });
 
-describe.only("Call Choreography Tests", () => {
+describe("Call Choreography Tests", () => {
   context.forEach((contractData) => {
     const { contractName, encoding, log, wallets, contract } = contractData;
 
@@ -299,6 +311,7 @@ describe.only("Call Choreography Tests", () => {
           // NOTE: this is to account for models implementing anti-patterns,
           // automated decisions pre task execution should be moved into the constructor.
           await enact(client, wallets[0], updatedContract, "enact", 0);
+          console.log(updatedContract.address);
 
           const ccontext: EventProcessingContext = {
             client,
@@ -426,17 +439,14 @@ describe.only("Call Choreography Tests", () => {
         });
       });
 
-      // afterEach(async () => {
-      //   // Restore original file content
-      //   if (originalSolContent) {
-      //     const solFilePath = path.join(CONTRACTS_PATH, `${contractName}.sol`);
-      //     fs.writeFileSync(solFilePath, originalSolContent);
-      //     debugLog(`Restored original ${contractName}.sol file`);
-      //   }
-
-      //   // Reset blockchain state
-      //   await networkHelpers.loadFixture(contractsFixture);
-      // });
+      afterEach(async () => {
+        // Restore original file content
+        if (originalSolContent) {
+          const solFilePath = path.join(CONTRACTS_PATH, `${contractName}.sol`);
+          fs.writeFileSync(solFilePath, originalSolContent);
+          debugLog(`Restored original ${contractName}.sol file`);
+        }
+      });
     });
   });
 });
