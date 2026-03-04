@@ -5,11 +5,7 @@ import fs from "fs";
 import path from "path";
 import Mustache from "mustache";
 import { fileURLToPath } from "url";
-import {
-  Event,
-  EventLog,
-  InstanceDataChange,
-} from "../util/EventLog/EventLog.js";
+import { Event, EventLog } from "../util/EventLog/EventLog.js";
 import { Trace } from "../util/EventLog/Trace.js";
 import { TriggerEncoding } from "../Generator/Encoding/TriggerEncoding.js";
 
@@ -113,12 +109,9 @@ export class FuzzyLog {
             genEvents.splice(
               seedRandMax(genEvents.length),
               0,
-              new Event(
-                getEventNameForID(id),
-                id,
+              new Event(getEventNameForID(id), id, randomParticipantName(), [
                 randomParticipantName(),
-                randomParticipantName(),
-              ),
+              ]),
             );
             break;
           }
