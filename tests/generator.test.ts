@@ -155,6 +155,10 @@ describe("Generation of edge cases", () => {
       await compileBpmn(parser, "sub-choreo-chained", [], [], false);
     });
 
+    it.only("Messages case to Sol Contract", async () => {
+      await compileBpmn(parser, "messages", [], [], false);
+    });
+
     it("Call choreography to Sol Contract", async () => {
       const results = await compileBpmn(
         parser,

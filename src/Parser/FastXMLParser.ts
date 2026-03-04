@@ -7,6 +7,7 @@ import {
   Label,
   LabelType,
   TaskLabel,
+  TaskType,
 } from "../Parser/Elements/Label.js";
 import { Participant } from "../Parser/Elements/Participant.js";
 import { Place, PlaceType } from "../Parser/Elements/Place.js";
@@ -14,16 +15,20 @@ import { Transition } from "../Parser/Elements/Transition.js";
 import { deleteFromArray } from "../util/helpers.js";
 import { InteractionNet } from "./InteractionNet.js";
 import { INetParser } from "./Parser.js";
+import { Message } from "./Elements/Message.js";
 
 enum Elements {
   rootElements = "definitions",
   choreographies = "choreography",
+  messages = "message",
   subChoreographies = "subChoreography",
   callChoreographies = "callChoreography",
   participants = "participant",
   tasks = "choreographyTask",
   flows = "sequenceFlow",
+  messageFlow = "messageFlow",
   participantsRef = "participantRef",
+  messageFlowRef = "messageFlowRef",
   participantsMapping = "participantAssociation",
   startEvent = "startEvent",
   endEvent = "endEvent",
@@ -45,6 +50,7 @@ enum Properties {
   calledChor = "@_calledChoreographyRef",
   innerPar = "@_innerParticipantRef",
   outerPar = "@_outerParticipantRef",
+  message = "@_messageRef",
 }
 
 export class INetFastXMLParser implements INetParser {
@@ -59,7 +65,9 @@ export class INetFastXMLParser implements INetParser {
   private static INetTranslator = class {
     iNet = new InteractionNet();
     flows = new Map<string, { flow: any; place: Place | null }>();
+    messageFlows = new Map<string, { flow: any; message: Message | null }>();
     callList = new Map<string, string[]>();
+    messages = new Map<string, Message>();
 
     translate(choreography: any): InteractionNet {
       // need to parse participants first, so we can reference them
@@ -88,6 +96,7 @@ export class INetFastXMLParser implements INetParser {
       this
         // need to parse flows first, so they're accessible
         .parseFlows(choreography[Elements.flows])
+        .parseMessageFlows(choreography[Elements.messageFlow])
         .translateStartEvent(choreography[Elements.startEvent])
         .translateEndEvent(choreography[Elements.endEvent])
         .translateTasks(choreography[Elements.tasks])
@@ -202,6 +211,17 @@ export class INetFastXMLParser implements INetParser {
       return this;
     }
 
+    parseMessageFlows(flows: any): this {
+      if (flows == null) return this;
+      for (const flow of flows) {
+        this.messageFlows.set(flow[Properties.id], {
+          flow: flow,
+          message: null,
+        });
+      }
+      return this;
+    }
+
     private parseInitiatorRespondents(task: any): {
       initiator: Participant;
       respondents: Participant[];
@@ -264,6 +284,7 @@ export class INetFastXMLParser implements INetParser {
 
       for (const task of tasks) {
         const { initiator, respondents } = this.parseInitiatorRespondents(task);
+        const message = this.parseMessage(task);
         const transition = this.addTransition(
           new Transition(
             task[Properties.id],
@@ -272,13 +293,50 @@ export class INetFastXMLParser implements INetParser {
               respondents!,
               task[Properties.name],
               task[Properties.id],
+              TaskType.Task,
+              message,
             ),
           ),
         );
+        if (message != null) message.linkedTransition = transition;
         this.translateIncomingFlows(transition, task[Elements.ins]);
         this.translateOutgoingFlows(transition, task[Elements.outs]);
       }
       return this;
+    }
+
+    /**
+     * Parses a message from a task element by resolving the message flow reference.
+     *
+     * @param task - The task element containing message flow references
+     * @returns The parsed Message object, or undefined if no message flow is referenced
+     * @throws Error if the task has multiple messages (only one allowed) or references an unknown message flow
+     */
+    private parseMessage(task: any): Message | undefined {
+      const messageID = task[Elements.messageFlowRef];
+      if (!messageID || messageID.length == 0) return undefined;
+      if (messageID.length > 1)
+        throw new Error(
+          `Task (${task}) has multiple messages (only one allowed)`,
+        );
+      const messageFlow = this.messageFlows.get(messageID[0]);
+      if (messageFlow == undefined) {
+        throw new Error(
+          `Message is referencing (id: ${messageID}) to unknown message flow`,
+        );
+      }
+
+      const messageRef = messageFlow.flow[Properties.message];
+      const message = this.messages.get(messageRef);
+      if (message == undefined) {
+        throw new Error(`Message ref (id: ${message}) to unknown message`);
+      }
+      if (message.label == undefined || message.label.length == 0) {
+        return undefined;
+      }
+      this.iNet.namedMessages.set(message.modelID, message);
+      messageFlow.message = message;
+      return message;
     }
 
     /**
@@ -594,10 +652,12 @@ export class INetFastXMLParser implements INetParser {
       const callList = this.extractCallGraph(
         rootElements[Elements.choreographies],
       );
+      const messages = this.translateMessages(rootElements[Elements.messages]);
       const iNets = new Map<string, InteractionNet>();
       for (const choreography of rootElements[Elements.choreographies]) {
         const iNetTranslator = new INetFastXMLParser.INetTranslator();
         iNetTranslator.callList = callList;
+        iNetTranslator.messages = messages;
         try {
           const iNet = iNetTranslator.translate(choreography);
           iNets.set(iNet.id, iNet);
@@ -618,6 +678,17 @@ export class INetFastXMLParser implements INetParser {
       //console.log(iNets);
       return resolve([...iNets.values()]);
     });
+  }
+
+  translateMessages(messages: any) {
+    const parsed = new Map<string, Message>();
+    for (const message of messages) {
+      parsed.set(
+        message[Properties.id],
+        new Message(message[Properties.id], message[Properties.name]),
+      );
+    }
+    return parsed;
   }
 
   extractCallGraph(choreographies: any) {

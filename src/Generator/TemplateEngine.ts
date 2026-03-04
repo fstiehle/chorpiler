@@ -69,6 +69,7 @@ export abstract class TemplateEngine implements ITemplateEngine {
 
     const encoder = new INetEncoder();
     const gen = encoder.generate(iNet, options, this.isInstanced);
+    console.log(iNet.namedMessages);
     gen.caseVariables = this.caseVariables;
 
     if (gen.callList.size != this.addressList.size) {
