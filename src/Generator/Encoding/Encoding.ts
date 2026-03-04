@@ -1,4 +1,4 @@
-import { CallType } from "../../Parser/Element.js";
+import { CallType } from "../../Parser/Elements/Call.js";
 import { CompileOptions } from "../TemplateEngine.js";
 
 export class Process {

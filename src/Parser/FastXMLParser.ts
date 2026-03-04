@@ -1,22 +1,19 @@
-import { InteractionNet } from "./InteractionNet.js";
 import { XMLParser } from "fast-xml-parser";
-import { Participant } from "./Participant.js";
+import { Call, CallType } from "../Parser/Elements/Call.js";
+import { Element } from "../Parser/Elements/Element.js";
+import { Guard } from "../Parser/Elements/Guard.js";
 import {
-  Element,
-  TaskLabel,
-  Transition,
-  Place,
-  LabelType,
-  Label,
-  PlaceType,
-  Guard,
-  TaskType,
-  Call,
-  CallType,
   CallLabel,
-} from "./Element.js";
-import { INetParser } from "./Parser.js";
+  Label,
+  LabelType,
+  TaskLabel,
+} from "../Parser/Elements/Label.js";
+import { Participant } from "../Parser/Elements/Participant.js";
+import { Place, PlaceType } from "../Parser/Elements/Place.js";
+import { Transition } from "../Parser/Elements/Transition.js";
 import { deleteFromArray } from "../util/helpers.js";
+import { InteractionNet } from "./InteractionNet.js";
+import { INetParser } from "./Parser.js";
 
 enum Elements {
   rootElements = "definitions",

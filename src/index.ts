@@ -27,7 +27,16 @@ export * from "./Generator/Encoding/TriggerEncoding.js";
 export * from "./Generator/Encoder.js";
 export * from "./Generator/TemplateEngine.js";
 
-export * from "./Parser/Element.js";
+export * from "./Parser/Elements/Call.js";
+export * from "./Parser/Elements/Element.js";
+export * from "./Parser/Elements/Guard.js";
+export * from "./Parser/Elements/Label.js";
+export * from "./Parser/Elements/Message.js";
+export * from "./Parser/Elements/Participant.js";
+export * from "./Parser/Elements/Place.js";
+export * from "./Parser/Elements/Transition.js";
+export * from "./Parser/InteractionNet.js";
+
 export * from "./Parser/InteractionNet.js";
 export * from "./Parser/Parser.js";
 export * from "./Parser/InteractionNet.js";

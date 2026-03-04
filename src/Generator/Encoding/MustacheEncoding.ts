@@ -3,7 +3,7 @@ import * as Encoding from "./Encoding.js";
 import { IFromEncoding } from "./IFromEncoding.js";
 import { capitalize } from "../../util/helpers.js";
 import { CompileOptions } from "../TemplateEngine.js";
-import { CallType } from "../../Parser/Element.js";
+import { CallType } from "../../Parser/Elements/Call.js";
 
 class MustacheProcessEncoding {
   constructor(

@@ -1,62 +1,12 @@
+import { Guard } from "./Guard.js";
+import { Message } from "./Message.js";
 import { Participant } from "./Participant.js";
 
-export class Element {
-  public source = new Array<Element>();
-  public target = new Array<Element>();
-
-  constructor(public id: string) {}
-}
-
-export class Place extends Element {
-  public source = new Array<Transition>();
-  public target = new Array<Transition>();
-
-  constructor(
-    id: string,
-    public type: PlaceType = PlaceType.Flow,
-  ) {
-    super(id);
-  }
-}
-
-export enum PlaceType {
-  Flow = 0,
-  Start = 1,
-  End = 2,
-}
-
-export class Transition extends Element {
-  source = new Array<Place>();
-  target = new Array<Place>();
-  calls = new Array<Call>(); // calls another choreography
-
-  constructor(
-    id: string,
-    public label: Label,
-  ) {
-    super(id);
-  }
-}
-
-// Transitions can have labels
 export class Label {
   constructor(
     public type: LabelType,
     public guard?: Guard | null,
   ) {}
-}
-
-// Labels can have guards
-export class Guard {
-  default: boolean = false;
-  conditions = new Map<string, string>();
-
-  constructor(
-    public name: string,
-    _default?: boolean,
-  ) {
-    if (_default != null) this.default = _default;
-  }
 }
 
 export class EventLabel extends Label {
@@ -78,9 +28,16 @@ export class TaskLabel extends EventLabel {
     name: string,
     modelID: string,
     public taskType: TaskType = TaskType.Task,
+    public message: Message | null = null,
   ) {
     super(sender, receiver, name, modelID, LabelType.Task);
   }
+}
+
+export enum TaskType {
+  Task,
+  SubChoreography,
+  CallChoreography,
 }
 
 export class CallLabel extends Label {
@@ -106,25 +63,6 @@ export enum LabelType {
   ParallelDiverging,
   EventExclusiveIncoming,
   EventExclusiveOutgoing,
-  SubChoreography,
-  CallChoreography,
-}
-
-export enum TaskType {
-  Task,
-  SubChoreography,
-  CallChoreography,
-}
-
-export class Call {
-  constructor(
-    public type: CallType,
-    public targetID: string,
-    public participantsMapping: Map<string, string> | null,
-  ) {}
-}
-
-export enum CallType {
   SubChoreography,
   CallChoreography,
 }

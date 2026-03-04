@@ -3,22 +3,17 @@
  * the template can be used to render the process token play by a TemplateEngine
  */
 import { deleteFromArray } from "../util/helpers.js";
-import {
-  Transition,
-  Element,
-  TaskLabel,
-  LabelType,
-  Place,
-  PlaceType,
-  Guard,
-  Call,
-  CallType,
-} from "../Parser/Element.js";
 import { InteractionNet } from "../Parser/InteractionNet.js";
 import * as Encoding from "./Encoding/Encoding.js";
 import { assert } from "console";
 import { CompileOptions } from "./TemplateEngine.js";
-import { Participant } from "../Parser/Participant.js";
+import { Transition } from "../Parser/Elements/Transition.js";
+import { Element } from "../Parser/Elements/Element.js";
+import { Place, PlaceType } from "../Parser/Elements/Place.js";
+import { LabelType, TaskLabel } from "../Parser/Elements/Label.js";
+import { CallType } from "../Parser/Elements/Call.js";
+import { Guard } from "../Parser/Elements/Guard.js";
+import { Participant } from "../Parser/Elements/Participant.js";
 
 const loggingEnabled = false; // Toggleable logging
 

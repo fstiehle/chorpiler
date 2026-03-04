@@ -10,13 +10,10 @@ import { TriggerEncoding } from "../Generator/Encoding/TriggerEncoding.js";
 import { GeneratorConstructor } from "../Generator/Generator.js";
 import SolDefaultContractGenerator from "../Generator/target/Sol/DefaultGenerator.js";
 import { TemplateEngine } from "../Generator/TemplateEngine.js";
-import {
-  Guard,
-  LabelType,
-  Place,
-  TaskLabel,
-  Transition,
-} from "../Parser/Element.js";
+import { Transition } from "../Parser/Elements/Transition.js";
+import { Place } from "../Parser/Elements/Place.js";
+import { TaskLabel } from "../Parser/Elements/Label.js";
+import { Guard } from "../Parser/Elements/Guard.js";
 import { INetFastXMLParser } from "../Parser/FastXMLParser.js";
 import { INetParser } from "../Parser/Parser.js";
 import {
