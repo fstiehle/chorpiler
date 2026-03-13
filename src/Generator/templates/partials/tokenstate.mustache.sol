@@ -1,0 +1,16 @@
+{{^hasSubProcesses}}
+{{^isInstanced}}
+tokenState
+{{/isInstanced}}
+{{#isInstanced}}
+processData[instanceID].tokenState
+{{/isInstanced}}
+{{/hasSubProcesses}}
+{{#hasSubProcesses}}
+{{^isInstanced}}
+tokenState[{{id}}]
+{{/isInstanced}}
+{{#isInstanced}}
+processData[instanceID].tokenState[{{id}}]
+{{/isInstanced}}
+{{/hasSubProcesses}}

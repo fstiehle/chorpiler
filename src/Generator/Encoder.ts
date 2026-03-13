@@ -246,6 +246,7 @@ export class INetEncoder {
             condition,
             isEnd,
             defaultBranch,
+            message: element.label.message,
           }),
         );
       }

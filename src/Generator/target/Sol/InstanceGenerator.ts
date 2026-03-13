@@ -36,6 +36,15 @@ export default class SolInstanceGenerator extends TemplateEngine {
           ),
         },
         {
+          partial: "tokenstate",
+          path: path.join(
+            __dirname,
+            "..",
+            "..",
+            "templates/partials/tokenstate.mustache.sol",
+          ),
+        },
+        {
           partial: "callcontract",
           path: path.join(
             __dirname,

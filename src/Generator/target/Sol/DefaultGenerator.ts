@@ -27,6 +27,15 @@ export default class SolDefaultContractGenerator extends TemplateEngine {
           ),
         },
         {
+          partial: "tokenstate",
+          path: path.join(
+            __dirname,
+            "..",
+            "..",
+            "templates/partials/tokenstate.mustache.sol",
+          ),
+        },
+        {
           partial: "casevariable",
           path: path.join(
             __dirname,

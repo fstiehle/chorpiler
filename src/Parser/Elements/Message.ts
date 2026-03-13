@@ -1,9 +1,9 @@
-import { Transition } from "./Transition.js";
+import { CaseVariable } from "../../Generator/Encoding/Encoding.js";
 
 export class Message {
   constructor(
     public modelID: string,
     public label: string | undefined,
-    public linkedTransition: Transition | null = null,
+    public caseVariable: CaseVariable | null = null,
   ) {}
 }

@@ -298,7 +298,6 @@ export class INetFastXMLParser implements INetParser {
             ),
           ),
         );
-        if (message != null) message.linkedTransition = transition;
         this.translateIncomingFlows(transition, task[Elements.ins]);
         this.translateOutgoingFlows(transition, task[Elements.outs]);
       }

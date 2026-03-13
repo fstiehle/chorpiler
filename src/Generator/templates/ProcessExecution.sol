@@ -59,6 +59,46 @@ contract {{{modelID}}} is IProcessExecution {
     {{/hasSubProcesses}}
   }
 
+  {{#taskWithCaseVar}}
+  function {{{modelID}}}({{#isInstanced}}uint instance, {{/isInstanced}}{{{message.caseVariable.type}}} _{{{message.caseVariable.name}}}) external {
+    require(tokenState & {{{consume}}} == {{{consume}}});
+    {{{conditionString}}}
+
+    {{^isInstanced}}
+    {{{message.caseVariable.name}}} = _{{{message.caseVariable.name}}};
+    {{/isInstanced}}
+    {{#isInstanced}}
+    processData[instance].{{{message.caseVariable.name}}} = _{{{message.caseVariable.name}}}
+    {{/isInstanced}}
+    {{^hasSubProcesses}}
+    {{^isInstanced}}
+    tokenState = {{{produce}}};
+    {{/isInstanced}}
+    {{#isInstanced}}
+    processData[instanceID].tokenState |= {{{produce}}};
+    {{/isInstanced}}
+    {{/hasSubProcesses}}
+    {{#hasSubProcesses}}
+    {{^isInstanced}}
+    tokenState[{{id}}] |= {{{produce}}};
+    {{/isInstanced}}
+    {{#isInstanced}}
+    processData[instanceID].tokenState[{{id}}] |= {{{produce}}};
+    {{/isInstanced}}
+    {{/hasSubProcesses}}
+    {{#options.debug}}
+    console.log(
+      "{{{modelID}}}: new token state is %d",
+       _tokenState
+    );
+
+    {{/options.debug}}
+    if (tokenState != 0) {
+      enact(0);
+    }
+  }
+
+  {{/taskWithCaseVar}}
   function enact(uint id) external {
     {{> execution}}
   }

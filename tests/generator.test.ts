@@ -4,11 +4,8 @@ import { beforeEach, describe, it } from "node:test";
 import path from "path";
 import util from "util";
 import { CaseVariable } from "../src/Generator/Encoding/Encoding.js";
-import { TriggerEncoding } from "../src/Generator/Encoding/TriggerEncoding.js";
 import SolDefaultContractGenerator from "../src/Generator/target/Sol/DefaultGenerator.js";
 import SolInstanceGenerator from "../src/Generator/target/Sol/InstanceGenerator.js";
-import SolStateChannelContractGenerator from "../src/Generator/target/Sol/StateChannelGenerator.js";
-import { TemplateEngine } from "../src/Generator/TemplateEngine.js";
 import { INetFastXMLParser } from "../src/Parser/FastXMLParser.js";
 import { INetParser } from "../src/Parser/Parser.js";
 import { BPMN_PATH, CONTRACTS_PATH } from "./config.js";
@@ -156,7 +153,20 @@ describe("Generation of edge cases", () => {
     });
 
     it.only("Messages case to Sol Contract", async () => {
-      await compileBpmn(parser, "messages", [], [], false);
+      await compileBpmn(
+        parser,
+        "messages",
+        [
+          new CaseVariable(
+            "pizza_order",
+            "string",
+            'string public pizza_order = ""',
+            false,
+          ),
+        ],
+        [],
+        false,
+      );
     });
 
     it("Call choreography to Sol Contract", async () => {

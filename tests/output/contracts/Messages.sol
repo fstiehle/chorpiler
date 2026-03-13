@@ -13,12 +13,64 @@ contract Messages is IProcessExecution {
   address[3] public participants;
   event Task(uint id);
 
+  // Case Variable pizza_order
+  string public pizza_order = ""
+
   constructor(address[3] memory _participants) {
     participants = _participants;
   }
 
   function getTokenState() external view returns (uint) {
     return tokenState;
+  }
+
+  function ChoreographyTask_0hy9n0g(string _pizza_order) external {
+    require(tokenState & 1 == 1);
+    require(msg.sender == participants[0], "Invalid initiator");
+
+    pizza_order = _pizza_order;
+    tokenState = 2;
+    console.log(
+      "ChoreographyTask_0hy9n0g: new token state is %d",
+       _tokenState
+    );
+
+    if (tokenState != 0) {
+      enact(0);
+    }
+  }
+
+  function ChoreographyTask_175oxwe(string _pizza_order) external {
+    require(tokenState & 4 == 4);
+    require(msg.sender == participants[2], "Invalid initiator");
+
+    pizza_order = _pizza_order;
+    tokenState = 0;
+    console.log(
+      "ChoreographyTask_175oxwe: new token state is %d",
+       _tokenState
+    );
+
+    if (tokenState != 0) {
+      enact(0);
+    }
+  }
+
+  function ChoreographyTask_1l3cbhv(string _pizza_order) external {
+    require(tokenState & 4 == 4);
+    require(msg.sender == participants[2], "Invalid initiator");
+require(pizza_order == "tuna", "Decision condition not met");
+
+    pizza_order = _pizza_order;
+    tokenState = 0;
+    console.log(
+      "ChoreographyTask_1l3cbhv: new token state is %d",
+       _tokenState
+    );
+
+    if (tokenState != 0) {
+      enact(0);
+    }
   }
 
   function enact(uint id) external {
@@ -32,15 +84,6 @@ contract Messages is IProcessExecution {
     );
     while(_tokenState != 0) {
       if (_tokenState & 1 == 1) {
-        // <--- ChoreographyTask_0hy9n0g order pizza --->
-        if (1 == id && msg.sender == participants[0]) {
-          // <--- custom code for task here --->
-          _tokenState &= ~uint(1);
-          _tokenState |= 2;
-          emit Task(1);
-          id = 0;
-          continue;
-        }
       }
       if (_tokenState & 2 == 2) {
         // <--- ChoreographyTask_1m3qduh hand over pizza --->
@@ -54,14 +97,6 @@ contract Messages is IProcessExecution {
         }
       }
       if (_tokenState & 4 == 4) {
-        // <--- ChoreographyTask_175oxwe deliver pizza --->
-        if (3 == id && msg.sender == participants[2]) {
-          // <--- custom code for task here --->
-          _tokenState &= ~uint(4);
-          _tokenState |= 0;
-          emit Task(3);
-          break; // is end
-        }
       }
       break;
     }

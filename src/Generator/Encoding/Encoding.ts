@@ -1,4 +1,5 @@
 import { CallType } from "../../Parser/Elements/Call.js";
+import { Message } from "../../Parser/Elements/Message.js";
 import { CompileOptions } from "../TemplateEngine.js";
 
 export class Process {
@@ -58,6 +59,7 @@ export class Call {
 }
 
 export class CaseVariable {
+  public linkedMessage: Message | null = null;
   constructor(
     public name: string,
     public type: string,
@@ -125,23 +127,27 @@ interface InitiatedTransitionParams extends TaskTransitionParams {
   modelID: string;
   initiatorID: number;
   taskName: string;
+  message?: Message | null;
 }
 
 export class InitiatedTransition extends TaskTransition {
   public modelID: string;
   public initiatorID: number;
   public taskName: string;
+  public message: Message | null;
 
   constructor({
     modelID,
     initiatorID,
     taskName,
+    message = null,
     ...transitionParams
   }: InitiatedTransitionParams) {
     super(transitionParams);
     this.modelID = modelID;
     this.initiatorID = initiatorID;
     this.taskName = taskName;
+    this.message = message;
   }
 }
 

@@ -4,6 +4,7 @@ import { IFromEncoding } from "./IFromEncoding.js";
 import { capitalize } from "../../util/helpers.js";
 import { CompileOptions } from "../TemplateEngine.js";
 import { CallType } from "../../Parser/Elements/Call.js";
+import { Message } from "../../Parser/Elements/Message.js";
 
 class MustacheProcessEncoding {
   constructor(
@@ -13,11 +14,13 @@ class MustacheProcessEncoding {
     public callList: Encoding.Call[],
     public caseVariables: CaseVariable[],
     public states: State[],
+    public taskWithCaseVar: TaskWithCaseVar[],
   ) {}
 
   // Template helper methods
   hasStates = (): boolean => this.states.length > 0;
   hasCalls = (): boolean => this.callList.length > 0;
+  hasTaskWithCaseVar = (): boolean => this.taskWithCaseVar.length > 0;
   numberOfParticipants = (): string => this.participants.length.toString();
   numberOfCalls = (): string => this.callList.length.toString();
 
@@ -26,9 +29,28 @@ class MustacheProcessEncoding {
     isInstanced: boolean = false,
   ) {
     const states = new Map<number, Encoding.Transition[]>();
+    const taskWithCaseVar = new Array<TaskWithCaseVar>();
+    const transitionsWithCaseVar = new Set<Encoding.Transition>();
+
+    // Process each state and extract transitions with case variables
     encoding.states.forEach((transitions, consume) => {
       states.set(consume, transitions);
+      transitions.forEach((transition) => {
+        if (transition instanceof Encoding.InitiatedTransition) {
+          if (transition.message?.caseVariable) {
+            transitionsWithCaseVar.add(transition);
+            taskWithCaseVar.push(
+              new TaskWithCaseVar(
+                consume.toString(),
+                this.convertTransition(transition, isInstanced),
+                transition.message,
+              ),
+            );
+          }
+        }
+      });
     });
+
     return new MustacheProcessEncoding(
       encoding.id.toString(),
       encoding.modelID,
@@ -39,19 +61,32 @@ class MustacheProcessEncoding {
       Array.from(encoding.caseVariables.values()).map(
         (c) => new CaseVariable(c.name, c.type, c.expression, c.setters),
       ),
-      MustacheProcessEncoding.convertStates(states, isInstanced),
+      MustacheProcessEncoding.convertStates(
+        states,
+        isInstanced,
+        transitionsWithCaseVar,
+      ),
+      taskWithCaseVar,
     );
   }
 
   private static convertStates(
     states: Map<number, Encoding.Transition[]>,
     isInstanced: boolean,
+    excludeTransitions: Set<Encoding.Transition> = new Set(),
   ): State[] {
     const stateArray = Array.from(states.entries()).map(
       ([consume, transitions]) => {
+        // Filter out transitions that are already in taskWithCaseVar
+        const filteredTransitions = transitions.filter(
+          (t) => !excludeTransitions.has(t),
+        );
+
         return new State(
           consume.toString(),
-          transitions.map((t) => this.convertTransition(t, isInstanced)),
+          filteredTransitions.map((t) =>
+            this.convertTransition(t, isInstanced),
+          ),
         );
       },
     );
@@ -140,6 +175,7 @@ export class MustacheEncoding
       main.callList,
       main.caseVariables,
       main.states,
+      main.taskWithCaseVar,
     );
   }
 }
@@ -273,7 +309,10 @@ class TransitionTarget {
   }
 }
 /**
- * Represents a case variable that can be used in the generated contract
+ * Represents a case variable that can be used in the generated contract.
+ * Automatically assembles validation conditions from the linked message's transition,
+ * following the same pattern as the Transition class but generating require statements
+ * for Solidity contract validation.
  */
 class CaseVariable {
   public functionName: string;
@@ -285,6 +324,78 @@ class CaseVariable {
     public setters: boolean,
   ) {
     this.functionName = "set" + capitalize(name);
+  }
+}
+
+class TaskWithCaseVar {
+  public produce: string;
+  public taskID: string | null;
+  public modelID: string;
+  public initiator: string;
+  public taskName: string;
+  public decision: string;
+  public isEnd: boolean;
+  public outTo: TransitionTarget | null;
+  public inFrom: TransitionTarget | null;
+  public isCall: boolean;
+  public isSub: boolean;
+  public isInstanced: boolean;
+  public message: Message | null;
+  public conditionParts: string[];
+  public conditionString: string;
+
+  constructor(
+    public consume: string,
+    public transition: Transition,
+    message: Message | null = null,
+  ) {
+    this.produce = transition.produce;
+    this.taskID = null; // No check on taskID as specified
+    this.modelID = transition.modelID;
+    this.initiator = transition.initiator;
+    this.taskName = transition.taskName;
+    this.decision = transition.decision;
+    this.isInstanced = transition.isInstanced;
+    this.isEnd = transition.isEnd;
+    this.outTo = transition.outTo;
+    this.inFrom = transition.inFrom;
+    this.isCall = transition.isCall;
+    this.isSub = transition.isSub;
+    this.message = message;
+
+    this.conditionParts = [];
+
+    if (this.inFrom && this.inFrom.isSub) {
+      const tokenStateRef = this.isInstanced
+        ? `processData[instanceID].tokenState[${this.inFrom.call.id}]`
+        : `tokenState[${this.inFrom.call.id}]`;
+      this.conditionParts.push(
+        `require(0 == ${tokenStateRef}, "SubChoreography not completed");`,
+      );
+    }
+
+    if (this.initiator) {
+      const participantsRef = this.isInstanced
+        ? `processData[instanceID].participants[${this.initiator}]`
+        : `participants[${this.initiator}]`;
+      this.conditionParts.push(
+        `require(msg.sender == ${participantsRef}, "Invalid initiator");`,
+      );
+    }
+
+    if (this.inFrom && this.inFrom.isCall) {
+      this.conditionParts.push(
+        `require(0 == ${this.inFrom.call.name}.getTokenState(instanceList[${this.inFrom.call.id}]), "Called choreography not completed");`,
+      );
+    }
+
+    if (this.decision) {
+      this.conditionParts.push(
+        `require(${this.decision}, "Decision condition not met");`,
+      );
+    }
+
+    this.conditionString = this.conditionParts.join("\n");
   }
 }
 

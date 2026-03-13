@@ -69,8 +69,16 @@ export abstract class TemplateEngine implements ITemplateEngine {
 
     const encoder = new INetEncoder();
     const gen = encoder.generate(iNet, options, this.isInstanced);
-    console.log(iNet.namedMessages);
     gen.caseVariables = this.caseVariables;
+    for (const message of iNet.namedMessages.values()) {
+      let match = undefined;
+      for (const [name, variable] of gen.caseVariables) {
+        if (name == message.label) {
+          variable.linkedMessage = message;
+          message.caseVariable = variable;
+        }
+      }
+    }
 
     if (gen.callList.size != this.addressList.size) {
       throw new Error(
@@ -81,7 +89,7 @@ export abstract class TemplateEngine implements ITemplateEngine {
     // add the address of each callAddresses to the Call class in callList, match them based on the key of the map
     for (const [callID, address] of this.addressList.entries()) {
       const call = gen.callList.get(callID);
-      if (call) {
+      if (call != undefined) {
         call.address = address;
       }
     }
