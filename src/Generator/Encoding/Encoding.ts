@@ -32,7 +32,6 @@ export class SubProcess extends Process {
 export class MainProcess extends Process {
   public options: CompileOptions = {
     unfoldSubNets: false,
-    loopProtection: true,
     events: false,
     debug: false,
   };

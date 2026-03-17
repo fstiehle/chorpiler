@@ -15,7 +15,6 @@ contract Pizza is IProcessExecution {
 
   // Case Variable items
   bool public items = false;
-
   function setItems(bool _items) external {
     items = _items;
   }
@@ -30,7 +29,6 @@ contract Pizza is IProcessExecution {
 
   function enact(uint id) external {
     uint _tokenState = tokenState;
-
     console.log(
       "Pizza: current token state is %d, sender %s trying to execute task %d",
       _tokenState,
@@ -91,8 +89,9 @@ contract Pizza is IProcessExecution {
       }
       break;
     }
-
+    
     tokenState = _tokenState;
+    
     console.log(
       "Pizza: new token state is %d",
        _tokenState

@@ -15,7 +15,6 @@ contract IncidentManagement is IProcessExecution {
 
   // Case Variable resolved
   bool public resolved = false;
-
   function setResolved(bool _resolved) external {
     resolved = _resolved;
   }
@@ -30,7 +29,6 @@ contract IncidentManagement is IProcessExecution {
 
   function enact(uint id) external {
     uint _tokenState = tokenState;
-
     console.log(
       "IncidentManagement: current token state is %d, sender %s trying to execute task %d",
       _tokenState,
@@ -162,8 +160,9 @@ contract IncidentManagement is IProcessExecution {
       }
       break;
     }
-
+    
     tokenState = _tokenState;
+    
     console.log(
       "IncidentManagement: new token state is %d",
        _tokenState

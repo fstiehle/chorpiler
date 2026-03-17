@@ -15,7 +15,6 @@ contract RentalAgreement is IProcessExecution {
 
   // Case Variable conditions
   uint public conditions;
-
   function setConditions(uint _conditions) external {
     conditions = _conditions;
   }
@@ -30,7 +29,6 @@ contract RentalAgreement is IProcessExecution {
 
   function enact(uint id) external {
     uint _tokenState = tokenState;
-
     console.log(
       "RentalAgreement: current token state is %d, sender %s trying to execute task %d",
       _tokenState,
@@ -150,8 +148,9 @@ contract RentalAgreement is IProcessExecution {
       }
       break;
     }
-
+    
     tokenState = _tokenState;
+    
     console.log(
       "RentalAgreement: new token state is %d",
        _tokenState

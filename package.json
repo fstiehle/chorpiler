@@ -14,7 +14,7 @@
     "test/comp": "node --import tsx/esm --test tests/parser.test.ts && node --import tsx/esm --test tests/generator.test.ts",
     "test/exec": "node --import tsx/esm --test tests/execution.test.ts",
     "test/call": "node --import tsx/esm --test tests/callchoreos.test.ts",
-    "test/debg": "node --import tsx/esm --test --test-only tests/generator.test.ts",
+    "test/debg": "node --import tsx/esm --test --test-only tests/parser.test.ts",
     "test/simu": "node --import tsx/esm --test tests/simulator/*.test.ts",
     "build": "tsc -p tsconfig.build.json && ncp ./src/Generator/templates ./lib/Generator/templates && ncp ./src/Simulator/templates ./lib/Simulator/templates",
     "prepublishOnly": "npm run build",
@@ -26,26 +26,24 @@
   "author": "Fabian Stiehle",
   "license": "ISC",
   "devDependencies": {
-    "@nomicfoundation/hardhat-network-helpers": "^3.0.3",
-    "@nomicfoundation/hardhat-node-test-runner": "^3.0.8",
-    "@nomicfoundation/hardhat-viem": "^3.0.1",
-    "@nomicfoundation/hardhat-viem-assertions": "^3.0.4",
-    "@openzeppelin/contracts": "^5.4.0",
-    "@types/mustache": "^4.2.6",
-    "@types/node": "^25.0.6",
-    "@types/prettier": "^2.7.3",
+    "@nomicfoundation/hardhat-network-helpers": "^3.0.4",
+    "@nomicfoundation/hardhat-node-test-runner": "^3.0.11",
+    "@nomicfoundation/hardhat-viem": "^3.0.4",
+    "@nomicfoundation/hardhat-viem-assertions": "^3.0.7",
+    "@openzeppelin/contracts": "^5.6.1",
+    "@types/node": "^25.5.0",
     "@types/seed-random": "^2.2.4",
-    "hardhat": "^3.1.3",
+    "hardhat": "^3.1.12",
     "ncp": "^2.0.0",
     "tsx": "^4.21.0",
     "typescript": "^5.9.3",
-    "viem": "^2.44.1"
+    "viem": "^2.47.4"
   },
   "dependencies": {
-    "fast-xml-parser": "^5.3.3",
+    "@types/mustache": "^4.2.6",
+    "fast-xml-parser": "^5.5.6",
+    "handlebars": "^4.7.8",
     "mustache": "^4.2.0",
-    "prettier": "^3.8.1",
-    "prettier-plugin-solidity": "^2.2.1",
     "seed-random": "^2.2.0"
   }
 }

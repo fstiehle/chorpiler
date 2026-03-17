@@ -36,7 +36,6 @@ contract CallChoreo is IProcessExecution {
 
   function enact(uint id) external {
     uint _tokenState = tokenState;
-
     console.log(
       "CallChoreo: current token state is %d, sender %s trying to execute task %d",
       _tokenState,
@@ -68,15 +67,16 @@ contract CallChoreo is IProcessExecution {
       if (_tokenState & 2 == 2) {
         // <---  auto transition  --->
         _tokenState &= ~uint(2);
-        instanceList[0] = Choreography_0betnp1.instance([participants[0], participants[2]]);
+        
         emit NewInstance(0, instanceList[0]);
         _tokenState |= 4;
         continue;
       }
       break;
     }
-
+    
     tokenState = _tokenState;
+    
     console.log(
       "CallChoreo: new token state is %d",
        _tokenState

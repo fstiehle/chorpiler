@@ -15,7 +15,6 @@ contract XORAND is IProcessExecution {
 
   // Case Variable items
   bool public items = false;
-
   function setItems(bool _items) external {
     items = _items;
   }
@@ -30,7 +29,6 @@ contract XORAND is IProcessExecution {
 
   function enact(uint id) external {
     uint _tokenState = tokenState;
-
     console.log(
       "XORAND: current token state is %d, sender %s trying to execute task %d",
       _tokenState,
@@ -97,8 +95,9 @@ contract XORAND is IProcessExecution {
       }
       break;
     }
-
+    
     tokenState = _tokenState;
+    
     console.log(
       "XORAND: new token state is %d",
        _tokenState

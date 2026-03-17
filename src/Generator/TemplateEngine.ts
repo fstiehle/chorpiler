@@ -1,18 +1,22 @@
-import Mustache from "mustache";
+import Handlebars from "handlebars";
 import { InteractionNet } from "../Parser/InteractionNet.js";
 import util from "util";
 import * as fs from "fs";
+import * as path from "path";
+import { fileURLToPath } from "url";
 import { CaseVariable } from "./Encoding/Encoding.js";
-import { INetEncoder } from "./Encoder.js";
-import { MustacheEncoding } from "./Encoding/MustacheEncoding.js";
-import { TriggerEncoding } from "./Encoding/TriggerEncoding.js";
+import { INetEncoder } from "./Encoding/Encoder.js";
+import { HandlebarsEncoding } from "./Encoding/Template/HandlebarsEncoding.js";
+import { TriggerEncoding } from "./Encoding/JSON/TriggerEncoding.js";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const readFile = util.promisify(fs.readFile);
 
 export interface CompileOptions {
   unfoldSubNets: boolean; // If true, sub choreographies are "folded" into the main choreography, i.e.,
   // they are treated as visual option only with no consequence for the generated contract
-  loopProtection: boolean; // adds a NOOP operation (ID=0), which is necessary to process looping behaviour, should be set to true.
   events: boolean; // emit Events on task execution
   debug: boolean; // add Hardhat's console.log debug info
 }
@@ -40,7 +44,36 @@ export abstract class TemplateEngine implements ITemplateEngine {
     private caseVariables = new Map<string, CaseVariable>(),
     private templatePartials = new Array<{ partial: string; path: string }>(),
     private isInstanced: boolean = false,
-  ) {}
+  ) {
+    // Merge constructor partials with discovered ones
+    const discoveredPartials = this.discoverPartials();
+    const constructorPartialNames = this.templatePartials.map(p => p.partial);
+    const newPartials = discoveredPartials.filter(p => !constructorPartialNames.includes(p.partial));
+    this.templatePartials = [...this.templatePartials, ...newPartials];
+  }
+
+  private discoverPartials(): Array<{ partial: string; path: string }> {
+    const partialsDir = path.join(path.dirname(this.templatePath), 'partials');
+    const partials: Array<{ partial: string; path: string }> = [];
+
+    try {
+      if (fs.existsSync(partialsDir)) {
+        const files = fs.readdirSync(partialsDir);
+        for (const file of files) {
+          if (file.endsWith('.handlebars.sol')) {
+            const partialName = file.replace('.handlebars.sol', '');
+            partials.push({
+              partial: partialName,
+              path: path.join(partialsDir, file)
+            });
+          }
+        }
+      }
+    } catch (error) {
+      console.warn('Failed to discover partials:', error);
+    }
+    return partials;
+  }
 
   async compile(_options?: {
     unfoldSubNets?: boolean;
@@ -59,13 +92,6 @@ export abstract class TemplateEngine implements ITemplateEngine {
     }
     const iNet: InteractionNet = { ...this.iNet }; // Deep copy: why?
     const template: string = await this.getTemplate();
-    const partials = this.templatePartials.reduce(
-      (acc: Record<string, string>, partial) => {
-        acc[partial.partial] = fs.readFileSync(partial.path).toString();
-        return acc;
-      },
-      {},
-    );
 
     const encoder = new INetEncoder();
     const gen = encoder.generate(iNet, options, this.isInstanced);
@@ -94,14 +120,46 @@ export abstract class TemplateEngine implements ITemplateEngine {
       }
     }
 
+    // Read and register partials with Handlebars
+    const partialsContent = this.templatePartials.reduce(
+      (acc: Record<string, string>, partial) => {
+        acc[partial.partial] = fs.readFileSync(partial.path).toString();
+        return acc;
+      },
+      {},
+    );
+
+    // Register partials with Handlebars
+    Object.entries(partialsContent).forEach(([name, content]) => {
+      Handlebars.registerPartial(name, content);
+    });
+
+    // Register custom helpers
+    this.registerHandlebarsHelpers();
+
+    // Compile and render template
+    const compiledTemplate = Handlebars.compile(template);
+    const encodedData = HandlebarsEncoding.fromEncoding(gen);
+
     return {
-      target: Mustache.render(
-        template,
-        MustacheEncoding.fromEncoding(gen),
-        partials,
-      ),
+      target: compiledTemplate(encodedData, {
+        allowProtoPropertiesByDefault: true,
+        allowProtoMethodsByDefault: true,
+      }),
       encoding: TriggerEncoding.fromEncoding(gen),
     };
+  }
+
+  private registerHandlebarsHelpers() {
+    // Helper to check if a value is non-zero (for handling "0" strings)
+    Handlebars.registerHelper("nonZero", function (value) {
+      return value && value !== "0";
+    });
+
+    // Helper to check if a value is truthy and not empty
+    Handlebars.registerHelper("hasValue", function (value) {
+      return value && value !== "" && value !== "0";
+    });
   }
 
   addCaseVariable(variable: CaseVariable) {

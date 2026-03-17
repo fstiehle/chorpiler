@@ -228,8 +228,7 @@ export class Simulator {
     options: ContractGenerationOptions,
   ): Promise<{ target: string; encoding: TriggerEncoding } | null> {
     const contract = await contractGenerator.compile({
-      unfoldSubNets: options.unfoldSubNets ?? true,
-      loopProtection: options.loopProtection ?? false,
+      unfoldSubNets: options.unfoldSubNets ?? true
     });
     return contract;
   }

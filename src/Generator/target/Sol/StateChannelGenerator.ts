@@ -16,35 +16,6 @@ export default class SolStateChannelContractGenerator extends TemplateEngine {
       _iNet,
       path.join(__dirname, "..", "..", "templates/ProcessChannel.sol"),
       _caseVariables,
-      [
-        {
-          partial: "conditional",
-          path: path.join(
-            __dirname,
-            "..",
-            "..",
-            "templates/partials/conditional.mustache.sol",
-          ),
-        },
-        {
-          partial: "transition",
-          path: path.join(
-            __dirname,
-            "..",
-            "..",
-            "templates/partials/transition.mustache.sol",
-          ),
-        },
-        {
-          partial: "execution",
-          path: path.join(
-            __dirname,
-            "..",
-            "..",
-            "templates/partials/execution.mustache.sol",
-          ),
-        },
-      ],
     );
   }
 }

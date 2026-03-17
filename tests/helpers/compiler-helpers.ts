@@ -7,7 +7,7 @@ import SolInstanceGenerator from "../../src/Generator/target/Sol/InstanceGenerat
 import SolStateChannelContractGenerator from "../../src/Generator/target/Sol/StateChannelGenerator.js";
 import { BPMN_PATH, CONTRACTS_PATH } from "../config.js";
 import { TemplateEngine } from "../../src/Generator/TemplateEngine.js";
-import { TriggerEncoding } from "../../src/Generator/Encoding/TriggerEncoding.js";
+import { TriggerEncoding } from "../../src/Generator/Encoding/JSON/TriggerEncoding.js";
 import assert from "assert";
 import { INetParser } from "../../src/index.js";
 

@@ -1,33 +1,34 @@
 //SPDX-License-Identifier: MIT
 pragma solidity ^0.8.9;
 
-{{#options.debug}}
+{{#if options.debug}}
 import "hardhat/console.sol";
 
-{{/options.debug}}
-{{#hasCalls}}
+{{/if}}
+{{! --------------------- }}
+{{#if hasCalls}}
 interface IInstanceExecution {
   function instance(address[] memory participants) external returns (uint);
   function enact(uint instance, uint id) external;
   function getTokenState(uint instance) external view returns (uint);
 }
 
-{{#callList}}
+{{#each callList}}
 {{> callcontract}}
 
-{{/callList}}
+{{/each}}
 
-{{/hasCalls}}
+{{/if}}
 interface IProcessExecution {
   function enact(uint id) external;
   function getTokenState() external view returns (uint);
 }
 
 contract {{{modelID}}} is IProcessExecution {
-  {{#hasCalls}}
+  {{#if hasCalls}}
   uint[{{{numberOfCalls}}}] private instanceList; // instance
   event NewInstance(uint id, uint instanceID);
-  {{/hasCalls}}
+  {{/if}}
   {{^hasSubProcesses}}
   uint private tokenState = 1;
   {{/hasSubProcesses}}
@@ -86,13 +87,14 @@ contract {{{modelID}}} is IProcessExecution {
     processData[instanceID].tokenState[{{id}}] |= {{{produce}}};
     {{/isInstanced}}
     {{/hasSubProcesses}}
-    {{#options.debug}}
+    {{! // --------------------- }}
+    {{#if options.debug}}
     console.log(
       "{{{modelID}}}: new token state is %d",
        _tokenState
     );
-
-    {{/options.debug}}
+    {{! Whitespace }}
+    {{/if}}
     if (tokenState != 0) {
       enact(0);
     }
@@ -103,10 +105,10 @@ contract {{{modelID}}} is IProcessExecution {
     {{> execution}}
   }
 
-  {{#subProcesses}}
+  {{#each subProcesses}}
   function {{modelID}}(uint id) external {
     {{> execution}}
   }
 
-  {{/subProcesses}}
+  {{/each}}
 }

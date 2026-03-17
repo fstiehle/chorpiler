@@ -190,6 +190,7 @@ export class INetFastXMLParser implements INetParser {
 
         const translator = new INetFastXMLParser.INetTranslator();
         // set subNet participants
+        translator.messageFlows = this.messageFlows;
         const subNet = translator.iNet;
         subNet.participants.set(initiator.id, initiator);
         for (const respondent of respondents)
@@ -314,10 +315,12 @@ export class INetFastXMLParser implements INetParser {
     private parseMessage(task: any): Message | undefined {
       const messageID = task[Elements.messageFlowRef];
       if (!messageID || messageID.length == 0) return undefined;
+
       if (messageID.length > 1)
         throw new Error(
           `Task (${task}) has multiple messages (only one allowed)`,
         );
+
       const messageFlow = this.messageFlows.get(messageID[0]);
       if (messageFlow == undefined) {
         throw new Error(
@@ -328,7 +331,7 @@ export class INetFastXMLParser implements INetParser {
       const messageRef = messageFlow.flow[Properties.message];
       const message = this.messages.get(messageRef);
       if (message == undefined) {
-        throw new Error(`Message ref (id: ${message}) to unknown message`);
+        return undefined;
       }
       if (message.label == undefined || message.label.length == 0) {
         return undefined;

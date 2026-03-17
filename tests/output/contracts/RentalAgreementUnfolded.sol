@@ -15,7 +15,6 @@ contract RentalAgreementUnfolded is IProcessExecution {
 
   // Case Variable conditions
   uint public conditions;
-
   function setConditions(uint _conditions) external {
     conditions = _conditions;
   }
@@ -31,7 +30,6 @@ contract RentalAgreementUnfolded is IProcessExecution {
 
   function enact(uint id) external {
     uint _tokenState = tokenState[0];
-
     console.log(
       "RentalAgreementUnfolded: current token state is %d, sender %s trying to execute task %d",
       _tokenState,
@@ -140,8 +138,9 @@ contract RentalAgreementUnfolded is IProcessExecution {
       }
       break;
     }
-
+    
     tokenState[0] = _tokenState;
+    
     console.log(
       "RentalAgreementUnfolded: new token state is %d",
        _tokenState
@@ -149,14 +148,7 @@ contract RentalAgreementUnfolded is IProcessExecution {
   }
 
   function SubChoreography_1sp0n7o(uint id) external {
-    uint _tokenState = tokenState[1];
-
-    console.log(
-      "SubChoreography_1sp0n7o: current token state is %d, sender %s trying to execute task %d",
-      _tokenState,
-      msg.sender,
-      id
-    );
+    uint _tokenState = tokenState;
     while(_tokenState != 0) {
       if (_tokenState & 1 == 1) {
         // <--- ChoreographyTask_1hddg8r pay rent --->
@@ -179,12 +171,9 @@ contract RentalAgreementUnfolded is IProcessExecution {
       }
       break;
     }
-
-    tokenState[1] = _tokenState;
-    console.log(
-      "SubChoreography_1sp0n7o: new token state is %d",
-       _tokenState
-    );
+    
+    tokenState = _tokenState;
+    
   }
 
 }

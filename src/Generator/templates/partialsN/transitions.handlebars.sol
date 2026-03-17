@@ -1,0 +1,16 @@
+{{#each transitions}}
+{{#if isDecision}}
+{{!// ---- decision requires an additional if/else flow ----- }}
+{{#if defaultBranch}}
+else {
+{{else}}
+if ({{{decision}}}) {
+{{/if}}
+  {{> firing}}
+}
+{{/if}}
+{{else}}
+{{!// ---- no decision: no additional if/else flow needed ----- }}
+{{> firing }}
+{{/if}}
+{{/each}}

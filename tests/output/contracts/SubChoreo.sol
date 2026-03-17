@@ -24,7 +24,6 @@ contract SubChoreo is IProcessExecution {
 
   function enact(uint id) external {
     uint _tokenState = tokenState[0];
-
     console.log(
       "SubChoreo: current token state is %d, sender %s trying to execute task %d",
       _tokenState,
@@ -73,8 +72,9 @@ contract SubChoreo is IProcessExecution {
       }
       break;
     }
-
+    
     tokenState[0] = _tokenState;
+    
     console.log(
       "SubChoreo: new token state is %d",
        _tokenState
@@ -82,14 +82,7 @@ contract SubChoreo is IProcessExecution {
   }
 
   function SubChoreography_1bsql62(uint id) external {
-    uint _tokenState = tokenState[1];
-
-    console.log(
-      "SubChoreography_1bsql62: current token state is %d, sender %s trying to execute task %d",
-      _tokenState,
-      msg.sender,
-      id
-    );
+    uint _tokenState = tokenState;
     while(_tokenState != 0) {
       if (_tokenState & 1 == 1) {
         // <--- ChoreographyTask_0tcvdg0 SubTask --->
@@ -103,12 +96,9 @@ contract SubChoreo is IProcessExecution {
       }
       break;
     }
-
-    tokenState[1] = _tokenState;
-    console.log(
-      "SubChoreography_1bsql62: new token state is %d",
-       _tokenState
-    );
+    
+    tokenState = _tokenState;
+    
   }
 
 }

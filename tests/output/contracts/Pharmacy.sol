@@ -23,7 +23,6 @@ contract Pharmacy is IProcessExecution {
 
   function enact(uint id) external {
     uint _tokenState = tokenState;
-
     console.log(
       "Pharmacy: current token state is %d, sender %s trying to execute task %d",
       _tokenState,
@@ -109,8 +108,9 @@ contract Pharmacy is IProcessExecution {
       }
       break;
     }
-
+    
     tokenState = _tokenState;
+    
     console.log(
       "Pharmacy: new token state is %d",
        _tokenState

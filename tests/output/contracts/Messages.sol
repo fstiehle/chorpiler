@@ -30,11 +30,6 @@ contract Messages is IProcessExecution {
 
     pizza_order = _pizza_order;
     tokenState = 2;
-    console.log(
-      "ChoreographyTask_0hy9n0g: new token state is %d",
-       _tokenState
-    );
-
     if (tokenState != 0) {
       enact(0);
     }
@@ -46,11 +41,6 @@ contract Messages is IProcessExecution {
 
     pizza_order = _pizza_order;
     tokenState = 0;
-    console.log(
-      "ChoreographyTask_175oxwe: new token state is %d",
-       _tokenState
-    );
-
     if (tokenState != 0) {
       enact(0);
     }
@@ -63,11 +53,6 @@ require(pizza_order == "tuna", "Decision condition not met");
 
     pizza_order = _pizza_order;
     tokenState = 0;
-    console.log(
-      "ChoreographyTask_1l3cbhv: new token state is %d",
-       _tokenState
-    );
-
     if (tokenState != 0) {
       enact(0);
     }
@@ -75,7 +60,6 @@ require(pizza_order == "tuna", "Decision condition not met");
 
   function enact(uint id) external {
     uint _tokenState = tokenState;
-
     console.log(
       "Messages: current token state is %d, sender %s trying to execute task %d",
       _tokenState,
@@ -100,8 +84,9 @@ require(pizza_order == "tuna", "Decision condition not met");
       }
       break;
     }
-
+    
     tokenState = _tokenState;
+    
     console.log(
       "Messages: new token state is %d",
        _tokenState

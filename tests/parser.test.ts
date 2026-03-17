@@ -46,6 +46,23 @@ describe("Test BPMN choreography parsing", () => {
           );
         });
       });
+
+      it.only(`test`, async () => {
+        const data = await readFile(path.join(shouldSucceedPath,
+          "sub-choreography2.bpmn"
+        ));
+        const result = await parser.fromXML(data);
+
+        assert.ok(result, `Should successfully parse model`);
+        assert.ok(
+          Array.isArray(result),
+          "Should return an array of interaction nets",
+        );
+        assert.ok(
+          result.length > 0,
+          "Should contain at least one interaction net",
+        );
+      });
     });
 
     describe("Parse models that should fail", () => {

@@ -16,62 +16,6 @@ export default class SolDefaultContractGenerator extends TemplateEngine {
       _iNet,
       path.join(__dirname, "..", "..", "templates/ProcessExecution.sol"),
       _caseVariables,
-      [
-        {
-          partial: "conditional",
-          path: path.join(
-            __dirname,
-            "..",
-            "..",
-            "templates/partials/conditional.mustache.sol",
-          ),
-        },
-        {
-          partial: "tokenstate",
-          path: path.join(
-            __dirname,
-            "..",
-            "..",
-            "templates/partials/tokenstate.mustache.sol",
-          ),
-        },
-        {
-          partial: "casevariable",
-          path: path.join(
-            __dirname,
-            "..",
-            "..",
-            "templates/partials/casevariable.mustache.sol",
-          ),
-        },
-        {
-          partial: "callcontract",
-          path: path.join(
-            __dirname,
-            "..",
-            "..",
-            "templates/partials/callcontract.mustache.sol",
-          ),
-        },
-        {
-          partial: "transition",
-          path: path.join(
-            __dirname,
-            "..",
-            "..",
-            "templates/partials/transition.mustache.sol",
-          ),
-        },
-        {
-          partial: "execution",
-          path: path.join(
-            __dirname,
-            "..",
-            "..",
-            "templates/partials/execution.mustache.sol",
-          ),
-        },
-      ],
     );
   }
 }

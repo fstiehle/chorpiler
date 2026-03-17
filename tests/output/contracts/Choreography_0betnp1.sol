@@ -34,7 +34,6 @@ contract Choreography_0betnp1 is IInstanceExecution {
 
   function enact(uint instanceID, uint id) external {
     uint _tokenState = processData[instanceID].tokenState;
-
     console.log(
       "Choreography_0betnp1: current token state is %d, sender %s trying to execute task %d",
       _tokenState,
@@ -54,8 +53,9 @@ contract Choreography_0betnp1 is IInstanceExecution {
       }
       break;
     }
-
+    
     processData[instanceID].tokenState = _tokenState;
+    
     console.log(
       "Choreography_0betnp1: new token state is %d",
        _tokenState

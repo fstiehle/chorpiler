@@ -2,18 +2,18 @@
  * Generates a Encoding from an INet, by removing silent transitions and encoding tasks in a bit array fashion,
  * the template can be used to render the process token play by a TemplateEngine
  */
-import { deleteFromArray } from "../util/helpers.js";
-import { InteractionNet } from "../Parser/InteractionNet.js";
-import * as Encoding from "./Encoding/Encoding.js";
+import { deleteFromArray } from "../../util/helpers.js";
+import { InteractionNet } from "../../Parser/InteractionNet.js";
+import * as Encoding from "../Encoding/Encoding.js";
 import { assert } from "console";
-import { CompileOptions } from "./TemplateEngine.js";
-import { Transition } from "../Parser/Elements/Transition.js";
-import { Element } from "../Parser/Elements/Element.js";
-import { Place, PlaceType } from "../Parser/Elements/Place.js";
-import { LabelType, TaskLabel } from "../Parser/Elements/Label.js";
-import { CallType } from "../Parser/Elements/Call.js";
-import { Guard } from "../Parser/Elements/Guard.js";
-import { Participant } from "../Parser/Elements/Participant.js";
+import { CompileOptions } from "../TemplateEngine.js";
+import { Transition } from "../../Parser/Elements/Transition.js";
+import { Element } from "../../Parser/Elements/Element.js";
+import { Place, PlaceType } from "../../Parser/Elements/Place.js";
+import { LabelType, TaskLabel } from "../../Parser/Elements/Label.js";
+import { CallType } from "../../Parser/Elements/Call.js";
+import { Guard } from "../../Parser/Elements/Guard.js";
+import { Participant } from "../../Parser/Elements/Participant.js";
 
 const loggingEnabled = false; // Toggleable logging
 
@@ -141,8 +141,7 @@ export class INetEncoder {
     // transitions to ids
     const taskIDs = new Map<string, number>();
     const transitions = new Array<Transition>();
-    const taskIDoffset =
-      this.mainEncoded.options.loopProtection === true ? 1 : 0; // keep 0 for noop, noop is required for loop protection,
+    const taskIDoffset = 1 // keep 0 for noop, noop is required for loop protection,
     // loop protection: set taskID to noop, once it is executed once, to prevent endless execution loops.
 
     // Preparation: set up all relevant transitions

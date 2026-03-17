@@ -1,5 +1,5 @@
-import { InitiatedTransition, MainProcess, Transition } from "./Encoding.js";
-import { IFromEncoding } from "./IFromEncoding.js";
+import { InitiatedTransition, MainProcess, Transition } from "../Encoding.js";
+import { IFromEncoding } from "../IFromEncoding.js";
 
 /**
  * Represents the encoding of the process with information needed for
