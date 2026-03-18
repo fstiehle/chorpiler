@@ -6,7 +6,7 @@ import { fileURLToPath } from "url";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 import { CaseVariable } from "../Generator/Encoding/Encoding.js";
-import { TriggerEncoding } from "../Generator/Encoding/TriggerEncoding.js";
+import { TriggerEncoding } from "../Generator/Encoding/JSON/TriggerEncoding.js";
 import { GeneratorConstructor } from "../Generator/Generator.js";
 import SolDefaultContractGenerator from "../Generator/target/Sol/DefaultGenerator.js";
 import { TemplateEngine } from "../Generator/TemplateEngine.js";
@@ -24,7 +24,7 @@ import {
 import { Trace } from "../util/EventLog/Trace.js";
 import { XESFastXMLParser } from "../util/EventLog/XESFastXMLParser.js";
 import { IXESParser } from "../util/EventLog/XESParser.js";
-import { INetEncoder } from "../Generator/Encoder.js";
+import { INetEncoder } from "../Generator/Encoding/Encoder.js";
 import { InteractionNet } from "../Parser/InteractionNet.js";
 
 const LOGGING_ENABLED = false; // Toggleable logging

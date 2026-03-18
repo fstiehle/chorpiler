@@ -1,4 +1,5 @@
 {{#each taskWithCaseVar}}
+
 function {{{modelID}}}({{#if isInstanced}}uint instance, {{/if}}{{{type}}} _{{{name}}}) external {
   require(tokenState & {{{consume}}} == {{{consume}}});
   {{{conditionString}}}
@@ -10,7 +11,7 @@ function {{{modelID}}}({{#if isInstanced}}uint instance, {{/if}}{{{type}}} _{{{n
   {{#if options.debug}}
   console.log(
     "{{{modelID}}}: new token state is %d",
-    _tokenState
+    tokenState
   );
   {{/if}}
   {{! // ---- Continue process loop ---- }}
@@ -18,5 +19,4 @@ function {{{modelID}}}({{#if isInstanced}}uint instance, {{/if}}{{{type}}} _{{{n
     enact(0);
   }
 }
-{{! // ---- Add Whitespace ---- }}
 {{/each}}

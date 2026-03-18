@@ -23,8 +23,8 @@ export default {
   },
 };
 
-export * from "./Generator/Encoding/TriggerEncoding.js";
-export * from "./Generator/Encoder.js";
+export * from "./Generator/Encoding/JSON/TriggerEncoding.js";
+export * from "./Generator/Encoding/Encoder.js";
 export * from "./Generator/TemplateEngine.js";
 
 export * from "./Parser/Elements/Call.js";

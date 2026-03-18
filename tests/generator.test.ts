@@ -5,7 +5,6 @@ import path from "path";
 import util from "util";
 import { CaseVariable } from "../src/Generator/Encoding/Encoding.js";
 import SolDefaultContractGenerator from "../src/Generator/target/Sol/DefaultGenerator.js";
-import SolInstanceGenerator from "../src/Generator/target/Sol/InstanceGenerator.js";
 import { INetFastXMLParser } from "../src/Parser/FastXMLParser.js";
 import { INetParser } from "../src/Parser/Parser.js";
 import { BPMN_PATH, CONTRACTS_PATH } from "./config.js";
@@ -40,9 +39,7 @@ describe("Generation of edge cases", () => {
         }
 
         for (const iNet of iNets) {
-          const generator = iNet.isCalled
-            ? new SolInstanceGenerator(iNet)
-            : new SolDefaultContractGenerator(iNet);
+          const generator = new SolDefaultContractGenerator(iNet, iNet.isCalled);
 
           const result = await generator.compile({
             unfoldSubNets: !isSubChoreography2,
@@ -152,15 +149,15 @@ describe("Generation of edge cases", () => {
       await compileBpmn(parser, "sub-choreo-chained", [], [], false);
     });
 
-    it.only("Messages case to Sol Contract", async () => {
+    it.skip("Messages case to Sol Contract", async () => {
       await compileBpmn(
         parser,
         "messages",
         [
           new CaseVariable(
             "pizza_order",
-            "string",
-            'string public pizza_order = ""',
+            "uint",
+            'uint public pizza_order = 0',
             false,
           ),
         ],

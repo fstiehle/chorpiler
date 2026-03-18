@@ -5,7 +5,6 @@ import { readFileSync, readdirSync } from "fs";
 import { strict as assert } from "node:assert";
 import path from "path";
 import { PublicClient, WalletClient } from "viem";
-import { TriggerEncoding } from "../../src/Generator/Encoding/TriggerEncoding.js";
 import {
   EventLog,
   InstanceDataChange,
@@ -16,6 +15,7 @@ import { CONTRACTS_PATH, XES_PATH } from "../config.js";
 import { HardhatViemHelpers } from "@nomicfoundation/hardhat-viem/types";
 import { DEBUG_MODE } from "./../config.js";
 import { NetworkHelpers } from "@nomicfoundation/hardhat-network-helpers/types";
+import { TriggerEncoding } from "../../src/Generator/Encoding/JSON/TriggerEncoding.js";
 
 export interface ContractData {
   contractName: string;

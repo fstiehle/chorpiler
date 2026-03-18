@@ -1,4 +1,4 @@
-{{!// ---- Performance: cache state in var ----- }}
+{{!// ---- Performance: cache state in var ---- }}
 uint _tokenState = {{> tokenstate }};
 
 {{!// ---- Debug Support ----- }}
@@ -9,8 +9,8 @@ console.log(
   msg.sender,
   id
 );
-{{/if}}
 
+{{/if}}
 {{!// ---- Main states loop ----- }}
 while(_tokenState != 0) {
   {{#each states}}

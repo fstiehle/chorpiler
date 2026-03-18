@@ -55,7 +55,7 @@
       <bpmn2:messageFlowRef>MessageFlow_1dujovs</bpmn2:messageFlowRef>
     </bpmn2:choreographyTask>
     <bpmn2:sequenceFlow id="Flow_1jpxy7l" sourceRef="Gateway_0e2xlj2" targetRef="ChoreographyTask_1l3cbhv">
-      <bpmn2:conditionExpression xsi:type="bpmn2:tFormalExpression" language="Solidity">pizza_order == "tuna"</bpmn2:conditionExpression>
+      <bpmn2:conditionExpression xsi:type="bpmn2:tFormalExpression" language="Solidity">pizza_order == 1</bpmn2:conditionExpression>
     </bpmn2:sequenceFlow>
     <bpmn2:exclusiveGateway id="Gateway_1xw09hz">
       <bpmn2:incoming>Flow_0vwz24g</bpmn2:incoming>

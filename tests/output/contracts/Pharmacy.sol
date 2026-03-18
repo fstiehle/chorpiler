@@ -3,12 +3,13 @@ pragma solidity ^0.8.9;
 
 import "hardhat/console.sol";
 
-interface IProcessExecution {
+interface IProcess {
   function enact(uint id) external;
   function getTokenState() external view returns (uint);
 }
 
-contract Pharmacy is IProcessExecution {
+
+contract Pharmacy is IProcess {
   uint private tokenState = 1;
   address[5] public participants;
   event Task(uint id);
@@ -23,12 +24,14 @@ contract Pharmacy is IProcessExecution {
 
   function enact(uint id) external {
     uint _tokenState = tokenState;
+    
     console.log(
       "Pharmacy: current token state is %d, sender %s trying to execute task %d",
       _tokenState,
       msg.sender,
       id
     );
+    
     while(_tokenState != 0) {
       if (_tokenState & 2 == 2) {
         // <--- ChoreographyTask_0lvyk79 Give prescription --->
@@ -116,5 +119,4 @@ contract Pharmacy is IProcessExecution {
        _tokenState
     );
   }
-
 }

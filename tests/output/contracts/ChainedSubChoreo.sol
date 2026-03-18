@@ -3,12 +3,13 @@ pragma solidity ^0.8.9;
 
 import "hardhat/console.sol";
 
-interface IProcessExecution {
+interface IProcess {
   function enact(uint id) external;
   function getTokenState() external view returns (uint);
 }
 
-contract ChainedSubChoreo is IProcessExecution {
+
+contract ChainedSubChoreo is IProcess {
   uint[3] public tokenState;
   address[3] public participants;
   event Task(uint id);
@@ -24,12 +25,14 @@ contract ChainedSubChoreo is IProcessExecution {
 
   function enact(uint id) external {
     uint _tokenState = tokenState[0];
+    
     console.log(
       "ChainedSubChoreo: current token state is %d, sender %s trying to execute task %d",
       _tokenState,
       msg.sender,
       id
     );
+    
     while(_tokenState != 0) {
       if (_tokenState & 1 == 1) {
         // <--- ChoreographyTask_0hy9n0g Start Task --->
@@ -89,9 +92,16 @@ contract ChainedSubChoreo is IProcessExecution {
        _tokenState
     );
   }
-
   function SubChoreography_1bsql62(uint id) external {
-    uint _tokenState = tokenState;
+    uint _tokenState = tokenState[1];
+    
+    console.log(
+      "SubChoreography_1bsql62: current token state is %d, sender %s trying to execute task %d",
+      _tokenState,
+      msg.sender,
+      id
+    );
+    
     while(_tokenState != 0) {
       if (_tokenState & 1 == 1) {
         // <--- ChoreographyTask_0tcvdg0 SubTask --->
@@ -106,12 +116,24 @@ contract ChainedSubChoreo is IProcessExecution {
       break;
     }
     
-    tokenState = _tokenState;
+    tokenState[1] = _tokenState;
     
+    console.log(
+      "SubChoreography_1bsql62: new token state is %d",
+       _tokenState
+    );
   }
-
+  
   function SubChoreography_0g7b7g1(uint id) external {
-    uint _tokenState = tokenState;
+    uint _tokenState = tokenState[2];
+    
+    console.log(
+      "SubChoreography_0g7b7g1: current token state is %d, sender %s trying to execute task %d",
+      _tokenState,
+      msg.sender,
+      id
+    );
+    
     while(_tokenState != 0) {
       if (_tokenState & 1 == 1) {
         // <--- ChoreographyTask_1y0z264 SubTask2 --->
@@ -126,8 +148,12 @@ contract ChainedSubChoreo is IProcessExecution {
       break;
     }
     
-    tokenState = _tokenState;
+    tokenState[2] = _tokenState;
     
+    console.log(
+      "SubChoreography_0g7b7g1: new token state is %d",
+       _tokenState
+    );
   }
-
+  
 }

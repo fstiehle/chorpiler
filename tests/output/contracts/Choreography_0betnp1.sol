@@ -3,7 +3,7 @@ pragma solidity ^0.8.9;
 
 import "hardhat/console.sol";
 
-interface IInstanceExecution {
+interface IProcessInstance {
   struct ProcessData {
     address[2] participants;
     uint tokenState;
@@ -13,14 +13,15 @@ interface IInstanceExecution {
   function instance(address[2] memory participants) external returns (uint);
 }
 
-contract Choreography_0betnp1 is IInstanceExecution {
-  mapping(uint => IInstanceExecution.ProcessData) public processData;
+
+contract Choreography_0betnp1 is IProcessInstance {
+  mapping(uint => IProcessInstance.ProcessData) public processData;
   uint private nextId = 0;
   event Task(uint id);
 
   function instance(address[2] memory _participants) external returns (uint) {
     uint newId = nextId;
-    processData[newId] = IInstanceExecution.ProcessData({
+    processData[newId] = IProcessInstance.ProcessData({
       participants: _participants,
       tokenState: 1
     });
@@ -34,12 +35,14 @@ contract Choreography_0betnp1 is IInstanceExecution {
 
   function enact(uint instanceID, uint id) external {
     uint _tokenState = processData[instanceID].tokenState;
+    
     console.log(
       "Choreography_0betnp1: current token state is %d, sender %s trying to execute task %d",
       _tokenState,
       msg.sender,
       id
     );
+    
     while(_tokenState != 0) {
       if (_tokenState & 1 == 1) {
         // <--- ChoreographyTask_14yfpb3 New Activity --->
@@ -61,5 +64,4 @@ contract Choreography_0betnp1 is IInstanceExecution {
        _tokenState
     );
   }
-
 }

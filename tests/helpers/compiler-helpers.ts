@@ -3,7 +3,6 @@ import path from "path";
 import util from "util";
 import { CaseVariable } from "../../src/Generator/Encoding/Encoding.js";
 import SolDefaultContractGenerator from "../../src/Generator/target/Sol/DefaultGenerator.js";
-import SolInstanceGenerator from "../../src/Generator/target/Sol/InstanceGenerator.js";
 import SolStateChannelContractGenerator from "../../src/Generator/target/Sol/StateChannelGenerator.js";
 import { BPMN_PATH, CONTRACTS_PATH } from "../config.js";
 import { TemplateEngine } from "../../src/Generator/TemplateEngine.js";
@@ -52,10 +51,8 @@ export const parseINet = (
   let generator;
   if (isStateChannel) {
     generator = new SolStateChannelContractGenerator(iNet);
-  } else if (iNet.isCalled) {
-    generator = new SolInstanceGenerator(iNet);
   } else {
-    generator = new SolDefaultContractGenerator(iNet);
+    generator = new SolDefaultContractGenerator(iNet, iNet.isCalled);
   }
 
   // Add case variables if provided

@@ -6,7 +6,7 @@ import * as path from "path";
 import { fileURLToPath } from "url";
 import { CaseVariable } from "./Encoding/Encoding.js";
 import { INetEncoder } from "./Encoding/Encoder.js";
-import { HandlebarsEncoding } from "./Encoding/Template/HandlebarsEncoding.js";
+import { HandlebarsEncoding } from "./Encoding/TemplateN/HandlebarsEncoding.js";
 import { TriggerEncoding } from "./Encoding/JSON/TriggerEncoding.js";
 
 const __filename = fileURLToPath(import.meta.url);
@@ -45,32 +45,50 @@ export abstract class TemplateEngine implements ITemplateEngine {
     private templatePartials = new Array<{ partial: string; path: string }>(),
     private isInstanced: boolean = false,
   ) {
-    // Merge constructor partials with discovered ones
-    const discoveredPartials = this.discoverPartials();
+    // Discover partials from both directories
+    const partialsDir = path.join(path.dirname(this.templatePath), 'partials');
+    const partialsNDir = path.join(path.dirname(this.templatePath), 'partialsN');
+
+    const basePartials = this.discoverPartials(partialsDir);
+    const overridePartials = this.discoverPartials(partialsNDir);
+
+    // Merge: constructor partials, then base partials, then partialsN (which override)
     const constructorPartialNames = this.templatePartials.map(p => p.partial);
-    const newPartials = discoveredPartials.filter(p => !constructorPartialNames.includes(p.partial));
-    this.templatePartials = [...this.templatePartials, ...newPartials];
+    const basePartialsFiltered = basePartials.filter(p => !constructorPartialNames.includes(p.partial));
+
+    // Build a map for efficient override handling
+    const partialsMap = new Map<string, { partial: string; path: string }>();
+
+    // Add constructor partials
+    this.templatePartials.forEach(p => partialsMap.set(p.partial, p));
+
+    // Add base partials (don't override constructor partials)
+    basePartialsFiltered.forEach(p => partialsMap.set(p.partial, p));
+
+    // Add partialsN (override everything)
+    overridePartials.forEach(p => partialsMap.set(p.partial, p));
+
+    this.templatePartials = Array.from(partialsMap.values());
   }
 
-  private discoverPartials(): Array<{ partial: string; path: string }> {
-    const partialsDir = path.join(path.dirname(this.templatePath), 'partials');
+  private discoverPartials(directory: string): Array<{ partial: string; path: string }> {
     const partials: Array<{ partial: string; path: string }> = [];
 
     try {
-      if (fs.existsSync(partialsDir)) {
-        const files = fs.readdirSync(partialsDir);
+      if (fs.existsSync(directory)) {
+        const files = fs.readdirSync(directory);
         for (const file of files) {
           if (file.endsWith('.handlebars.sol')) {
             const partialName = file.replace('.handlebars.sol', '');
             partials.push({
               partial: partialName,
-              path: path.join(partialsDir, file)
+              path: path.join(directory, file)
             });
           }
         }
       }
     } catch (error) {
-      console.warn('Failed to discover partials:', error);
+      console.warn(`Failed to discover partials in ${directory}:`, error);
     }
     return partials;
   }

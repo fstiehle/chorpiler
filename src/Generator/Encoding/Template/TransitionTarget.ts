@@ -1,4 +1,4 @@
-import { Call } from "../Encoding.js";
+import * as Encoding from "../Encoding.js";
 import { CallType } from "../../../Parser/Elements/Call.js";
 
 export class TransitionTarget {
@@ -6,7 +6,7 @@ export class TransitionTarget {
   public isSub = false;
   public callString: string | undefined = undefined;
 
-  constructor(public call: Call) {
+  constructor(public call: Encoding.Call) {
     this.isCall = isCallChoreography(call);
     this.isSub = isSubChoreography(call);
 
@@ -22,10 +22,10 @@ export class TransitionTarget {
   }
 }
 
-function isCallChoreography(call: Call): boolean {
+function isCallChoreography(call: Encoding.Call): boolean {
   return call?.type === CallType.CallChoreography;
 }
 
-function isSubChoreography(call: Call): boolean {
+function isSubChoreography(call: Encoding.Call): boolean {
   return call?.type === CallType.SubChoreography;
 }

@@ -3,18 +3,19 @@ pragma solidity ^0.8.9;
 
 import "hardhat/console.sol";
 
-interface IProcessExecution {
+interface IProcess {
   function enact(uint id) external;
   function getTokenState() external view returns (uint);
 }
 
-contract RentalAgreement is IProcessExecution {
+
+contract RentalAgreement is IProcess {
   uint private tokenState = 1;
   address[3] public participants;
   event Task(uint id);
-
   // Case Variable conditions
   uint public conditions;
+  
   function setConditions(uint _conditions) external {
     conditions = _conditions;
   }
@@ -29,12 +30,14 @@ contract RentalAgreement is IProcessExecution {
 
   function enact(uint id) external {
     uint _tokenState = tokenState;
+    
     console.log(
       "RentalAgreement: current token state is %d, sender %s trying to execute task %d",
       _tokenState,
       msg.sender,
       id
     );
+    
     while(_tokenState != 0) {
       if (_tokenState & 2 == 2) {
         // <--- ChoreographyTask_19lvxvh pay bond --->
@@ -156,5 +159,4 @@ contract RentalAgreement is IProcessExecution {
        _tokenState
     );
   }
-
 }

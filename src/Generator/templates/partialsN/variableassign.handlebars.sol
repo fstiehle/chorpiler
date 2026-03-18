@@ -1,6 +1,6 @@
 {{!// ---- instance support ----- }}
 {{#if isInstanced}}
-processData[instance].{{{name}}} = _{{{name}}};
+processData[instanceID].{{{name}}} = _{{{name}}};
 {{else}}
 {{!// ---- direct assignment (uninstanced) ----- }}
 {{{name}}} = _{{{name}}};

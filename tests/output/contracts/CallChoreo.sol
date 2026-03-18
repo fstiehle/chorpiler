@@ -3,24 +3,25 @@ pragma solidity ^0.8.9;
 
 import "hardhat/console.sol";
 
-interface IInstanceExecution {
+interface IProcess {
+  function enact(uint id) external;
+  function getTokenState() external view returns (uint);
+}
+
+interface IInstanceCall {
   function instance(address[] memory participants) external returns (uint);
   function enact(uint instance, uint id) external;
   function getTokenState(uint instance) external view returns (uint);
 }
 
-interface IChoreography_0betnp1 is IInstanceExecution {
+// Interface for Choreography_0betnp1
+interface IChoreography_0betnp1 is IInstanceCall {
   function instance(address[2] memory participants) external returns (uint);
 }
 IChoreography_0betnp1 constant Choreography_0betnp1 = IChoreography_0betnp1(0x0000000000000000000000000000000000000000);
 
-interface IProcessExecution {
-  function enact(uint id) external;
-  function getTokenState() external view returns (uint);
-}
-
-contract CallChoreo is IProcessExecution {
-  uint[1] private instanceList; // instance
+contract CallChoreo is IProcess {
+  uint[1] private instanceList; // instanceIDs for calls
   event NewInstance(uint id, uint instanceID);
   uint private tokenState = 1;
   address[3] public participants;
@@ -36,12 +37,14 @@ contract CallChoreo is IProcessExecution {
 
   function enact(uint id) external {
     uint _tokenState = tokenState;
+    
     console.log(
       "CallChoreo: current token state is %d, sender %s trying to execute task %d",
       _tokenState,
       msg.sender,
       id
     );
+    
     while(_tokenState != 0) {
       if (_tokenState & 1 == 1) {
         // <--- ChoreographyTask_0hy9n0g order pizza --->
@@ -67,7 +70,7 @@ contract CallChoreo is IProcessExecution {
       if (_tokenState & 2 == 2) {
         // <---  auto transition  --->
         _tokenState &= ~uint(2);
-        
+        instanceList[0] = Choreography_0betnp1.instance([participants[0], participants[2]]);
         emit NewInstance(0, instanceList[0]);
         _tokenState |= 4;
         continue;
@@ -82,5 +85,4 @@ contract CallChoreo is IProcessExecution {
        _tokenState
     );
   }
-
 }

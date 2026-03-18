@@ -10,12 +10,15 @@ const __dirname = path.dirname(__filename);
 export default class SolDefaultContractGenerator extends TemplateEngine {
   constructor(
     _iNet: InteractionNet,
+    isInstanced = false,
     _caseVariables?: Map<string, CaseVariable>,
   ) {
     super(
       _iNet,
-      path.join(__dirname, "..", "..", "templates/ProcessExecution.sol"),
+      path.join(__dirname, "..", "..", "templates/Contract.handlebars.sol"),
       _caseVariables,
+      [], // partials will be auto-discovered
+      isInstanced
     );
   }
 }

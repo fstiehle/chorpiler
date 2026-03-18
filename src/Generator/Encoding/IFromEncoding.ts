@@ -1,7 +1,7 @@
-import { Process } from "./Encoding.js";
+import { MainProcess, Process } from "./Encoding.js";
 
 export abstract class IFromEncoding {
-  static fromEncoding(encoding: Process) {
+  static fromEncoding(encoding: MainProcess) {
     return encoding;
   }
 }

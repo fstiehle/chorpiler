@@ -1,10 +1,10 @@
-// <--- {{#modelID}}{{modelID}} {{taskName}}{{/modelID}}{{^modelID}} auto transition {{/modelID}} --->
+// <--- {{#if modelID}}{{modelID}} {{taskName}}{{else}} auto transition {{/if}} --->
 {{#if hasConditions}}
 {{!// ---- additional conditions to be checked ----- }}
 if ({{{conditionString}}}) {
-  {{ > firing }}
+  {{> firing }}
 }
-{{/else}}
+{{else}}
 {{!// ---- no additional conditions to be checked: direct firing ----- }}
-{{ > firing }}
+{{> firing }}
 {{/if}}

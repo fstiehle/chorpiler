@@ -3,18 +3,19 @@ pragma solidity ^0.8.9;
 
 import "hardhat/console.sol";
 
-interface IProcessExecution {
+interface IProcess {
   function enact(uint id) external;
   function getTokenState() external view returns (uint);
 }
 
-contract XORAND is IProcessExecution {
+
+contract XORAND is IProcess {
   uint private tokenState = 1;
   address[3] public participants;
   event Task(uint id);
-
   // Case Variable items
   bool public items = false;
+  
   function setItems(bool _items) external {
     items = _items;
   }
@@ -29,12 +30,14 @@ contract XORAND is IProcessExecution {
 
   function enact(uint id) external {
     uint _tokenState = tokenState;
+    
     console.log(
       "XORAND: current token state is %d, sender %s trying to execute task %d",
       _tokenState,
       msg.sender,
       id
     );
+    
     while(_tokenState != 0) {
       if (_tokenState & 1 == 1) {
         // <--- ChoreographyTask_1vnykqp Order goods --->
@@ -103,5 +106,4 @@ contract XORAND is IProcessExecution {
        _tokenState
     );
   }
-
 }

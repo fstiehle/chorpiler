@@ -13,7 +13,7 @@ emit NewInstance({{{outTo.call.id}}}, instanceList[{{{outTo.call.id}}}]);
 {{/if}}
 {{/if}}
 {{/if}}
-{{#if produce}}
+{{#if hasProduce}}
 _tokenState |= {{{produce}}};
 {{/if}}
 {{#if options.events}}

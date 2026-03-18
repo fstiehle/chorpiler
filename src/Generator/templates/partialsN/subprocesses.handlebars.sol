@@ -1,5 +1,6 @@
 {{#each subProcesses}}
-function {{modelID}}(uint id) external {
+function {{modelID}}({{#if isInstanced}}uint instanceID, {{/if}}uint id) external {
   {{> states}}
 }
+
 {{/each}}

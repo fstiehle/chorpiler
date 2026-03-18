@@ -3,18 +3,19 @@ pragma solidity ^0.8.9;
 
 import "hardhat/console.sol";
 
-interface IProcessExecution {
+interface IProcess {
   function enact(uint id) external;
   function getTokenState() external view returns (uint);
 }
 
-contract Pizza is IProcessExecution {
+
+contract Pizza is IProcess {
   uint private tokenState = 1;
   address[3] public participants;
   event Task(uint id);
-
   // Case Variable items
   bool public items = false;
+  
   function setItems(bool _items) external {
     items = _items;
   }
@@ -29,12 +30,14 @@ contract Pizza is IProcessExecution {
 
   function enact(uint id) external {
     uint _tokenState = tokenState;
+    
     console.log(
       "Pizza: current token state is %d, sender %s trying to execute task %d",
       _tokenState,
       msg.sender,
       id
     );
+    
     while(_tokenState != 0) {
       if (_tokenState & 1 == 1) {
         // <--- ChoreographyTask_0hy9n0g Order Pizza --->
@@ -97,5 +100,4 @@ contract Pizza is IProcessExecution {
        _tokenState
     );
   }
-
 }

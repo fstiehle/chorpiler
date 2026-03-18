@@ -6,8 +6,8 @@ import { EventLog } from "../../src/util/EventLog/EventLog.js";
 import { FuzzyLog } from "../../src/Simulator/FuzzyLog.js";
 import * as fs from "fs";
 import * as path from "path";
-import { TriggerEncoding } from "../../src/Generator/Encoding/TriggerEncoding.js";
 import { fileURLToPath } from "url";
+import { TriggerEncoding } from "../../src/Generator/Encoding/JSON/TriggerEncoding.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);

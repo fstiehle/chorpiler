@@ -7,7 +7,7 @@
 
 {{!// ---- Setter ----- }}
 {{#if setters}}
-function {{{functionName}}}({{#if isInstanced}}uint instance, {{/if}}{{{type}}} _{{{name}}}) external {
+function {{{functionName}}}({{#if isInstanced}}uint instanceID, {{/if}}{{{type}}} _{{{name}}}) external {
   {{> variableassign}}
 }
 {{/if}}
