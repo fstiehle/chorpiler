@@ -6,11 +6,11 @@ else {
 {{else}}
 if ({{{decision}}}) {
 {{/if}}
-  {{> firing}}
+  {{> transition }}
 }
 {{/if}}
 {{else}}
 {{!// ---- no decision: no additional if/else flow needed ----- }}
-{{> firing }}
+{{> transition }}
 {{/if}}
 {{/each}}

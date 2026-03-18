@@ -23,6 +23,7 @@ while(_tokenState != 0) {
 
 {{> tokenstate }} = _tokenState;
 
+{{!// ---- Debug Support ----- }}
 {{#if options.debug}}
 console.log(
   "{{{modelID}}}: new token state is %d",
