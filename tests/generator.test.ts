@@ -217,5 +217,85 @@ describe("Generation of edge cases", () => {
         "CallChoreo should have calls size of 1",
       );
     });
+
+    it("Chained Call choreography to Sol Contract", async () => {
+      const results = await compileBpmn(
+        parser,
+        "call-choreo-chained",
+        [],
+        [
+          {
+            callID: "Choreography_0betnp1",
+            address: undefined,
+          },
+          {
+            callID: "Choreography_1661x4r",
+            address: undefined,
+          },
+        ],
+        false,
+      );
+
+      // Read and verify Choreography_0betnp1.json
+      const choreography0betnp1Path = path.join(
+        CONTRACTS_PATH,
+        "Choreography_0betnp1.json",
+      );
+      assert.ok(
+        fs.existsSync(choreography0betnp1Path),
+        "Choreography_0betnp1.json should exist",
+      );
+
+      // Read and verify Choreography1661x4r.json
+      const Choreography1661x4rPath = path.join(
+        CONTRACTS_PATH,
+        "Choreography_1661x4r.json",
+      );
+      assert.ok(
+        fs.existsSync(Choreography1661x4rPath),
+        "Choreography_1661x4r.json should exist",
+      );
+
+      const Choreography1661x4rData = JSON.parse(
+        fs.readFileSync(Choreography1661x4rPath, "utf8"),
+      );
+      assert.strictEqual(
+        Choreography1661x4rData.isCalled,
+        true,
+        "Choreography1661x4r should have isCalled: true",
+      );
+      assert.strictEqual(
+        Choreography1661x4rData.isInstanced,
+        true,
+        "Choreography1661x4r should have isInstanced: true",
+      );
+
+      const choreography0betnp1Data = JSON.parse(
+        fs.readFileSync(choreography0betnp1Path, "utf8"),
+      );
+      assert.strictEqual(
+        choreography0betnp1Data.isCalled,
+        true,
+        "Choreography_0betnp1 should have isCalled: true",
+      );
+      assert.strictEqual(
+        choreography0betnp1Data.isInstanced,
+        true,
+        "Choreography_0betnp1 should have isInstanced: true",
+      );
+
+      // Read and verify CallChoreo.json
+      const callChoreoPath = path.join(CONTRACTS_PATH, "CallChoreoChained.json");
+      assert.ok(fs.existsSync(callChoreoPath), "CallChoreoChained.json should exist");
+
+      const callChoreoData = JSON.parse(
+        fs.readFileSync(callChoreoPath, "utf8"),
+      );
+      assert.strictEqual(
+        Object.keys(callChoreoData.calls).length,
+        2,
+        "CallChoreoChained should have calls size of 2",
+      );
+    });
   });
 });

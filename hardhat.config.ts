@@ -18,7 +18,7 @@ const config: HardhatUserConfig = {
   networks: {
     default: {
       type: "edr-simulated",
-      chainType: "generic",
+      chainId: 123,
       mining: { auto: true },
     },
   },

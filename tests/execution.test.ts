@@ -311,7 +311,7 @@ describe("Call Choreography Tests", () => {
           // NOTE: this is to account for models implementing anti-patterns,
           // automated decisions pre task execution should be moved into the constructor.
           await enact(client, wallets[0], updatedContract, "enact", 0);
-          console.log(updatedContract.address);
+          // console.log(updatedContract.address);
 
           const ccontext: EventProcessingContext = {
             client,
@@ -385,6 +385,7 @@ describe("Call Choreography Tests", () => {
 
                           for (const instanceEvent of trace) {
                             try {
+                              console.log(1)
                               await processEvent(
                                 instanceEvent,
                                 instanceContext,
