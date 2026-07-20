@@ -6,7 +6,7 @@ import * as path from "path";
 import { fileURLToPath } from "url";
 import { CaseVariable } from "./Encoding/Encoding.js";
 import { INetEncoder } from "./Encoding/Encoder.js";
-import { HandlebarsEncoding } from "./Encoding/TemplateN/HandlebarsEncoding.js";
+import { HandlebarsEncoding } from "./Encoding/Template/HandlebarsEncoding.js";
 import { TriggerEncoding } from "./Encoding/JSON/TriggerEncoding.js";
 
 const __filename = fileURLToPath(import.meta.url);
@@ -47,10 +47,8 @@ export abstract class TemplateEngine implements ITemplateEngine {
   ) {
     // Discover partials from both directories
     const partialsDir = path.join(path.dirname(this.templatePath), 'partials');
-    const partialsNDir = path.join(path.dirname(this.templatePath), 'partialsN');
 
     const basePartials = this.discoverPartials(partialsDir);
-    const overridePartials = this.discoverPartials(partialsNDir);
 
     // Merge: constructor partials, then base partials, then partialsN (which override)
     const constructorPartialNames = this.templatePartials.map(p => p.partial);
@@ -64,10 +62,6 @@ export abstract class TemplateEngine implements ITemplateEngine {
 
     // Add base partials (don't override constructor partials)
     basePartialsFiltered.forEach(p => partialsMap.set(p.partial, p));
-
-    // Add partialsN (override everything)
-    overridePartials.forEach(p => partialsMap.set(p.partial, p));
-
     this.templatePartials = Array.from(partialsMap.values());
   }
 

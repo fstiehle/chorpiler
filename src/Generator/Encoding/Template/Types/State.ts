@@ -1,4 +1,4 @@
-import type * as Encoding from "../Encoding.js";
+import type * as Encoding from "../../Encoding.js";
 import { Transition } from "./Transition.js";
 import { Options } from "./Options.js";
 
@@ -41,11 +41,8 @@ export class State {
     id: string,
     modelID: string
   ): State {
-    // Filter out transitions that are already in taskWithCaseVar
-    const filteredTransitions = transitions.filter(t => !excludeTransitions.has(t));
-
     // Convert transitions
-    const convertedTransitions = filteredTransitions.map(t =>
+    const convertedTransitions = transitions.map(t =>
       Transition.fromEncoding(t, isInstanced, options)
     );
 
@@ -53,12 +50,15 @@ export class State {
     convertedTransitions.sort((a, b) => {
       if (a.defaultBranch && !b.defaultBranch) return 1;
       if (!a.defaultBranch && b.defaultBranch) return -1;
+      if (a.defaultBranch && b.defaultBranch) {
+        throw new Error("Cannot have two default branches in the same state");
+      }
       return 0;
     });
 
     // Check if this is a decision state (has decision conditions)
-    const hasDecisions = filteredTransitions.some(t => t.condition);
-    const hasDefaultBranch = filteredTransitions.some(t => t.defaultBranch);
+    const hasDecisions = transitions.some(t => t.condition);
+    const hasDefaultBranch = transitions.some(t => t.defaultBranch);
 
     return new State(
       consume.toString(),

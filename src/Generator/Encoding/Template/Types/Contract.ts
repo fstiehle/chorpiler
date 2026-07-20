@@ -1,7 +1,7 @@
 import { Options } from "./Options.js";
 import { Call } from "./Call.js";
 import { CaseVariable } from "./CaseVariable.js";
-import { TaskWithCaseVar } from "./TaskWithCaseVar.js";
+import { DataTask } from "./DataTask.js";
 import { State } from "./State.js";
 import { SubProcess } from "./SubProcess.js";
 
@@ -20,7 +20,7 @@ import { SubProcess } from "./SubProcess.js";
  * - numberOfProcesses: total number of processes (main + subs)
  * - callList: array of called contract interfaces
  * - caseVariables: array of case variables
- * - taskWithCaseVar: array of tasks that set case variables
+ * dataTasks: array of tasks that set case variables
  * - states: array of states in the main process
  * - subProcesses: array of sub-processes
  */
@@ -35,7 +35,7 @@ export class Contract {
     public numberOfProcesses: string,
     public callList: Call[],
     public caseVariables: CaseVariable[],
-    public taskWithCaseVar: TaskWithCaseVar[],
+    public dataTasks: DataTask[],
     public states: State[],
     public subProcesses: SubProcess[],
     public isInstanced: boolean,
@@ -55,7 +55,7 @@ export class Contract {
    * Useful for conditional rendering in templates.
    */
   get hasDataTasks(): boolean {
-    return this.taskWithCaseVar.length > 0;
+    return this.dataTasks.length > 0;
   }
 
   /**

@@ -1,5 +1,5 @@
-import * as Encoding from "../Encoding.js";
-import { CallType } from "../../../Parser/Elements/Call.js";
+import * as Encoding from "../../Encoding.js";
+import { CallType } from "../../../../Parser/Elements/Call.js";
 import { Options } from "./Options.js";
 
 /**
@@ -21,7 +21,7 @@ import { Options } from "./Options.js";
  * - hasSubProcesses: whether contract has sub-processes (for tokenstate partial)
  * - id: process identifier (for tokenstate partial)
  */
-export class TaskWithCaseVar {
+export class DataTask {
   constructor(
     public modelID: string,
     public isInstanced: boolean,
@@ -33,10 +33,11 @@ export class TaskWithCaseVar {
     public options: Options,
     public hasSubProcesses: boolean,
     public id: string,
+    public taskID: number,
   ) {}
 
   /**
-   * Creates a TaskWithCaseVar instance from an Encoding.InitiatedTransition.
+   * Creates a DataTask instance from an Encoding.InitiatedTransition.
    */
   static fromEncoding(
     transition: Encoding.InitiatedTransition,
@@ -44,15 +45,15 @@ export class TaskWithCaseVar {
     options: Options,
     hasSubProcesses: boolean,
     id: string
-  ): TaskWithCaseVar {
+  ): DataTask {
     if (!transition.message?.caseVariable) {
-      throw new Error("TaskWithCaseVar requires a transition with a caseVariable");
+      throw new Error("DataTask requires a transition with a caseVariable");
     }
 
     const caseVar = transition.message.caseVariable;
     const conditionString = buildConditionString(transition, isInstanced);
 
-    return new TaskWithCaseVar(
+    return new DataTask(
       transition.modelID,
       isInstanced,
       caseVar.type,
@@ -62,13 +63,14 @@ export class TaskWithCaseVar {
       transition.produce.toString(),
       options,
       hasSubProcesses,
-      id
+      id,
+      transition.taskID
     );
   }
 }
 
 /**
- * Builds require() condition string for TaskWithCaseVar.
+ * Builds require() condition string for DataTask.
  */
 function buildConditionString(
   transition: Encoding.InitiatedTransition,

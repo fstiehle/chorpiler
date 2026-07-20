@@ -12,5 +12,5 @@
     "outDir": "lib",
   },
   "include": ["./**/*.ts"],
-  "exclude": ["src/Generator/templates", "node_modules", "lib"],
+  "exclude": ["src/Generator/Encoding/templates", "node_modules", "lib"],
 }

@@ -14,7 +14,7 @@ export default class SolStateChannelContractGenerator extends TemplateEngine {
   ) {
     super(
       _iNet,
-      path.join(__dirname, "..", "..", "templates/ProcessChannel.sol"),
+      path.join(__dirname, "..", "..", "Encoding/Template/templates/ProcessChannel.sol"),
       _caseVariables,
     );
   }

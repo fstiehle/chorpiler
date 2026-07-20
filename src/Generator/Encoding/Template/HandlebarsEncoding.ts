@@ -1,63 +1,106 @@
 import * as Encoding from "../Encoding.js";
 import { IFromEncoding } from "../IFromEncoding.js";
-import { CompileOptions } from "../../TemplateEngine.js";
-import { HandlebarsProcessEncoding } from "./HandlebarsProcessEncoding.js";
+import { Contract } from "./Types/Contract.js";
+import { Options } from "./Types/Options.js";
+import { Call } from "./Types/Call.js";
+import { CaseVariable } from "./Types/CaseVariable.js";
+import { DataTask } from "./Types/DataTask.js";
+import { State } from "./Types/State.js";
+import { SubProcess } from "./Types/SubProcess.js";
 
-export class HandlebarsEncoding
-  extends HandlebarsProcessEncoding
-  implements IFromEncoding
-{
+/**
+ * HandlebarsEncoding converts internal Encoding.MainProcess to Contract template structure.
+ * This is the main entry point for converting parsed choreography models into
+ * Handlebars-ready data for Contract.handlebars.sol rendering.
+ */
+export class HandlebarsEncoding implements IFromEncoding {
   /**
-   * Converts an `Encoding.Process` object to a Handlebars template-ready object.
+   * Converts an Encoding.MainProcess to a Contract instance.
    *
-   * @param encoding - The `Encoding.Process` object to convert.
-   * @returns A new `HandlebarsEncoding` object.
+   * @param encoding - The internal encoding from the parser/encoder
+   * @returns Contract instance ready for Handlebars template rendering
    */
-
-  constructor(
-    public options: CompileOptions,
-    public isCalled: boolean = false,
-    public isInstanced: boolean = false,
-    public subProcesses: HandlebarsProcessEncoding[] = [],
-    ...args: ConstructorParameters<typeof HandlebarsProcessEncoding>
-  ) {
-    super(...args);
-  }
-
-  get hasSubProcesses(): boolean {
-    return this.subProcesses.length > 0;
-  }
-  get numberOfProcesses(): string {
-    return (this.subProcesses.length + 1).toString();
-  }
-
-  static fromEncoding(encoding: Encoding.MainProcess): HandlebarsEncoding {
-    const main = HandlebarsProcessEncoding.fromEncoding(
-      encoding,
-      encoding.options,
-      encoding.isInstanced,
-    );
-    const subProcesses = Array.from(encoding.subProcesses.values()).map(
-      (subProcess) =>
-        HandlebarsProcessEncoding.fromEncoding(
-          subProcess,
-          encoding.options,
-          encoding.isInstanced,
-        ),
+  static fromEncoding(encoding: Encoding.MainProcess): Contract {
+    // Convert options
+    const options = new Options(
+      encoding.options.debug,
+      encoding.options.events
     );
 
-    return new HandlebarsEncoding(
-      encoding.options,
-      encoding.isCalled,
-      encoding.isInstanced,
+    // Convert calls using Call.fromEncoding
+    const callList = Array.from(encoding.callList.values()).map(call =>
+      Call.fromEncoding(call)
+    );
+
+    // Convert case variables using CaseVariable.fromEncoding
+    const caseVariables = Array.from(encoding.caseVariables.values()).map(cv =>
+      CaseVariable.fromEncoding(cv, encoding.isInstanced)
+    );
+
+    // Separate transitions with case variables from regular states
+    const dataTasks: DataTask[] = [];
+    const transitionsWithCaseVar = new Set<Encoding.Transition>();
+
+    encoding.states.forEach((transitions) => {
+      transitions.forEach((transition) => {
+        if (transition instanceof Encoding.InitiatedTransition) {
+          if (transition.message?.caseVariable) {
+            transitionsWithCaseVar.add(transition);
+
+            // Use DataTask.fromEncoding
+            dataTasks.push(
+              DataTask.fromEncoding(
+                transition,
+                encoding.isInstanced,
+                options,
+                encoding.subProcesses.size > 0,
+                encoding.id.toString()
+              )
+            );
+          }
+        }
+      });
+    });
+
+    // Convert main process states using State.fromEncoding
+    const states = Array.from(encoding.states.entries()).map(([consume, transitions]) => {
+      return State.fromEncoding(
+        consume,
+        transitions,
+        transitionsWithCaseVar,
+        encoding.isInstanced,
+        options,
+        encoding.subProcesses.size > 0,
+        encoding.id.toString(),
+        encoding.modelID
+      );
+    });
+
+    // Convert sub-processes using SubProcess.fromEncoding
+    const subProcesses = Array.from(encoding.subProcesses.values()).map(subProcess =>
+      SubProcess.fromEncoding(
+        subProcess,
+        encoding.isInstanced,
+        options
+      )
+    );
+
+    // Create and return Contract
+    return new Contract(
+      options,
+      encoding.modelID,
+      encoding.participants.size.toString(),
+      encoding.subProcesses.size > 0,
+      encoding.callList.size > 0,
+      encoding.callList.size.toString(),
+      (encoding.subProcesses.size + 1).toString(),
+      callList,
+      caseVariables,
+      dataTasks,
+      states,
       subProcesses,
-      main.id,
-      main.modelID,
-      main.participants,
-      main.callList,
-      main.caseVariables,
-      main.states,
-      main.taskWithCaseVar,
+      encoding.isInstanced,
+      encoding.id.toString()
     );
   }
 }

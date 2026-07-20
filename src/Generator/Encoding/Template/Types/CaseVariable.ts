@@ -1,5 +1,5 @@
-import type * as Encoding from "../Encoding.js";
-import { capitalize } from "../../../util/helpers.js";
+import type * as Encoding from "../../Encoding.js";
+import { capitalize } from "../../../../util/helpers.js";
 
 /**
  * Represents a case variable in the template encoding.

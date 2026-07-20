@@ -15,7 +15,7 @@ export default class SolDefaultContractGenerator extends TemplateEngine {
   ) {
     super(
       _iNet,
-      path.join(__dirname, "..", "..", "templates/Contract.handlebars.sol"),
+      path.join(__dirname, "..", "..", "Encoding/Template/templates/Contract.handlebars.sol"),
       _caseVariables,
       [], // partials will be auto-discovered
       isInstanced

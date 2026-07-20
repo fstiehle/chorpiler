@@ -1,5 +1,5 @@
-import * as Encoding from "../Encoding.js";
-import { CallType } from "../../../Parser/Elements/Call.js";
+import * as Encoding from "../../Encoding.js";
+import { CallType } from "../../../../Parser/Elements/Call.js";
 import { OutTo } from "./OutTo.js";
 import { Options } from "./Options.js";
 

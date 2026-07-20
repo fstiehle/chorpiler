@@ -1,6 +1,6 @@
 # TemplateN Class Structure
 
-This document provides a visual representation of the TemplateN class hierarchy and template file mappings.
+This document provides a visual representation of the Template class hierarchy.
 
 ## Class Hierarchy with Template Files
 
@@ -28,7 +28,7 @@ Contract (Root)
 │   ├── functionName: string
 │   └── type: string
 │
-├── TaskWithCaseVar[] (from taskWithCaseVar)
+├── DataTask[] (from dataTasks)
 │   │ Used in: datatasks.handlebars.sol
 │   ├── modelID: string
 │   ├── isInstanced: boolean (PROPAGATED)
@@ -109,8 +109,8 @@ Contract.handlebars.sol (Root Template)
 │
 ├── {{> datatasks}}
 │   └── datatasks.handlebars.sol
-│       └── {{#each taskWithCaseVar}}
-│           ├── TaskWithCaseVar class (with propagated: options, isInstanced, hasSubProcesses, id)
+│       └── {{#each dataTasks}}
+│           ├── DataTask class (with propagated: options, isInstanced, hasSubProcesses, id)
 │           ├── {{> variableassign}}
 │           │   └── variableassign.handlebars.sol
 │           │       └── Uses: isInstanced, name
@@ -146,56 +146,3 @@ Contract.handlebars.sol (Root Template)
             └── {{> states}} (recursive)
                 └── [Same structure as main states above]
 ```
-
-## Property Propagation Pattern
-
-Properties are propagated through the class hierarchy to support nested partials:
-
-**Propagated to State:**
-- `options: Options` - For debug logging in states.handlebars.sol
-- `isInstanced: boolean` - For tokenstate partial
-- `hasSubProcesses: boolean` - For tokenstate partial
-- `id: string` - For sub-process token state array indexing
-- `modelID: string` - For debug logging
-
-**Propagated to Transition:**
-- `options: Options` - For event emission in firing.handlebars.sol
-
-**Propagated to TaskWithCaseVar:**
-- `options: Options` - For debug logging in datatasks.handlebars.sol
-- `isInstanced: boolean` - For variableassign and tokenstate partials
-- `hasSubProcesses: boolean` - For tokenstate partial
-- `id: string` - For tokenstate partial
-
-**Propagated to CaseVariable:**
-- `isInstanced: boolean` - For variableassign partial
-
-These properties are passed through constructor parameters and ensure nested partials have access to required context.
-
-## Template File Locations
-
-All template files are located in:
-- Main template: `chorpiler/src/Generator/templates/Contract.handlebars.sol`
-- Partials: `chorpiler/src/Generator/templates/partialsN/*.handlebars.sol`
-
-### Partial Files
-
-1. **interfaces.handlebars.sol** - Interface declarations
-2. **calls.handlebars.sol** - Called contract interfaces
-3. **parameters.handlebars.sol** - Contract state variables and declarations
-4. **casevariables.handlebars.sol** - Case variable declarations and setters
-5. **datatasks.handlebars.sol** - Task functions that set case variables
-6. **states.handlebars.sol** - Main state loop with token state checking
-7. **transitions.handlebars.sol** - Transition iteration with decision logic
-8. **transition.handlebars.sol** - Individual transition rendering
-9. **firing.handlebars.sol** - Transition firing logic (token consumption/production)
-10. **tokenstate.handlebars.sol** - Token state reference (handles instanced/sub-process variations)
-11. **variableassign.handlebars.sol** - Variable assignment (handles instanced variations)
-12. **subprocesses.handlebars.sol** - Sub-process function definitions
-
-## Converter Class
-
-**HandlebarsEncoding** - Converts `Encoding.MainProcess` to `Contract`
-- Location: `chorpiler/src/Generator/Encoding/TemplateN/HandlebarsEncoding.ts`
-- Method: `static fromEncoding(encoding: Encoding.MainProcess): Contract`
-- Implements: `IFromEncoding` interface

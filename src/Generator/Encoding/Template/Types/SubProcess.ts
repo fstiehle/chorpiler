@@ -1,4 +1,4 @@
-import type * as Encoding from "../Encoding.js";
+import type * as Encoding from "../../Encoding.js";
 import { Options } from "./Options.js";
 import { State } from "./State.js";
 
