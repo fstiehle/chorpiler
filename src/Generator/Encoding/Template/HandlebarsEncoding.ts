@@ -37,10 +37,11 @@ export class HandlebarsEncoding implements IFromEncoding {
       CaseVariable.fromEncoding(cv, encoding.isInstanced)
     );
 
-    // Separate transitions with case variables from regular states
+    // Get transitions with messages referencing case variables
     const dataTasks: DataTask[] = [];
     const transitionsWithCaseVar = new Set<Encoding.Transition>();
 
+    // Check main process states
     encoding.states.forEach((transitions) => {
       transitions.forEach((transition) => {
         if (transition instanceof Encoding.InitiatedTransition) {
@@ -54,11 +55,38 @@ export class HandlebarsEncoding implements IFromEncoding {
                 encoding.isInstanced,
                 options,
                 encoding.subProcesses.size > 0,
-                encoding.id.toString()
+                encoding.id.toString(),
+                null
               )
             );
           }
         }
+      });
+    });
+
+    // Also check subProcesses for transitions with case variables
+    const subProcessesWithDataTasks = new Array<string>()
+    encoding.subProcesses.forEach((subProcess) => {
+      subProcess.states.forEach((transitions) => {
+        transitions.forEach((transition) => {
+          if (transition instanceof Encoding.InitiatedTransition) {
+            if (transition.message?.caseVariable) {
+              transitionsWithCaseVar.add(transition);
+              subProcessesWithDataTasks.push(subProcess.modelID);
+              // Use DataTask.fromEncoding
+              dataTasks.push(
+                DataTask.fromEncoding(
+                  transition,
+                  encoding.isInstanced,
+                  options,
+                  encoding.subProcesses.size > 0,
+                  subProcess.id.toString(),
+                  subProcess.modelID
+                )
+              );
+            }
+          }
+        });
       });
     });
 
@@ -67,7 +95,7 @@ export class HandlebarsEncoding implements IFromEncoding {
       return State.fromEncoding(
         consume,
         transitions,
-        transitionsWithCaseVar,
+        new Set(),
         encoding.isInstanced,
         options,
         encoding.subProcesses.size > 0,
@@ -81,7 +109,8 @@ export class HandlebarsEncoding implements IFromEncoding {
       SubProcess.fromEncoding(
         subProcess,
         encoding.isInstanced,
-        options
+        options,
+        subProcessesWithDataTasks.includes(subProcess.modelID)
       )
     );
 

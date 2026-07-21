@@ -15,11 +15,14 @@ Chorpiler has additional tools that help with testing and interacting with such 
 | Choreography tasks | ✔          |
 | Events             | Start, End |
 | Gateways           | XOR, EVENT, AND |
+| Messages           | ✔* |
 | Sub-Choreographies           | ✔ |
 | Call-Choreographies           | ✔ |
 | Case Variables  | ✔          |
 | Looping behaviour  | ✔          |
 | Uncontrolled flow merge  | ✔          |
+
+* Messages are used to enforce data events, see _Case Variables & Data-Based Decisions_ below
 
 ## Usage
 
@@ -66,6 +69,10 @@ For usage see also the tests defined in `tests/compiler`. For usage of the resul
 
 > TODO:
 XOR Picture example plus corresponding XML code.
+
+#### Generating Setters
+
+#### Enforcement through Messages
 
 ### Interacting with Contracts
 

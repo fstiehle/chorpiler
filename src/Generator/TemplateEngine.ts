@@ -47,7 +47,6 @@ export abstract class TemplateEngine implements ITemplateEngine {
   ) {
     // Discover partials from both directories
     const partialsDir = path.join(path.dirname(this.templatePath), 'partials');
-
     const basePartials = this.discoverPartials(partialsDir);
 
     // Merge: constructor partials, then base partials, then partialsN (which override)

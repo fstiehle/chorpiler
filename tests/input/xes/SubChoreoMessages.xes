@@ -10,16 +10,15 @@
       <string key="concept:name" value="order pizza" />
       <string key="id" value="ChoreographyTask_0hy9n0g" />
       <string key="sourceRef" value="Participant_06qakjv" />
-      <int key="pizza_order" value="1" />
-    </event>
-    <event>
-      <string key="concept:name" value="hand over pizza" />
-      <string key="id" value="ChoreographyTask_1m3qduh" />
-      <string key="sourceRef" value="Participant_0mgz9si" />
     </event>
     <event>
       <string key="concept:name" value="New Activity" />
-      <string key="id" value="ChoreographyTask_1l3cbhv" />
+      <string key="id" value="ChoreographyTask_03r94ad" />
+      <string key="sourceRef" value="Participant_06qakjv" />
+    </event>
+    <event>
+      <string key="concept:name" value="deliver pizza" />
+      <string key="id" value="ChoreographyTask_175oxwe" />
       <string key="sourceRef" value="Participant_0537iz2" />
     </event>
   </trace>
@@ -30,13 +29,14 @@
       <string key="sourceRef" value="Participant_06qakjv" />
     </event>
     <event>
-      <string key="concept:name" value="hand over pizza" />
-      <string key="id" value="ChoreographyTask_1m3qduh" />
-      <string key="sourceRef" value="Participant_0mgz9si" />
+      <string key="concept:name" value="New Activity" />
+      <string key="id" value="ChoreographyTask_03r94ad" />
+      <string key="sourceRef" value="Participant_06qakjv" />
+      <int key="conditions" value="1" />
     </event>
     <event>
-      <string key="concept:name" value="deliver pizza" />
-      <string key="id" value="ChoreographyTask_175oxwe" />
+      <string key="concept:name" value="New Activity" />
+      <string key="id" value="ChoreographyTask_1l3cbhv" />
       <string key="sourceRef" value="Participant_0537iz2" />
     </event>
   </trace>

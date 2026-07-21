@@ -39,7 +39,7 @@ describe("Generation of edge cases", () => {
         }
 
         for (const iNet of iNets) {
-          const generator = new SolDefaultContractGenerator(iNet, iNet.isCalled);
+          const generator = new SolDefaultContractGenerator(iNet, undefined, iNet.isCalled);
 
           const result = await generator.compile({
             unfoldSubNets: !isSubChoreography2,
@@ -158,6 +158,23 @@ describe("Generation of edge cases", () => {
             "pizza_order",
             "uint",
             'uint public pizza_order = 0',
+            false,
+          ),
+        ],
+        [],
+        false,
+      );
+    });
+
+    it.only("Sub Choreo Messages case to Sol Contract", async () => {
+      await compileBpmn(
+        parser,
+        "sub-choreo-messages",
+        [
+          new CaseVariable(
+            "conditions",
+            "uint",
+            'uint public conditions = 0',
             false,
           ),
         ],

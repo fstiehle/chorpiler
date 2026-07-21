@@ -34,6 +34,7 @@ export class DataTask {
     public hasSubProcesses: boolean,
     public id: string,
     public taskID: number,
+    public subProcessCallback: string | null
   ) {}
 
   /**
@@ -44,7 +45,8 @@ export class DataTask {
     isInstanced: boolean,
     options: Options,
     hasSubProcesses: boolean,
-    id: string
+    id: string,
+    subProcessCallback: string | null
   ): DataTask {
     if (!transition.message?.caseVariable) {
       throw new Error("DataTask requires a transition with a caseVariable");
@@ -64,7 +66,8 @@ export class DataTask {
       options,
       hasSubProcesses,
       id,
-      transition.taskID
+      transition.taskID,
+      subProcessCallback
     );
   }
 }

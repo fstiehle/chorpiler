@@ -121,7 +121,7 @@ export class TriggerEncoding implements IFromEncoding {
         const initiated = transition as InitiatedTransition;
         taskMap.set(
           initiated.modelID,
-          new Task(initiated.taskID, initiated.initiatorID, processID),
+          new Task(initiated.taskID, initiated.initiatorID, processID, initiated.message !== null && initiated.message.caseVariable !== null ),
         );
       });
   }
@@ -138,6 +138,7 @@ export class TriggerEncoding implements IFromEncoding {
             id: task.encoding,
             initiator: task.initiator,
             processID: task.processID,
+            hasDataTask: task.hasDataTask
           },
         ]),
       ),
@@ -173,7 +174,7 @@ export class TriggerEncoding implements IFromEncoding {
     isCalled?: boolean;
     isInstanced?: boolean;
     tasks: {
-      [modelID: string]: { id: number; initiator: number; processID: number };
+      [modelID: string]: { id: number; initiator: number; processID: number; hasDataTask: boolean };
     };
     participants: { [k: string]: number };
     calls?: {
@@ -196,7 +197,7 @@ export class TriggerEncoding implements IFromEncoding {
       new Map(
         Object.entries(object.tasks).map(([modelID, task]) => [
           modelID,
-          new Task(task.id, task.initiator, task.processID),
+          new Task(task.id, task.initiator, task.processID, task.hasDataTask),
         ]),
       ),
       new Map(Object.entries(object.participants)),
@@ -236,11 +237,12 @@ export class TriggerEncoding implements IFromEncoding {
   }
 }
 
-class Task {
+export class Task {
   constructor(
     public encoding: number,
     public initiator: number,
     public processID: number,
+    public hasDataTask: boolean,
   ) {}
 }
 

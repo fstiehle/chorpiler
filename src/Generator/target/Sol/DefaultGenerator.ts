@@ -10,8 +10,8 @@ const __dirname = path.dirname(__filename);
 export default class SolDefaultContractGenerator extends TemplateEngine {
   constructor(
     _iNet: InteractionNet,
-    isInstanced = false,
     _caseVariables?: Map<string, CaseVariable>,
+    isInstanced = false,
   ) {
     super(
       _iNet,

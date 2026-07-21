@@ -21,7 +21,8 @@ export class SubProcess {
     public modelID: string,
     public id: string,
     public states: State[],
-    public options: Options
+    public options: Options,
+    public hasDataTasks: boolean
   ) {
   }
 
@@ -33,7 +34,8 @@ export class SubProcess {
   static fromEncoding(
     subProcess: Encoding.SubProcess,
     isInstanced: boolean,
-    options: Options
+    options: Options,
+    hasDataTasks: boolean
   ): SubProcess {
     // Convert states for this sub-process
     const states = Array.from(subProcess.states.entries()).map(([consume, transitions]) => {
@@ -53,7 +55,8 @@ export class SubProcess {
       subProcess.modelID,
       subProcess.id.toString(),
       states,
-      options
+      options,
+      hasDataTasks
     );
   }
 }

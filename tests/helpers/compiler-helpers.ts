@@ -52,7 +52,7 @@ export const parseINet = (
   if (isStateChannel) {
     generator = new SolStateChannelContractGenerator(iNet);
   } else {
-    generator = new SolDefaultContractGenerator(iNet, iNet.isCalled);
+    generator = new SolDefaultContractGenerator(iNet, undefined, iNet.isCalled);
   }
 
   // Add case variables if provided

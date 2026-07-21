@@ -7,7 +7,7 @@ import Mustache from "mustache";
 import { fileURLToPath } from "url";
 import { Event, EventLog } from "../util/EventLog/EventLog.js";
 import { Trace } from "../util/EventLog/Trace.js";
-import { TriggerEncoding } from "../Generator/Encoding/TriggerEncoding.js";
+import { TriggerEncoding } from "../Generator/Encoding/JSON/TriggerEncoding.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);

@@ -7,6 +7,7 @@ import path from "path";
 import { PublicClient, WalletClient } from "viem";
 import {
   EventLog,
+  Event,
   InstanceDataChange,
 } from "../../src/util/EventLog/EventLog.js";
 import { XESFastXMLParser } from "../../src/util/EventLog/XESFastXMLParser.js";
@@ -39,7 +40,7 @@ export interface EventProcessingContext {
 export interface EventProcessingHooks {
   beforeAssert?: (event: any, context: EventProcessingContext) => Promise<void>;
   afterAssert?: (
-    event: any,
+    event: Event,
     context: EventProcessingContext,
     result: any,
   ) => Promise<void>;
@@ -55,7 +56,7 @@ export const debugLog = (...args: any[]) => {
 };
 
 export async function processEvent(
-  event: any,
+  event: Event,
   context: EventProcessingContext,
   hooks: EventProcessingHooks = {},
 ): Promise<{
@@ -93,54 +94,60 @@ export async function processEvent(
     return { success: false };
   }
 
+  const task = encoding.tasks.get(event.id);
+  const preTokenState = await getTokenState(
+    client,
+    contract,
+    task && hasSubChoreos(encoding) ? task.processID : null,
+    context.instance,
+  );
+
+  let dataTaskPerformed = false;
+  let receipt = null;
+
   // Perform data change first, the event name might be a dummy name
   if (event.dataChange) {
     debugLog(`Processing ${event.dataChange.length} data changes`);
-    await dataSet(client, wallets[participantID], contract, event.dataChange);
+    // Check for a data task
+    if (task && task.hasDataTask) {
+      debugLog(
+        `Processing data task: ${event.name} (Task ID: ${task.encoding}, Process ID: ${task.processID}), Pre-state: ${preTokenState}`,
+      );
+      receipt = await dataTask(client, wallets[participantID], contract, event);
+      dataTaskPerformed = true;
+    }
+    if (!dataTaskPerformed) {
+      // compatibility for setter contracts
+      debugLog(`Processing data setting`);
+      await dataSet(client, wallets[participantID], contract, event.dataChange);
+    }
   }
 
-  const task = encoding.tasks.get(event.id);
   if (!task) {
     console.warn(`event '${event.name}' not found!'`);
     return { success: false };
   }
 
-  let functionName = "enact";
-  const processID = task.processID;
-  if (processID != 0) {
-    // task is in a subChoreo, call it instead
-    const subModuleName = encoding.subModels.get(Number(processID));
-    if (subModuleName) {
-      functionName = subModuleName.modelID;
-    } else {
-      console.warn(
-        `SubModule with processID ${processID} not found, falling back to 'enact'`,
-      );
-    }
-  }
-
-  const preTokenState = await getTokenState(
-    client,
-    contract,
-    hasSubChoreos(encoding) ? task.processID : null,
-    context.instance,
-  );
-  debugLog(
-    `Trying to enact task: ${event.name} (Task ID: ${task.encoding}, Process ID: ${task.processID}), Pre-state: ${preTokenState}`,
-  );
+  const functionName = getFunctionNameForTask(task, encoding);
 
   if (hooks.beforeAssert) {
     await hooks.beforeAssert(event, context);
   }
 
-  const receipt = await enact(
-    client,
-    wallets[participantID],
-    contract,
-    functionName,
-    task.encoding,
-    context.instance,
-  );
+  // skip if task was already performed as part of a data task
+  if (!dataTaskPerformed) {
+    debugLog(
+      `Trying to enact task: ${event.name} (Task ID: ${task.encoding}, Process ID: ${task.processID}), Pre-state: ${preTokenState}`,
+    );
+    receipt = await enact(
+      client,
+      wallets[participantID],
+      contract,
+      functionName,
+      task.encoding,
+      context.instance,
+    );
+  }
 
   const postTokenState = await getTokenState(
     client,
@@ -150,6 +157,7 @@ export async function processEvent(
   );
   debugLog(`Post-state: ${postTokenState} (changed from ${preTokenState})`);
 
+  assert(receipt !== undefined);
   const result = { receipt, preTokenState, postTokenState };
 
   if (hooks.afterAssert) {
@@ -353,6 +361,61 @@ export async function dataSet(
   }
 }
 
+export async function dataTask(
+  client: PublicClient,
+  wallet: WalletClient,
+  contract: any,
+  event: Event,
+) {
+  if (event.dataChange == null) {
+    return
+  }
+  for (const el of event.dataChange) {
+    const { result, request } = await client.simulateContract({
+      address: contract.address,
+      abi: contract.abi,
+      functionName: event.id,
+      args: [el.val],
+      account: wallet.account,
+    });
+
+    const hash = await wallet.writeContract(request);
+    //console.log(`DataSet transaction submitted: ${hash}`);
+
+    try {
+      // Check if transaction exists before waiting
+      const tx = await client.getTransaction({ hash });
+      //console.log(`DataSet transaction found: ${tx.hash}`);
+    } catch (error) {
+      console.warn(`DataSet transaction not found: ${hash}`);
+      return new Error(
+        `DataSet transaction ${hash} was not found in the mempool for variable ${el.variable}`,
+      );
+    }
+
+    const receipt = await (async () => {
+      let timer: NodeJS.Timeout;
+      return Promise.race([
+        client.waitForTransactionReceipt({ hash }),
+        new Promise<null>(
+          (_, reject) =>
+            (timer = setTimeout(
+              () =>
+                reject(
+                  new Error(
+                    `Transaction timeout: ${hash} not mined after 2 seconds`,
+                  ),
+                ),
+              2000,
+            )),
+        ),
+      ]).finally(() => clearTimeout(timer));
+    })();
+    return receipt;
+    //console.log(`DataTask transaction mined for ${el.variable}`);
+  }
+}
+
 // isEnabled will report false for a task if it is behind an automated gateway where the process is currently halted.
 // this can happen in two situations:
 //  1. The gateway is at the start of the process (bad practice: make the decision in the constructor if possible).
@@ -390,6 +453,31 @@ export async function isEnabled(
 
 export function hasSubChoreos(encoding: TriggerEncoding) {
   return encoding.subModels && encoding.subModels.size > 0;
+}
+
+/**
+ * Determines the function name to call based on the task's process ID.
+ * Returns 'enact' for main process tasks, or the sub-choreography model ID for sub-process tasks.
+ */
+export function getFunctionNameForTask(
+  task: { processID: number },
+  encoding: TriggerEncoding,
+): string {
+  const processID = task.processID;
+  if (processID === 0) {
+    return "enact";
+  }
+
+  // task is in a subChoreo, call it instead
+  const subModuleName = encoding.subModels.get(Number(processID));
+  if (subModuleName) {
+    return subModuleName.modelID;
+  }
+
+  console.warn(
+    `SubModule with processID ${processID} not found, falling back to 'enact'`,
+  );
+  return "enact";
 }
 
 export async function getEnabled(

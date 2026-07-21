@@ -191,6 +191,7 @@ export class INetFastXMLParser implements INetParser {
         const translator = new INetFastXMLParser.INetTranslator();
         // set subNet participants
         translator.messageFlows = this.messageFlows;
+        translator.messages = this.messages;
         const subNet = translator.iNet;
         subNet.participants.set(initiator.id, initiator);
         for (const respondent of respondents)
@@ -200,6 +201,10 @@ export class INetFastXMLParser implements INetParser {
           subNetID,
           translator.translateChoreography(subChoreography),
         );
+        // Merge named messages from sub-choreography into parent
+        for (const [id, message] of translator.iNet.namedMessages) {
+          this.iNet.namedMessages.set(id, message);
+        }
       }
       return this;
     }
@@ -330,6 +335,7 @@ export class INetFastXMLParser implements INetParser {
 
       const messageRef = messageFlow.flow[Properties.message];
       const message = this.messages.get(messageRef);
+
       if (message == undefined) {
         return undefined;
       }

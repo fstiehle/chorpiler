@@ -1,1 +1,1 @@
-{"processID":0,"isCalled":true,"isInstanced":true,"tasks":{"ChoreographyTask_14yfpb3":{"id":1,"initiator":0,"processID":0}},"participants":{"Participant_0t7ur06":0,"Participant_1x7055n":1},"states":{"ChoreographyTask_14yfpb3":1},"calls":{},"subModels":{}}
+{"processID":0,"isCalled":true,"isInstanced":true,"tasks":{"ChoreographyTask_14yfpb3":{"id":1,"initiator":0,"processID":0,"hasDataTask":false}},"participants":{"Participant_0t7ur06":0,"Participant_1x7055n":1},"states":{"ChoreographyTask_14yfpb3":1},"calls":{},"subModels":{}}
