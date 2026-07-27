@@ -1,10 +1,72 @@
 //SPDX-License-Identifier: MIT
 pragma solidity ^0.8.9;
 
+/**
+Handles membership and existence for all channels.
+1.) Register a new channel with its dispute contract (CREATE2 address)
+2.) Verify a state update for a channel
+*/
+interface IChannelRoot {
+  struct Channel {
+    uint instanceID
+    address[] participants;
+    address resolveContract;
+    bytes32 OP_RETURN;
+  }
+
+  struct Step {
+    uint index;
+    uint caseID;
+    uint from;
+    uint taskID;
+    uint newTokenState;
+    uint conditionState;
+    bytes[{{{numberOfParticipants}}}] signatures;
+  }
+  /*
+  Registers a new channel, its resolve contract address, and participating participants.
+  */
+  function register(Channel calldata _channel) external returns (uint);
+  function verify(uint instanceID, bytes32 payload) external view returns (bool);
+}
+
 import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
 
-contract ProcessChannel {
+contract ChannelRoot {
   using ECDSA for bytes32;
+
+  mapping(bytes32 => IChannelRoot.Channel) public channels;
+
+  function verify(uint instance, bytes32 payload) private view returns (bool) {
+    bytes32 id = keccak256(abi.encode(instance, msg.sender);
+
+
+    for (uint i = 0; i < chanels[]; i++) {
+      if (payload.toEthSignedMessageHash().recover(_step.signatures[i]) != participants[i]) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  function checkStep(bytes32 payload) private view returns (bool) {
+    // Check that step is higher than previously recorded steps
+    if (index >= _step.index) {
+      return false;
+    }
+    // Verify signatures
+    bytes32 payload = keccak256(
+      abi.encode(_step.index, _step.caseID, _step.from, _step.taskID, _step.newTokenState, _step.conditionState)
+    );
+
+    for (uint i = 0; i < {{{numberOfParticipants}}}; i++) {
+      if (payload.toEthSignedMessageHash().recover(_step.signatures[i]) != participants[i]) {
+        return false;
+      }
+    }
+    return true;
+  }
+
   struct Step {
     uint index;
     uint caseID;
@@ -21,10 +83,10 @@ contract ProcessChannel {
   uint public immutable disputeWindowInUNIX;
   uint public disputeMadeAtUNIX = 0;
 
-  address[{{{numberOfParticipants}}}] public participants; 
+  address[{{{numberOfParticipants}}}] public participants;
 
   /**
-   * @param _participants addresses for the roles 
+   * @param _participants addresses for the roles
    * in the order (BulkBuyer, Manufacturer, Middleman, Supplier, SpecialCarrier)
    * @param _disputeWindowInUNIX time for the dispute window to remain open in UNIX.
    */
@@ -54,7 +116,7 @@ contract ProcessChannel {
           index = _step.index;
           tokenState = _step.newTokenState;
         } else if (_disputeMadeAtUNIX + disputeWindowInUNIX >= block.timestamp) {
-          // submission to existing dispute 
+          // submission to existing dispute
           index = _step.index;
           tokenState = _step.newTokenState;
         }
@@ -62,66 +124,12 @@ contract ProcessChannel {
     }
   }
 
-  function checkStep(Step calldata _step) private view returns (bool) {
-    // Check that step is higher than previously recorded steps
-    if (index >= _step.index) { 
-      return false;
-    } 
-    // Verify signatures
-    bytes32 payload = keccak256(
-      abi.encode(_step.index, _step.caseID, _step.from, _step.taskID, _step.newTokenState, _step.conditionState)
-    );
-
-    for (uint i = 0; i < {{{numberOfParticipants}}}; i++) {
-      if (payload.toEthSignedMessageHash().recover(_step.signatures[i]) != participants[i]) {
-        return false;
-      }
-    }
-    return true;
-  }
-
   /**
    * If a dispute window has elapsed, execution must continue through this function
    * @param id id of the activity to begin
    */
   function continueAfterDispute(uint id{{#hasConditions}}, uint cond{{/hasConditions}}) external {
-    uint _disputeMadeAtUNIX = disputeMadeAtUNIX;
-    require(_disputeMadeAtUNIX != 0 && _disputeMadeAtUNIX + disputeWindowInUNIX < block.timestamp, "No elapsed dispute");
 
-    uint _tokenState = tokenState;
-
-    {{#hasManualTransitions}}
-    while(true) {
-      {{#manualTransitions}}
-      if ({{#condition}}(cond & {{{condition}}} == {{{condition}}}) && {{/condition}}{{{id}}} == id && (_tokenState & {{{consume}}} == {{{consume}}}){{#initiator}} && msg.sender == participants[{{{initiator}}}]{{/initiator}}) {
-        _tokenState &= ~uint({{{consume}}});
-        _tokenState |= {{{produce}}};
-        break;
-      }
-      {{/manualTransitions}}
-      return;
-    }
-    {{/hasManualTransitions}}
-
-    {{#hasAutonomousTransitions}}
-    while(_tokenState != 0) {
-      {{#autonomousTransitions}}
-      if ({{#condition}}(cond & {{{condition}}} == {{{condition}}}) && {{/condition}}(_tokenState & {{{consume}}} == {{{consume}}})) {
-        _tokenState &= ~uint({{{consume}}});
-        _tokenState |= {{{produce}}};
-        {{#isEnd}}
-        break; // is end
-        {{/isEnd}}
-        {{^isEnd}}
-        continue;
-        {{/isEnd}}
-      }
-      {{/autonomousTransitions}}
-      break;
-    }
-    {{/hasAutonomousTransitions}}
-
-    tokenState = _tokenState;
   }
 
 }
