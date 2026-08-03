@@ -14,18 +14,17 @@ interface IChannelRoot {
     address[] participants;
     address resolveContract;
   }
-  struct Step {
+  struct Proof {
     bytes[] calldata signatures;
     bytes32 stateHash;
     bytes32 OP_RETURN;
   }
-}
 
  /*
   Registers a new channel, its resolve contract address, and participating participants.
   */
   function register(Channel calldata _channel) external;
-  function verify(bytes32 _id, Step calldata _step) external returns (bool);
+  function verify(bytes32 _id, Proof calldata _step) external returns (bool);
 }
 
 import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
@@ -42,7 +41,7 @@ contract ChannelRoot {
     channels[id] = _channel;
   }
 
-  function verify(bytes32 _id, Step calldata _step) external returns (bool) {
+  function verify(bytes32 _id, Proof calldata _step) external returns (bool) {
     bytes32 payload = abi.encode(_step.payload, _step.OP_RETURN);
 
     for (uint i = 0; i < channels[_id].participants; i++) {

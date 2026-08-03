@@ -44,6 +44,7 @@ export abstract class TemplateEngine implements ITemplateEngine {
     private caseVariables = new Map<string, CaseVariable>(),
     private templatePartials = new Array<{ partial: string; path: string }>(),
     private isInstanced: boolean = false,
+    private isChannel: boolean = false,
   ) {
     // Discover partials from both directories
     const partialsDir = path.join(path.dirname(this.templatePath), 'partials');
@@ -105,7 +106,7 @@ export abstract class TemplateEngine implements ITemplateEngine {
     const template: string = await this.getTemplate();
 
     const encoder = new INetEncoder();
-    const gen = encoder.generate(iNet, options, this.isInstanced);
+    const gen = encoder.generate(iNet, options, this.isInstanced, this.isChannel);
     gen.caseVariables = this.caseVariables;
     for (const message of iNet.namedMessages.values()) {
       let match = undefined;

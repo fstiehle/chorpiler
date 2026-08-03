@@ -1,135 +1,127 @@
 //SPDX-License-Identifier: MIT
 pragma solidity ^0.8.9;
 
-/**
-Handles membership and existence for all channels.
-1.) Register a new channel with its dispute contract (CREATE2 address)
-2.) Verify a state update for a channel
-*/
+{{#if options.debug}}
+import "hardhat/console.sol";
+{{/if}}
+
 interface IChannelRoot {
+  // TODO: Variable Packing
   struct Channel {
     uint instanceID
     address[] participants;
     address resolveContract;
+  }
+  struct Proof {
+    bytes[] calldata signatures;
+    bytes32 stateHash;
     bytes32 OP_RETURN;
   }
 
-  struct Step {
-    uint index;
-    uint caseID;
-    uint from;
-    uint taskID;
-    uint newTokenState;
-    uint conditionState;
-    bytes[{{{numberOfParticipants}}}] signatures;
-  }
-  /*
+ /*
   Registers a new channel, its resolve contract address, and participating participants.
   */
-  function register(Channel calldata _channel) external returns (uint);
-  function verify(uint instanceID, bytes32 payload) external view returns (bool);
+  function register(Channel calldata _channel) external;
+  function verify(bytes32 _id, Proof calldata _step) external returns (bool);
 }
 
-import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
+IChannelRoot constant Channel_Root = IChannelRoot(0x0000000000000000000000000000000000000000);
 
-contract ChannelRoot {
-  using ECDSA for bytes32;
-
-  mapping(bytes32 => IChannelRoot.Channel) public channels;
-
-  function verify(uint instance, bytes32 payload) private view returns (bool) {
-    bytes32 id = keccak256(abi.encode(instance, msg.sender);
-
-
-    for (uint i = 0; i < chanels[]; i++) {
-      if (payload.toEthSignedMessageHash().recover(_step.signatures[i]) != participants[i]) {
-        return false;
-      }
-    }
-    return true;
+interface IChannelResolver {
+  struct InstanceState {
+    {{!// ---- Sub Process Support ----- }}
+    {{#if hasSubProcesses}}
+    uint[{{{numberOfProcesses}}}] public tokenState;
+    {{else}}
+    uint tokenState;
+    {{/if}}
+    {{!// ---- Instanced Case Variables ----- }}
+    {{#each caseVariables}}
+    {{{expression}}}
+    {{/each}}
   }
+  struct InstanceData {
+    address[{{{numberOfParticipants}}}] participants;
+    InstanceState state;
 
-  function checkStep(bytes32 payload) private view returns (bool) {
-    // Check that step is higher than previously recorded steps
-    if (index >= _step.index) {
-      return false;
-    }
-    // Verify signatures
-    bytes32 payload = keccak256(
-      abi.encode(_step.index, _step.caseID, _step.from, _step.taskID, _step.newTokenState, _step.conditionState)
-    );
-
-    for (uint i = 0; i < {{{numberOfParticipants}}}; i++) {
-      if (payload.toEthSignedMessageHash().recover(_step.signatures[i]) != participants[i]) {
-        return false;
-      }
-    }
-    return true;
+    // state channel version index
+    uint public index;
+    /// Timestamps for the challenge-response dispute window
+    uint public disputeMadeAtUNIX;
   }
+  function enact(uint instanceID, uint id) external;
+  function getTokenState(uint instanceID) external view returns (uint);
+  function instance(address[{{{numberOfParticipants}}}] memory participants) external returns (uint);
+  function submit(Step calldata _step) external;
+}
+
+{{! ---- // List/declarations of called contracts and their interfaces ---- }}
+{{> calls}}
+
+contract ChannelResolver{{{modelID}}} is IChannelResolver {
+  uint public immutable disputeWindowInUNIX = 86400;
+
+  {{> parameters }}
+
+  {{> casevariables }}
+
+  {{> constructor }}
 
   struct Step {
     uint index;
-    uint caseID;
-    uint from;
-    uint taskID;
-    uint newTokenState;
-    uint conditionState;
+    uint intsanceID;
+    InstanceState newState;
     bytes[{{{numberOfParticipants}}}] signatures;
-  }
-  uint public tokenState = 1;
-  uint public index = 0;
-
-  /// Timestamps for the challenge-response dispute window
-  uint public immutable disputeWindowInUNIX;
-  uint public disputeMadeAtUNIX = 0;
-
-  address[{{{numberOfParticipants}}}] public participants;
-
-  /**
-   * @param _participants addresses for the roles
-   * in the order (BulkBuyer, Manufacturer, Middleman, Supplier, SpecialCarrier)
-   * @param _disputeWindowInUNIX time for the dispute window to remain open in UNIX.
-   */
-  constructor(address[{{{numberOfParticipants}}}] memory _participants, uint _disputeWindowInUNIX) {
-    participants = _participants;
-    disputeWindowInUNIX = _disputeWindowInUNIX;
   }
 
   /**
    * Trigger new dispute or submit new state to elapse current dispute state
    * @param _step Last unanimously signed step, or empty step if process is stuck in start event
    */
-   function submit(Step calldata _step) external {
-    uint _disputeMadeAtUNIX = disputeMadeAtUNIX;
+   function submit(uint id, Step calldata _step) external {
+    uint _disputeMadeAtUNIX = instanceData[_step.intsanceID].disputeMadeAtUNIX;
     if (0 == _step.index && 0 == _disputeMadeAtUNIX) {
       // stuck in start event
-      disputeMadeAtUNIX = block.timestamp;
+      instanceData[_step.intsanceID].disputeMadeAtUNIX = block.timestamp;
     }
     else {
-      if (checkStep(_step)) {
+      if (checkStep(id, _step)) {
         if (0 == _disputeMadeAtUNIX) {
           // new dispute or final state
           if (_step.newTokenState != 0) {
             // new dispute with state submission
-            disputeMadeAtUNIX = block.timestamp;
+            instanceData[_step.intsanceID].disputeMadeAtUNIX = block.timestamp;
           }
-          index = _step.index;
-          tokenState = _step.newTokenState;
+          instanceData[_step.intsanceID].index = _step.index;
+          instanceData[_step.intsanceID].state = _step.newState;
         } else if (_disputeMadeAtUNIX + disputeWindowInUNIX >= block.timestamp) {
           // submission to existing dispute
-          index = _step.index;
-          tokenState = _step.newTokenState;
+          instanceData[_step.intsanceID].index = _step.index;
+          instanceData[_step.intsanceID].state = _step.newState;
         }
       }
     }
   }
 
-  /**
-   * If a dispute window has elapsed, execution must continue through this function
-   * @param id id of the activity to begin
-   */
-  function continueAfterDispute(uint id{{#hasConditions}}, uint cond{{/hasConditions}}) external {
-
+  function checkStep(uint id, Step _step) private view returns (bool) {
+    // Check that step is higher than previously recorded steps
+    if (instanceData[_step.intsanceID].index >= _step.index) {
+      return false;
+    }
+    return Channel_Root.verify(id, Proof({ TODO }))
   }
 
+  function getTokenState({{#if isInstanced}}uint instanceID{{/if}}) external view returns (uint) {
+    return {{> tokenstate id=0 }};
+  }
+
+  {{! ---- // Main Enact Function ---- }}
+  function enact({{#if isInstanced}}uint instanceID, {{/if}}uint id) {{#if hasDataTasks}}public{{else}}external{{/if}} {
+    {{> states }}
+  }
+  {{! ---- // Tasks that set casevariables ---- }}
+  {{> datatasks }}
+  {{! ---- // Whitespace ---- }}
+  {{! ---- // Sub process enactment functions ---- }}
+  {{> subprocesses }}
 }

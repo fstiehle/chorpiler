@@ -1,3 +1,8 @@
+{{!// ---- Channel Support: Allow execution only if on-chain contract is unlocked ---- }}
+{{#if isChannel}}
+// TODO: Channel Spervermerk
+{{/if}}
+
 {{!// ---- Performance: cache state in var ---- }}
 uint _tokenState = {{> tokenstate }};
 

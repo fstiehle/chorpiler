@@ -2,8 +2,7 @@
 {{!// ---- Support for Instanced Contract ----- }}
 {{#if isInstanced}}
 interface IProcessInstance {
-  struct ProcessData {
-    address[2] participants;
+  struct InstanceState {
     {{!// ---- Sub Process Support ----- }}
     {{#if hasSubProcesses}}
     uint[{{{numberOfProcesses}}}] public tokenState;
@@ -14,6 +13,10 @@ interface IProcessInstance {
     {{#each caseVariables}}
     {{{expression}}}
     {{/each}}
+  }
+  struct InstanceData {
+    address[{{{numberOfParticipants}}}] participants;
+    InstanceState state;
   }
   function enact(uint instanceID, uint id) external;
   function getTokenState(uint instanceID) external view returns (uint);

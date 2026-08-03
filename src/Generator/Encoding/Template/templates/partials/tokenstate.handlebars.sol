@@ -2,10 +2,10 @@
 {{#if isInstanced}}
 {{#if hasSubProcesses}}
 {{!// ---- sub process ----- }}
-processData[instanceID].tokenState[{{id}}]{{! (Remove Whitespace) ~}}
+instanceData[instanceID].state.tokenState[{{id}}]{{! (Remove Whitespace) ~}}
 {{else}}
 {{!// ---- no sub process ----- }}
-processData[instanceID].tokenState{{! (Remove Whitespace) ~}}
+instanceData[instanceID].state.tokenState{{! (Remove Whitespace) ~}}
 {{/if}}
 {{else}}
 {{!// ---- uninstanced support ----- }}

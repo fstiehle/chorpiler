@@ -7,7 +7,7 @@ event NewInstance(uint id, uint instanceID);
 {{/if}}
 {{!// ---- Instance Support: list of process data ----- }}
 {{#if isInstanced}}
-mapping(uint => IProcessInstance.ProcessData) public processData;
+mapping(uint => IProcessInstance.InstanceData) public instanceData;
 uint private nextId = 0;
 {{else}}
 {{!// ---- Non-Instanced Contract ----- }}

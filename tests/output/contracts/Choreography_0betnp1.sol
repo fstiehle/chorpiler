@@ -4,9 +4,12 @@ pragma solidity ^0.8.9;
 import "hardhat/console.sol";
 
 interface IProcessInstance {
-  struct ProcessData {
-    address[2] participants;
+  struct InstanceState {
     uint tokenState;
+  }
+  struct InstanceData {
+    address[2] participants;
+    InstanceState state;
   }
   function enact(uint instanceID, uint id) external;
   function getTokenState(uint instanceID) external view returns (uint);
@@ -15,26 +18,28 @@ interface IProcessInstance {
 
 
 contract Choreography_0betnp1 is IProcessInstance {
-  mapping(uint => IProcessInstance.ProcessData) public processData;
+  mapping(uint => IProcessInstance.InstanceData) public instanceData;
   uint private nextId = 0;
   event Task(uint id);
 
   function instance(address[2] memory _participants) external returns (uint) {
     uint newId = nextId;
-    processData[newId] = IProcessInstance.ProcessData({
+    instanceData[newId] = IProcessInstance.InstanceData({
       participants: _participants,
-      tokenState: 1
+      state: IProcessInstance.InstanceState({
+        tokenState: 1
+      })
     });
     nextId = newId + 1;
     return newId;
   }
 
   function getTokenState(uint instanceID) external view returns (uint) {
-    return processData[instanceID].tokenState;
+    return instanceData[instanceID].state.tokenState;
   }
 
   function enact(uint instanceID, uint id) external {
-    uint _tokenState = processData[instanceID].tokenState;
+    uint _tokenState = instanceData[instanceID].state.tokenState;
     
     console.log(
       "Choreography_0betnp1: current token state is %d, sender %s trying to execute task %d",
@@ -46,7 +51,7 @@ contract Choreography_0betnp1 is IProcessInstance {
     while(_tokenState != 0) {
       if (_tokenState & 1 == 1) {
         // <--- ChoreographyTask_14yfpb3 New Activity --->
-        if (1 == id && msg.sender == processData[instanceID].participants[0]) {
+        if (1 == id && msg.sender == instanceData[instanceID].participants[0]) {
           // <--- custom code for task here --->
           _tokenState &= ~uint(1);
           _tokenState |= 0;
@@ -57,7 +62,7 @@ contract Choreography_0betnp1 is IProcessInstance {
       break;
     }
     
-    processData[instanceID].tokenState = _tokenState;
+    instanceData[instanceID].state.tokenState = _tokenState;
     
     console.log(
       "Choreography_0betnp1: new token state is %d",

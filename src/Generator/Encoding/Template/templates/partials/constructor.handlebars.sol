@@ -2,14 +2,16 @@
 {{#if isInstanced}}
 function instance(address[{{{numberOfParticipants}}}] memory _participants) external returns (uint) {
   uint newId = nextId;
-  processData[newId] = IProcessInstance.ProcessData({
+  instanceData[newId] = IProcessInstance.InstanceData({
     participants: _participants,
-    {{^hasSubProcesses}}
-    tokenState: 1
-    {{/hasSubProcesses}}
-    {{#hasSubProcesses}}
-    tokenState[0]: 1
-    {{/hasSubProcesses}}
+    state: IProcessInstance.InstanceState({
+      {{^hasSubProcesses}}
+      tokenState: 1
+      {{/hasSubProcesses}}
+      {{#hasSubProcesses}}
+      tokenState[0]: 1
+      {{/hasSubProcesses}}
+    })
   });
   nextId = newId + 1;
   return newId;

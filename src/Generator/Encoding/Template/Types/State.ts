@@ -23,6 +23,7 @@ export class State {
     public transitions: Transition[],
     public isDecision: boolean,
     public isInstanced: boolean,
+    public isChannel: boolean,
     public hasSubProcesses: boolean,
     public id: string,
     public modelID: string,
@@ -36,6 +37,7 @@ export class State {
     transitions: Encoding.Transition[],
     excludeTransitions: Set<Encoding.Transition>,
     isInstanced: boolean,
+    isChannel: boolean,
     options: Options,
     hasSubProcesses: boolean,
     id: string,
@@ -65,6 +67,7 @@ export class State {
       convertedTransitions,
       hasDecisions && hasDefaultBranch,
       isInstanced,
+      isChannel,
       hasSubProcesses,
       id,
       modelID

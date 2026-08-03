@@ -41,6 +41,7 @@ export class MainProcess extends Process {
   subProcesses = new Map<string, SubProcess>();
   isCalled = false;
   isInstanced = false;
+  isChannel = false;
 }
 
 export class Call {

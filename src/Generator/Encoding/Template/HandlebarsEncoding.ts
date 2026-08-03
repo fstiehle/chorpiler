@@ -97,6 +97,7 @@ export class HandlebarsEncoding implements IFromEncoding {
         transitions,
         new Set(),
         encoding.isInstanced,
+        encoding.isChannel,
         options,
         encoding.subProcesses.size > 0,
         encoding.id.toString(),
@@ -109,6 +110,7 @@ export class HandlebarsEncoding implements IFromEncoding {
       SubProcess.fromEncoding(
         subProcess,
         encoding.isInstanced,
+        encoding.isChannel,
         options,
         subProcessesWithDataTasks.includes(subProcess.modelID)
       )
@@ -129,6 +131,7 @@ export class HandlebarsEncoding implements IFromEncoding {
       states,
       subProcesses,
       encoding.isInstanced,
+      encoding.isChannel,
       encoding.id.toString()
     );
   }

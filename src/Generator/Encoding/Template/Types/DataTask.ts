@@ -83,7 +83,7 @@ function buildConditionString(
 
   if (transition.inFrom && isSubChoreography(transition.inFrom)) {
     const tokenStateRef = isInstanced
-      ? `processData[instanceID].tokenState[${transition.inFrom.id}]`
+      ? `instanceData[instanceID].tokenState[${transition.inFrom.id}]`
       : `tokenState[${transition.inFrom.id}]`;
     conditions.push(
       `require(0 == ${tokenStateRef}, "SubChoreography not completed");`
@@ -91,7 +91,7 @@ function buildConditionString(
   }
 
   const participantsRef = isInstanced
-    ? `processData[instanceID].participants[${transition.initiatorID}]`
+    ? `instanceData[instanceID].participants[${transition.initiatorID}]`
     : `participants[${transition.initiatorID}]`;
   conditions.push(
     `require(msg.sender == ${participantsRef}, "Invalid initiator");`

@@ -71,7 +71,7 @@ export class Transition {
 
     if (t.inFrom && isSubChoreography(t.inFrom)) {
       const tokenStateRef = isInstanced
-        ? `processData[instanceID].tokenState[${t.inFrom.id}]`
+        ? `instanceData[instanceID].tokenState[${t.inFrom.id}]`
         : `tokenState[${t.inFrom.id}]`;
       conditions.push(`0 == ${tokenStateRef}`);
     }
@@ -79,7 +79,7 @@ export class Transition {
     if (isInitiatedTransition) {
       const initiated = t as Encoding.InitiatedTransition;
       const participantsRef = isInstanced
-        ? `processData[instanceID].participants[${initiated.initiatorID}]`
+        ? `instanceData[instanceID].participants[${initiated.initiatorID}]`
         : `participants[${initiated.initiatorID}]`;
       conditions.push(`msg.sender == ${participantsRef}`);
     }

@@ -24,6 +24,7 @@ export class INetEncoder {
     _iNet: InteractionNet,
     options: CompileOptions,
     isInstanced = false,
+    isChannel = false,
   ) {
     const iNet: InteractionNet = { ..._iNet };
     if (iNet.initial == null || iNet.end == null) {
@@ -33,6 +34,7 @@ export class INetEncoder {
     this.mainEncoded.options = options;
     this.mainEncoded.isCalled = iNet.isCalled;
     this.mainEncoded.isInstanced = isInstanced;
+    this.mainEncoded.isChannel = isChannel;
     // create participant template options and IDs
     this.mainEncoded.participants = this.encodeParticipants(iNet.participants);
 

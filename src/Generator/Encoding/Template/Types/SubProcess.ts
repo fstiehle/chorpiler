@@ -34,6 +34,7 @@ export class SubProcess {
   static fromEncoding(
     subProcess: Encoding.SubProcess,
     isInstanced: boolean,
+    isChannel: boolean,
     options: Options,
     hasDataTasks: boolean
   ): SubProcess {
@@ -44,6 +45,7 @@ export class SubProcess {
         transitions,
         new Set(), // Sub-processes don't separate case variable tasks
         isInstanced,
+        isChannel,
         options,
         true,
         subProcess.id.toString(),
