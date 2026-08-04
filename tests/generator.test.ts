@@ -31,12 +31,8 @@ describe("Generation of edge cases", () => {
         const data = await readFile(path.join(edgeCasesPath, bpmnFile));
         const iNets = await parser.fromXML(data);
 
-        // Special handling for sub-choreography2.bpmn, which needs unfold=false
+        // Special handling for sub-choreography2.bpmn, which we test on unfold=false
         const isSubChoreography2 = bpmnFile === "sub-choreography2.bpmn";
-
-        if (isSubChoreography2) {
-          console.log(iNets);
-        }
 
         for (const iNet of iNets) {
           const generator = new SolDefaultContractGenerator(iNet, undefined, iNet.isCalled);
@@ -58,8 +54,19 @@ describe("Generation of edge cases", () => {
       await compileBpmn(
         parser,
         "xor-and",
-        [new CaseVariable("items", "bool", "bool public items = false;", true)],
+        [new CaseVariable("items", "bool", "false", true, "public")],
         [],
+      );
+    });
+
+    it("XOR-AND case to State Channel Contract", async () => {
+      await compileBpmn(
+        parser,
+        "xor-and",
+        [new CaseVariable("items", "bool", "false", true, "public")],
+        [],
+        false,
+        true
       );
     });
 
@@ -67,7 +74,7 @@ describe("Generation of edge cases", () => {
       await compileBpmn(parser, "out-of-order-xml", [], []);
     });
 
-    it.skip("Pharmacy case to State Channel Root", async () => {
+    it("Pharmacy (out of order xml file) caseto State Channel", async () => {
       await compileBpmn(parser, "out-of-order-xml", [], [], false, true);
     });
 
@@ -75,7 +82,7 @@ describe("Generation of edge cases", () => {
       await compileBpmn(parser, "supply-chain", [], []);
     });
 
-    it.skip("Supply chain case to State Channel Root", async () => {
+    it("Supply chain case to State Channel", async () => {
       await compileBpmn(parser, "supply-chain", [], [], false, true);
     });
 
@@ -87,16 +94,32 @@ describe("Generation of edge cases", () => {
           new CaseVariable(
             "resolved",
             "bool",
-            "bool public resolved = false;",
+            "false",
             true,
+            "public"
           ),
         ],
         [],
       );
     });
 
-    it.skip("Incident Management case to State Channel Root", async () => {
-      await compileBpmn(parser, "incident-management", [], [], false, true);
+    it("Incident Management case to State Channel", async () => {
+      await compileBpmn(
+        parser,
+        "incident-management",
+        [
+          new CaseVariable(
+            "resolved",
+            "bool",
+            "false",
+            true,
+            "public"
+          ),
+        ],
+        [],
+        false,
+        true
+      );
     });
 
     it("Rental Agreement case to Sol Contract", async () => {
@@ -107,11 +130,31 @@ describe("Generation of edge cases", () => {
           new CaseVariable(
             "conditions",
             "uint",
-            "uint public conditions;",
+            "0",
             true,
+            "public"
           ),
         ],
         [],
+      );
+    });
+
+    it("Rental Agreement case to State Channel", async () => {
+      await compileBpmn(
+        parser,
+        "rental-agreement",
+        [
+          new CaseVariable(
+            "conditions",
+            "uint",
+            "0",
+            true,
+            "public"
+          ),
+        ],
+        [],
+        false,
+        true
       );
     });
 
@@ -119,7 +162,7 @@ describe("Generation of edge cases", () => {
       await compileBpmn(
         parser,
         "pizza",
-        [new CaseVariable("items", "bool", "bool public items = false;", true)],
+        [new CaseVariable("items", "bool", "false", true, "public")],
         [],
       );
     });
@@ -132,8 +175,9 @@ describe("Generation of edge cases", () => {
           new CaseVariable(
             "conditions",
             "uint",
-            "uint public conditions;",
+            "0",
             true,
+            "public"
           ),
         ],
         [],
@@ -157,8 +201,9 @@ describe("Generation of edge cases", () => {
           new CaseVariable(
             "pizza_order",
             "uint",
-            'uint public pizza_order = 0',
+            '0',
             false,
+            "public"
           ),
         ],
         [],
@@ -166,7 +211,26 @@ describe("Generation of edge cases", () => {
       );
     });
 
-    it.only("Sub Choreo Messages case to Sol Contract", async () => {
+    it("Messages case to State Channel", async () => {
+      await compileBpmn(
+        parser,
+        "messages",
+        [
+          new CaseVariable(
+            "pizza_order",
+            "uint",
+            '0',
+            false,
+            "public"
+          ),
+        ],
+        [],
+        false,
+        true
+      );
+    });
+
+    it("Sub Choreo Messages case to Sol Contract", async () => {
       await compileBpmn(
         parser,
         "sub-choreo-messages",
@@ -174,12 +238,32 @@ describe("Generation of edge cases", () => {
           new CaseVariable(
             "conditions",
             "uint",
-            'uint public conditions = 0',
+            '0',
             false,
+            "public"
           ),
         ],
         [],
         false,
+      );
+    });
+
+    it("Sub Choreo Messages case to State Channel", async () => {
+      await compileBpmn(
+        parser,
+        "sub-choreo-messages",
+        [
+          new CaseVariable(
+            "conditions",
+            "uint",
+            '0',
+            false,
+            "public"
+          ),
+        ],
+        [],
+        false,
+        true
       );
     });
 

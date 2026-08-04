@@ -1,5 +1,5 @@
 //SPDX-License-Identifier: MIT
-pragma solidity ^0.8.9;
+pragma solidity ^0.8.24;
 
 {{#if options.debug}}
 import "hardhat/console.sol";
@@ -27,7 +27,7 @@ contract {{{modelID}}} is {{#if isInstanced}}IProcessInstance{{else}}IProcess{{/
   }
   {{! ---- // Tasks that set casevariables ---- }}
   {{> datatasks }}
-  {{! ---- // Whitespace ---- }}
+
   {{! ---- // Sub process enactment functions ---- }}
   {{> subprocesses }}
 }

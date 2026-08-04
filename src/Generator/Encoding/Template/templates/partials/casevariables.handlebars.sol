@@ -2,7 +2,7 @@
 // Case Variable {{{name}}}
 {{#unless isInstanced}}
 {{!// ---- Initialise uninstanced variables ----- }}
-{{{expression}}}
+{{{type}}} {{{visibility}}} {{{name}}} = {{{defaultValue}}};
 {{/unless}}
 
 {{!// ---- Setter ----- }}

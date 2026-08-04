@@ -63,8 +63,9 @@ export class CaseVariable {
   constructor(
     public name: string,
     public type: string,
-    public expression: string,
+    public defaultValue: string,
     public setters: boolean,
+    public visibility: string
   ) {}
 }
 

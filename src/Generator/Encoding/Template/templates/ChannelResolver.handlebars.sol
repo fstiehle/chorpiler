@@ -1,19 +1,21 @@
 //SPDX-License-Identifier: MIT
-pragma solidity ^0.8.9;
+pragma solidity ^0.8.24;
 
 {{#if options.debug}}
 import "hardhat/console.sol";
 {{/if}}
 
 interface IChannelRoot {
+
   // TODO: Variable Packing
   struct Channel {
-    uint instanceID
+    uint instanceID;
     address[] participants;
     address resolveContract;
   }
+
   struct Proof {
-    bytes[] calldata signatures;
+    bytes[] signatures;
     bytes32 stateHash;
     bytes32 OP_RETURN;
   }
@@ -25,38 +27,51 @@ interface IChannelRoot {
   function verify(bytes32 _id, Proof calldata _step) external returns (bool);
 }
 
-IChannelRoot constant Channel_Root = IChannelRoot(0x0000000000000000000000000000000000000000);
+interface IProcessInstance {
 
-interface IChannelResolver {
   struct InstanceState {
     {{!// ---- Sub Process Support ----- }}
     {{#if hasSubProcesses}}
-    uint[{{{numberOfProcesses}}}] public tokenState;
+    uint[{{{numberOfProcesses}}}] tokenState;
     {{else}}
     uint tokenState;
     {{/if}}
     {{!// ---- Instanced Case Variables ----- }}
     {{#each caseVariables}}
-    {{{expression}}}
+    {{{type}}} {{{name}}};
     {{/each}}
+
+    // state channel version index
+    uint index;
   }
+
   struct InstanceData {
     address[{{{numberOfParticipants}}}] participants;
     InstanceState state;
-
-    // state channel version index
-    uint public index;
     /// Timestamps for the challenge-response dispute window
-    uint public disputeMadeAtUNIX;
+    uint disputeMadeAtUNIX;
   }
+}
+
+interface IChannelResolver {
+  struct Step {
+    uint index;
+    uint intsanceID;
+    IProcessInstance.InstanceState newState;
+    bytes[] signatures;
+    bytes32 OP_RETURN;
+  }
+
   function enact(uint instanceID, uint id) external;
   function getTokenState(uint instanceID) external view returns (uint);
   function instance(address[{{{numberOfParticipants}}}] memory participants) external returns (uint);
-  function submit(Step calldata _step) external;
+  function submit(bytes32 id, Step calldata _step) external;
 }
 
 {{! ---- // List/declarations of called contracts and their interfaces ---- }}
 {{> calls}}
+
+IChannelRoot constant Channel_Root = IChannelRoot(0x0000000000000000000000000000000000000000);
 
 contract ChannelResolver{{{modelID}}} is IChannelResolver {
   uint public immutable disputeWindowInUNIX = 86400;
@@ -67,18 +82,11 @@ contract ChannelResolver{{{modelID}}} is IChannelResolver {
 
   {{> constructor }}
 
-  struct Step {
-    uint index;
-    uint intsanceID;
-    InstanceState newState;
-    bytes[{{{numberOfParticipants}}}] signatures;
-  }
-
   /**
    * Trigger new dispute or submit new state to elapse current dispute state
    * @param _step Last unanimously signed step, or empty step if process is stuck in start event
    */
-   function submit(uint id, Step calldata _step) external {
+   function submit(bytes32 id, Step calldata _step) external {
     uint _disputeMadeAtUNIX = instanceData[_step.intsanceID].disputeMadeAtUNIX;
     if (0 == _step.index && 0 == _disputeMadeAtUNIX) {
       // stuck in start event
@@ -88,27 +96,30 @@ contract ChannelResolver{{{modelID}}} is IChannelResolver {
       if (checkStep(id, _step)) {
         if (0 == _disputeMadeAtUNIX) {
           // new dispute or final state
-          if (_step.newTokenState != 0) {
+          if (_step.newState.tokenState{{#if hasSubProcesses}}[0]{{/if}} != 0) {
             // new dispute with state submission
             instanceData[_step.intsanceID].disputeMadeAtUNIX = block.timestamp;
           }
-          instanceData[_step.intsanceID].index = _step.index;
           instanceData[_step.intsanceID].state = _step.newState;
         } else if (_disputeMadeAtUNIX + disputeWindowInUNIX >= block.timestamp) {
           // submission to existing dispute
-          instanceData[_step.intsanceID].index = _step.index;
           instanceData[_step.intsanceID].state = _step.newState;
         }
       }
     }
   }
 
-  function checkStep(uint id, Step _step) private view returns (bool) {
+  function checkStep(bytes32 id, Step calldata _step) private returns (bool) {
     // Check that step is higher than previously recorded steps
-    if (instanceData[_step.intsanceID].index >= _step.index) {
+    if (instanceData[_step.intsanceID].state.index >= _step.index) {
       return false;
     }
-    return Channel_Root.verify(id, Proof({ TODO }))
+
+    return Channel_Root.verify(id, IChannelRoot.Proof({
+      signatures: _step.signatures,
+      stateHash: keccak256(abi.encode(_step.newState)),
+      OP_RETURN: _step.OP_RETURN
+    }));
   }
 
   function getTokenState({{#if isInstanced}}uint instanceID{{/if}}) external view returns (uint) {

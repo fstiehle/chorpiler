@@ -11,7 +11,7 @@ interface IProcessInstance {
     {{/if}}
     {{!// ---- Instanced Case Variables ----- }}
     {{#each caseVariables}}
-    {{{expression}}}
+    {{{type}}} {{{name}}};
     {{/each}}
   }
   struct InstanceData {

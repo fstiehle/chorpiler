@@ -1,6 +1,8 @@
 import * as Encoding from "../../Encoding.js";
 import { CallType } from "../../../../Parser/Elements/Call.js";
 import { Options } from "./Options.js";
+import { Decision } from "./Decision.js";
+import { buildTokenStateRef, buildParticipantsRef } from "./varNames.js";
 
 /**
  * Represents a task with case variable in the template encoding.
@@ -46,14 +48,15 @@ export class DataTask {
     options: Options,
     hasSubProcesses: boolean,
     id: string,
-    subProcessCallback: string | null
+    subProcessCallback: string | null,
+    caseVariables: Map<string, Encoding.CaseVariable>
   ): DataTask {
     if (!transition.message?.caseVariable) {
       throw new Error("DataTask requires a transition with a caseVariable");
     }
 
     const caseVar = transition.message.caseVariable;
-    const conditionString = buildConditionString(transition, isInstanced);
+    const conditionString = buildConditionString(transition, isInstanced, caseVariables);
 
     return new DataTask(
       transition.modelID,
@@ -77,22 +80,19 @@ export class DataTask {
  */
 function buildConditionString(
   transition: Encoding.InitiatedTransition,
-  isInstanced: boolean
+  isInstanced: boolean,
+  caseVariables: Map<string, Encoding.CaseVariable>
 ): string {
   const conditions: string[] = [];
 
   if (transition.inFrom && isSubChoreography(transition.inFrom)) {
-    const tokenStateRef = isInstanced
-      ? `instanceData[instanceID].tokenState[${transition.inFrom.id}]`
-      : `tokenState[${transition.inFrom.id}]`;
+    const tokenStateRef = buildTokenStateRef(transition.inFrom.id, isInstanced);
     conditions.push(
       `require(0 == ${tokenStateRef}, "SubChoreography not completed");`
     );
   }
 
-  const participantsRef = isInstanced
-    ? `instanceData[instanceID].participants[${transition.initiatorID}]`
-    : `participants[${transition.initiatorID}]`;
+  const participantsRef = buildParticipantsRef(transition.initiatorID, isInstanced);
   conditions.push(
     `require(msg.sender == ${participantsRef}, "Invalid initiator");`
   );
@@ -104,9 +104,13 @@ function buildConditionString(
   }
 
   if (transition.condition) {
-    conditions.push(
-      `require(${transition.condition}, "Decision condition not met");`
-    );
+    // Use Decision class to handle case variable references
+    const condition = Decision.fromEncoding(transition.condition, caseVariables, isInstanced);
+    if (condition.expression) {
+      conditions.push(
+        `require(${condition.expression}, "Decision condition not met");`
+      );
+    }
   }
 
   return conditions.join("\n");

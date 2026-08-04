@@ -20,29 +20,25 @@ export class CaseVariable {
   constructor(
     public name: string,
     public isInstanced: boolean,
-    public expression: string,
+    public defaultValue: string,
     public setters: boolean,
     public functionName: string,
     public type: string,
+    public visibility: string
   ) {}
 
   /**
    * Creates a CaseVariable instance from an Encoding.CaseVariable.
    */
   static fromEncoding(cv: Encoding.CaseVariable, isInstanced: boolean): CaseVariable {
-    // Strip trailing whitespace and ensure semicolon at the end
-    let expression = cv.expression.trimEnd();
-    if (!expression.endsWith(";")) {
-      expression += ";";
-    }
-
     return new CaseVariable(
       cv.name,
       isInstanced,
-      expression,
+      cv.defaultValue,
       cv.setters,
       "set" + capitalize(cv.name),
-      cv.type
+      cv.type,
+      cv.visibility
     );
   }
 }

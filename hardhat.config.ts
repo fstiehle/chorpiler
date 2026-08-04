@@ -7,8 +7,9 @@ import { CONTRACTS_PATH, OUTPUT_PATH } from "./tests/config.js";
 
 const config: HardhatUserConfig = {
   solidity: {
-    version: "0.8.9",
+    version: "0.8.24",
     settings: {
+      evmVersion: "cancun",
       optimizer: {
         enabled: true,
         runs: 100,
@@ -23,7 +24,7 @@ const config: HardhatUserConfig = {
     },
   },
   paths: {
-    sources: CONTRACTS_PATH,
+    sources: [ CONTRACTS_PATH, "src/Contracts" ],
     cache: OUTPUT_PATH + "/cache",
     artifacts: OUTPUT_PATH + "/artifacts",
     tests: "tests",

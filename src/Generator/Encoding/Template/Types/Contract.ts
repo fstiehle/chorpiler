@@ -39,7 +39,7 @@ export class Contract {
     public states: State[],
     public subProcesses: SubProcess[],
     public isInstanced: boolean,
-    isChannel: boolean,
+    public isChannel: boolean,
     public id: string,
   ) {}
 

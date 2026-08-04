@@ -22,7 +22,9 @@ export class SubProcess {
     public id: string,
     public states: State[],
     public options: Options,
-    public hasDataTasks: boolean
+    public hasDataTasks: boolean,
+    public isChannel: boolean,
+    public isInstanced: boolean
   ) {
   }
 
@@ -36,7 +38,8 @@ export class SubProcess {
     isInstanced: boolean,
     isChannel: boolean,
     options: Options,
-    hasDataTasks: boolean
+    hasDataTasks: boolean,
+    caseVariables: Map<string, Encoding.CaseVariable>
   ): SubProcess {
     // Convert states for this sub-process
     const states = Array.from(subProcess.states.entries()).map(([consume, transitions]) => {
@@ -45,11 +48,11 @@ export class SubProcess {
         transitions,
         new Set(), // Sub-processes don't separate case variable tasks
         isInstanced,
-        isChannel,
         options,
         true,
         subProcess.id.toString(),
-        subProcess.modelID
+        subProcess.modelID,
+        caseVariables
       );
     });
 
@@ -58,7 +61,9 @@ export class SubProcess {
       subProcess.id.toString(),
       states,
       options,
-      hasDataTasks
+      hasDataTasks,
+      isInstanced,
+      isChannel,
     );
   }
 }

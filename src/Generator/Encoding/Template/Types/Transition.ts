@@ -2,6 +2,8 @@ import * as Encoding from "../../Encoding.js";
 import { CallType } from "../../../../Parser/Elements/Call.js";
 import { OutTo } from "./OutTo.js";
 import { Options } from "./Options.js";
+import { Decision } from "./Decision.js";
+import { buildTokenStateRef, buildParticipantsRef } from "./varNames.js";
 
 /**
  * Represents a transition in the template encoding.
@@ -26,6 +28,8 @@ import { Options } from "./Options.js";
  *
  * Propagated properties (for nested partials):
  * - options: compile options (for event emission in firing.handlebars.sol)
+ * - isInstanced: whether the process supports instances
+ * - hasSubProcesses: whether the contract has sub-processes
  */
 export class Transition {
   constructor(
@@ -41,6 +45,8 @@ export class Transition {
     public defaultBranch: boolean,
     public decision: string | null,
     public options: Options,
+    public isInstanced: boolean,
+    public hasSubProcesses: boolean,
   ) { }
 
   isSub = () => this.outTo !== null && this.outTo.isSub;
@@ -56,7 +62,9 @@ export class Transition {
   static fromEncoding(
     t: Encoding.Transition,
     isInstanced: boolean,
-    options: Options
+    options: Options,
+    caseVariables: Map<string, Encoding.CaseVariable>,
+    hasSubProcesses: boolean
   ): Transition {
     const isTaskTransition = t instanceof Encoding.TaskTransition;
     const isInitiatedTransition = t instanceof Encoding.InitiatedTransition;
@@ -70,17 +78,13 @@ export class Transition {
     }
 
     if (t.inFrom && isSubChoreography(t.inFrom)) {
-      const tokenStateRef = isInstanced
-        ? `instanceData[instanceID].tokenState[${t.inFrom.id}]`
-        : `tokenState[${t.inFrom.id}]`;
+      const tokenStateRef = buildTokenStateRef(t.inFrom.id, isInstanced);
       conditions.push(`0 == ${tokenStateRef}`);
     }
 
     if (isInitiatedTransition) {
       const initiated = t as Encoding.InitiatedTransition;
-      const participantsRef = isInstanced
-        ? `instanceData[instanceID].participants[${initiated.initiatorID}]`
-        : `participants[${initiated.initiatorID}]`;
+      const participantsRef = buildParticipantsRef(initiated.initiatorID, isInstanced);
       conditions.push(`msg.sender == ${participantsRef}`);
     }
 
@@ -113,6 +117,9 @@ export class Transition {
       );
     }
 
+    // Process decision condition using Decision class
+    const condition = Decision.fromEncoding(t.condition, caseVariables, isInstanced);
+
     return new Transition(
       isInitiatedTransition ? (t as Encoding.InitiatedTransition).modelID : null,
       isInitiatedTransition ? (t as Encoding.InitiatedTransition).taskName : null,
@@ -124,8 +131,10 @@ export class Transition {
       isTaskTransition ? (t as Encoding.TaskTransition).taskID.toString() : null,
       isInitiatedTransition ? (t as Encoding.InitiatedTransition).initiatorID.toString() : null,
       t.defaultBranch,
-      t.condition ?? null,
-      options
+      condition.expression,
+      options,
+      isInstanced,
+      hasSubProcesses
     );
   }
 }

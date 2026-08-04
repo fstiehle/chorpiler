@@ -23,7 +23,6 @@ export class State {
     public transitions: Transition[],
     public isDecision: boolean,
     public isInstanced: boolean,
-    public isChannel: boolean,
     public hasSubProcesses: boolean,
     public id: string,
     public modelID: string,
@@ -37,15 +36,15 @@ export class State {
     transitions: Encoding.Transition[],
     excludeTransitions: Set<Encoding.Transition>,
     isInstanced: boolean,
-    isChannel: boolean,
     options: Options,
     hasSubProcesses: boolean,
     id: string,
-    modelID: string
+    modelID: string,
+    caseVariables: Map<string, Encoding.CaseVariable>
   ): State {
     // Convert transitions
     const convertedTransitions = transitions.map(t =>
-      Transition.fromEncoding(t, isInstanced, options)
+      Transition.fromEncoding(t, isInstanced, options, caseVariables, hasSubProcesses)
     );
 
     // Sort transitions so defaultBranch is last
@@ -67,7 +66,6 @@ export class State {
       convertedTransitions,
       hasDecisions && hasDefaultBranch,
       isInstanced,
-      isChannel,
       hasSubProcesses,
       id,
       modelID

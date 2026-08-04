@@ -1,4 +1,4 @@
-import type * as Encoding from "../Encoding.js";
+import type * as Encoding from "../../Encoding.js";
 
 /**
  * Represents a called contract in the template encoding.

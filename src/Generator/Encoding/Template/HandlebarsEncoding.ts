@@ -56,7 +56,8 @@ export class HandlebarsEncoding implements IFromEncoding {
                 options,
                 encoding.subProcesses.size > 0,
                 encoding.id.toString(),
-                null
+                null,
+                encoding.caseVariables
               )
             );
           }
@@ -81,7 +82,8 @@ export class HandlebarsEncoding implements IFromEncoding {
                   options,
                   encoding.subProcesses.size > 0,
                   subProcess.id.toString(),
-                  subProcess.modelID
+                  subProcess.modelID,
+                  encoding.caseVariables
                 )
               );
             }
@@ -97,11 +99,11 @@ export class HandlebarsEncoding implements IFromEncoding {
         transitions,
         new Set(),
         encoding.isInstanced,
-        encoding.isChannel,
         options,
         encoding.subProcesses.size > 0,
         encoding.id.toString(),
-        encoding.modelID
+        encoding.modelID,
+        encoding.caseVariables
       );
     });
 
@@ -112,7 +114,8 @@ export class HandlebarsEncoding implements IFromEncoding {
         encoding.isInstanced,
         encoding.isChannel,
         options,
-        subProcessesWithDataTasks.includes(subProcess.modelID)
+        subProcessesWithDataTasks.includes(subProcess.modelID),
+        encoding.caseVariables
       )
     );
 

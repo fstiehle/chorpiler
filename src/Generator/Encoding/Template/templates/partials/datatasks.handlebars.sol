@@ -1,6 +1,6 @@
 {{#each dataTasks}}
 
-function {{{modelID}}}({{#if isInstanced}}uint instance, {{/if}}{{{type}}} _{{{name}}}) external {
+function {{{modelID}}}({{#if isInstanced}}uint instanceID, {{/if}}{{{type}}} _{{{name}}}) external {
   require({{> tokenstate }} & {{{consume}}} == {{{consume}}});
   {{{conditionString}}}
 
@@ -15,9 +15,9 @@ function {{{modelID}}}({{#if isInstanced}}uint instance, {{/if}}{{{type}}} _{{{n
   {{/if}}
   {{! // ---- Continue process loop ---- }}
   {{#if subProcessCallback}}
-    {{subProcessCallback}}({{taskID}});
+    {{subProcessCallback}}({{#if isInstanced}}instanceID, {{/if}}{{taskID}});
   {{else}}
-    enact({{taskID}});
+    enact({{#if isInstanced}}instanceID, {{/if}}{{taskID}});
   {{/if}}
 }
 {{/each}}

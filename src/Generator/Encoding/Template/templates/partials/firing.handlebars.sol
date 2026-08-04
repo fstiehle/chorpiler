@@ -7,7 +7,7 @@ _tokenState &= ~uint({{{consume}}});
 {{#if outTo}}
 {{#if isSub}}
 {{! // ---- Sub Choreo Support: instanciate sub choreo ---- }}
-tokenState[{{outTo.id}}] = 1;
+{{> tokenstate id = outTo.id }} = 1;
 {{/if}}
 {{#if isCall}}
 {{! // ---- Call Choreo Support: call external contract ---- }}

@@ -2,15 +2,27 @@
 {{#if isInstanced}}
 function instance(address[{{{numberOfParticipants}}}] memory _participants) external returns (uint) {
   uint newId = nextId;
+  {{#if hasSubProcesses}}
+  uint[{{{numberOfProcesses}}}] memory newTokenState;
+  newTokenState[0] = 1;
+  {{/if}}
   instanceData[newId] = IProcessInstance.InstanceData({
+    {{#if isChannel}}
+    disputeMadeAtUNIX: 0,
+    {{/if}}
     participants: _participants,
     state: IProcessInstance.InstanceState({
-      {{^hasSubProcesses}}
-      tokenState: 1
-      {{/hasSubProcesses}}
-      {{#hasSubProcesses}}
-      tokenState[0]: 1
-      {{/hasSubProcesses}}
+      {{#if isChannel}}
+      index: 0,
+      {{/if}}
+      {{#if hasSubProcesses}}
+      tokenState: newTokenState{{!// No Whitespace ~}}
+      {{else}}
+      tokenState: 1{{!// No Whitespace ~}}
+      {{/if}}
+{{!// Align Comma ~}}{{#each caseVariables}},
+      {{{name}}}: {{defaultValue}}
+      {{/each}}
     })
   });
   nextId = newId + 1;

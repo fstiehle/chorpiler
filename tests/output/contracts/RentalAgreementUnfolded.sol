@@ -1,5 +1,5 @@
 //SPDX-License-Identifier: MIT
-pragma solidity ^0.8.9;
+pragma solidity ^0.8.24;
 
 import "hardhat/console.sol";
 
@@ -14,7 +14,7 @@ contract RentalAgreementUnfolded is IProcess {
   address[3] public participants;
   event Task(uint id);
   // Case Variable conditions
-  uint public conditions;
+  uint public conditions = 0;
   
   function setConditions(uint _conditions) external {
     conditions = _conditions;
@@ -149,6 +149,7 @@ contract RentalAgreementUnfolded is IProcess {
        _tokenState
     );
   }
+
   function SubChoreography_1sp0n7o(uint id) external {
     uint _tokenState = tokenState[1];
     

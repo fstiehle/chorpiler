@@ -3,7 +3,7 @@ import path from "path";
 import util from "util";
 import { CaseVariable } from "../../src/Generator/Encoding/Encoding.js";
 import SolDefaultContractGenerator from "../../src/Generator/target/Sol/DefaultGenerator.js";
-import SolStateChannelContractGenerator from "../../src/Generator/target/Sol/StateChannelGenerator.js";
+import SolStateChannelContractGenerator from "../../src/Generator/target/Sol/ChannelGenerator.js";
 import { BPMN_PATH, CONTRACTS_PATH } from "../config.js";
 import { TemplateEngine } from "../../src/Generator/TemplateEngine.js";
 import { TriggerEncoding } from "../../src/Generator/Encoding/JSON/TriggerEncoding.js";
@@ -136,9 +136,15 @@ const compileCase = async (
   // ) {
   //   directory = path.join(directory, "callchoreos");
   // }
+  let solFileName = `${generator.iNet.id}.sol`;
+  let jsonFileName = `${generator.iNet.id}.json`;
 
-  const solFilePath = path.join(directory, `${generator.iNet.id}.sol`);
-  const jsonFilePath = path.join(directory, `${generator.iNet.id}.json`);
+  if (isStateChannel) {
+    solFileName = "channel_" + solFileName;
+    jsonFileName = "channel_" + jsonFileName;
+  }
+  const solFilePath = path.join(directory, solFileName);
+  const jsonFilePath = path.join(directory, jsonFileName);
 
   // Write the contract file
   await writeFile(solFilePath, output.target, { flag: "w+" });

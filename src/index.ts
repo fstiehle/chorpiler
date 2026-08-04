@@ -1,5 +1,5 @@
 import SolDefaultContractGenerator from "./Generator/target/Sol/DefaultGenerator.js";
-import SolStateChannelContractGenerator from "./Generator/target/Sol/StateChannelGenerator.js";
+import SolStateChannelContractGenerator from "./Generator/target/Sol/ChannelGenerator.js";
 import { INetFastXMLParser } from "./Parser/FastXMLParser.js";
 import { Simulator } from "./Simulator/Simulator.js";
 import { EventLog, Event } from "./util/EventLog/EventLog.js";

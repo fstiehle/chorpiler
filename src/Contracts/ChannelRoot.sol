@@ -7,49 +7,64 @@ Handles membership and existence for all channels.
 2.) Verify a state update for a channel
 */
 interface IChannelRoot {
-
   // TODO: Variable Packing
   struct Channel {
-    uint instanceID
+    uint instanceID;
     address[] participants;
     address resolveContract;
   }
   struct Proof {
-    bytes[] calldata signatures;
+    bytes[] signatures;
     bytes32 stateHash;
     bytes32 OP_RETURN;
   }
 
- /*
+  /*
   Registers a new channel, its resolve contract address, and participating participants.
   */
   function register(Channel calldata _channel) external;
+
   function verify(bytes32 _id, Proof calldata _step) external returns (bool);
 }
 
 import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
+import "@openzeppelin/contracts/utils/cryptography/MessageHashUtils.sol";
 
-contract ChannelRoot {
+contract ChannelRoot is IChannelRoot {
   using ECDSA for bytes32;
-
-  mapping(bytes32 => IChannelRoot.Channel) public channels;
+  using MessageHashUtils for bytes32;
+  mapping(bytes32 => Channel) public channels;
 
   function register(Channel calldata _channel) external {
-    bytes32 id = keccak256(abi.encode(_channel.instance, _channel.participants, _channel.resolveContract);
+    bytes32 id = keccak256(
+      abi.encode(
+        _channel.instanceID,
+        _channel.participants,
+        _channel.resolveContract
+      )
+    );
     // write to channel if id doesn't exist yet
-    require(channels[id].resolveContract == address(0), "Channel already exists");
+    require(
+      channels[id].resolveContract == address(0),
+      "Channel already exists"
+    );
     channels[id] = _channel;
   }
 
-  function verify(bytes32 _id, Proof calldata _step) external returns (bool) {
-    bytes32 payload = abi.encode(_step.payload, _step.OP_RETURN);
+  function verify(
+    bytes32 _id,
+    Proof calldata _step
+  ) external view returns (bool) {
+    bytes32 payload = keccak256(abi.encode(_step.stateHash, _step.OP_RETURN));
 
-    for (uint i = 0; i < channels[_id].participants; i++) {
-      if (payload.toEthSignedMessageHash().recover(_step.signatures[i]) != channels[_id].participants[i]) {
+    for (uint i = 0; i < channels[_id].participants.length; i++) {
+      if (
+        payload.toEthSignedMessageHash().recover(_step.signatures[i]) !=
+        channels[_id].participants[i]
+      ) {
         return false;
       }
     }
     return true;
   }
-
 }

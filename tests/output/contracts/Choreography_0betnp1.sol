@@ -1,5 +1,5 @@
 //SPDX-License-Identifier: MIT
-pragma solidity ^0.8.9;
+pragma solidity ^0.8.24;
 
 import "hardhat/console.sol";
 
@@ -27,8 +27,7 @@ contract Choreography_0betnp1 is IProcessInstance {
     instanceData[newId] = IProcessInstance.InstanceData({
       participants: _participants,
       state: IProcessInstance.InstanceState({
-        tokenState: 1
-      })
+        tokenState: 1    })
     });
     nextId = newId + 1;
     return newId;
@@ -69,4 +68,5 @@ contract Choreography_0betnp1 is IProcessInstance {
        _tokenState
     );
   }
+
 }
