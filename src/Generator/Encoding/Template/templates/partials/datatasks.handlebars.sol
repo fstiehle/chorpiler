@@ -15,9 +15,9 @@ function {{{modelID}}}({{#if isInstanced}}uint instanceID, {{/if}}{{{type}}} _{{
   {{/if}}
   {{! // ---- Continue process loop ---- }}
   {{#if subProcessCallback}}
-    {{subProcessCallback}}({{#if isInstanced}}instanceID, {{/if}}{{taskID}});
+  {{subProcessCallback}}({{#if isInstanced}}instanceID, {{/if}}{{taskID}});
   {{else}}
-    enact({{#if isInstanced}}instanceID, {{/if}}{{taskID}});
+  enact({{#if isInstanced}}instanceID, {{/if}}{{taskID}});
   {{/if}}
 }
 {{/each}}

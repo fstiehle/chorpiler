@@ -6,14 +6,15 @@ import "hardhat/console.sol";
 {{/if}}
 
 interface IChannelRoot {
-
   // TODO: Variable Packing
+  // Registered State Channels
   struct Channel {
     uint instanceID;
     address[] participants;
     address resolveContract;
   }
 
+  // Submitted Proof
   struct Proof {
     bytes[] signatures;
     bytes32 stateHash;
@@ -28,7 +29,7 @@ interface IChannelRoot {
 }
 
 interface IProcessInstance {
-
+  // State of a process instance (these change as the process progresses)
   struct InstanceState {
     {{!// ---- Sub Process Support ----- }}
     {{#if hasSubProcesses}}
@@ -40,20 +41,19 @@ interface IProcessInstance {
     {{#each caseVariables}}
     {{{type}}} {{{name}}};
     {{/each}}
-
-    // state channel version index
-    uint index;
+    uint index; // state channel version index
   }
 
+  // Encapsulating static instance data (need not to be signed)
   struct InstanceData {
     address[{{{numberOfParticipants}}}] participants;
     InstanceState state;
-    /// Timestamps for the challenge-response dispute window
     uint disputeMadeAtUNIX;
   }
 }
 
 interface IChannelResolver {
+  // A step can be submitted to start a dispute or as final state
   struct Step {
     uint index;
     uint intsanceID;
@@ -67,7 +67,7 @@ interface IChannelResolver {
   function instance(address[{{{numberOfParticipants}}}] memory participants) external returns (uint);
   function submit(bytes32 id, Step calldata _step) external;
 }
-
+{{! ---- No Whitespace ---- }}
 {{! ---- // List/declarations of called contracts and their interfaces ---- }}
 {{> calls}}
 
@@ -132,7 +132,7 @@ contract ChannelResolver{{{modelID}}} is IChannelResolver {
   }
   {{! ---- // Tasks that set casevariables ---- }}
   {{> datatasks }}
-  {{! ---- // Whitespace ---- }}
+
   {{! ---- // Sub process enactment functions ---- }}
   {{> subprocesses }}
 }

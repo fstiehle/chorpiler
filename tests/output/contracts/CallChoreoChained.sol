@@ -8,6 +8,7 @@ interface IProcess {
   function getTokenState() external view returns (uint);
 }
 
+
 interface IInstanceCall {
   function instance(address[] memory participants) external returns (uint);
   function enact(uint instance, uint id) external;

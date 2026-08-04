@@ -4,14 +4,15 @@ pragma solidity ^0.8.24;
 import "hardhat/console.sol";
 
 interface IChannelRoot {
-
   // TODO: Variable Packing
+  // Registered State Channels
   struct Channel {
     uint instanceID;
     address[] participants;
     address resolveContract;
   }
 
+  // Submitted Proof
   struct Proof {
     bytes[] signatures;
     bytes32 stateHash;
@@ -26,23 +27,22 @@ interface IChannelRoot {
 }
 
 interface IProcessInstance {
-
+  // State of a process instance (these change as the process progresses)
   struct InstanceState {
     uint tokenState;
-
-    // state channel version index
-    uint index;
+    uint index; // state channel version index
   }
 
+  // Encapsulating static instance data (need not to be signed)
   struct InstanceData {
     address[5] participants;
     InstanceState state;
-    /// Timestamps for the challenge-response dispute window
     uint disputeMadeAtUNIX;
   }
 }
 
 interface IChannelResolver {
+  // A step can be submitted to start a dispute or as final state
   struct Step {
     uint index;
     uint intsanceID;
@@ -56,7 +56,6 @@ interface IChannelResolver {
   function instance(address[5] memory participants) external returns (uint);
   function submit(bytes32 id, Step calldata _step) external;
 }
-
 
 IChannelRoot constant Channel_Root = IChannelRoot(0x0000000000000000000000000000000000000000);
 
@@ -224,4 +223,5 @@ contract ChannelResolverPharmacy is IChannelResolver {
        _tokenState
     );
   }
+
 }

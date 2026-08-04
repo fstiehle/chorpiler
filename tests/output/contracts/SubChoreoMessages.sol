@@ -98,13 +98,13 @@ contract SubChoreoMessages is IProcess {
       "Set uint conditions to",
       _conditions
     );
-      enact(1);
+    enact(1);
   }
   
   function ChoreographyTask_175oxwe(uint _conditions) external {
     require(tokenState[0] & 4 == 4);
     require(0 == tokenState[1], "SubChoreography not completed");
-  require(msg.sender == participants[2], "Invalid initiator");
+  	require(msg.sender == participants[2], "Invalid initiator");
   
     conditions = _conditions;
   
@@ -112,14 +112,14 @@ contract SubChoreoMessages is IProcess {
       "Set uint conditions to",
       _conditions
     );
-      enact(2);
+    enact(2);
   }
   
   function ChoreographyTask_1l3cbhv(uint _conditions) external {
     require(tokenState[0] & 4 == 4);
     require(0 == tokenState[1], "SubChoreography not completed");
-  require(msg.sender == participants[2], "Invalid initiator");
-  require(conditions == 1, "Decision condition not met");
+  	require(msg.sender == participants[2], "Invalid initiator");
+  	require(conditions == 1, "Decision condition not met");
   
     conditions = _conditions;
   
@@ -127,7 +127,7 @@ contract SubChoreoMessages is IProcess {
       "Set uint conditions to",
       _conditions
     );
-      enact(3);
+    enact(3);
   }
   
   function ChoreographyTask_03r94ad(uint _conditions) external {
@@ -140,7 +140,7 @@ contract SubChoreoMessages is IProcess {
       "Set uint conditions to",
       _conditions
     );
-      SubChoreography_0lqe5k1(1);
+    SubChoreography_0lqe5k1(1);
   }
 
   function SubChoreography_0lqe5k1(uint id) public {

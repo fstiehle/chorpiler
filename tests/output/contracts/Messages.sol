@@ -101,7 +101,7 @@ contract Messages is IProcess {
       "Set uint pizza_order to",
       _pizza_order
     );
-      enact(1);
+    enact(1);
   }
   
   function ChoreographyTask_175oxwe(uint _pizza_order) external {
@@ -114,13 +114,13 @@ contract Messages is IProcess {
       "Set uint pizza_order to",
       _pizza_order
     );
-      enact(3);
+    enact(3);
   }
   
   function ChoreographyTask_1l3cbhv(uint _pizza_order) external {
     require(tokenState & 4 == 4);
     require(msg.sender == participants[2], "Invalid initiator");
-  require(pizza_order == 1, "Decision condition not met");
+  	require(pizza_order == 1, "Decision condition not met");
   
     pizza_order = _pizza_order;
   
@@ -128,7 +128,7 @@ contract Messages is IProcess {
       "Set uint pizza_order to",
       _pizza_order
     );
-      enact(4);
+    enact(4);
   }
 
 }

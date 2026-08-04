@@ -113,7 +113,7 @@ function buildConditionString(
     }
   }
 
-  return conditions.join("\n");
+  return conditions.join("\n\t");
 }
 
 /**

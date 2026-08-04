@@ -4,14 +4,15 @@ pragma solidity ^0.8.24;
 import "hardhat/console.sol";
 
 interface IChannelRoot {
-
   // TODO: Variable Packing
+  // Registered State Channels
   struct Channel {
     uint instanceID;
     address[] participants;
     address resolveContract;
   }
 
+  // Submitted Proof
   struct Proof {
     bytes[] signatures;
     bytes32 stateHash;
@@ -26,24 +27,23 @@ interface IChannelRoot {
 }
 
 interface IProcessInstance {
-
+  // State of a process instance (these change as the process progresses)
   struct InstanceState {
     uint tokenState;
     uint pizza_order;
-
-    // state channel version index
-    uint index;
+    uint index; // state channel version index
   }
 
+  // Encapsulating static instance data (need not to be signed)
   struct InstanceData {
     address[3] participants;
     InstanceState state;
-    /// Timestamps for the challenge-response dispute window
     uint disputeMadeAtUNIX;
   }
 }
 
 interface IChannelResolver {
+  // A step can be submitted to start a dispute or as final state
   struct Step {
     uint index;
     uint intsanceID;
@@ -58,7 +58,6 @@ interface IChannelResolver {
   function submit(bytes32 id, Step calldata _step) external;
 }
 
-
 IChannelRoot constant Channel_Root = IChannelRoot(0x0000000000000000000000000000000000000000);
 
 contract ChannelResolverMessages is IChannelResolver {
@@ -67,7 +66,6 @@ contract ChannelResolverMessages is IChannelResolver {
   mapping(uint => IProcessInstance.InstanceData) public instanceData;
   uint private nextId = 0;
   event Task(uint id);
-  // Case Variable pizza_order
   
 
   function instance(address[3] memory _participants) external returns (uint) {
@@ -208,7 +206,7 @@ contract ChannelResolverMessages is IChannelResolver {
       "Set uint pizza_order to",
       _pizza_order
     );
-      enact(instanceID, 1);
+    enact(instanceID, 1);
   }
   
   function ChoreographyTask_175oxwe(uint instanceID, uint _pizza_order) external {
@@ -221,13 +219,13 @@ contract ChannelResolverMessages is IChannelResolver {
       "Set uint pizza_order to",
       _pizza_order
     );
-      enact(instanceID, 3);
+    enact(instanceID, 3);
   }
   
   function ChoreographyTask_1l3cbhv(uint instanceID, uint _pizza_order) external {
     require(instanceData[instanceID].state.tokenState & 4 == 4);
     require(msg.sender == instanceData[instanceID].participants[2], "Invalid initiator");
-  require(instanceData[instanceID].state.pizza_order == 1, "Decision condition not met");
+  	require(instanceData[instanceID].state.pizza_order == 1, "Decision condition not met");
   
     instanceData[instanceID].state.pizza_order = _pizza_order;
   
@@ -235,6 +233,7 @@ contract ChannelResolverMessages is IChannelResolver {
       "Set uint pizza_order to",
       _pizza_order
     );
-      enact(instanceID, 4);
+    enact(instanceID, 4);
   }
+
 }

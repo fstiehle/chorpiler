@@ -4,14 +4,15 @@ pragma solidity ^0.8.24;
 import "hardhat/console.sol";
 
 interface IChannelRoot {
-
   // TODO: Variable Packing
+  // Registered State Channels
   struct Channel {
     uint instanceID;
     address[] participants;
     address resolveContract;
   }
 
+  // Submitted Proof
   struct Proof {
     bytes[] signatures;
     bytes32 stateHash;
@@ -26,24 +27,23 @@ interface IChannelRoot {
 }
 
 interface IProcessInstance {
-
+  // State of a process instance (these change as the process progresses)
   struct InstanceState {
     uint[2] tokenState;
     uint conditions;
-
-    // state channel version index
-    uint index;
+    uint index; // state channel version index
   }
 
+  // Encapsulating static instance data (need not to be signed)
   struct InstanceData {
     address[3] participants;
     InstanceState state;
-    /// Timestamps for the challenge-response dispute window
     uint disputeMadeAtUNIX;
   }
 }
 
 interface IChannelResolver {
+  // A step can be submitted to start a dispute or as final state
   struct Step {
     uint index;
     uint intsanceID;
@@ -58,7 +58,6 @@ interface IChannelResolver {
   function submit(bytes32 id, Step calldata _step) external;
 }
 
-
 IChannelRoot constant Channel_Root = IChannelRoot(0x0000000000000000000000000000000000000000);
 
 contract ChannelResolverSubChoreoMessages is IChannelResolver {
@@ -67,7 +66,6 @@ contract ChannelResolverSubChoreoMessages is IChannelResolver {
   mapping(uint => IProcessInstance.InstanceData) public instanceData;
   uint private nextId = 0;
   event Task(uint id);
-  // Case Variable conditions
   
 
   function instance(address[3] memory _participants) external returns (uint) {
@@ -206,13 +204,13 @@ contract ChannelResolverSubChoreoMessages is IChannelResolver {
       "Set uint conditions to",
       _conditions
     );
-      enact(instanceID, 1);
+    enact(instanceID, 1);
   }
   
   function ChoreographyTask_175oxwe(uint instanceID, uint _conditions) external {
     require(instanceData[instanceID].state.tokenState[0] & 4 == 4);
     require(0 == instanceData[instanceID].state.tokenState[1], "SubChoreography not completed");
-  require(msg.sender == instanceData[instanceID].participants[2], "Invalid initiator");
+  	require(msg.sender == instanceData[instanceID].participants[2], "Invalid initiator");
   
     instanceData[instanceID].state.conditions = _conditions;
   
@@ -220,14 +218,14 @@ contract ChannelResolverSubChoreoMessages is IChannelResolver {
       "Set uint conditions to",
       _conditions
     );
-      enact(instanceID, 2);
+    enact(instanceID, 2);
   }
   
   function ChoreographyTask_1l3cbhv(uint instanceID, uint _conditions) external {
     require(instanceData[instanceID].state.tokenState[0] & 4 == 4);
     require(0 == instanceData[instanceID].state.tokenState[1], "SubChoreography not completed");
-  require(msg.sender == instanceData[instanceID].participants[2], "Invalid initiator");
-  require(instanceData[instanceID].state.conditions == 1, "Decision condition not met");
+  	require(msg.sender == instanceData[instanceID].participants[2], "Invalid initiator");
+  	require(instanceData[instanceID].state.conditions == 1, "Decision condition not met");
   
     instanceData[instanceID].state.conditions = _conditions;
   
@@ -235,7 +233,7 @@ contract ChannelResolverSubChoreoMessages is IChannelResolver {
       "Set uint conditions to",
       _conditions
     );
-      enact(instanceID, 3);
+    enact(instanceID, 3);
   }
   
   function ChoreographyTask_03r94ad(uint instanceID, uint _conditions) external {
@@ -248,8 +246,9 @@ contract ChannelResolverSubChoreoMessages is IChannelResolver {
       "Set uint conditions to",
       _conditions
     );
-      SubChoreography_0lqe5k1(instanceID, 1);
+    SubChoreography_0lqe5k1(instanceID, 1);
   }
+
   function SubChoreography_0lqe5k1(uint instanceID, uint id) public {
     uint _disputeMadeAtUNIX = instanceData[instanceID].disputeMadeAtUNIX;
     require(_disputeMadeAtUNIX != 0 && _disputeMadeAtUNIX + disputeWindowInUNIX < block.timestamp, "No elapsed dispute");

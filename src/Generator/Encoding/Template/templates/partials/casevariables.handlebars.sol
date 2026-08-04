@@ -1,6 +1,6 @@
 {{#each caseVariables}}
-// Case Variable {{{name}}}
 {{#unless isInstanced}}
+// Case Variable {{{name}}}
 {{!// ---- Initialise uninstanced variables ----- }}
 {{{type}}} {{{visibility}}} {{{name}}} = {{{defaultValue}}};
 {{/unless}}

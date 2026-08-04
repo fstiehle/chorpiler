@@ -4,14 +4,15 @@ pragma solidity ^0.8.24;
 import "hardhat/console.sol";
 
 interface IChannelRoot {
-
   // TODO: Variable Packing
+  // Registered State Channels
   struct Channel {
     uint instanceID;
     address[] participants;
     address resolveContract;
   }
 
+  // Submitted Proof
   struct Proof {
     bytes[] signatures;
     bytes32 stateHash;
@@ -26,24 +27,23 @@ interface IChannelRoot {
 }
 
 interface IProcessInstance {
-
+  // State of a process instance (these change as the process progresses)
   struct InstanceState {
     uint[2] tokenState;
     uint conditions;
-
-    // state channel version index
-    uint index;
+    uint index; // state channel version index
   }
 
+  // Encapsulating static instance data (need not to be signed)
   struct InstanceData {
     address[3] participants;
     InstanceState state;
-    /// Timestamps for the challenge-response dispute window
     uint disputeMadeAtUNIX;
   }
 }
 
 interface IChannelResolver {
+  // A step can be submitted to start a dispute or as final state
   struct Step {
     uint index;
     uint intsanceID;
@@ -58,7 +58,6 @@ interface IChannelResolver {
   function submit(bytes32 id, Step calldata _step) external;
 }
 
-
 IChannelRoot constant Channel_Root = IChannelRoot(0x0000000000000000000000000000000000000000);
 
 contract ChannelResolverRentalAgreement is IChannelResolver {
@@ -67,7 +66,6 @@ contract ChannelResolverRentalAgreement is IChannelResolver {
   mapping(uint => IProcessInstance.InstanceData) public instanceData;
   uint private nextId = 0;
   event Task(uint id);
-  // Case Variable conditions
   
   function setConditions(uint instanceID, uint _conditions) external {
     instanceData[instanceID].state.conditions = _conditions;
@@ -257,6 +255,7 @@ contract ChannelResolverRentalAgreement is IChannelResolver {
        _tokenState
     );
   }
+
   function SubChoreography_1sp0n7o(uint instanceID, uint id) external {
     uint _disputeMadeAtUNIX = instanceData[instanceID].disputeMadeAtUNIX;
     require(_disputeMadeAtUNIX != 0 && _disputeMadeAtUNIX + disputeWindowInUNIX < block.timestamp, "No elapsed dispute");

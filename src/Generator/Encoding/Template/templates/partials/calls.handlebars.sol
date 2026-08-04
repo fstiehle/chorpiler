@@ -1,4 +1,5 @@
 {{#if hasCalls}}
+
 {{!// ---- Call Interface ----- }}
 interface IInstanceCall {
   function instance(address[] memory participants) external returns (uint);
