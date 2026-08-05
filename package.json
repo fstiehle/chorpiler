@@ -14,6 +14,7 @@
     "test/comp": "node --import tsx/esm --test tests/parser.test.ts && node --import tsx/esm --test tests/generator.test.ts",
     "test/exec": "node --import tsx/esm --test tests/execution.test.ts",
     "test/chan": "node --import tsx/esm --test tests/channel-root.test.ts",
+    "test/reso": "node --import tsx/esm --test tests/channel-reso.test.ts",
     "test/debg": "node --import tsx/esm --test --test-only tests/generator.test.ts",
     "test/simu": "node --import tsx/esm --test tests/simulator/*.test.ts",
     "build": "tsc -p tsconfig.build.json && ncp ./src/Generator/templates ./lib/Generator/templates && ncp ./src/Simulator/templates ./lib/Simulator/templates",

@@ -30,12 +30,13 @@ interface IProcessInstance {
   // State of a process instance (these change as the process progresses)
   struct InstanceState {
     uint tokenState;
+    uint order;
     uint index; // state channel version index
   }
 
   // Encapsulating static instance data (need not to be signed)
   struct InstanceData {
-    address[2] participants;
+    address[3] participants;
     InstanceState state;
     uint disputeMadeAtUNIX;
   }
@@ -53,27 +54,44 @@ interface IChannelResolver {
 
   function enact(uint instanceID, uint id) external;
   function getTokenState(uint instanceID) external view returns (uint);
-  function instance(address[2] memory participants) external returns (uint);
+  function instance(address[3] memory participants) external returns (uint);
   function submit(bytes32 id, Step calldata _step) external;
 }
 
+interface IInstanceCall {
+  function instance(address[] memory participants) external returns (uint);
+  function enact(uint instance, uint id) external;
+  function getTokenState(uint instance) external view returns (uint);
+}
+
+// Interface for Choreography_0betnp1
+interface IChoreography_0betnp1 is IInstanceCall {
+  function instance(address[2] memory participants) external returns (uint);
+}
+IChoreography_0betnp1 constant Choreography_0betnp1 = IChoreography_0betnp1(0x0000000000000000000000000000000000000000);
+
 IChannelRoot constant Channel_Root = IChannelRoot(0x0000000000000000000000000000000000000000);
 
-contract ChannelResolverChoreography_1661x4r is IChannelResolver {
+contract ChannelResolverCallChoreo is IChannelResolver {
   uint public immutable disputeWindowInUNIX = 86400;
 
+  uint[1] private instanceList; // instanceIDs for calls
+  event NewInstance(uint id, uint instanceID);
   mapping(uint => IProcessInstance.InstanceData) public instanceData;
   uint private nextId = 0;
   event Task(uint id);
+  
 
-  function instance(address[2] memory _participants) external returns (uint) {
+  function instance(address[3] memory _participants) external returns (uint) {
     uint newId = nextId;
     instanceData[newId] = IProcessInstance.InstanceData({
       disputeMadeAtUNIX: 0,
       participants: _participants,
       state: IProcessInstance.InstanceState({
         index: 0,
-        tokenState: 1    })
+        tokenState: 1,
+        order: 0
+      })
     });
     nextId = newId + 1;
     return newId;
@@ -123,14 +141,14 @@ contract ChannelResolverChoreography_1661x4r is IChannelResolver {
     return instanceData[instanceID].state.tokenState;
   }
 
-  function enact(uint instanceID, uint id) external {
+  function enact(uint instanceID, uint id) public {
     uint _disputeMadeAtUNIX = instanceData[instanceID].disputeMadeAtUNIX;
     require(_disputeMadeAtUNIX != 0 && _disputeMadeAtUNIX + disputeWindowInUNIX < block.timestamp, "No elapsed dispute");
     
     uint _tokenState = instanceData[instanceID].state.tokenState;
     
     console.log(
-      "Choreography_1661x4r: current token state is %d, sender %s trying to execute task %d",
+      "ChannelResolverCallChoreo: current token state is %d, sender %s trying to execute task %d",
       _tokenState,
       msg.sender,
       id
@@ -138,13 +156,40 @@ contract ChannelResolverChoreography_1661x4r is IChannelResolver {
     
     while(_tokenState != 0) {
       if (_tokenState & 1 == 1) {
-        // <--- ChoreographyTask_0e1hkhi New Activity --->
+        // <--- ChoreographyTask_0hy9n0g order pizza --->
         if (1 == id && msg.sender == instanceData[instanceID].participants[0]) {
           // <--- custom code for task here --->
           _tokenState &= ~uint(1);
-          _tokenState |= 0;
+          _tokenState |= 2;
           emit Task(1);
+          id = 0;
+          continue;
+        }
+      }
+      if (_tokenState & 4 == 4) {
+        // <--- ChoreographyTask_175oxwe deliver pizza --->
+        if (2 == id && msg.sender == instanceData[instanceID].participants[2] && 0 == Choreography_0betnp1.getTokenState(instanceList[0])) {
+          // <--- custom code for task here --->
+          _tokenState &= ~uint(4);
+          _tokenState |= 0;
+          emit Task(2);
           break; // is end
+        }
+      }
+      if (_tokenState & 2 == 2) {
+        if (instanceData[instanceID].state.order == 1) {
+          // <---  auto transition  --->
+          _tokenState &= ~uint(2);
+          instanceList[0] = Choreography_0betnp1.instance([instanceData[instanceID].participants[0], instanceData[instanceID].participants[2]]);
+          emit NewInstance(0, instanceList[0]);
+          _tokenState |= 4;
+          continue;
+        }
+        else {
+          // <---  auto transition  --->
+          _tokenState &= ~uint(2);
+          _tokenState |= 4;
+          continue;
         }
       }
       break;
@@ -153,9 +198,22 @@ contract ChannelResolverChoreography_1661x4r is IChannelResolver {
     instanceData[instanceID].state.tokenState = _tokenState;
     
     console.log(
-      "Choreography_1661x4r: new token state is %d",
+      "ChannelResolverCallChoreo: new token state is %d",
        _tokenState
     );
+  }
+  
+  function ChoreographyTask_0hy9n0g(uint instanceID, uint _order) external {
+    require(instanceData[instanceID].state.tokenState & 1 == 1);
+    require(msg.sender == instanceData[instanceID].participants[0], "Invalid initiator");
+  
+    instanceData[instanceID].state.order = _order;
+  
+    console.log(
+      "Set uint order to",
+      _order
+    );
+    enact(instanceID, 1);
   }
 
 }

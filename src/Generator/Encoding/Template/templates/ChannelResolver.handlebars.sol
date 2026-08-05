@@ -73,7 +73,7 @@ interface IChannelResolver {
 
 IChannelRoot constant Channel_Root = IChannelRoot(0x0000000000000000000000000000000000000000);
 
-contract ChannelResolver{{{modelID}}} is IChannelResolver {
+contract {{{modelID}}} is IChannelResolver {
   uint public immutable disputeWindowInUNIX = 86400;
 
   {{> parameters }}

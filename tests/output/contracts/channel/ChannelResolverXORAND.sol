@@ -137,7 +137,7 @@ contract ChannelResolverXORAND is IChannelResolver {
     uint _tokenState = instanceData[instanceID].state.tokenState;
     
     console.log(
-      "XORAND: current token state is %d, sender %s trying to execute task %d",
+      "ChannelResolverXORAND: current token state is %d, sender %s trying to execute task %d",
       _tokenState,
       msg.sender,
       id
@@ -207,7 +207,7 @@ contract ChannelResolverXORAND is IChannelResolver {
     instanceData[instanceID].state.tokenState = _tokenState;
     
     console.log(
-      "XORAND: new token state is %d",
+      "ChannelResolverXORAND: new token state is %d",
        _tokenState
     );
   }

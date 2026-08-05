@@ -357,8 +357,8 @@ describe("Generation of edge cases", () => {
 
       verifyCallChoreography(
         CHANNEL_CONTRACTS_PATH,
-        "CallChoreo",
-        ["Choreography_0betnp1"],
+        "ChannelResolverCallChoreo",
+        ["ChannelResolverChoreography_0betnp1"],
         1
       );
     });
@@ -410,8 +410,8 @@ describe("Generation of edge cases", () => {
 
       verifyCallChoreography(
         CHANNEL_CONTRACTS_PATH,
-        "CallChoreoChained",
-        ["Choreography_0betnp1", "Choreography_1661x4r"],
+        "ChannelResolverCallChoreoChained",
+        ["ChannelResolverChoreography_0betnp1", "ChannelResolverChoreography_1661x4r"],
         2
       );
     });
@@ -455,8 +455,8 @@ describe("Generation of edge cases", () => {
 
       verifyCallChoreography(
         CHANNEL_CONTRACTS_PATH,
-        "CallChoreo",
-        ["Choreography_0betnp1"],
+        "ChannelResolverCallChoreo",
+        ["ChannelResolverChoreography_0betnp1"],
         1
       );
     });

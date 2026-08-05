@@ -123,16 +123,17 @@ const compileCase = async (
   unfold: boolean = true,
   isStateChannel: boolean = false,
 ) => {
+  let directory = CONTRACTS_PATH;
+  if (isStateChannel) {
+    directory = CHANNEL_CONTRACTS_PATH;
+    generator.iNet.id = "ChannelResolver" + generator.iNet.id;
+  }
+
   const output = await generator.compile({
     unfoldSubNets: unfold,
     events: true,
     debug: true,
   });
-
-  let directory = CONTRACTS_PATH;
-  if (isStateChannel) {
-    directory = CHANNEL_CONTRACTS_PATH;
-  }
   // if (
   //   (output.encoding.calls && output.encoding.calls.size > 0) ||
   //   output.encoding.isCalled

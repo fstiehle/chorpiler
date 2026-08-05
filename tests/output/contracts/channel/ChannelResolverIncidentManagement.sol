@@ -30,12 +30,13 @@ interface IProcessInstance {
   // State of a process instance (these change as the process progresses)
   struct InstanceState {
     uint tokenState;
+    bool resolved;
     uint index; // state channel version index
   }
 
   // Encapsulating static instance data (need not to be signed)
   struct InstanceData {
-    address[3] participants;
+    address[5] participants;
     InstanceState state;
     uint disputeMadeAtUNIX;
   }
@@ -53,47 +54,33 @@ interface IChannelResolver {
 
   function enact(uint instanceID, uint id) external;
   function getTokenState(uint instanceID) external view returns (uint);
-  function instance(address[3] memory participants) external returns (uint);
+  function instance(address[5] memory participants) external returns (uint);
   function submit(bytes32 id, Step calldata _step) external;
 }
 
-interface IInstanceCall {
-  function instance(address[] memory participants) external returns (uint);
-  function enact(uint instance, uint id) external;
-  function getTokenState(uint instance) external view returns (uint);
-}
-
-// Interface for Choreography_0betnp1
-interface IChoreography_0betnp1 is IInstanceCall {
-  function instance(address[2] memory participants) external returns (uint);
-}
-IChoreography_0betnp1 constant Choreography_0betnp1 = IChoreography_0betnp1(0x0000000000000000000000000000000000000000);
-
-// Interface for Choreography_1661x4r
-interface IChoreography_1661x4r is IInstanceCall {
-  function instance(address[2] memory participants) external returns (uint);
-}
-IChoreography_1661x4r constant Choreography_1661x4r = IChoreography_1661x4r(0x0000000000000000000000000000000000000000);
-
 IChannelRoot constant Channel_Root = IChannelRoot(0x0000000000000000000000000000000000000000);
 
-contract ChannelResolverCallChoreoChained is IChannelResolver {
+contract ChannelResolverIncidentManagement is IChannelResolver {
   uint public immutable disputeWindowInUNIX = 86400;
 
-  uint[2] private instanceList; // instanceIDs for calls
-  event NewInstance(uint id, uint instanceID);
   mapping(uint => IProcessInstance.InstanceData) public instanceData;
   uint private nextId = 0;
   event Task(uint id);
+  
+  function setResolved(uint instanceID, bool _resolved) external {
+    instanceData[instanceID].state.resolved = _resolved;
+  }
 
-  function instance(address[3] memory _participants) external returns (uint) {
+  function instance(address[5] memory _participants) external returns (uint) {
     uint newId = nextId;
     instanceData[newId] = IProcessInstance.InstanceData({
       disputeMadeAtUNIX: 0,
       participants: _participants,
       state: IProcessInstance.InstanceState({
         index: 0,
-        tokenState: 1    })
+        tokenState: 1,
+        resolved: false
+      })
     });
     nextId = newId + 1;
     return newId;
@@ -150,7 +137,7 @@ contract ChannelResolverCallChoreoChained is IChannelResolver {
     uint _tokenState = instanceData[instanceID].state.tokenState;
     
     console.log(
-      "CallChoreoChained: current token state is %d, sender %s trying to execute task %d",
+      "ChannelResolverIncidentManagement: current token state is %d, sender %s trying to execute task %d",
       _tokenState,
       msg.sender,
       id
@@ -158,7 +145,7 @@ contract ChannelResolverCallChoreoChained is IChannelResolver {
     
     while(_tokenState != 0) {
       if (_tokenState & 1 == 1) {
-        // <--- ChoreographyTask_0hy9n0g order pizza --->
+        // <--- ChoreographyTask_1586fdc Customer Has a Problem --->
         if (1 == id && msg.sender == instanceData[instanceID].participants[0]) {
           // <--- custom code for task here --->
           _tokenState &= ~uint(1);
@@ -169,21 +156,114 @@ contract ChannelResolverCallChoreoChained is IChannelResolver {
         }
       }
       if (_tokenState & 2 == 2) {
-        // <---  auto transition  --->
-        _tokenState &= ~uint(2);
-        instanceList[0] = Choreography_0betnp1.instance([instanceData[instanceID].participants[0], instanceData[instanceID].participants[2]]);
-        emit NewInstance(0, instanceList[0]);
-        _tokenState |= 4;
-        continue;
+        // <--- ChoreographyTask_1y1xlzg Get problem description --->
+        if (2 == id && msg.sender == instanceData[instanceID].participants[1]) {
+          // <--- custom code for task here --->
+          _tokenState &= ~uint(2);
+          _tokenState |= 4;
+          emit Task(2);
+          id = 0;
+          continue;
+        }
+      }
+      if (_tokenState & 8 == 8) {
+        // <--- ChoreographyTask_0uo8k5k Explain solution --->
+        if (3 == id && msg.sender == instanceData[instanceID].participants[1]) {
+          // <--- custom code for task here --->
+          _tokenState &= ~uint(8);
+          _tokenState |= 0;
+          emit Task(3);
+          break; // is end
+        }
       }
       if (_tokenState & 4 == 4) {
-        // <---  auto transition  --->
-        if (0 == Choreography_0betnp1.getTokenState(instanceList[0])) {
+        if (instanceData[instanceID].state.resolved==true) {
+          // <---  auto transition  --->
           _tokenState &= ~uint(4);
-          instanceList[1] = Choreography_1661x4r.instance([instanceData[instanceID].participants[0], instanceData[instanceID].participants[1]]);
-          emit NewInstance(1, instanceList[1]);
-          _tokenState |= 0;
-          break; // is end
+          _tokenState |= 8;
+          continue;
+        }
+        else {
+          // <--- ChoreographyTask_0z1rm3g Ask 1st level support --->
+          if (4 == id && msg.sender == instanceData[instanceID].participants[1]) {
+            // <--- custom code for task here --->
+            _tokenState &= ~uint(4);
+            _tokenState |= 16;
+            emit Task(4);
+            id = 0;
+            continue;
+          }
+        }
+      }
+      if (_tokenState & 32 == 32) {
+        // <--- ChoreographyTask_1qccz6z Provide feedback --->
+        if (5 == id && msg.sender == instanceData[instanceID].participants[2]) {
+          // <--- custom code for task here --->
+          _tokenState &= ~uint(32);
+          _tokenState |= 8;
+          emit Task(5);
+          id = 0;
+          continue;
+        }
+      }
+      if (_tokenState & 16 == 16) {
+        if (instanceData[instanceID].state.resolved==true) {
+          // <---  auto transition  --->
+          _tokenState &= ~uint(16);
+          _tokenState |= 32;
+          continue;
+        }
+        else {
+          // <--- ChoreographyTask_1qslyew Ask 2nd level support --->
+          if (6 == id && msg.sender == instanceData[instanceID].participants[2]) {
+            // <--- custom code for task here --->
+            _tokenState &= ~uint(16);
+            _tokenState |= 64;
+            emit Task(6);
+            id = 0;
+            continue;
+          }
+        }
+      }
+      if (_tokenState & 64 == 64) {
+        if (instanceData[instanceID].state.resolved==true) {
+          // <---  auto transition  --->
+          _tokenState &= ~uint(64);
+          _tokenState |= 256;
+          continue;
+        }
+        else {
+          // <--- ChoreographyTask_15fmbmw Ask developer --->
+          if (7 == id && msg.sender == instanceData[instanceID].participants[3]) {
+            // <--- custom code for task here --->
+            _tokenState &= ~uint(64);
+            _tokenState |= 128;
+            emit Task(7);
+            id = 0;
+            continue;
+          }
+        }
+      }
+      if (_tokenState & 128 == 128) {
+        // <--- ChoreographyTask_15tec1l Provide feedback --->
+        if (8 == id && msg.sender == instanceData[instanceID].participants[4]) {
+          // <--- custom code for task here --->
+          _tokenState &= ~uint(128);
+          _tokenState |= 256;
+          emit Task(8);
+          id = 0;
+          continue;
+        }
+      }
+      if (_tokenState & 256 == 256) {
+        // <--- ChoreographyTask_1ecmkkd Provide feedback --->
+        if (9 == id && msg.sender == instanceData[instanceID].participants[3]) {
+          // <--- custom code for task here --->
+          _tokenState &= ~uint(256);
+          _tokenState |= 32;
+          emit Task(9);
+          id = 0;
+          continue;
         }
       }
       break;
@@ -192,7 +272,7 @@ contract ChannelResolverCallChoreoChained is IChannelResolver {
     instanceData[instanceID].state.tokenState = _tokenState;
     
     console.log(
-      "CallChoreoChained: new token state is %d",
+      "ChannelResolverIncidentManagement: new token state is %d",
        _tokenState
     );
   }

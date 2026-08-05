@@ -29,8 +29,7 @@ interface IChannelRoot {
 interface IProcessInstance {
   // State of a process instance (these change as the process progresses)
   struct InstanceState {
-    uint[2] tokenState;
-    uint conditions;
+    uint tokenState;
     uint index; // state channel version index
   }
 
@@ -58,28 +57,43 @@ interface IChannelResolver {
   function submit(bytes32 id, Step calldata _step) external;
 }
 
+interface IInstanceCall {
+  function instance(address[] memory participants) external returns (uint);
+  function enact(uint instance, uint id) external;
+  function getTokenState(uint instance) external view returns (uint);
+}
+
+// Interface for Choreography_0betnp1
+interface IChoreography_0betnp1 is IInstanceCall {
+  function instance(address[2] memory participants) external returns (uint);
+}
+IChoreography_0betnp1 constant Choreography_0betnp1 = IChoreography_0betnp1(0x0000000000000000000000000000000000000000);
+
+// Interface for Choreography_1661x4r
+interface IChoreography_1661x4r is IInstanceCall {
+  function instance(address[2] memory participants) external returns (uint);
+}
+IChoreography_1661x4r constant Choreography_1661x4r = IChoreography_1661x4r(0x0000000000000000000000000000000000000000);
+
 IChannelRoot constant Channel_Root = IChannelRoot(0x0000000000000000000000000000000000000000);
 
-contract ChannelResolverSubChoreoMessages is IChannelResolver {
+contract ChannelResolverCallChoreoChained is IChannelResolver {
   uint public immutable disputeWindowInUNIX = 86400;
 
+  uint[2] private instanceList; // instanceIDs for calls
+  event NewInstance(uint id, uint instanceID);
   mapping(uint => IProcessInstance.InstanceData) public instanceData;
   uint private nextId = 0;
   event Task(uint id);
-  
 
   function instance(address[3] memory _participants) external returns (uint) {
     uint newId = nextId;
-    uint[2] memory newTokenState;
-    newTokenState[0] = 1;
     instanceData[newId] = IProcessInstance.InstanceData({
       disputeMadeAtUNIX: 0,
       participants: _participants,
       state: IProcessInstance.InstanceState({
         index: 0,
-        tokenState: newTokenState,
-        conditions: 0
-      })
+        tokenState: 1    })
     });
     nextId = newId + 1;
     return newId;
@@ -99,7 +113,7 @@ contract ChannelResolverSubChoreoMessages is IChannelResolver {
       if (checkStep(id, _step)) {
         if (0 == _disputeMadeAtUNIX) {
           // new dispute or final state
-          if (_step.newState.tokenState[0] != 0) {
+          if (_step.newState.tokenState != 0) {
             // new dispute with state submission
             instanceData[_step.intsanceID].disputeMadeAtUNIX = block.timestamp;
           }
@@ -126,17 +140,17 @@ contract ChannelResolverSubChoreoMessages is IChannelResolver {
   }
 
   function getTokenState(uint instanceID) external view returns (uint) {
-    return instanceData[instanceID].state.tokenState[0];
+    return instanceData[instanceID].state.tokenState;
   }
 
-  function enact(uint instanceID, uint id) public {
+  function enact(uint instanceID, uint id) external {
     uint _disputeMadeAtUNIX = instanceData[instanceID].disputeMadeAtUNIX;
     require(_disputeMadeAtUNIX != 0 && _disputeMadeAtUNIX + disputeWindowInUNIX < block.timestamp, "No elapsed dispute");
     
-    uint _tokenState = instanceData[instanceID].state.tokenState[0];
+    uint _tokenState = instanceData[instanceID].state.tokenState;
     
     console.log(
-      "SubChoreoMessages: current token state is %d, sender %s trying to execute task %d",
+      "ChannelResolverCallChoreoChained: current token state is %d, sender %s trying to execute task %d",
       _tokenState,
       msg.sender,
       id
@@ -154,134 +168,33 @@ contract ChannelResolverSubChoreoMessages is IChannelResolver {
           continue;
         }
       }
-      if (_tokenState & 4 == 4) {
-        if (instanceData[instanceID].state.conditions == 1) {
-          // <--- ChoreographyTask_1l3cbhv New Activity --->
-          if (3 == id && 0 == instanceData[instanceID].state.tokenState[1] && msg.sender == instanceData[instanceID].participants[2]) {
-            // <--- custom code for task here --->
-            _tokenState &= ~uint(4);
-            _tokenState |= 0;
-            emit Task(3);
-            break; // is end
-          }
-        }
-        else {
-          // <--- ChoreographyTask_175oxwe deliver pizza --->
-          if (2 == id && 0 == instanceData[instanceID].state.tokenState[1] && msg.sender == instanceData[instanceID].participants[2]) {
-            // <--- custom code for task here --->
-            _tokenState &= ~uint(4);
-            _tokenState |= 0;
-            emit Task(2);
-            break; // is end
-          }
-        }
-      }
       if (_tokenState & 2 == 2) {
         // <---  auto transition  --->
         _tokenState &= ~uint(2);
-        instanceData[instanceID].state.tokenState[1] = 1;
+        instanceList[0] = Choreography_0betnp1.instance([instanceData[instanceID].participants[0], instanceData[instanceID].participants[2]]);
+        emit NewInstance(0, instanceList[0]);
         _tokenState |= 4;
         continue;
       }
-      break;
-    }
-    
-    instanceData[instanceID].state.tokenState[0] = _tokenState;
-    
-    console.log(
-      "SubChoreoMessages: new token state is %d",
-       _tokenState
-    );
-  }
-  
-  function ChoreographyTask_0hy9n0g(uint instanceID, uint _conditions) external {
-    require(instanceData[instanceID].state.tokenState[0] & 1 == 1);
-    require(msg.sender == instanceData[instanceID].participants[0], "Invalid initiator");
-  
-    instanceData[instanceID].state.conditions = _conditions;
-  
-    console.log(
-      "Set uint conditions to",
-      _conditions
-    );
-    enact(instanceID, 1);
-  }
-  
-  function ChoreographyTask_175oxwe(uint instanceID, uint _conditions) external {
-    require(instanceData[instanceID].state.tokenState[0] & 4 == 4);
-    require(0 == instanceData[instanceID].state.tokenState[1], "SubChoreography not completed");
-  	require(msg.sender == instanceData[instanceID].participants[2], "Invalid initiator");
-  
-    instanceData[instanceID].state.conditions = _conditions;
-  
-    console.log(
-      "Set uint conditions to",
-      _conditions
-    );
-    enact(instanceID, 2);
-  }
-  
-  function ChoreographyTask_1l3cbhv(uint instanceID, uint _conditions) external {
-    require(instanceData[instanceID].state.tokenState[0] & 4 == 4);
-    require(0 == instanceData[instanceID].state.tokenState[1], "SubChoreography not completed");
-  	require(msg.sender == instanceData[instanceID].participants[2], "Invalid initiator");
-  	require(instanceData[instanceID].state.conditions == 1, "Decision condition not met");
-  
-    instanceData[instanceID].state.conditions = _conditions;
-  
-    console.log(
-      "Set uint conditions to",
-      _conditions
-    );
-    enact(instanceID, 3);
-  }
-  
-  function ChoreographyTask_03r94ad(uint instanceID, uint _conditions) external {
-    require(instanceData[instanceID].state.tokenState[1] & 1 == 1);
-    require(msg.sender == instanceData[instanceID].participants[0], "Invalid initiator");
-  
-    instanceData[instanceID].state.conditions = _conditions;
-  
-    console.log(
-      "Set uint conditions to",
-      _conditions
-    );
-    SubChoreography_0lqe5k1(instanceID, 1);
-  }
-
-  function SubChoreography_0lqe5k1(uint instanceID, uint id) public {
-    uint _disputeMadeAtUNIX = instanceData[instanceID].disputeMadeAtUNIX;
-    require(_disputeMadeAtUNIX != 0 && _disputeMadeAtUNIX + disputeWindowInUNIX < block.timestamp, "No elapsed dispute");
-    
-    uint _tokenState = instanceData[instanceID].state.tokenState[1];
-    
-    console.log(
-      "SubChoreography_0lqe5k1: current token state is %d, sender %s trying to execute task %d",
-      _tokenState,
-      msg.sender,
-      id
-    );
-    
-    while(_tokenState != 0) {
-      if (_tokenState & 1 == 1) {
-        // <--- ChoreographyTask_03r94ad New Activity --->
-        if (1 == id && msg.sender == instanceData[instanceID].participants[0]) {
-          // <--- custom code for task here --->
-          _tokenState &= ~uint(1);
+      if (_tokenState & 4 == 4) {
+        // <---  auto transition  --->
+        if (0 == Choreography_0betnp1.getTokenState(instanceList[0])) {
+          _tokenState &= ~uint(4);
+          instanceList[1] = Choreography_1661x4r.instance([instanceData[instanceID].participants[0], instanceData[instanceID].participants[1]]);
+          emit NewInstance(1, instanceList[1]);
           _tokenState |= 0;
-          emit Task(1);
           break; // is end
         }
       }
       break;
     }
     
-    instanceData[instanceID].state.tokenState[1] = _tokenState;
+    instanceData[instanceID].state.tokenState = _tokenState;
     
     console.log(
-      "SubChoreography_0lqe5k1: new token state is %d",
+      "ChannelResolverCallChoreoChained: new token state is %d",
        _tokenState
     );
   }
-  
+
 }

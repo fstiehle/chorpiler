@@ -134,7 +134,7 @@ contract ChannelResolverChoreography_0betnp1 is IChannelResolver {
     uint _tokenState = instanceData[instanceID].state.tokenState;
     
     console.log(
-      "Choreography_0betnp1: current token state is %d, sender %s trying to execute task %d",
+      "ChannelResolverChoreography_0betnp1: current token state is %d, sender %s trying to execute task %d",
       _tokenState,
       msg.sender,
       id
@@ -157,7 +157,7 @@ contract ChannelResolverChoreography_0betnp1 is IChannelResolver {
     instanceData[instanceID].state.tokenState = _tokenState;
     
     console.log(
-      "Choreography_0betnp1: new token state is %d",
+      "ChannelResolverChoreography_0betnp1: new token state is %d",
        _tokenState
     );
   }

@@ -35,7 +35,7 @@ interface IProcessInstance {
 
   // Encapsulating static instance data (need not to be signed)
   struct InstanceData {
-    address[5] participants;
+    address[2] participants;
     InstanceState state;
     uint disputeMadeAtUNIX;
   }
@@ -53,20 +53,20 @@ interface IChannelResolver {
 
   function enact(uint instanceID, uint id) external;
   function getTokenState(uint instanceID) external view returns (uint);
-  function instance(address[5] memory participants) external returns (uint);
+  function instance(address[2] memory participants) external returns (uint);
   function submit(bytes32 id, Step calldata _step) external;
 }
 
 IChannelRoot constant Channel_Root = IChannelRoot(0x0000000000000000000000000000000000000000);
 
-contract ChannelResolverPharmacy is IChannelResolver {
+contract ChannelResolverChoreography_1661x4r is IChannelResolver {
   uint public immutable disputeWindowInUNIX = 86400;
 
   mapping(uint => IProcessInstance.InstanceData) public instanceData;
   uint private nextId = 0;
   event Task(uint id);
 
-  function instance(address[5] memory _participants) external returns (uint) {
+  function instance(address[2] memory _participants) external returns (uint) {
     uint newId = nextId;
     instanceData[newId] = IProcessInstance.InstanceData({
       disputeMadeAtUNIX: 0,
@@ -130,87 +130,21 @@ contract ChannelResolverPharmacy is IChannelResolver {
     uint _tokenState = instanceData[instanceID].state.tokenState;
     
     console.log(
-      "Pharmacy: current token state is %d, sender %s trying to execute task %d",
+      "ChannelResolverChoreography_1661x4r: current token state is %d, sender %s trying to execute task %d",
       _tokenState,
       msg.sender,
       id
     );
     
     while(_tokenState != 0) {
-      if (_tokenState & 2 == 2) {
-        // <--- ChoreographyTask_0lvyk79 Give prescription --->
-        if (1 == id && msg.sender == instanceData[instanceID].participants[3]) {
-          // <--- custom code for task here --->
-          _tokenState &= ~uint(2);
-          _tokenState |= 4;
-          emit Task(1);
-          id = 0;
-          continue;
-        }
-      }
-      if (_tokenState & 8 == 8) {
-        // <--- ChoreographyTask_1eeg831 Give medication --->
-        if (2 == id && msg.sender == instanceData[instanceID].participants[4]) {
-          // <--- custom code for task here --->
-          _tokenState &= ~uint(8);
-          _tokenState |= 0;
-          emit Task(2);
-          break; // is end
-        }
-      }
-      if (_tokenState & 4 == 4) {
-        // <--- ChoreographyTask_0hi5qrq Order medication --->
-        if (3 == id && msg.sender == instanceData[instanceID].participants[4]) {
-          // <--- custom code for task here --->
-          _tokenState &= ~uint(4);
-          _tokenState |= 16;
-          emit Task(3);
-          id = 0;
-          continue;
-        }
-      }
       if (_tokenState & 1 == 1) {
-        // <--- ChoreographyTask_1mgomgq Write prescription --->
-        if (4 == id && msg.sender == instanceData[instanceID].participants[0]) {
+        // <--- ChoreographyTask_0e1hkhi New Activity --->
+        if (1 == id && msg.sender == instanceData[instanceID].participants[0]) {
           // <--- custom code for task here --->
           _tokenState &= ~uint(1);
-          _tokenState |= 2;
-          emit Task(4);
-          id = 0;
-          continue;
-        }
-      }
-      if (_tokenState & 32 == 32) {
-        // <--- ChoreographyTask_0qvwzvz Deliver medication --->
-        if (5 == id && msg.sender == instanceData[instanceID].participants[1]) {
-          // <--- custom code for task here --->
-          _tokenState &= ~uint(32);
-          _tokenState |= 64;
-          emit Task(5);
-          id = 0;
-          continue;
-        }
-      }
-      if (_tokenState & 64 == 64) {
-        // <--- ChoreographyTask_1gwk89f Notify that maedication arrived --->
-        if (6 == id && msg.sender == instanceData[instanceID].participants[4]) {
-          // <--- custom code for task here --->
-          _tokenState &= ~uint(64);
-          _tokenState |= 8;
-          emit Task(6);
-          id = 0;
-          continue;
-        }
-      }
-      if (_tokenState & 16 == 16) {
-        // <--- ChoreographyTask_0gppzdf Medication created --->
-        if (7 == id && msg.sender == instanceData[instanceID].participants[2]) {
-          // <--- custom code for task here --->
-          _tokenState &= ~uint(16);
-          _tokenState |= 32;
-          emit Task(7);
-          id = 0;
-          continue;
+          _tokenState |= 0;
+          emit Task(1);
+          break; // is end
         }
       }
       break;
@@ -219,7 +153,7 @@ contract ChannelResolverPharmacy is IChannelResolver {
     instanceData[instanceID].state.tokenState = _tokenState;
     
     console.log(
-      "Pharmacy: new token state is %d",
+      "ChannelResolverChoreography_1661x4r: new token state is %d",
        _tokenState
     );
   }

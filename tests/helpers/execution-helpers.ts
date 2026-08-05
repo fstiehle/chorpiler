@@ -1,9 +1,11 @@
 /**
  * Helper functions for contract execution tests
  */
-import { readFileSync, readdirSync } from "fs";
+import { readFileSync, readdirSync, writeFileSync } from "fs";
 import { strict as assert } from "node:assert";
 import path from "path";
+import { spawn } from "child_process";
+import { getAddress } from "viem/utils";
 import { PublicClient, WalletClient } from "viem";
 import {
   EventLog,
@@ -54,6 +56,122 @@ const DEBUG =
 export const debugLog = (...args: any[]) => {
   if (DEBUG) console.log(...args);
 };
+
+/**
+ * Options for updating and recompiling a contract
+ */
+export interface ContractUpdateOptions {
+  contractName: string;
+  contractPath: string;
+  viem: HardhatViemHelpers;
+  networkHelpers: NetworkHelpers<"generic">;
+  contractsFixture: () => Promise<void>;
+  wallets?: WalletClient[];
+  replacements: Array<{
+    placeholder: RegExp;
+    address: string;
+    description: string;
+  }>;
+}
+
+/**
+ * Updates a contract file with new addresses, recompiles it, and redeploys it.
+ * Returns the original file content for restoration and the newly deployed contract.
+ *
+ * @param options - Configuration options for the contract update
+ * @returns Object containing original content and updated contract
+ */
+export async function updateAndRedeployContract(
+  options: ContractUpdateOptions
+): Promise<{ originalContent: string; updatedContract: any }> {
+  const {
+    contractName,
+    contractPath,
+    viem,
+    networkHelpers,
+    contractsFixture,
+    wallets,
+    replacements,
+  } = options;
+
+  const solFilePath = path.join(contractPath, `${contractName}.sol`);
+  const originalContent = readFileSync(solFilePath, "utf8");
+  let updatedContent = originalContent;
+
+  // Apply all replacements
+  for (const { placeholder, address, description } of replacements) {
+    const checksummedAddress = getAddress(address);
+    updatedContent = updatedContent.replace(placeholder, description.replace("ADDRESS", checksummedAddress));
+    debugLog(`Replaced ${description} with address: ${checksummedAddress}`);
+  }
+
+  // Only proceed if content changed
+  if (updatedContent === originalContent) {
+    debugLog(`No changes needed for ${contractName}.sol`);
+    return { originalContent, updatedContract: null };
+  }
+
+  // Write updated content
+  writeFileSync(solFilePath, updatedContent);
+  debugLog(`Updated ${contractName}.sol with new addresses`);
+
+  // Compile the updated contract
+  debugLog(`Compiling updated ${contractName}.sol...`);
+  await new Promise<void>((resolve, reject) => {
+    const compile = spawn("npx", ["hardhat", "compile"], {
+      cwd: process.cwd(),
+      stdio: "pipe",
+    });
+
+    compile.stdout.on("data", (data) => {
+      debugLog(`Hardhat compile output: ${data}`);
+    });
+
+    compile.stderr.on("data", (data) => {
+      debugLog(`Hardhat compile error: ${data}`);
+    });
+
+    compile.on("close", (code) => {
+      if (code === 0) {
+        debugLog(`Successfully compiled ${contractName}.sol`);
+        resolve();
+      } else {
+        reject(new Error(`Hardhat compilation failed with code ${code}`));
+      }
+    });
+  });
+
+  // Reset blockchain state after recompile
+  await networkHelpers.loadFixture(contractsFixture);
+
+  // Redeploy the contract
+  const updatedContract = wallets
+    ? await viem.deployContract(contractName, [
+        wallets.map((w) => w.account!.address).filter(Boolean),
+      ])
+    : await viem.deployContract(contractName);
+
+  debugLog(
+    `Redeployed ${contractName} at address: ${updatedContract.address}`
+  );
+
+  return { originalContent, updatedContract };
+}
+
+/**
+ * Restores the original content of a contract file
+ */
+export function restoreContractFile(
+  contractName: string,
+  contractPath: string,
+  originalContent: string
+): void {
+  if (originalContent) {
+    const solFilePath = path.join(contractPath, `${contractName}.sol`);
+    writeFileSync(solFilePath, originalContent);
+    debugLog(`Restored original ${contractName}.sol file`);
+  }
+}
 
 export async function processEvent(
   event: Event,
@@ -192,8 +310,14 @@ export async function prepareContracts(
       encoding.participants.size,
     );
     assert(encoding.participants.size === wallets.length);
+
+    // Strip 'ChannelResolver' prefix if present for XES log lookup
+    const baseContractName = contractName.startsWith('ChannelResolver')
+      ? contractName.replace('ChannelResolver', '')
+      : contractName;
+    const logName = `${baseContractName}.xes`;
     const log = await parser.fromXML(
-      readFileSync(path.join(XES_PATH, `${contractName}.xes`)),
+      readFileSync(path.join(XES_PATH, logName)),
     );
     assert(log.traces.length !== 0);
 
@@ -201,7 +325,7 @@ export async function prepareContracts(
     try {
       nonLog = await parser.fromXML(
         readFileSync(
-          path.join(XES_PATH, "nonconforming", `non_${contractName}.xes`),
+          path.join(XES_PATH, "nonconforming", `non_${baseContractName}.xes`),
         ),
       );
       assert(nonLog.traces.length !== 0);

@@ -30,13 +30,12 @@ interface IProcessInstance {
   // State of a process instance (these change as the process progresses)
   struct InstanceState {
     uint tokenState;
-    uint pizza_order;
     uint index; // state channel version index
   }
 
   // Encapsulating static instance data (need not to be signed)
   struct InstanceData {
-    address[3] participants;
+    address[5] participants;
     InstanceState state;
     uint disputeMadeAtUNIX;
   }
@@ -54,30 +53,27 @@ interface IChannelResolver {
 
   function enact(uint instanceID, uint id) external;
   function getTokenState(uint instanceID) external view returns (uint);
-  function instance(address[3] memory participants) external returns (uint);
+  function instance(address[5] memory participants) external returns (uint);
   function submit(bytes32 id, Step calldata _step) external;
 }
 
 IChannelRoot constant Channel_Root = IChannelRoot(0x0000000000000000000000000000000000000000);
 
-contract ChannelResolverMessages is IChannelResolver {
+contract ChannelResolverSupplyChain is IChannelResolver {
   uint public immutable disputeWindowInUNIX = 86400;
 
   mapping(uint => IProcessInstance.InstanceData) public instanceData;
   uint private nextId = 0;
   event Task(uint id);
-  
 
-  function instance(address[3] memory _participants) external returns (uint) {
+  function instance(address[5] memory _participants) external returns (uint) {
     uint newId = nextId;
     instanceData[newId] = IProcessInstance.InstanceData({
       disputeMadeAtUNIX: 0,
       participants: _participants,
       state: IProcessInstance.InstanceState({
         index: 0,
-        tokenState: 1,
-        pizza_order: 0
-      })
+        tokenState: 1    })
     });
     nextId = newId + 1;
     return newId;
@@ -127,14 +123,14 @@ contract ChannelResolverMessages is IChannelResolver {
     return instanceData[instanceID].state.tokenState;
   }
 
-  function enact(uint instanceID, uint id) public {
+  function enact(uint instanceID, uint id) external {
     uint _disputeMadeAtUNIX = instanceData[instanceID].disputeMadeAtUNIX;
     require(_disputeMadeAtUNIX != 0 && _disputeMadeAtUNIX + disputeWindowInUNIX < block.timestamp, "No elapsed dispute");
     
     uint _tokenState = instanceData[instanceID].state.tokenState;
     
     console.log(
-      "Messages: current token state is %d, sender %s trying to execute task %d",
+      "ChannelResolverSupplyChain: current token state is %d, sender %s trying to execute task %d",
       _tokenState,
       msg.sender,
       id
@@ -142,7 +138,7 @@ contract ChannelResolverMessages is IChannelResolver {
     
     while(_tokenState != 0) {
       if (_tokenState & 1 == 1) {
-        // <--- ChoreographyTask_0hy9n0g order pizza --->
+        // <--- ChoreographyTask_0fs2cuu Order Goods --->
         if (1 == id && msg.sender == instanceData[instanceID].participants[0]) {
           // <--- custom code for task here --->
           _tokenState &= ~uint(1);
@@ -153,36 +149,101 @@ contract ChannelResolverMessages is IChannelResolver {
         }
       }
       if (_tokenState & 2 == 2) {
-        // <--- ChoreographyTask_1m3qduh hand over pizza --->
-        if (2 == id && msg.sender == instanceData[instanceID].participants[1]) {
+        // <--- ChoreographyTask_006cwga Place Order for Supplies --->
+        if (2 == id && msg.sender == instanceData[instanceID].participants[4]) {
           // <--- custom code for task here --->
           _tokenState &= ~uint(2);
-          _tokenState |= 4;
+          _tokenState |= 12;
           emit Task(2);
           id = 0;
           continue;
         }
       }
       if (_tokenState & 4 == 4) {
-        if (instanceData[instanceID].state.pizza_order == 1) {
-          // <--- ChoreographyTask_1l3cbhv New Activity --->
-          if (4 == id && msg.sender == instanceData[instanceID].participants[2]) {
-            // <--- custom code for task here --->
-            _tokenState &= ~uint(4);
-            _tokenState |= 0;
-            emit Task(4);
-            break; // is end
-          }
+        // <--- ChoreographyTask_1cx0lht Forward Order for Supplies --->
+        if (3 == id && msg.sender == instanceData[instanceID].participants[1]) {
+          // <--- custom code for task here --->
+          _tokenState &= ~uint(4);
+          _tokenState |= 16;
+          emit Task(3);
+          id = 0;
+          continue;
         }
-        else {
-          // <--- ChoreographyTask_175oxwe deliver pizza --->
-          if (3 == id && msg.sender == instanceData[instanceID].participants[2]) {
-            // <--- custom code for task here --->
-            _tokenState &= ~uint(4);
-            _tokenState |= 0;
-            emit Task(3);
-            break; // is end
-          }
+      }
+      if (_tokenState & 8 == 8) {
+        // <--- ChoreographyTask_1lvykr0 Place Order for Transport --->
+        if (4 == id && msg.sender == instanceData[instanceID].participants[1]) {
+          // <--- custom code for task here --->
+          _tokenState &= ~uint(8);
+          _tokenState |= 32;
+          emit Task(4);
+          id = 0;
+          continue;
+        }
+      }
+      if (_tokenState & 48 == 48) {
+        // <--- ChoreographyTask_16xqypd Request Details --->
+        if (5 == id && msg.sender == instanceData[instanceID].participants[3]) {
+          // <--- custom code for task here --->
+          _tokenState &= ~uint(48);
+          _tokenState |= 64;
+          emit Task(5);
+          id = 0;
+          continue;
+        }
+      }
+      if (_tokenState & 64 == 64) {
+        // <--- ChoreographyTask_0uqv9gl Provide Details --->
+        if (6 == id && msg.sender == instanceData[instanceID].participants[2]) {
+          // <--- custom code for task here --->
+          _tokenState &= ~uint(64);
+          _tokenState |= 128;
+          emit Task(6);
+          id = 0;
+          continue;
+        }
+      }
+      if (_tokenState & 128 == 128) {
+        // <--- ChoreographyTask_1pt59s6 Send Waybill --->
+        if (7 == id && msg.sender == instanceData[instanceID].participants[2]) {
+          // <--- custom code for task here --->
+          _tokenState &= ~uint(128);
+          _tokenState |= 256;
+          emit Task(7);
+          id = 0;
+          continue;
+        }
+      }
+      if (_tokenState & 256 == 256) {
+        // <--- ChoreographyTask_0g98slq Deliver Supplies --->
+        if (8 == id && msg.sender == instanceData[instanceID].participants[3]) {
+          // <--- custom code for task here --->
+          _tokenState &= ~uint(256);
+          _tokenState |= 512;
+          emit Task(8);
+          id = 0;
+          continue;
+        }
+      }
+      if (_tokenState & 512 == 512) {
+        // <--- ChoreographyTask_0c08h7c Report Start of Production --->
+        if (9 == id && msg.sender == instanceData[instanceID].participants[4]) {
+          // <--- custom code for task here --->
+          _tokenState &= ~uint(512);
+          _tokenState |= 1024;
+          emit Task(9);
+          id = 0;
+          continue;
+        }
+      }
+      if (_tokenState & 1024 == 1024) {
+        // <--- ChoreographyTask_1mgz3z1 Deliver Goods --->
+        if (10 == id && msg.sender == instanceData[instanceID].participants[4]) {
+          // <--- custom code for task here --->
+          _tokenState &= ~uint(1024);
+          _tokenState |= 0;
+          emit Task(10);
+          break; // is end
         }
       }
       break;
@@ -191,49 +252,9 @@ contract ChannelResolverMessages is IChannelResolver {
     instanceData[instanceID].state.tokenState = _tokenState;
     
     console.log(
-      "Messages: new token state is %d",
+      "ChannelResolverSupplyChain: new token state is %d",
        _tokenState
     );
-  }
-  
-  function ChoreographyTask_0hy9n0g(uint instanceID, uint _pizza_order) external {
-    require(instanceData[instanceID].state.tokenState & 1 == 1);
-    require(msg.sender == instanceData[instanceID].participants[0], "Invalid initiator");
-  
-    instanceData[instanceID].state.pizza_order = _pizza_order;
-  
-    console.log(
-      "Set uint pizza_order to",
-      _pizza_order
-    );
-    enact(instanceID, 1);
-  }
-  
-  function ChoreographyTask_175oxwe(uint instanceID, uint _pizza_order) external {
-    require(instanceData[instanceID].state.tokenState & 4 == 4);
-    require(msg.sender == instanceData[instanceID].participants[2], "Invalid initiator");
-  
-    instanceData[instanceID].state.pizza_order = _pizza_order;
-  
-    console.log(
-      "Set uint pizza_order to",
-      _pizza_order
-    );
-    enact(instanceID, 3);
-  }
-  
-  function ChoreographyTask_1l3cbhv(uint instanceID, uint _pizza_order) external {
-    require(instanceData[instanceID].state.tokenState & 4 == 4);
-    require(msg.sender == instanceData[instanceID].participants[2], "Invalid initiator");
-  	require(instanceData[instanceID].state.pizza_order == 1, "Decision condition not met");
-  
-    instanceData[instanceID].state.pizza_order = _pizza_order;
-  
-    console.log(
-      "Set uint pizza_order to",
-      _pizza_order
-    );
-    enact(instanceID, 4);
   }
 
 }

@@ -1,12 +1,10 @@
 /**
  * Test suite for process execution functionality
  */
-import * as fs from "fs";
 import { network } from "hardhat";
 import { strict as assert } from "node:assert";
 import { afterEach, beforeEach, describe, it } from "node:test";
 import { decodeEventLog, getAddress } from "viem/utils";
-import { spawn } from "child_process";
 import {
   debugLog,
   enact,
@@ -15,9 +13,10 @@ import {
   hasSubChoreos,
   prepareContracts,
   processEvent,
+  updateAndRedeployContract,
+  restoreContractFile,
 } from "./helpers/execution-helpers.js";
 import { CONTRACTS_PATH } from "./config.js";
-import path from "node:path";
 
 const REPLAY_NON_CONFORMING = false;
 
@@ -218,91 +217,39 @@ describe("Call Choreography Tests", () => {
       beforeEach(async () => {
         debugLog(`Setting up Call Choreography test for ${contractName}...`);
 
-        // Read the original Solidity file
-        const solFilePath = path.join(CONTRACTS_PATH, `${contractName}.sol`);
-        originalSolContent = fs.readFileSync(solFilePath, "utf8");
-
-        // Create updated Solidity content with actual contract addresses
-        let updatedSolContent = originalSolContent;
-
-        // Replace placeholder addresses with actual deployed contract addresses
+        // Build replacement patterns for all called contracts
+        const replacements = [];
         for (const [callContractName] of encoding.calls) {
           const callContract = context.get(callContractName);
           if (callContract?.contract?.address) {
-            const checksummedAddress = getAddress(
-              callContract.contract.address,
-            );
-            const placeholder = new RegExp(
-              `${callContractName}\\s*\\(\\s*0x0000000000000000000000000000000000000000\\s*\\)`,
-              "g",
-            );
-            const replacement = `${callContractName}(${checksummedAddress})`;
-            updatedSolContent = updatedSolContent.replace(
-              placeholder,
-              replacement,
-            );
-            debugLog(
-              `Replaced ${callContractName} placeholder with address: ${checksummedAddress}`,
-            );
+            replacements.push({
+              placeholder: new RegExp(
+                `${callContractName}\\s*\\(\\s*0x0000000000000000000000000000000000000000\\s*\\)`,
+                "g"
+              ),
+              address: callContract.contract.address,
+              description: `${callContractName}(ADDRESS)`,
+            });
           } else {
             console.warn(
-              `Call contract ${callContractName} not found or not deployed`,
+              `Call contract ${callContractName} not found or not deployed`
             );
           }
         }
 
-        // Write updated content back to file
-        if (updatedSolContent !== originalSolContent) {
-          fs.writeFileSync(solFilePath, updatedSolContent);
-          debugLog(
-            `Updated ${contractName}.sol with actual contract addresses`,
-          );
+        // Use the helper to update and redeploy
+        const result = await updateAndRedeployContract({
+          contractName,
+          contractPath: CONTRACTS_PATH,
+          viem,
+          networkHelpers,
+          contractsFixture,
+          wallets: [...contractData.wallets.values()],
+          replacements,
+        });
 
-          // Compile the updated contract using hardhat
-          debugLog(`Compiling updated ${contractName}.sol...`);
-          await new Promise<void>((resolve, reject) => {
-            const compile = spawn("npx", ["hardhat", "compile"], {
-              cwd: process.cwd(),
-              stdio: "pipe",
-            });
-
-            compile.stdout.on("data", (data) => {
-              debugLog(`Hardhat compile output: ${data}`);
-            });
-
-            compile.stderr.on("data", (data) => {
-              debugLog(`Hardhat compile error: ${data}`);
-            });
-
-            compile.on("close", (code) => {
-              if (code === 0) {
-                debugLog(`Successfully compiled ${contractName}.sol`);
-                resolve();
-              } else {
-                reject(
-                  new Error(`Hardhat compilation failed with code ${code}`),
-                );
-              }
-            });
-          });
-
-          // Reset blockchain state to recompile
-          await networkHelpers.loadFixture(contractsFixture);
-
-          // Redeploy this specific contract with updated addresses
-          updatedContract = await viem.deployContract(contractName, [
-            [...contractData.wallets.values()]
-              .map((v) => v.account!.address)
-              .filter(Boolean),
-          ]);
-
-          debugLog(
-            `Redeployed ${contractName} at address: ${updatedContract.address}`,
-          );
-        } else {
-          // No changes needed, use existing contract
-          updatedContract = contractData.contract;
-        }
+        originalSolContent = result.originalContent;
+        updatedContract = result.updatedContract || contractData.contract;
       });
 
       log.traces.forEach((trace, i) => {
@@ -442,11 +389,7 @@ describe("Call Choreography Tests", () => {
 
       afterEach(async () => {
         // Restore original file content
-        if (originalSolContent) {
-          const solFilePath = path.join(CONTRACTS_PATH, `${contractName}.sol`);
-          fs.writeFileSync(solFilePath, originalSolContent);
-          debugLog(`Restored original ${contractName}.sol file`);
-        }
+        restoreContractFile(contractName, CONTRACTS_PATH, originalSolContent);
       });
     });
   });

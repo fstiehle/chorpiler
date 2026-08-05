@@ -139,7 +139,7 @@ contract ChannelResolverRentalAgreement is IChannelResolver {
     uint _tokenState = instanceData[instanceID].state.tokenState[0];
     
     console.log(
-      "RentalAgreement: current token state is %d, sender %s trying to execute task %d",
+      "ChannelResolverRentalAgreement: current token state is %d, sender %s trying to execute task %d",
       _tokenState,
       msg.sender,
       id
@@ -251,7 +251,7 @@ contract ChannelResolverRentalAgreement is IChannelResolver {
     instanceData[instanceID].state.tokenState[0] = _tokenState;
     
     console.log(
-      "RentalAgreement: new token state is %d",
+      "ChannelResolverRentalAgreement: new token state is %d",
        _tokenState
     );
   }
