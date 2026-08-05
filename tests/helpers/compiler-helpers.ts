@@ -4,7 +4,7 @@ import util from "util";
 import { CaseVariable } from "../../src/Generator/Encoding/Encoding.js";
 import SolDefaultContractGenerator from "../../src/Generator/target/Sol/DefaultGenerator.js";
 import SolStateChannelContractGenerator from "../../src/Generator/target/Sol/ChannelGenerator.js";
-import { BPMN_PATH, CONTRACTS_PATH } from "../config.js";
+import { BPMN_PATH, CONTRACTS_PATH, CHANNEL_CONTRACTS_PATH } from "../config.js";
 import { TemplateEngine } from "../../src/Generator/TemplateEngine.js";
 import { TriggerEncoding } from "../../src/Generator/Encoding/JSON/TriggerEncoding.js";
 import assert from "assert";
@@ -130,6 +130,9 @@ const compileCase = async (
   });
 
   let directory = CONTRACTS_PATH;
+  if (isStateChannel) {
+    directory = CHANNEL_CONTRACTS_PATH;
+  }
   // if (
   //   (output.encoding.calls && output.encoding.calls.size > 0) ||
   //   output.encoding.isCalled
@@ -138,11 +141,6 @@ const compileCase = async (
   // }
   let solFileName = `${generator.iNet.id}.sol`;
   let jsonFileName = `${generator.iNet.id}.json`;
-
-  if (isStateChannel) {
-    solFileName = "channel_" + solFileName;
-    jsonFileName = "channel_" + jsonFileName;
-  }
   const solFilePath = path.join(directory, solFileName);
   const jsonFilePath = path.join(directory, jsonFileName);
 

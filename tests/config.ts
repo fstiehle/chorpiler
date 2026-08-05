@@ -11,3 +11,4 @@ export const BPMN_PATH = path.join(__dirname, "input", "bpmn");
 export const XES_PATH = path.join(__dirname, "input", "xes");
 export const OUTPUT_PATH = path.join(__dirname, "output");
 export const CONTRACTS_PATH = path.join(OUTPUT_PATH, "contracts");
+export const CHANNEL_CONTRACTS_PATH = path.join(CONTRACTS_PATH, "channel");

@@ -104,7 +104,7 @@ export class Transition {
       const isCall = isCallChoreography(t.outTo);
       if (isCall && t.outTo.participants) {
         participants = t.outTo.participants
-          .map(p => `participants[${p.id}]`)
+          .map(p => buildParticipantsRef(p.id, isInstanced))
           .join(", ");
       }
 

@@ -27,6 +27,9 @@ contract CallChoreo is IProcess {
   uint private tokenState = 1;
   address[3] public participants;
   event Task(uint id);
+  // Case Variable order
+  uint private order = 0;
+  
 
   constructor(address[3] memory _participants) {
     participants = _participants;
@@ -36,7 +39,7 @@ contract CallChoreo is IProcess {
     return tokenState;
   }
 
-  function enact(uint id) external {
+  function enact(uint id) public {
     uint _tokenState = tokenState;
     
     console.log(
@@ -69,12 +72,20 @@ contract CallChoreo is IProcess {
         }
       }
       if (_tokenState & 2 == 2) {
-        // <---  auto transition  --->
-        _tokenState &= ~uint(2);
-        instanceList[0] = Choreography_0betnp1.instance([participants[0], participants[2]]);
-        emit NewInstance(0, instanceList[0]);
-        _tokenState |= 4;
-        continue;
+        if (order == 1) {
+          // <---  auto transition  --->
+          _tokenState &= ~uint(2);
+          instanceList[0] = Choreography_0betnp1.instance([participants[0], participants[2]]);
+          emit NewInstance(0, instanceList[0]);
+          _tokenState |= 4;
+          continue;
+        }
+        else {
+          // <---  auto transition  --->
+          _tokenState &= ~uint(2);
+          _tokenState |= 4;
+          continue;
+        }
       }
       break;
     }
@@ -85,6 +96,19 @@ contract CallChoreo is IProcess {
       "CallChoreo: new token state is %d",
        _tokenState
     );
+  }
+  
+  function ChoreographyTask_0hy9n0g(uint _order) external {
+    require(tokenState & 1 == 1);
+    require(msg.sender == participants[0], "Invalid initiator");
+  
+    order = _order;
+  
+    console.log(
+      "Set uint order to",
+      _order
+    );
+    enact(1);
   }
 
 }

@@ -152,8 +152,9 @@ export class Simulator {
             new CaseVariable(
               "conditions",
               "uint",
-              "uint public conditions;",
+              "0",
               true,
+              "public"
             ),
           );
 

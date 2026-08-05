@@ -14,6 +14,7 @@ export class TriggerEncoding implements IFromEncoding {
     public processID: number,
     public isCalled: boolean = false,
     public isInstanced: boolean = false,
+    public isChannel: boolean = false,
     public tasks: Map<string, Task> = new Map(),
     public participants: Map<string, number> = new Map(),
     public states: Map<string, number> = new Map(),
@@ -89,6 +90,7 @@ export class TriggerEncoding implements IFromEncoding {
       processID,
       encoding.isCalled,
       encoding.isInstanced,
+      encoding.isChannel,
       tasks,
       participants,
       states,
@@ -131,6 +133,7 @@ export class TriggerEncoding implements IFromEncoding {
       processID: encoding.processID,
       isCalled: encoding.isCalled,
       isInstanced: encoding.isInstanced,
+      isChannel: encoding.isChannel,
       tasks: Object.fromEntries(
         Array.from(encoding.tasks.entries()).map(([modelID, task]) => [
           modelID,
@@ -173,6 +176,7 @@ export class TriggerEncoding implements IFromEncoding {
     processID: number;
     isCalled?: boolean;
     isInstanced?: boolean;
+    isChannel?: boolean;
     tasks: {
       [modelID: string]: { id: number; initiator: number; processID: number; hasDataTask: boolean };
     };
@@ -194,6 +198,7 @@ export class TriggerEncoding implements IFromEncoding {
       object.processID,
       object.isCalled ?? false,
       object.isInstanced ?? false,
+      object.isChannel ?? false,
       new Map(
         Object.entries(object.tasks).map(([modelID, task]) => [
           modelID,

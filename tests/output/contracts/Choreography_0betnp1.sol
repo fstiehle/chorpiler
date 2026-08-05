@@ -6,6 +6,7 @@ import "hardhat/console.sol";
 interface IProcessInstance {
   struct InstanceState {
     uint tokenState;
+    uint order;
   }
   struct InstanceData {
     address[2] participants;
@@ -21,13 +22,16 @@ contract Choreography_0betnp1 is IProcessInstance {
   mapping(uint => IProcessInstance.InstanceData) public instanceData;
   uint private nextId = 0;
   event Task(uint id);
+  
 
   function instance(address[2] memory _participants) external returns (uint) {
     uint newId = nextId;
     instanceData[newId] = IProcessInstance.InstanceData({
       participants: _participants,
       state: IProcessInstance.InstanceState({
-        tokenState: 1    })
+        tokenState: 1,
+        order: 0
+      })
     });
     nextId = newId + 1;
     return newId;
