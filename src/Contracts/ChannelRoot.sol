@@ -24,6 +24,8 @@ interface IChannelRoot {
   */
   function register(Channel calldata _channel) external;
 
+  function getChannel(bytes32 _id) external view returns (Channel memory);
+
   function verify(bytes32 _id, Proof calldata _step) external returns (bool);
 }
 
@@ -33,7 +35,7 @@ import "@openzeppelin/contracts/utils/cryptography/MessageHashUtils.sol";
 contract ChannelRoot is IChannelRoot {
   using ECDSA for bytes32;
   using MessageHashUtils for bytes32;
-  mapping(bytes32 => Channel) public channels;
+  mapping(bytes32 => Channel) private _channels;
 
   function register(Channel calldata _channel) external {
     bytes32 id = keccak256(
@@ -45,26 +47,34 @@ contract ChannelRoot is IChannelRoot {
     );
     // write to channel if id doesn't exist yet
     require(
-      channels[id].resolveContract == address(0),
+      _channels[id].resolveContract == address(0),
       "Channel already exists"
     );
-    channels[id] = _channel;
+    _channels[id] = _channel;
   }
 
   function verify(
     bytes32 _id,
     Proof calldata _step
   ) external view returns (bool) {
+    require(
+      _channels[_id].resolveContract != address(0),
+      "Channel does not exist"
+    );
     bytes32 payload = keccak256(abi.encode(_step.stateHash, _step.OP_RETURN));
 
-    for (uint i = 0; i < channels[_id].participants.length; i++) {
+    for (uint i = 0; i < _channels[_id].participants.length; i++) {
       if (
         payload.toEthSignedMessageHash().recover(_step.signatures[i]) !=
-        channels[_id].participants[i]
+        _channels[_id].participants[i]
       ) {
         return false;
       }
     }
     return true;
+  }
+
+  function getChannel(bytes32 _id) external view returns (Channel memory) {
+    return _channels[_id];
   }
 }
