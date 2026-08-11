@@ -109,12 +109,6 @@ export async function updateAndRedeployContract(
     debugLog(`Replaced ${description} with address: ${checksummedAddress}`);
   }
 
-  // Only proceed if content changed
-  if (updatedContent === originalContent) {
-    debugLog(`No changes needed for ${contractName}.sol`);
-    return Promise.resolve({ originalContent, updatedContract: null });
-  }
-
   // Write updated content
   writeFileSync(solFilePath, updatedContent);
   debugLog(`Updated ${contractName}.sol with new addresses`);
@@ -145,10 +139,11 @@ export async function updateAndRedeployContract(
     });
   });
 
-  // Reset blockchain state after recompile
-  await networkHelpers.loadFixture(contractsFixture);
-
   // Redeploy the contract
+  // NOTE: Do NOT reset the blockchain fixture here. Resetting the fixture inside this helper
+  // caused caller-created instances and state to be lost (race between instance creation and
+  // reloading the fixture). Callers that need a fresh fixture should call
+  // networkHelpers.loadFixture(contractsFixture) explicitly.
   let updatedContract: any;
   if (isInstanced) {
     updatedContract = await viem.deployContract(contractName);
