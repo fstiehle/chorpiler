@@ -7,7 +7,7 @@ import { CaseVariable } from "../src/Generator/Encoding/Encoding.js";
 import SolDefaultContractGenerator from "../src/Generator/target/Sol/DefaultGenerator.js";
 import { INetFastXMLParser } from "../src/Parser/FastXMLParser.js";
 import { INetParser } from "../src/Parser/Parser.js";
-import { BPMN_PATH, CONTRACTS_PATH, CHANNEL_CONTRACTS_PATH } from "./config.js";
+import { BPMN_PATH, CONTRACTS_PATH, CHANNEL_CONTRACTS_PATH, TEST_MODE as CONFIG_TEST_MODE } from "./config.js";
 import { compileBpmn } from "./helpers/compiler-helpers.js";
 
 const readFile = util.promisify(fs.readFile);
@@ -357,8 +357,8 @@ describe("Generation of edge cases", () => {
 
       verifyCallChoreography(
         CHANNEL_CONTRACTS_PATH,
-        "ChannelResolverCallChoreo",
-        ["ChannelResolverChoreography_0betnp1"],
+        "CallChoreo",
+        ["Choreography_0betnp1"],
         1
       );
     });
@@ -410,8 +410,8 @@ describe("Generation of edge cases", () => {
 
       verifyCallChoreography(
         CHANNEL_CONTRACTS_PATH,
-        "ChannelResolverCallChoreoChained",
-        ["ChannelResolverChoreography_0betnp1", "ChannelResolverChoreography_1661x4r"],
+        "CallChoreoChained",
+        ["Choreography_0betnp1", "Choreography_1661x4r"],
         2
       );
     });
@@ -455,8 +455,8 @@ describe("Generation of edge cases", () => {
 
       verifyCallChoreography(
         CHANNEL_CONTRACTS_PATH,
-        "ChannelResolverCallChoreo",
-        ["ChannelResolverChoreography_0betnp1"],
+        "CallChoreo",
+        ["Choreography_0betnp1"],
         1
       );
     });

@@ -6,6 +6,7 @@ import { strict as assert } from "node:assert";
 import path from "path";
 import { spawn } from "child_process";
 import { getAddress } from "viem/utils";
+import { encodeAbiParameters, keccak256, parseAbiParameters } from "viem";
 import { PublicClient, WalletClient } from "viem";
 import {
   EventLog,
@@ -67,6 +68,8 @@ export interface ContractUpdateOptions {
   networkHelpers: NetworkHelpers<"generic">;
   contractsFixture: () => Promise<void>;
   wallets?: WalletClient[];
+  // When true, the contract is instanced and should be deployed without constructor participants
+  isInstanced?: boolean;
   replacements: Array<{
     placeholder: RegExp;
     address: string;
@@ -91,6 +94,7 @@ export async function updateAndRedeployContract(
     networkHelpers,
     contractsFixture,
     wallets,
+    isInstanced,
     replacements,
   } = options;
 
@@ -108,7 +112,7 @@ export async function updateAndRedeployContract(
   // Only proceed if content changed
   if (updatedContent === originalContent) {
     debugLog(`No changes needed for ${contractName}.sol`);
-    return { originalContent, updatedContract: null };
+    return Promise.resolve({ originalContent, updatedContract: null });
   }
 
   // Write updated content
@@ -145,11 +149,16 @@ export async function updateAndRedeployContract(
   await networkHelpers.loadFixture(contractsFixture);
 
   // Redeploy the contract
-  const updatedContract = wallets
-    ? await viem.deployContract(contractName, [
-        wallets.map((w) => w.account!.address).filter(Boolean),
-      ])
-    : await viem.deployContract(contractName);
+  let updatedContract: any;
+  if (isInstanced) {
+    updatedContract = await viem.deployContract(contractName);
+  } else if (wallets && wallets.length > 0) {
+    updatedContract = await viem.deployContract(contractName, [
+      wallets.map((w) => w.account!.address).filter(Boolean),
+    ]);
+  } else {
+    updatedContract = await viem.deployContract(contractName);
+  }
 
   debugLog(
     `Redeployed ${contractName} at address: ${updatedContract.address}`
@@ -231,13 +240,13 @@ export async function processEvent(
       debugLog(
         `Processing data task: ${event.name} (Task ID: ${task.encoding}, Process ID: ${task.processID}), Pre-state: ${preTokenState}`,
       );
-      receipt = await dataTask(client, wallets[participantID], contract, event);
+      receipt = await dataTask(client, wallets[participantID], contract, event, context.instance);
       dataTaskPerformed = true;
     }
     if (!dataTaskPerformed) {
       // compatibility for setter contracts
       debugLog(`Processing data setting`);
-      await dataSet(client, wallets[participantID], contract, event.dataChange);
+      await dataSet(client, wallets[participantID], contract, event.dataChange, context.instance);
     }
   }
 
@@ -287,65 +296,70 @@ export async function processEvent(
 
 export async function prepareContracts(
   viem: HardhatViemHelpers,
-  contractPath: string,
+  contractPaths: string | string[],
 ) {
   const parser = new XESFastXMLParser();
 
-  const contractNames = readdirSync(contractPath, { withFileTypes: true })
-    .filter((dirent) => dirent.isFile() && dirent.name.endsWith(".sol"))
-    .map((dirent) => dirent.name.replace(".sol", ""));
+  const paths = Array.isArray(contractPaths) ? contractPaths : [contractPaths];
 
   const contracts: Map<string, ContractData> = new Map();
-  for (const contractName of contractNames) {
-    const encoding = TriggerEncoding.fromJSON(
-      JSON.parse(
-        readFileSync(
-          path.join(contractPath, `${contractName}.json`),
-        ).toString(),
-      ),
-    );
-    assert(encoding.processID != null);
-    const wallets = (await viem.getWalletClients()).slice(
-      0,
-      encoding.participants.size,
-    );
-    assert(encoding.participants.size === wallets.length);
 
-    // Strip 'ChannelResolver' prefix if present for XES log lookup
-    const baseContractName = contractName.startsWith('ChannelResolver')
-      ? contractName.replace('ChannelResolver', '')
-      : contractName;
-    const logName = `${baseContractName}.xes`;
-    const log = await parser.fromXML(
-      readFileSync(path.join(XES_PATH, logName)),
-    );
-    assert(log.traces.length !== 0);
+  for (const contractPath of paths) {
+    const contractNames = readdirSync(contractPath, { withFileTypes: true })
+      .filter((dirent) => dirent.isFile() && dirent.name.endsWith(".sol"))
+      .map((dirent) => dirent.name.replace(".sol", ""));
 
-    let nonLog: EventLog | undefined;
-    try {
-      nonLog = await parser.fromXML(
-        readFileSync(
-          path.join(XES_PATH, "nonconforming", `non_${baseContractName}.xes`),
+    for (const contractName of contractNames) {
+      const encoding = TriggerEncoding.fromJSON(
+        JSON.parse(
+          readFileSync(
+            path.join(contractPath, `${contractName}.json`),
+          ).toString(),
         ),
       );
-      assert(nonLog.traces.length !== 0);
-    } catch {
-      console.warn(
-        `Non-conforming log not found for ${contractName}. ` +
-          `Expected at: ${path.join(XES_PATH, "nonconforming", `non_${contractName}.xes`)}. ` +
-          `Consider generating it using the generate-nonlogs script.`,
+      assert(encoding.processID != null);
+      const wallets = (await viem.getWalletClients()).slice(
+        0,
+        encoding.participants.size,
       );
-    }
+      assert(encoding.participants.size === wallets.length);
 
-    const contract: any | undefined = undefined;
-    contracts.set(contractName, {
-      contractName,
-      contract,
-      encoding,
-      log,
-      nonLog,
-      wallets,
-    });
+      // Strip 'ChannelResolver' prefix if present for XES log lookup
+      const baseContractName = contractName.startsWith('ChannelResolver')
+        ? contractName.replace('ChannelResolver', '')
+        : contractName;
+      const logName = `${baseContractName}.xes`;
+      const log = await parser.fromXML(
+        readFileSync(path.join(XES_PATH, logName)),
+      );
+      assert(log.traces.length !== 0);
+
+      let nonLog: EventLog | undefined;
+      try {
+        nonLog = await parser.fromXML(
+          readFileSync(
+            path.join(XES_PATH, "nonconforming", `non_${baseContractName}.xes`),
+          ),
+        );
+        assert(nonLog.traces.length !== 0);
+      } catch {
+        console.warn(
+          `Non-conforming log not found for ${contractName}. ` +
+            `Expected at: ${path.join(XES_PATH, "nonconforming", `non_${contractName}.xes`)}. ` +
+            `Consider generating it using the generate-nonlogs script.`,
+        );
+      }
+
+      const contract: any | undefined = undefined;
+      contracts.set(contractName, {
+        contractName,
+        contract,
+        encoding,
+        log,
+        nonLog,
+        wallets,
+      });
+    }
   }
 
   return contracts;
@@ -379,6 +393,51 @@ export async function getTokenState(
   }
 }
 
+export async function write(
+  client: PublicClient,
+  wallet: WalletClient,
+  contract: any,
+  functionName: string,
+  functionArgs: any[],
+) {
+  const { request } = await client.simulateContract({
+    address: contract.address,
+    abi: contract.abi,
+    functionName,
+    args: functionArgs,
+    account: wallet.account,
+  });
+
+  const hash = await wallet.writeContract(request);
+
+  try {
+    // Check if transaction exists before waiting
+    await client.getTransaction({ hash });
+  } catch (error) {
+    console.warn(`Transaction not found immediately: ${hash}`);
+    throw new Error(
+      `Transaction ${hash} was not found in the mempool. This may indicate a network issue or the transaction was rejected.`,
+    );
+  }
+
+  const receipt = await (async () => {
+    let timer: NodeJS.Timeout;
+    return Promise.race([
+      client.waitForTransactionReceipt({ hash }),
+      new Promise<null>(
+        (_, reject) =>
+          (timer = setTimeout(
+            () =>
+              reject(new Error(`Transaction timeout: ${hash} not mined after 2 seconds`)),
+            2000,
+          )),
+      ),
+    ]).finally(() => clearTimeout(timer));
+  })();
+
+  return receipt;
+}
+
 export async function enact(
   client: PublicClient,
   wallet: WalletClient,
@@ -388,49 +447,7 @@ export async function enact(
   instanceID?: number,
 ) {
   const args = instanceID !== undefined ? [instanceID, taskID] : [taskID];
-
-  const { request } = await client.simulateContract({
-    address: contract.address,
-    abi: contract.abi,
-    functionName,
-    args,
-    account: wallet.account,
-  });
-
-  //console.log(`Submitting enact transaction for taskID: ${taskID}`);
-  const hash = await wallet.writeContract(request);
-  //console.log(`Transaction submitted with hash: ${hash}`);
-
-  try {
-    // Check if transaction exists before waiting
-    const tx = await client.getTransaction({ hash });
-    //console.log(`Transaction found in mempool: ${tx.hash}`);
-  } catch (error) {
-    console.warn(`Transaction not found immediately: ${hash}`);
-    // Try to resubmit or handle gracefully
-    throw new Error(
-      `Transaction ${hash} was not found in the mempool. This may indicate a network issue or the transaction was rejected.`,
-    );
-  }
-  const receipt = await (async () => {
-    let timer: NodeJS.Timeout;
-    return Promise.race([
-      client.waitForTransactionReceipt({ hash }),
-      new Promise<null>(
-        (_, reject) =>
-          (timer = setTimeout(
-            () =>
-              reject(
-                new Error(
-                  `Transaction timeout: ${hash} not mined after 2 seconds`,
-                ),
-              ),
-            2000,
-          )),
-      ),
-    ]).finally(() => clearTimeout(timer));
-  })();
-  return receipt;
+  return await write(client, wallet, contract, functionName, args);
 }
 
 export async function dataSet(
@@ -438,50 +455,20 @@ export async function dataSet(
   wallet: WalletClient,
   contract: any,
   dataChange: InstanceDataChange[],
+  instanceID?: number,
 ) {
   for (const el of dataChange) {
-    const { result, request } = await client.simulateContract({
-      address: contract.address,
-      abi: contract.abi,
-      functionName: "set" + capitalize(el.variable),
-      args: [el.val],
-      account: wallet.account,
-    });
-
-    const hash = await wallet.writeContract(request);
-    //console.log(`DataSet transaction submitted: ${hash}`);
+    const functionName = "set" + capitalize(el.variable);
+    const args = instanceID !== undefined ? [instanceID, el.val] : [el.val];
 
     try {
-      // Check if transaction exists before waiting
-      const tx = await client.getTransaction({ hash });
-      //console.log(`DataSet transaction found: ${tx.hash}`);
-    } catch (error) {
-      console.warn(`DataSet transaction not found: ${hash}`);
+      await write(client, wallet, contract, functionName, args);
+    } catch (err) {
+      console.warn(`DataSet transaction failed for variable ${el.variable}:`, err);
       return new Error(
-        `DataSet transaction ${hash} was not found in the mempool for variable ${el.variable}`,
+        `DataSet transaction failed for variable ${el.variable}: ${String(err)}`,
       );
     }
-
-    const receipt = await (async () => {
-      let timer: NodeJS.Timeout;
-      return Promise.race([
-        client.waitForTransactionReceipt({ hash }),
-        new Promise<null>(
-          (_, reject) =>
-            (timer = setTimeout(
-              () =>
-                reject(
-                  new Error(
-                    `Transaction timeout: ${hash} not mined after 2 seconds`,
-                  ),
-                ),
-              2000,
-            )),
-        ),
-      ]).finally(() => clearTimeout(timer));
-    })();
-
-    //console.log(`DataSet transaction mined for ${el.variable}`);
   }
 }
 
@@ -490,53 +477,24 @@ export async function dataTask(
   wallet: WalletClient,
   contract: any,
   event: Event,
+  instanceID?: number,
 ) {
   if (event.dataChange == null) {
-    return
+    return;
   }
   for (const el of event.dataChange) {
-    const { result, request } = await client.simulateContract({
-      address: contract.address,
-      abi: contract.abi,
-      functionName: event.id,
-      args: [el.val],
-      account: wallet.account,
-    });
-
-    const hash = await wallet.writeContract(request);
-    //console.log(`DataSet transaction submitted: ${hash}`);
+    const functionName = event.id;
+    const args = instanceID !== undefined ? [instanceID, el.val] : [el.val];
 
     try {
-      // Check if transaction exists before waiting
-      const tx = await client.getTransaction({ hash });
-      //console.log(`DataSet transaction found: ${tx.hash}`);
-    } catch (error) {
-      console.warn(`DataSet transaction not found: ${hash}`);
+      const receipt = await write(client, wallet, contract, functionName, args);
+      return receipt;
+    } catch (err) {
+      console.warn(`DataTask transaction failed for variable ${el.variable}:`, err);
       return new Error(
-        `DataSet transaction ${hash} was not found in the mempool for variable ${el.variable}`,
+        `DataTask transaction failed for variable ${el.variable}: ${String(err)}`,
       );
     }
-
-    const receipt = await (async () => {
-      let timer: NodeJS.Timeout;
-      return Promise.race([
-        client.waitForTransactionReceipt({ hash }),
-        new Promise<null>(
-          (_, reject) =>
-            (timer = setTimeout(
-              () =>
-                reject(
-                  new Error(
-                    `Transaction timeout: ${hash} not mined after 2 seconds`,
-                  ),
-                ),
-              2000,
-            )),
-        ),
-      ]).finally(() => clearTimeout(timer));
-    })();
-    return receipt;
-    //console.log(`DataTask transaction mined for ${el.variable}`);
   }
 }
 
@@ -621,4 +579,101 @@ export async function getEnabled(
   }
 
   return enabled;
+}
+
+export function computeChannelID(
+  instanceID: bigint | number,
+  participants: `0x${string}`[],
+  resolveContract: `0x${string}`,
+) {
+  // Ensure instanceID is BigInt for ABI encoding
+  const instance = typeof instanceID === "bigint" ? instanceID : BigInt(instanceID);
+  return keccak256(
+    encodeAbiParameters(
+      parseAbiParameters("uint, address[], address"),
+      [instance, participants, resolveContract],
+    ),
+  );
+}
+
+export function buildCaseValues(encoding: TriggerEncoding) {
+  const caseValues: Record<string, any> = {};
+  if (!encoding.caseVariables) return caseValues;
+
+  for (const [, cv] of encoding.caseVariables) {
+    let val: any = cv.defaultValue;
+
+    const type = (cv.type || '').trim();
+
+    // Handle array types like address[] or uint256[]
+    if (type.endsWith('[]')) {
+      if (!val || val === '') {
+        val = [];
+      } else if (typeof val === 'string') {
+        try {
+          val = JSON.parse(val);
+        } catch (e) {
+          // If not valid JSON, try comma-separated
+          val = val.split(',').map((s: string) => s.trim());
+        }
+      }
+
+      // Coerce elements based on element type
+      const elemType = type.slice(0, -2);
+      if (elemType.startsWith('uint') || elemType.startsWith('int')) {
+        val = val.map((v: any) => (typeof v === 'string' && /^\d+$/.test(v) ? BigInt(v) : v));
+      } else if (elemType === 'address') {
+        val = val.map((v: any) => {
+          try { return getAddress(v); } catch (e) { return v; }
+        });
+      }
+    } else if (type.startsWith('uint') || type.startsWith('int')) {
+      if (val === '' || val === undefined || val === null) {
+        val = 0n;
+      } else if (typeof val === 'string' && /^\d+$/.test(val)) {
+        try {
+          val = BigInt(val);
+        } catch (e) {
+          // leave as string
+        }
+      }
+    } else if (type === 'bool' || type.includes('bool')) {
+      if (typeof val === 'string') {
+        if (val === 'true' || val === '1') val = true;
+        else if (val === 'false' || val === '0') val = false;
+      } else {
+        val = Boolean(val);
+      }
+    } else if (type === 'address') {
+      if (!val || val === '') {
+        val = '0x0000000000000000000000000000000000000000';
+      } else if (typeof val === 'string') {
+        try {
+          val = getAddress(val);
+        } catch (e) {
+          // leave as-is if invalid
+        }
+      }
+    } else if (type.startsWith('bytes')) {
+      if (!val || val === '') {
+        // default to 32 zero bytes
+        val = '0x' + '0'.repeat(64);
+      } else if (typeof val === 'string' && !val.startsWith('0x')) {
+        val = '0x' + val;
+      }
+    } else {
+      // fallback: try to convert numeric strings to BigInt
+      if (typeof val === 'string' && /^\d+$/.test(val)) {
+        try {
+          val = BigInt(val);
+        } catch (e) {
+          // leave as string
+        }
+      }
+    }
+
+    caseValues[cv.name] = val;
+  }
+
+  return caseValues;
 }

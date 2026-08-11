@@ -16,6 +16,7 @@ import {
   getTokenState,
   processEvent,
   hasSubChoreos,
+  write,
 } from "./helpers/execution-helpers.js";
 import { CHANNEL_CONTRACTS_PATH } from "./config.js";
 
@@ -68,7 +69,7 @@ describe("Channel Resolver Tests", () => {
           viem,
           networkHelpers,
           contractsFixture,
-          wallets: undefined, // Channel contracts are instanced, no constructor params
+          isInstanced: true, // Channel contracts are instanced, no constructor params
           replacements: [
             {
               placeholder: /IChannelRoot\s*\(\s*0x[0-9a-fA-F]{40}\s*\)/g,
@@ -90,16 +91,7 @@ describe("Channel Resolver Tests", () => {
           resolveContract: updatedContract.address,
         };
 
-        const { request } = await client.simulateContract({
-          address: channelRoot.address,
-          abi: channelRoot.abi,
-          functionName: "register",
-          args: [channelData],
-          account: wallets[0].account,
-        });
-
-        const hash = await wallets[0].writeContract(request);
-        await client.waitForTransactionReceipt({ hash });
+        await write(client, contractData.wallets[0], channelRoot, 'register', [channelData]);
         debugLog(`Registered resolver ${contractName} with ChannelRoot`);
       });
 

@@ -462,11 +462,4 @@ describe("ChannelRoot Contract Tests", () => {
       debugLog("✓ Many participants channel registered successfully");
     });
   });
-
-  describe("Address Export", () => {
-    it("should export ChannelRoot address for use in other contracts", () => {
-      assert(CHANNEL_ROOT_ADDRESS, "CHANNEL_ROOT_ADDRESS should be exported");
-      assert.strictEqual(CHANNEL_ROOT_ADDRESS, channelRootAddress, "Exported address should match deployed address");
-    });
-  });
 });

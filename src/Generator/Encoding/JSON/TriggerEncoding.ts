@@ -18,6 +18,11 @@ export class TriggerEncoding implements IFromEncoding {
     public tasks: Map<string, Task> = new Map(),
     public participants: Map<string, number> = new Map(),
     public states: Map<string, number> = new Map(),
+    public caseVariables: Map<string, { name: string,
+    defaultValue: string,
+    setters: boolean,
+    type: string,
+    visibility: string }> = new Map(),
     public calls: Map<
       string,
       { id: number; participants: Map<number, string> }
@@ -95,6 +100,18 @@ export class TriggerEncoding implements IFromEncoding {
       participants,
       states,
       new Map(
+        Array.from(encoding.caseVariables.entries()).map(([modelID, cv]) => [
+          modelID,
+          {
+            name: cv.name,
+            defaultValue: cv.defaultValue,
+            setters: cv.setters,
+            type: cv.type,
+            visibility: cv.visibility,
+          },
+        ]),
+      ),
+      new Map(
         Array.from(encoding.callList.entries()).map(([key, c]) => [
           key,
           {
@@ -147,6 +164,18 @@ export class TriggerEncoding implements IFromEncoding {
       ),
       participants: Object.fromEntries(encoding.participants),
       states: Object.fromEntries(encoding.states),
+      caseVariables: Object.fromEntries(
+        Array.from(encoding.caseVariables.entries()).map(([modelID, cv]) => [
+          modelID,
+          {
+            name: cv.name,
+            defaultValue: cv.defaultValue,
+            setters: cv.setters,
+            type: cv.type,
+            visibility: cv.visibility,
+          },
+        ]),
+      ),
       calls: Object.fromEntries(
         Array.from(encoding.calls.entries()).map(([key, call]) => [
           key,
@@ -181,6 +210,7 @@ export class TriggerEncoding implements IFromEncoding {
       [modelID: string]: { id: number; initiator: number; processID: number; hasDataTask: boolean };
     };
     participants: { [k: string]: number };
+    caseVariables?: { [modelID: string]: { name: string; defaultValue: string; setters: boolean; functionName: string; type: string; visibility: string } };
     calls?: {
       [k: string]: { id: number; participants: { [k: string]: string } };
     };
@@ -209,6 +239,20 @@ export class TriggerEncoding implements IFromEncoding {
       object.states
         ? new Map(
             Object.entries(object.states).map(([key, value]) => [key, value]),
+          )
+        : new Map(),
+      object.caseVariables
+        ? new Map(
+            Object.entries(object.caseVariables).map(([modelID, cv]) => [
+              modelID,
+              {
+                name: cv.name,
+                defaultValue: cv.defaultValue,
+                setters: cv.setters,
+                type: cv.type,
+                visibility: cv.visibility,
+              },
+            ]),
           )
         : new Map(),
       object.calls

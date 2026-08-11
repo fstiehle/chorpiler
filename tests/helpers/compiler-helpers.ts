@@ -126,7 +126,6 @@ const compileCase = async (
   let directory = CONTRACTS_PATH;
   if (isStateChannel) {
     directory = CHANNEL_CONTRACTS_PATH;
-    generator.iNet.id = "ChannelResolver" + generator.iNet.id;
   }
 
   const output = await generator.compile({

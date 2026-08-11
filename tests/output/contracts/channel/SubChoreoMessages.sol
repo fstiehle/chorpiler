@@ -58,9 +58,9 @@ interface IChannelResolver {
   function submit(bytes32 id, Step calldata _step) external;
 }
 
-IChannelRoot constant Channel_Root = IChannelRoot(0x0000000000000000000000000000000000000000);
+IChannelRoot constant Channel_Root = IChannelRoot(0x5FbDB2315678afecb367f032d93F642f64180aa3);
 
-contract ChannelResolverSubChoreoMessages is IChannelResolver {
+contract SubChoreoMessages is IChannelResolver {
   uint public immutable disputeWindowInUNIX = 86400;
 
   mapping(uint => IProcessInstance.InstanceData) public instanceData;
@@ -136,7 +136,7 @@ contract ChannelResolverSubChoreoMessages is IChannelResolver {
     uint _tokenState = instanceData[instanceID].state.tokenState[0];
     
     console.log(
-      "ChannelResolverSubChoreoMessages: current token state is %d, sender %s trying to execute task %d",
+      "SubChoreoMessages: current token state is %d, sender %s trying to execute task %d",
       _tokenState,
       msg.sender,
       id
@@ -189,7 +189,7 @@ contract ChannelResolverSubChoreoMessages is IChannelResolver {
     instanceData[instanceID].state.tokenState[0] = _tokenState;
     
     console.log(
-      "ChannelResolverSubChoreoMessages: new token state is %d",
+      "SubChoreoMessages: new token state is %d",
        _tokenState
     );
   }

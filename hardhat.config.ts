@@ -3,7 +3,7 @@ import hardhatViem from "@nomicfoundation/hardhat-viem";
 import hardhatViemAssertions from "@nomicfoundation/hardhat-viem-assertions";
 import hardhatNodeTestRunner from "@nomicfoundation/hardhat-node-test-runner";
 import hardhatNetworkHelpers from "@nomicfoundation/hardhat-network-helpers";
-import { CONTRACTS_PATH, OUTPUT_PATH } from "./tests/config.js";
+import { CONTRACTS_PATH,  CHANNEL_CONTRACTS_PATH, OUTPUT_PATH, TEST_MODE as CONFIG_TEST_MODE } from "./tests/config.js";
 
 const config: HardhatUserConfig = {
   solidity: {
@@ -24,7 +24,15 @@ const config: HardhatUserConfig = {
     },
   },
   paths: {
-    sources: [ CONTRACTS_PATH, "src/Contracts" ],
+    // Determine runtime test mode: environment variable takes precedence over config value
+    sources: ((): string[] => {
+      const mode = process.env.TEST_MODE ?? CONFIG_TEST_MODE ?? "default";
+      if (mode === "channels") {
+        // When testing channels, only include the channel subfolder (ignore parent contracts folder)
+        return [CHANNEL_CONTRACTS_PATH, "src/Contracts"];
+      }
+      return [CONTRACTS_PATH, "src/Contracts"];
+    })(),
     cache: OUTPUT_PATH + "/cache",
     artifacts: OUTPUT_PATH + "/artifacts",
     tests: "tests",

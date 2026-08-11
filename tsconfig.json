@@ -10,6 +10,8 @@
     "forceConsistentCasingInFileNames": true,
     "moduleResolution": "node16",
     "outDir": "lib",
+    "sourceMap": true,
+    "inlineSources": true
   },
   "include": ["./**/*.ts"],
   "exclude": ["src/Generator/Encoding/templates", "node_modules", "lib"],
