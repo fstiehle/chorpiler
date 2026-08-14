@@ -9,7 +9,7 @@ interface IChannelRoot {
   // TODO: Variable Packing
   // Registered State Channels
   struct Channel {
-    uint instanceID;
+    bytes32 instanceID;
     address[] participants;
     address resolveContract;
   }
@@ -55,16 +55,15 @@ interface IProcessInstance {
 interface IChannelResolver {
   // A step can be submitted to start a dispute or as final state
   struct Step {
-    uint index;
-    uint intsanceID;
+    bytes32 intsanceID;
     IProcessInstance.InstanceState newState;
     bytes[] signatures;
     bytes32 OP_RETURN;
   }
 
-  function enact(uint instanceID, uint id) external;
-  function getTokenState(uint instanceID) external view returns (uint);
-  function instance(address[{{{numberOfParticipants}}}] memory participants) external returns (uint);
+  function enact(bytes32 instanceID, uint id) external;
+  function getTokenState(bytes32 instanceID) external view returns (uint);
+  function instance(uint _nonce, address[{{{numberOfParticipants}}}] memory participants) external returns (bytes32);
   function submit(bytes32 id, Step calldata _step) external;
 }
 {{! ---- No Whitespace ---- }}
@@ -88,9 +87,12 @@ contract {{{modelID}}} is IChannelResolver {
    */
    function submit(bytes32 id, Step calldata _step) external {
     uint _disputeMadeAtUNIX = instanceData[_step.intsanceID].disputeMadeAtUNIX;
-    if (0 == _step.index && 0 == _disputeMadeAtUNIX) {
+    if (0 == _step.newState.index && 0 == _disputeMadeAtUNIX) {
       // stuck in start event
       instanceData[_step.intsanceID].disputeMadeAtUNIX = block.timestamp;
+      {{#if options.debug}}
+      console.log("{{{modelID}}}: new dispute (stuck in start event) registered with ID (see below)"); console.logBytes32(id);
+      {{/if}}
     }
     else {
       if (checkStep(id, _step)) {
@@ -105,13 +107,16 @@ contract {{{modelID}}} is IChannelResolver {
           // submission to existing dispute
           instanceData[_step.intsanceID].state = _step.newState;
         }
+        {{#if options.debug}}
+        console.log("{{{modelID}}}: new dispute registered with ID (see below)"); console.logBytes32(id);
+        {{/if}}
       }
     }
   }
 
   function checkStep(bytes32 id, Step calldata _step) private returns (bool) {
     // Check that step is higher than previously recorded steps
-    if (instanceData[_step.intsanceID].state.index >= _step.index) {
+    if (instanceData[_step.intsanceID].state.index >= _step.newState.index) {
       return false;
     }
 
@@ -122,12 +127,12 @@ contract {{{modelID}}} is IChannelResolver {
     }));
   }
 
-  function getTokenState({{#if isInstanced}}uint instanceID{{/if}}) external view returns (uint) {
+  function getTokenState({{#if isInstanced}}bytes32 instanceID{{/if}}) external view returns (uint) {
     return {{> tokenstate id=0 }};
   }
 
   {{! ---- // Main Enact Function ---- }}
-  function enact({{#if isInstanced}}uint instanceID, {{/if}}uint id) {{#if hasDataTasks}}public{{else}}external{{/if}} {
+  function enact({{#if isInstanced}}bytes32 instanceID, {{/if}}uint id) {{#if hasDataTasks}}public{{else}}external{{/if}} {
     {{> states }}
   }
   {{! ---- // Tasks that set casevariables ---- }}

@@ -9,7 +9,7 @@ Handles membership and existence for all channels.
 interface IChannelRoot {
   // TODO: Variable Packing
   struct Channel {
-    uint instanceID;
+    bytes32 instanceID;
     address[] participants;
     address resolveContract;
   }

@@ -7,7 +7,7 @@ interface IChannelRoot {
   // TODO: Variable Packing
   // Registered State Channels
   struct Channel {
-    uint instanceID;
+    bytes32 instanceID;
     address[] participants;
     address resolveContract;
   }
@@ -45,32 +45,40 @@ interface IProcessInstance {
 interface IChannelResolver {
   // A step can be submitted to start a dispute or as final state
   struct Step {
-    uint index;
-    uint intsanceID;
+    bytes32 intsanceID;
     IProcessInstance.InstanceState newState;
     bytes[] signatures;
     bytes32 OP_RETURN;
   }
 
-  function enact(uint instanceID, uint id) external;
-  function getTokenState(uint instanceID) external view returns (uint);
-  function instance(address[3] memory participants) external returns (uint);
+  function enact(bytes32 instanceID, uint id) external;
+  function getTokenState(bytes32 instanceID) external view returns (uint);
+  function instance(uint _nonce, address[3] memory participants) external returns (bytes32);
   function submit(bytes32 id, Step calldata _step) external;
 }
 
-IChannelRoot constant Channel_Root = IChannelRoot(0x0000000000000000000000000000000000000000);
+IChannelRoot constant Channel_Root = IChannelRoot(0x5FbDB2315678afecb367f032d93F642f64180aa3);
 
 contract Messages is IChannelResolver {
   uint public immutable disputeWindowInUNIX = 86400;
 
-  mapping(uint => IProcessInstance.InstanceData) public instanceData;
-  uint private nextId = 0;
+  mapping(bytes32 => IProcessInstance.InstanceData) public instanceData;
   event Task(uint id);
   
 
-  function instance(address[3] memory _participants) external returns (uint) {
-    uint newId = nextId;
-    instanceData[newId] = IProcessInstance.InstanceData({
+  function instance(uint _nonce, address[3] memory _participants) external returns (bytes32) {
+    bytes32 id = keccak256(
+      abi.encode(
+        _nonce,
+        _participants
+      )
+    );
+    // write to channel if id doesn't exist yet
+    require(
+      instanceData[id].state.tokenState == 0,
+      "instance already exists"
+    );
+    instanceData[id] = IProcessInstance.InstanceData({
       disputeMadeAtUNIX: 0,
       participants: _participants,
       state: IProcessInstance.InstanceState({
@@ -79,8 +87,8 @@ contract Messages is IChannelResolver {
         pizza_order: 0
       })
     });
-    nextId = newId + 1;
-    return newId;
+    console.log("Messages: new instance registered with ID (see below)"); console.logBytes32(id);
+    return id;
   }
 
   /**
@@ -89,9 +97,10 @@ contract Messages is IChannelResolver {
    */
    function submit(bytes32 id, Step calldata _step) external {
     uint _disputeMadeAtUNIX = instanceData[_step.intsanceID].disputeMadeAtUNIX;
-    if (0 == _step.index && 0 == _disputeMadeAtUNIX) {
+    if (0 == _step.newState.index && 0 == _disputeMadeAtUNIX) {
       // stuck in start event
       instanceData[_step.intsanceID].disputeMadeAtUNIX = block.timestamp;
+      console.log("Messages: new dispute (stuck in start event) registered with ID (see below)"); console.logBytes32(id);
     }
     else {
       if (checkStep(id, _step)) {
@@ -106,13 +115,14 @@ contract Messages is IChannelResolver {
           // submission to existing dispute
           instanceData[_step.intsanceID].state = _step.newState;
         }
+        console.log("Messages: new dispute registered with ID (see below)"); console.logBytes32(id);
       }
     }
   }
 
   function checkStep(bytes32 id, Step calldata _step) private returns (bool) {
     // Check that step is higher than previously recorded steps
-    if (instanceData[_step.intsanceID].state.index >= _step.index) {
+    if (instanceData[_step.intsanceID].state.index >= _step.newState.index) {
       return false;
     }
 
@@ -123,11 +133,11 @@ contract Messages is IChannelResolver {
     }));
   }
 
-  function getTokenState(uint instanceID) external view returns (uint) {
+  function getTokenState(bytes32 instanceID) external view returns (uint) {
     return instanceData[instanceID].state.tokenState;
   }
 
-  function enact(uint instanceID, uint id) public {
+  function enact(bytes32 instanceID, uint id) public {
     uint _disputeMadeAtUNIX = instanceData[instanceID].disputeMadeAtUNIX;
     require(_disputeMadeAtUNIX != 0 && _disputeMadeAtUNIX + disputeWindowInUNIX < block.timestamp, "No elapsed dispute");
     
@@ -196,7 +206,7 @@ contract Messages is IChannelResolver {
     );
   }
   
-  function ChoreographyTask_0hy9n0g(uint instanceID, uint _pizza_order) external {
+  function ChoreographyTask_0hy9n0g(bytes32 instanceID, uint _pizza_order) external {
     require(instanceData[instanceID].state.tokenState & 1 == 1);
     require(msg.sender == instanceData[instanceID].participants[0], "Invalid initiator");
   
@@ -209,7 +219,7 @@ contract Messages is IChannelResolver {
     enact(instanceID, 1);
   }
   
-  function ChoreographyTask_175oxwe(uint instanceID, uint _pizza_order) external {
+  function ChoreographyTask_175oxwe(bytes32 instanceID, uint _pizza_order) external {
     require(instanceData[instanceID].state.tokenState & 4 == 4);
     require(msg.sender == instanceData[instanceID].participants[2], "Invalid initiator");
   
@@ -222,7 +232,7 @@ contract Messages is IChannelResolver {
     enact(instanceID, 3);
   }
   
-  function ChoreographyTask_1l3cbhv(uint instanceID, uint _pizza_order) external {
+  function ChoreographyTask_1l3cbhv(bytes32 instanceID, uint _pizza_order) external {
     require(instanceData[instanceID].state.tokenState & 4 == 4);
     require(msg.sender == instanceData[instanceID].participants[2], "Invalid initiator");
   	require(instanceData[instanceID].state.pizza_order == 1, "Decision condition not met");

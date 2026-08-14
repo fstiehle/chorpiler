@@ -18,9 +18,9 @@ interface IProcessInstance {
     address[{{{numberOfParticipants}}}] participants;
     InstanceState state;
   }
-  function enact(uint instanceID, uint id) external;
-  function getTokenState(uint instanceID) external view returns (uint);
-  function instance(address[{{{numberOfParticipants}}}] memory participants) external returns (uint);
+  function enact(bytes32 instanceID, uint id) external;
+  function getTokenState(bytes32 instanceID) external view returns (uint);
+  function instance(uint nonce, address[{{{numberOfParticipants}}}] memory participants) external returns (bytes32);
 }
 {{!// ---- Non-Instanced Contract ----- }}
 {{else}}

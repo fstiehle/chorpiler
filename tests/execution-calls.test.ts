@@ -14,6 +14,7 @@ import {
   restoreContractFile,
   write,
   computeChannelID,
+  computeInstanceID,
   buildCaseValues,
 } from "./helpers/execution-helpers.js";
 import { CONTRACTS_PATH, CHANNEL_CONTRACTS_PATH, TEST_MODE as CONFIG_TEST_MODE } from "./config.js";
@@ -48,7 +49,7 @@ debugLog("Connected to client: " + networkName);
 describe("Call Choreography Tests", () => {
   context.forEach((contractData) => {
     let { contractName, encoding, log, wallets, contract } = contractData;
-
+    const instanceID = computeInstanceID(0, [...contractData.wallets.values()].map((v) => v.account!.address));
     // Only test contracts that have calls (encoding.calls.size > 0)
     if (encoding.calls.size === 0) {
       return;
@@ -106,7 +107,7 @@ describe("Call Choreography Tests", () => {
               .filter(Boolean) as `0x${string}`[];
 
             const channelData = {
-              instanceID: 0n,
+              instanceID: computeInstanceID(0, participants),
               participants,
               resolveContract: callContract.contract.address,
             };
@@ -134,18 +135,17 @@ describe("Call Choreography Tests", () => {
         contract = result.updatedContract || contractData.contract;
 
         if (encoding.isChannel) {
+          const participants = [...contractData.wallets.values()]
+            .map((v) => v.account!.address);
+
           debugLog(`${contractName} create new instance ...`);
-          await write(client, contractData.wallets[0], contract, 'instance', [
-              wallets.map((w) => w.account!.address),
-            ]);
+          await write(client, contractData.wallets[0], contract, 'instance', [0, participants]);
           debugLog(`New instance created for ${contractName}`);
 
           // Register the resolver with the ChannelRoot
           const channelData = {
-            instanceID: 0n,
-            participants: [...contractData.wallets.values()]
-              .map((v) => v.account!.address)
-              .filter(Boolean),
+            instanceID: computeInstanceID(0, participants),
+            participants,
             resolveContract: contract.address,
           };
 
@@ -162,7 +162,6 @@ describe("Call Choreography Tests", () => {
           const caseValues = buildCaseValues(encoding);
 
           const submitData = {
-            index: 0,
             intsanceID: channelData.instanceID,
             newState: {
               tokenState: encoding.subModels
@@ -181,12 +180,11 @@ describe("Call Choreography Tests", () => {
           // Advance time by one day and one second to pass dispute window
           await networkHelpers.time.increase(86400 + 1);
           await networkHelpers.mine();
-        } else if (encoding.isInstanced) {
 
+        } else if (encoding.isInstanced) {
           debugLog(`${contractName} is instanced, create new instance ...`);
-          await write(client, contractData.wallets[0], contract, 'instance', [
-              wallets.map((w) => w.account!.address),
-            ]);
+          await write(client, contractData.wallets[0], contract, 'instance', [0, [...contractData.wallets.values()]
+            .map((v) => v.account!.address)]);
           debugLog(`New instance created for ${contractName}`);
         }
       });
@@ -201,7 +199,7 @@ describe("Call Choreography Tests", () => {
           // make a NOOP call to confirm deployment and to trigger any automated decisions
           // NOTE: this is to account for models implementing anti-patterns,
           // automated decisions pre task execution should be moved into the constructor.
-          await enact(client, wallets[0], contract, "enact", 0, encoding.isInstanced ? 0 : undefined);
+          await enact(client, wallets[0], contract, "enact", 0, encoding.isInstanced ? instanceID : undefined);
           // console.log(updatedContract.address);
 
           const ccontext: EventProcessingContext = {
@@ -210,7 +208,7 @@ describe("Call Choreography Tests", () => {
             contract,
             encoding,
             networkHelpers,
-            instance: encoding.isInstanced ? 0 : undefined
+            instance: encoding.isInstanced ? instanceID : undefined
           };
 
           for (const event of trace) {
@@ -237,7 +235,7 @@ describe("Call Choreography Tests", () => {
                   } else if (emit.eventName == "NewInstance") {
                     debugLog("NewInstance event detected:", emit);
                     const id = Number(emit.args.id);
-                    const instance = Number(emit.args.instanceID);
+                    const instance = emit.args.instanceID;
 
                     // Find the contract name by looking up the ID in encoding.calls
                     let contractName: string | undefined;
@@ -265,9 +263,11 @@ describe("Call Choreography Tests", () => {
                       // Include case variables and their default values in the newState\
                       const caseValues = buildCaseValues(contractData.encoding);
 
+                      const participants = [...contractData.wallets.values()]
+                        .map((v) => v.account!.address);
+
                       const submitData = {
-                        index: 0,
-                        intsanceID: 0n,
+                        intsanceID: instance,
                         newState: {
                           tokenState: contractData.encoding.subModels
                             ? new Array(contractData.encoding.subModels.size + 1).fill(0n)
@@ -279,7 +279,7 @@ describe("Call Choreography Tests", () => {
                         OP_RETURN: "0x0000000000000000000000000000000000000000000000000000000000000000",
                       }
                       const channelData = {
-                        instanceID: 0n,
+                        instanceID: instance,
                         participants: [...contractData.wallets.values()]
                           .map((v) => v.account!.address),
                         resolveContract: contractData.contract.address,
@@ -342,7 +342,7 @@ describe("Call Choreography Tests", () => {
               client,
               contract,
               hasSubChoreos(encoding) ? 0 : null,
-              encoding.isInstanced ? 0 : undefined
+              encoding.isInstanced ? instanceID : undefined
             ),
             0,
             `end tokenState not 0!`,
@@ -351,7 +351,7 @@ describe("Call Choreography Tests", () => {
           if (hasSubChoreos(encoding)) {
             for (const [processID, subModel] of encoding.subModels) {
               assert.equal(
-                await getTokenState(client, contract, processID, encoding.isInstanced ? 0 : undefined),
+                await getTokenState(client, contract, processID, encoding.isInstanced ? instanceID : undefined),
                 0,
                 `subModel ${subModel.modelID} (processID: ${processID}) tokenState not 0!`,
               );

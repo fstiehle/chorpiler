@@ -7,7 +7,7 @@ interface IChannelRoot {
   // TODO: Variable Packing
   // Registered State Channels
   struct Channel {
-    uint instanceID;
+    bytes32 instanceID;
     address[] participants;
     address resolveContract;
   }
@@ -44,34 +44,33 @@ interface IProcessInstance {
 interface IChannelResolver {
   // A step can be submitted to start a dispute or as final state
   struct Step {
-    uint index;
-    uint intsanceID;
+    bytes32 intsanceID;
     IProcessInstance.InstanceState newState;
     bytes[] signatures;
     bytes32 OP_RETURN;
   }
 
-  function enact(uint instanceID, uint id) external;
-  function getTokenState(uint instanceID) external view returns (uint);
-  function instance(address[3] memory participants) external returns (uint);
+  function enact(bytes32 instanceID, uint id) external;
+  function getTokenState(bytes32 instanceID) external view returns (uint);
+  function instance(uint _nonce, address[3] memory participants) external returns (bytes32);
   function submit(bytes32 id, Step calldata _step) external;
 }
 
 interface IInstanceCall {
-  function instance(address[] memory participants) external returns (uint);
-  function enact(uint instance, uint id) external;
-  function getTokenState(uint instance) external view returns (uint);
+  function instance(uint nonce, address[] memory participants) external returns (bytes32);
+  function enact(bytes32 instance, uint id) external;
+  function getTokenState(bytes32 instance) external view returns (uint);
 }
 
 // Interface for Choreography_0betnp1
 interface IChoreography_0betnp1 is IInstanceCall {
-  function instance(address[2] memory participants) external returns (uint);
+  function instance(uint nonce, address[2] memory participants) external returns (bytes32);
 }
 IChoreography_0betnp1 constant Choreography_0betnp1 = IChoreography_0betnp1(0x0000000000000000000000000000000000000000);
 
 // Interface for Choreography_1661x4r
 interface IChoreography_1661x4r is IInstanceCall {
-  function instance(address[2] memory participants) external returns (uint);
+  function instance(uint nonce, address[2] memory participants) external returns (bytes32);
 }
 IChoreography_1661x4r constant Choreography_1661x4r = IChoreography_1661x4r(0x0000000000000000000000000000000000000000);
 
@@ -80,23 +79,33 @@ IChannelRoot constant Channel_Root = IChannelRoot(0x0000000000000000000000000000
 contract CallChoreoChained is IChannelResolver {
   uint public immutable disputeWindowInUNIX = 86400;
 
-  uint[2] private instanceList; // instanceIDs for calls
-  event NewInstance(uint id, uint instanceID);
-  mapping(uint => IProcessInstance.InstanceData) public instanceData;
-  uint private nextId = 0;
+  bytes32[2] private instanceList; // instanceIDs for calls
+  uint private nextID; // nonce list for calls
+  event NewInstance(uint id, bytes32 instanceID);
+  mapping(bytes32 => IProcessInstance.InstanceData) public instanceData;
   event Task(uint id);
 
-  function instance(address[3] memory _participants) external returns (uint) {
-    uint newId = nextId;
-    instanceData[newId] = IProcessInstance.InstanceData({
+  function instance(uint _nonce, address[3] memory _participants) external returns (bytes32) {
+    bytes32 id = keccak256(
+      abi.encode(
+        _nonce,
+        _participants
+      )
+    );
+    // write to channel if id doesn't exist yet
+    require(
+      instanceData[id].state.tokenState == 0,
+      "instance already exists"
+    );
+    instanceData[id] = IProcessInstance.InstanceData({
       disputeMadeAtUNIX: 0,
       participants: _participants,
       state: IProcessInstance.InstanceState({
         index: 0,
         tokenState: 1    })
     });
-    nextId = newId + 1;
-    return newId;
+    console.log("CallChoreoChained: new instance registered with ID (see below)"); console.logBytes32(id);
+    return id;
   }
 
   /**
@@ -105,9 +114,10 @@ contract CallChoreoChained is IChannelResolver {
    */
    function submit(bytes32 id, Step calldata _step) external {
     uint _disputeMadeAtUNIX = instanceData[_step.intsanceID].disputeMadeAtUNIX;
-    if (0 == _step.index && 0 == _disputeMadeAtUNIX) {
+    if (0 == _step.newState.index && 0 == _disputeMadeAtUNIX) {
       // stuck in start event
       instanceData[_step.intsanceID].disputeMadeAtUNIX = block.timestamp;
+      console.log("CallChoreoChained: new dispute (stuck in start event) registered with ID (see below)"); console.logBytes32(id);
     }
     else {
       if (checkStep(id, _step)) {
@@ -122,13 +132,14 @@ contract CallChoreoChained is IChannelResolver {
           // submission to existing dispute
           instanceData[_step.intsanceID].state = _step.newState;
         }
+        console.log("CallChoreoChained: new dispute registered with ID (see below)"); console.logBytes32(id);
       }
     }
   }
 
   function checkStep(bytes32 id, Step calldata _step) private returns (bool) {
     // Check that step is higher than previously recorded steps
-    if (instanceData[_step.intsanceID].state.index >= _step.index) {
+    if (instanceData[_step.intsanceID].state.index >= _step.newState.index) {
       return false;
     }
 
@@ -139,11 +150,11 @@ contract CallChoreoChained is IChannelResolver {
     }));
   }
 
-  function getTokenState(uint instanceID) external view returns (uint) {
+  function getTokenState(bytes32 instanceID) external view returns (uint) {
     return instanceData[instanceID].state.tokenState;
   }
 
-  function enact(uint instanceID, uint id) external {
+  function enact(bytes32 instanceID, uint id) external {
     uint _disputeMadeAtUNIX = instanceData[instanceID].disputeMadeAtUNIX;
     require(_disputeMadeAtUNIX != 0 && _disputeMadeAtUNIX + disputeWindowInUNIX < block.timestamp, "No elapsed dispute");
     
@@ -171,7 +182,8 @@ contract CallChoreoChained is IChannelResolver {
       if (_tokenState & 2 == 2) {
         // <---  auto transition  --->
         _tokenState &= ~uint(2);
-        instanceList[0] = Choreography_0betnp1.instance([instanceData[instanceID].participants[0], instanceData[instanceID].participants[2]]);
+        instanceList[0] = Choreography_0betnp1.instance(nextID, [instanceData[instanceID].participants[0], instanceData[instanceID].participants[2]]);
+        nextID = nextID + 1;
         emit NewInstance(0, instanceList[0]);
         _tokenState |= 4;
         continue;
@@ -180,7 +192,8 @@ contract CallChoreoChained is IChannelResolver {
         // <---  auto transition  --->
         if (0 == Choreography_0betnp1.getTokenState(instanceList[0])) {
           _tokenState &= ~uint(4);
-          instanceList[1] = Choreography_1661x4r.instance([instanceData[instanceID].participants[0], instanceData[instanceID].participants[1]]);
+          instanceList[1] = Choreography_1661x4r.instance(nextID, [instanceData[instanceID].participants[0], instanceData[instanceID].participants[1]]);
+          nextID = nextID + 1;
           emit NewInstance(1, instanceList[1]);
           _tokenState |= 0;
           break; // is end

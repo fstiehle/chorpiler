@@ -1,6 +1,6 @@
 {{#each dataTasks}}
 
-function {{{modelID}}}({{#if isInstanced}}uint instanceID, {{/if}}{{{type}}} _{{{name}}}) external {
+function {{{modelID}}}({{#if isInstanced}}bytes32 instanceID, {{/if}}{{{type}}} _{{{name}}}) external {
   require({{> tokenstate }} & {{{consume}}} == {{{consume}}});
   {{{conditionString}}}
 

@@ -16,6 +16,7 @@ import {
   updateAndRedeployContract,
   write,
   computeChannelID,
+  computeInstanceID,
   buildCaseValues,
 } from "./helpers/execution-helpers.js";
 import { CONTRACTS_PATH, CHANNEL_CONTRACTS_PATH, TEST_MODE as CONFIG_TEST_MODE } from "./config.js";
@@ -69,6 +70,7 @@ describe.only("Execute all contracts by replaying xes logs in output/contracts",
       describe(`should execute contract: ${contractData.contractName}`, async () => {
         let { contractName, nonLog, contract, encoding, log, wallets } =
           contractData;
+        const instanceID = computeInstanceID(0, [...contractData.wallets.values()].map((v) => v.account!.address));
         assert(
           contract != undefined && contract.address != undefined,
           "contract is not set up, did you load the fixture?",
@@ -101,19 +103,18 @@ describe.only("Execute all contracts by replaying xes logs in output/contracts",
             if (result.updatedContract != null) {
               contract = result.updatedContract!;
             }
+            const participants = [...contractData.wallets.values()]
+              .map((v) => v.account!.address);
 
             debugLog(`${contractName} create new instance ...`);
-            await write(client, contractData.wallets[0], contract, 'instance', [
-                wallets.map((w) => w.account!.address),
-              ]);
+            await write(client, contractData.wallets[0], contract, 'instance', [0, participants]);
             debugLog(`New instance created for ${contractName}`);
+
 
             // Register the resolver with the ChannelRoot
             const channelData = {
-              instanceID: 0n,
-              participants: [...contractData.wallets.values()]
-                .map((v) => v.account!.address)
-                .filter(Boolean),
+              instanceID: computeInstanceID(0, participants),
+              participants,
               resolveContract: contract.address,
             };
 
@@ -130,10 +131,9 @@ describe.only("Execute all contracts by replaying xes logs in output/contracts",
             const caseValues = buildCaseValues(encoding);
 
             const submitData = {
-              index: 0,
               intsanceID: channelData.instanceID,
               newState: {
-                tokenState: encoding.subModels
+                tokenState: encoding.subModels.size > 0
                   ? new Array(encoding.subModels.size + 1).fill(0n)
                   : 1n,
                 index: 0n,
@@ -153,9 +153,8 @@ describe.only("Execute all contracts by replaying xes logs in output/contracts",
           } else if (encoding.isInstanced) {
 
             debugLog(`${contractName} is instanced, create new instance ...`);
-            await write(client, contractData.wallets[0], contract, 'instance', [
-                wallets.map((w) => w.account!.address),
-              ]);
+            await write(client, contractData.wallets[0], contract, 'instance', [0, [...contractData.wallets.values()]
+              .map((v) => v.account!.address)]);
             debugLog(`New instance created for ${contractName}`);
           }
         });
@@ -170,7 +169,7 @@ describe.only("Execute all contracts by replaying xes logs in output/contracts",
             // make a NOOP call to confirm deployment and to trigger any automated decisions
             // NOTE: this is to account for models implementing anti-patterns,
             // automated decisions pre task execution should be moved into the constructor.
-            await enact(client, wallets[0], contract, "enact", 0, encoding.isInstanced ? 0 : undefined);
+            await enact(client, wallets[0], contract, "enact", 0, encoding.isInstanced ? instanceID : undefined);
 
             const context: EventProcessingContext = {
               client,
@@ -178,7 +177,7 @@ describe.only("Execute all contracts by replaying xes logs in output/contracts",
               contract,
               encoding,
               networkHelpers,
-              instance: encoding.isInstanced ? 0 : undefined
+              instance: encoding.isInstanced ? instanceID : undefined
             };
 
             for (const event of trace) {
@@ -207,7 +206,7 @@ describe.only("Execute all contracts by replaying xes logs in output/contracts",
                 client,
                 contract,
                 hasSubChoreos(encoding) ? 0 : null,
-                encoding.isInstanced ? 0 : undefined
+                encoding.isInstanced ? instanceID : undefined
               ),
               0,
               `end tokenState not 0!`,
@@ -216,7 +215,7 @@ describe.only("Execute all contracts by replaying xes logs in output/contracts",
             if (hasSubChoreos(encoding)) {
               for (const [processID, subModel] of encoding.subModels) {
                 assert.equal(
-                  await getTokenState(client, contract, processID, encoding.isInstanced ? 0 : undefined),
+                  await getTokenState(client, contract, processID, encoding.isInstanced ? instanceID : undefined),
                   0,
                   `subModel ${subModel.modelID} (processID: ${processID}) tokenState not 0!`,
                 );
@@ -232,7 +231,7 @@ describe.only("Execute all contracts by replaying xes logs in output/contracts",
               // make a NOOP call to confirm deployment and to trigger any automated decisions
               // NOTE: this is to account for models implementing anti-patterns,
               // automated decisions pre task execution should be moved into the constructor.
-              await enact(client, wallets[0], contract, "enact", 0, encoding.isInstanced ? 0 : undefined);
+              await enact(client, wallets[0], contract, "enact", 0, encoding.isInstanced ? instanceID : undefined);
 
               const context: EventProcessingContext = {
                 client,
@@ -240,7 +239,7 @@ describe.only("Execute all contracts by replaying xes logs in output/contracts",
                 contract,
                 encoding,
                 networkHelpers,
-                instance: encoding.isInstanced ? 0 : undefined
+                instance: encoding.isInstanced ? instanceID : undefined
               };
 
               let eventsRejected = 0;
@@ -272,7 +271,7 @@ describe.only("Execute all contracts by replaying xes logs in output/contracts",
                 client,
                 contract,
                 hasSubChoreos(encoding) ? 0 : null,
-                encoding.isInstanced ? 0 : undefined
+                encoding.isInstanced ? instanceID : undefined
               );
 
               assert(

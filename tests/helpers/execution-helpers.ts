@@ -37,7 +37,7 @@ export interface EventProcessingContext {
   contract: any;
   encoding: TriggerEncoding;
   networkHelpers: NetworkHelpers<"generic">;
-  instance?: number;
+  instance?: `0x${string}`;
 }
 
 export interface EventProcessingHooks {
@@ -364,7 +364,7 @@ export async function getTokenState(
   client: PublicClient,
   contract: any,
   processID: number | null,
-  instanceID?: number,
+  instanceID?: `0x${string}`,
 ) {
   const args = instanceID !== undefined ? [instanceID] : [];
 
@@ -439,7 +439,7 @@ export async function enact(
   contract: any,
   functionName: string,
   taskID: number,
-  instanceID?: number,
+  instanceID?: `0x${string}`,
 ) {
   const args = instanceID !== undefined ? [instanceID, taskID] : [taskID];
   return await write(client, wallet, contract, functionName, args);
@@ -450,7 +450,7 @@ export async function dataSet(
   wallet: WalletClient,
   contract: any,
   dataChange: InstanceDataChange[],
-  instanceID?: number,
+  instanceID?: `0x${string}`,
 ) {
   for (const el of dataChange) {
     const functionName = "set" + capitalize(el.variable);
@@ -472,7 +472,7 @@ export async function dataTask(
   wallet: WalletClient,
   contract: any,
   event: Event,
-  instanceID?: number,
+  instanceID?: `0x${string}`,
 ) {
   if (event.dataChange == null) {
     return;
@@ -577,16 +577,34 @@ export async function getEnabled(
 }
 
 export function computeChannelID(
-  instanceID: bigint | number,
+  instanceID: `0x${string}`,
   participants: `0x${string}`[],
   resolveContract: `0x${string}`,
 ) {
-  // Ensure instanceID is BigInt for ABI encoding
-  const instance = typeof instanceID === "bigint" ? instanceID : BigInt(instanceID);
   return keccak256(
     encodeAbiParameters(
-      parseAbiParameters("uint, address[], address"),
-      [instance, participants, resolveContract],
+      parseAbiParameters("bytes32, address[], address"),
+      [instanceID, participants, resolveContract],
+    ),
+  );
+}
+
+export function computeInstanceID(
+  _nounce: bigint | number,
+  participants: `0x${string}`[],
+) {
+  // Ensure nonce is BigInt for ABI encoding
+  const nounce = typeof _nounce === "bigint" ? _nounce : BigInt(_nounce);
+
+  // Choose a fixed-size address array type when participants length is known
+  // (e.g. address[3]) — otherwise fall back to dynamic address[].
+  const addrType = participants && participants.length > 0 ? `address[${participants.length}]` : "address[]";
+  const abiTypes = `uint256, ${addrType}`;
+
+  return keccak256(
+    encodeAbiParameters(
+      parseAbiParameters(abiTypes),
+      [nounce, participants],
     ),
   );
 }

@@ -17,12 +17,12 @@ contract {{{modelID}}} is {{#if isInstanced}}IProcessInstance{{else}}IProcess{{/
 
   {{> constructor }}
 
-  function getTokenState({{#if isInstanced}}uint instanceID{{/if}}) external view returns (uint) {
+  function getTokenState({{#if isInstanced}}bytes32 instanceID{{/if}}) external view returns (uint) {
     return {{> tokenstate id=0 }};
   }
 
   {{! ---- // Main Enact Function ---- }}
-  function enact({{#if isInstanced}}uint instanceID, {{/if}}uint id) {{#if hasDataTasks}}public{{else}}external{{/if}} {
+  function enact({{#if isInstanced}}bytes32 instanceID, {{/if}}uint id) {{#if hasDataTasks}}public{{else}}external{{/if}} {
     {{> states }}
   }
   {{! ---- // Tasks that set casevariables ---- }}

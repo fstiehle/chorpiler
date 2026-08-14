@@ -2,16 +2,16 @@
 
 {{!// ---- Call Interface ----- }}
 interface IInstanceCall {
-  function instance(address[] memory participants) external returns (uint);
-  function enact(uint instance, uint id) external;
-  function getTokenState(uint instance) external view returns (uint);
+  function instance(uint nonce, address[] memory participants) external returns (bytes32);
+  function enact(bytes32 instance, uint id) external;
+  function getTokenState(bytes32 instance) external view returns (uint);
 }
 {{#each callList}}
 
 {{!// ---- Initate Call Contract interfaces ----- }}
 // Interface for {{{name}}}
 interface I{{{name}}} is IInstanceCall {
-  function instance(address[{{{numberOfParticipants}}}] memory participants) external returns (uint);
+  function instance(uint nonce, address[{{{numberOfParticipants}}}] memory participants) external returns (bytes32);
 }
 I{{{name}}} constant {{name}} = I{{{name}}}({{address}});
 {{/each}}

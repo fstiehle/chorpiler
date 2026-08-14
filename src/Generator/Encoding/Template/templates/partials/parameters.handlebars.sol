@@ -1,14 +1,14 @@
 {{!// ---- Call Support ----- }}
 {{#if hasCalls}}
-uint[{{{numberOfCalls}}}] private instanceList; // instanceIDs for calls
+bytes32[{{{numberOfCalls}}}] private instanceList; // instanceIDs for calls
+uint private nextID; // nonce list for calls
 {{#if options.events}}
-event NewInstance(uint id, uint instanceID);
+event NewInstance(uint id, bytes32 instanceID);
 {{/if}}
 {{/if}}
 {{!// ---- Instance Support: list of process data ----- }}
 {{#if isInstanced}}
-mapping(uint => IProcessInstance.InstanceData) public instanceData;
-uint private nextId = 0;
+mapping(bytes32 => IProcessInstance.InstanceData) public instanceData;
 {{else}}
 {{!// ---- Non-Instanced Contract ----- }}
 {{!// ---- Sub Process Support ----- }}

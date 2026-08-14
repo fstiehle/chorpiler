@@ -11,7 +11,7 @@ import { network } from "hardhat";
 import { strict as assert } from "node:assert";
 import { describe, it, beforeEach, afterEach } from "node:test";
 import { encodeAbiParameters, keccak256, parseAbiParameters, toHex, encodePacked } from "viem";
-import { debugLog } from "./helpers/execution-helpers.js";
+import { computeInstanceID, debugLog } from "./helpers/execution-helpers.js";
 import type { Address, Hex } from "viem";
 
 const { viem, networkHelpers, networkName } = await network.connect();
@@ -83,8 +83,8 @@ describe("ChannelRoot Contract Tests", () => {
 
   describe("Channel Registration", () => {
     it("should register a new channel successfully", async () => {
-      const instanceID = 1n;
       const participants = [wallets[0].account!.address, wallets[1].account!.address];
+      const instanceID = computeInstanceID(0, participants);
       const resolveContract = wallets[2].account!.address; // Mock resolve contract address
 
       const channel = {
@@ -104,7 +104,7 @@ describe("ChannelRoot Contract Tests", () => {
       // Calculate the expected channel ID
       const channelID = keccak256(
         encodeAbiParameters(
-          parseAbiParameters("uint, address[], address"),
+          parseAbiParameters("bytes32, address[], address"),
           [instanceID, participants, resolveContract]
         )
       );
@@ -121,8 +121,8 @@ describe("ChannelRoot Contract Tests", () => {
     });
 
     it("should prevent duplicate channel registration", async () => {
-      const instanceID = 2n;
       const participants = [wallets[0].account!.address, wallets[1].account!.address];
+      const instanceID = computeInstanceID(2, participants);
       const resolveContract = wallets[2].account!.address;
 
       const channel = {
@@ -157,13 +157,13 @@ describe("ChannelRoot Contract Tests", () => {
       const resolveContract = wallets[2].account!.address;
 
       const channel1 = {
-        instanceID: 10n,
+        instanceID: computeInstanceID(10, participants),
         participants,
         resolveContract,
       };
 
       const channel2 = {
-        instanceID: 20n,
+        instanceID: computeInstanceID(20, participants),
         participants,
         resolveContract,
       };
@@ -185,17 +185,16 @@ describe("ChannelRoot Contract Tests", () => {
     });
 
     it("should handle channels with different participant sets", async () => {
-      const instanceID = 30n;
       const resolveContract = wallets[4].account!.address;
 
       const channel1 = {
-        instanceID,
+        instanceID: computeInstanceID(30, [wallets[0].account!.address, wallets[1].account!.address]),
         participants: [wallets[0].account!.address, wallets[1].account!.address],
         resolveContract,
       };
 
       const channel2 = {
-        instanceID,
+        instanceID: computeInstanceID(30, [wallets[2].account!.address, wallets[3].account!.address]),
         participants: [wallets[2].account!.address, wallets[3].account!.address],
         resolveContract,
       };
@@ -223,8 +222,8 @@ describe("ChannelRoot Contract Tests", () => {
 
     beforeEach(async () => {
       // Setup: Register a channel for verification tests
-      const instanceID = 100n;
       participants = [wallets[0].account!.address, wallets[1].account!.address];
+      const instanceID = computeInstanceID(100, participants);
       const resolveContract = wallets[2].account!.address;
 
       const channel = {
@@ -240,7 +239,7 @@ describe("ChannelRoot Contract Tests", () => {
 
       channelID = keccak256(
         encodeAbiParameters(
-          parseAbiParameters("uint, address[], address"),
+          parseAbiParameters("bytes32, address[], address"),
           [instanceID, participants, resolveContract]
         )
       );
@@ -393,8 +392,8 @@ describe("ChannelRoot Contract Tests", () => {
 
   describe("Edge Cases", () => {
     it("should handle channel with single participant", async () => {
-      const instanceID = 200n;
       const participants = [wallets[0].account!.address];
+      const instanceID = computeInstanceID(200, participants);
       const resolveContract = wallets[1].account!.address;
 
       const channel = {
@@ -411,7 +410,7 @@ describe("ChannelRoot Contract Tests", () => {
 
       const channelID = keccak256(
         encodeAbiParameters(
-          parseAbiParameters("uint, address[], address"),
+          parseAbiParameters("bytes32, address[], address"),
           [instanceID, participants, resolveContract]
         )
       );
@@ -443,8 +442,8 @@ describe("ChannelRoot Contract Tests", () => {
     });
 
     it("should handle channel with many participants", async () => {
-      const instanceID = 300n;
       const participants = wallets.slice(0, 5).map((w) => w.account!.address);
+      const instanceID = computeInstanceID(300, participants);
       const resolveContract = wallets[5].account!.address;
 
       const channel = {

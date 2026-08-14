@@ -12,36 +12,45 @@ interface IProcessInstance {
     address[2] participants;
     InstanceState state;
   }
-  function enact(uint instanceID, uint id) external;
-  function getTokenState(uint instanceID) external view returns (uint);
-  function instance(address[2] memory participants) external returns (uint);
+  function enact(bytes32 instanceID, uint id) external;
+  function getTokenState(bytes32 instanceID) external view returns (uint);
+  function instance(uint nonce, address[2] memory participants) external returns (bytes32);
 }
 
 
 contract Choreography_0betnp1 is IProcessInstance {
-  mapping(uint => IProcessInstance.InstanceData) public instanceData;
-  uint private nextId = 0;
+  mapping(bytes32 => IProcessInstance.InstanceData) public instanceData;
   event Task(uint id);
   
 
-  function instance(address[2] memory _participants) external returns (uint) {
-    uint newId = nextId;
-    instanceData[newId] = IProcessInstance.InstanceData({
+  function instance(uint _nonce, address[2] memory _participants) external returns (bytes32) {
+    bytes32 id = keccak256(
+      abi.encode(
+        _nonce,
+        _participants
+      )
+    );
+    // write to channel if id doesn't exist yet
+    require(
+      instanceData[id].state.tokenState == 0,
+      "instance already exists"
+    );
+    instanceData[id] = IProcessInstance.InstanceData({
       participants: _participants,
       state: IProcessInstance.InstanceState({
         tokenState: 1,
         order: 0
       })
     });
-    nextId = newId + 1;
-    return newId;
+    console.log("Choreography_0betnp1: new instance registered with ID (see below)"); console.logBytes32(id);
+    return id;
   }
 
-  function getTokenState(uint instanceID) external view returns (uint) {
+  function getTokenState(bytes32 instanceID) external view returns (uint) {
     return instanceData[instanceID].state.tokenState;
   }
 
-  function enact(uint instanceID, uint id) external {
+  function enact(bytes32 instanceID, uint id) external {
     uint _tokenState = instanceData[instanceID].state.tokenState;
     
     console.log(

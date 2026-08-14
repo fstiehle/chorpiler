@@ -11,7 +11,8 @@ _tokenState &= ~uint({{{consume}}});
 {{/if}}
 {{#if isCall}}
 {{! // ---- Call Choreo Support: call external contract ---- }}
-instanceList[{{{outTo.id}}}] = {{{outTo.name}}}.instance([{{{outTo.participants}}}]);
+instanceList[{{{outTo.id}}}] = {{{outTo.name}}}.instance(nextID, [{{{outTo.participants}}}]);
+nextID = nextID + 1;
 {{! // ---- Event Support ---- }}
 {{#if options.events}}
 emit NewInstance({{{outTo.id}}}, instanceList[{{{outTo.id}}}]);

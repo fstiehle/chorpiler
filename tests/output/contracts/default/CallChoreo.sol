@@ -10,20 +10,21 @@ interface IProcess {
 
 
 interface IInstanceCall {
-  function instance(address[] memory participants) external returns (uint);
-  function enact(uint instance, uint id) external;
-  function getTokenState(uint instance) external view returns (uint);
+  function instance(uint nonce, address[] memory participants) external returns (bytes32);
+  function enact(bytes32 instance, uint id) external;
+  function getTokenState(bytes32 instance) external view returns (uint);
 }
 
 // Interface for Choreography_0betnp1
 interface IChoreography_0betnp1 is IInstanceCall {
-  function instance(address[2] memory participants) external returns (uint);
+  function instance(uint nonce, address[2] memory participants) external returns (bytes32);
 }
 IChoreography_0betnp1 constant Choreography_0betnp1 = IChoreography_0betnp1(0x0000000000000000000000000000000000000000);
 
 contract CallChoreo is IProcess {
-  uint[1] private instanceList; // instanceIDs for calls
-  event NewInstance(uint id, uint instanceID);
+  bytes32[1] private instanceList; // instanceIDs for calls
+  uint private nextID; // nonce list for calls
+  event NewInstance(uint id, bytes32 instanceID);
   uint private tokenState = 1;
   address[3] public participants;
   event Task(uint id);
@@ -75,7 +76,8 @@ contract CallChoreo is IProcess {
         if (order == 1) {
           // <---  auto transition  --->
           _tokenState &= ~uint(2);
-          instanceList[0] = Choreography_0betnp1.instance([participants[0], participants[2]]);
+          instanceList[0] = Choreography_0betnp1.instance(nextID, [participants[0], participants[2]]);
+          nextID = nextID + 1;
           emit NewInstance(0, instanceList[0]);
           _tokenState |= 4;
           continue;

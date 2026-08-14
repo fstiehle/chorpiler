@@ -1,12 +1,27 @@
 {{!// ---- Instanced Contract: No constructor but instance() ---- }}
 {{#if isInstanced}}
-function instance(address[{{{numberOfParticipants}}}] memory _participants) external returns (uint) {
-  uint newId = nextId;
+function instance(uint _nonce, address[{{{numberOfParticipants}}}] memory _participants) external returns (bytes32) {
+  bytes32 id = keccak256(
+    abi.encode(
+      _nonce,
+      _participants
+    )
+  );
+  // write to channel if id doesn't exist yet
   {{#if hasSubProcesses}}
+  require(
+    instanceData[id].state.tokenState[0] == 0,
+    "instance already exists"
+  );
   uint[{{{numberOfProcesses}}}] memory newTokenState;
   newTokenState[0] = 1;
+  {{else}}
+  require(
+    instanceData[id].state.tokenState == 0,
+    "instance already exists"
+  );
   {{/if}}
-  instanceData[newId] = IProcessInstance.InstanceData({
+  instanceData[id] = IProcessInstance.InstanceData({
     {{#if isChannel}}
     disputeMadeAtUNIX: 0,
     {{/if}}
@@ -25,8 +40,11 @@ function instance(address[{{{numberOfParticipants}}}] memory _participants) exte
       {{/each}}
     })
   });
-  nextId = newId + 1;
-  return newId;
+  {{!// ---- Debug Support ----- }}
+  {{#if options.debug}}
+  console.log("{{{modelID}}}: new instance registered with ID (see below)"); console.logBytes32(id);
+  {{/if}}
+  return id;
 }
 {{else}}
 {{!// ---- Non-Instanced Contract: normal constructor ---- }}
