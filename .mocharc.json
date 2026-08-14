@@ -1,5 +1,0 @@
-{
-  "extension": ["ts"],
-  "require": ["tsx", "hardhat/register"],
-  "timeout": 40000
-}

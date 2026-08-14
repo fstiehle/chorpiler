@@ -1,19 +1,19 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <log xes.version="1.0">
 	<global scope="event">
-		<string key="concept:name" value="Task Name"/>
-		<string key="sourceRef" value="Participant ID"/>
+		<string key="concept:name" value="Task Name" />
+		<string key="sourceRef" value="Participant ID" />
 	</global>
 
   {{#traces}}
-  <trace>
+  <trace id="{{id}}">
     {{#events}}
     <event>
-      <string key="concept:name" value="{{name}}"/>
-      <string key="id" value="{{id}}"/>
-      <string key="sourceRef" value="{{source}}"/>
+      <string key="concept:name" value="{{name}}" />
+      <string key="id" value="{{id}}" />
+      <string key="sourceRef" value="{{source}}" />
       {{#dataChange}}
-      <boolean key="{{{variable}}}" value="{{{val}}}"/>
+      <boolean key="{{{variable}}}" value="{{{val}}}" />
       {{/dataChange}}
     </event>
     {{/events}}

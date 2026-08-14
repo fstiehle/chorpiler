@@ -1,0 +1,403 @@
+<ns0:definitions xmlns:ns0="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:ns2="http://www.signavio.com" xmlns:ns3="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:ns4="http://www.omg.org/spec/DD/20100524/DC" xmlns:ns5="http://www.omg.org/spec/DD/20100524/DI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" exporter="Signavio Process Editor, http://www.signavio.com" exporterVersion="19.1.2" expressionLanguage="http://www.w3.org/TR/XPath" id="sid-a9a6ebd3-0798-4e15-b451-dd474bd94902" targetNamespace="http://www.signavio.com" typeLanguage="http://www.w3.org/2001/XMLSchema" xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL http://www.omg.org/spec/BPMN/2.0/20100501/BPMN20.xsd">
+  <ns0:message id="sid-00e1b46c-e485-4551-a17b-6f0c3f21ec2c" name="order(string product)"></ns0:message>
+  <ns0:message id="sid-624ca53e-cc27-4a74-97be-055cb19cae54" name="offer(uint price)"></ns0:message>
+  <ns0:message id="sid-72ee2908-7c6b-4b9e-a80b-4734a6b2cb0b" name="confirmation(bool accepted, bool reiterate)"></ns0:message>
+  <ns0:message id="sid-abba267c-92e3-4944-a98a-d317e035c861" name="withdraw(string motivation)"></ns0:message>
+  <ns0:message id="sid-e385b492-6b2b-475b-a8dd-8fc09513393b" name="shipInfo(string shipAddress)"></ns0:message>
+  <ns0:message id="sid-b9828a39-b70d-4470-b5d2-61cda9b2bc64" name="payment(uint amount)"></ns0:message>
+  <ns0:message id="sid-2F272EDB-9940-467E-AADC-2B485679AF43" name="shipment(string shipInfo)"></ns0:message>
+  <ns0:message id="sid-06caa7c5-fba5-4524-8d4d-2f24b1d51468" name="invoice(string invoiceInfo)"></ns0:message>
+  <ns0:message id="sid-98454827-3add-4331-b915-ccdacd7dc42e" name="order(string product)"></ns0:message>
+  <ns0:message id="sid-aced5f0f-2b63-4689-b77a-a228772014e1" name="confirmation(bool accepted, bool reiterate)"></ns0:message>
+  <ns0:message id="sid-4638761f-b1a6-4c4e-ba04-be0479beccfd" name="offer(uint price)"></ns0:message>
+  <ns0:message id="sid-d92c4d30-d34c-4abb-926e-cad484f1a490" name="withdraw(string motivation)"></ns0:message>
+  <ns0:message id="sid-c95c8f14-780d-4359-a1c5-6a510bb4d95d" name="shipInfo(string shipAddress)"></ns0:message>
+  <ns0:message id="sid-47973223-10e9-4225-a768-052993b0d9be" name="payment(uint amount)"></ns0:message>
+  <ns0:message id="sid-c71afe96-532c-49a2-b601-cb037107488d" name="shipment(string shipInfo)"></ns0:message>
+  <ns0:message id="sid-4dd56c19-f796-43e3-9ff2-af26013f9b91" name="invoice(string invoiceInfo)"></ns0:message>
+  <ns0:choreography id="sid_992f678d_eae2_427f_a791_b1cde70e5745" isClosed="false">
+    <ns0:participant id="sid-91d77630-3cf5-449b-b894-2aa6498b4ca4" name="Buyer"></ns0:participant>
+    <ns0:participant id="sid-260ebe9c-f089-49f5-a083-42bd9e9bd309" name="Seller"></ns0:participant>
+    <ns0:participant id="sid-b7831095-49d6-4384-ab5d-c033ed6d3ad5" name="Seller"></ns0:participant>
+    <ns0:participant id="sid-0013c0ea-32b1-4b1d-a4c6-dfc98851dd01" name="Buyer"></ns0:participant>
+    <ns0:participant id="sid-9d2b142c-fe64-4606-9c44-f22a5bc79cfc" name="Buyer"></ns0:participant>
+    <ns0:participant id="sid-37e6ff60-a2b9-4483-b9d6-31647a979c32" name="Seller"></ns0:participant>
+    <ns0:participant id="sid-ba907c8e-f205-48b8-990a-5a93d3a70c8d" name="Buyer"></ns0:participant>
+    <ns0:participant id="sid-458f9527-cebd-4106-bb33-8302d8fe37dc" name="Seller"></ns0:participant>
+    <ns0:participant id="sid-da2dd6f1-31e6-433d-81a1-ae8db9d8d647" name="Buyer"></ns0:participant>
+    <ns0:participant id="sid-b0303e79-5042-40d6-8f25-8285ec369319" name="Seller"></ns0:participant>
+    <ns0:participant id="sid-8c233881-e420-4414-bc8e-b44a4e5bd8bc" name="Seller"></ns0:participant>
+    <ns0:participant id="sid-40187acc-824a-4a3a-ba92-54e06d9901cd" name="Buyer"></ns0:participant>
+    <ns0:participant id="sid-0b7ef39f-6aaa-42a5-8661-d034064cbaad" name="Seller"></ns0:participant>
+    <ns0:participant id="sid-2d60826f-9d3e-42e1-b37c-7b46446b75a4" name="Buyer"></ns0:participant>
+    <ns0:messageFlow id="sid-df721ee0-20b7-4cf4-8e47-af87f739be69" messageRef="sid-98454827-3add-4331-b915-ccdacd7dc42e" sourceRef="sid-91d77630-3cf5-449b-b894-2aa6498b4ca4" targetRef="sid-260ebe9c-f089-49f5-a083-42bd9e9bd309"></ns0:messageFlow>
+    <ns0:messageFlow id="sid-e9f7f8a3-9533-4ac9-9335-85b5de2d9b09" messageRef="sid-aced5f0f-2b63-4689-b77a-a228772014e1" sourceRef="sid-b7831095-49d6-4384-ab5d-c033ed6d3ad5" targetRef="sid-0013c0ea-32b1-4b1d-a4c6-dfc98851dd01"></ns0:messageFlow>
+    <ns0:messageFlow id="sid-62bd4caf-9f46-4c58-8d6e-43df9a4954f9" messageRef="sid-4638761f-b1a6-4c4e-ba04-be0479beccfd" sourceRef="sid-0013c0ea-32b1-4b1d-a4c6-dfc98851dd01" targetRef="sid-b7831095-49d6-4384-ab5d-c033ed6d3ad5"></ns0:messageFlow>
+    <ns0:messageFlow id="sid-20101219-2e5d-46a8-a022-277f963a6675" messageRef="sid-d92c4d30-d34c-4abb-926e-cad484f1a490" sourceRef="sid-9d2b142c-fe64-4606-9c44-f22a5bc79cfc" targetRef="sid-37e6ff60-a2b9-4483-b9d6-31647a979c32"></ns0:messageFlow>
+    <ns0:messageFlow id="sid-5e181094-c615-4aac-aef0-e7901afe0e56" messageRef="sid-c95c8f14-780d-4359-a1c5-6a510bb4d95d" sourceRef="sid-ba907c8e-f205-48b8-990a-5a93d3a70c8d" targetRef="sid-458f9527-cebd-4106-bb33-8302d8fe37dc"></ns0:messageFlow>
+    <ns0:messageFlow id="sid-28dabd10-48a6-4adc-9234-898806ccc063" messageRef="sid-47973223-10e9-4225-a768-052993b0d9be" sourceRef="sid-da2dd6f1-31e6-433d-81a1-ae8db9d8d647" targetRef="sid-b0303e79-5042-40d6-8f25-8285ec369319"></ns0:messageFlow>
+    <ns0:messageFlow id="sid-6822ce31-cdcd-45f2-b1c1-41054ad25b76" messageRef="sid-c71afe96-532c-49a2-b601-cb037107488d" sourceRef="sid-8c233881-e420-4414-bc8e-b44a4e5bd8bc" targetRef="sid-40187acc-824a-4a3a-ba92-54e06d9901cd"></ns0:messageFlow>
+    <ns0:messageFlow id="sid-a3161fbb-5ec5-4ec2-9934-cb8607141e1f" messageRef="sid-4dd56c19-f796-43e3-9ff2-af26013f9b91" sourceRef="sid-0b7ef39f-6aaa-42a5-8661-d034064cbaad" targetRef="sid-2d60826f-9d3e-42e1-b37c-7b46446b75a4"></ns0:messageFlow>
+    <ns0:startEvent id="sid-0EC70E7E-A42A-4C9E-B120-16B25BDACE7A" isInterrupting name="">
+      <ns0:outgoing>sid-6BFD2DBA-69AD-4793-AEF9-7250E705C43D</ns0:outgoing>
+    </ns0:startEvent>
+    <ns0:choreographyTask id="sid-7D873213-2244-48EB-B043-2D234DC60BFE" initiatingParticipantRef="sid-91d77630-3cf5-449b-b894-2aa6498b4ca4" loopType="None" name="Select&amp;#10;Product">
+      <ns0:incoming>sid-6BFD2DBA-69AD-4793-AEF9-7250E705C43D</ns0:incoming>
+      <ns0:outgoing>sid-636B8B6F-84E1-40ED-94D3-508D141C77B6</ns0:outgoing>
+      <ns0:participantRef>sid-91d77630-3cf5-449b-b894-2aa6498b4ca4</ns0:participantRef>
+      <ns0:participantRef>sid-260ebe9c-f089-49f5-a083-42bd9e9bd309</ns0:participantRef>
+      <ns0:messageFlowRef>sid-df721ee0-20b7-4cf4-8e47-af87f739be69</ns0:messageFlowRef>
+    </ns0:choreographyTask>
+    <ns0:choreographyTask id="sid-568A1539-A6F2-40B1-83FC-3502C87561C4" initiatingParticipantRef="sid-b7831095-49d6-4384-ab5d-c033ed6d3ad5" loopType="None" name="Make&amp;#10;Offer">
+      <ns0:incoming>sid-8090FED0-B02A-4B2A-A8D9-E3459096F64F</ns0:incoming>
+      <ns0:outgoing>sid-B4BC47BA-FB2E-4E2E-97FF-6FC9542AA182</ns0:outgoing>
+      <ns0:participantRef>sid-b7831095-49d6-4384-ab5d-c033ed6d3ad5</ns0:participantRef>
+      <ns0:participantRef>sid-0013c0ea-32b1-4b1d-a4c6-dfc98851dd01</ns0:participantRef>
+      <ns0:messageFlowRef>sid-e9f7f8a3-9533-4ac9-9335-85b5de2d9b09</ns0:messageFlowRef>
+      <ns0:messageFlowRef>sid-62bd4caf-9f46-4c58-8d6e-43df9a4954f9</ns0:messageFlowRef>
+    </ns0:choreographyTask>
+    <ns0:choreographyTask id="sid-4C0BFF22-299A-4EB1-8102-894FDFC03826" initiatingParticipantRef="sid-9d2b142c-fe64-4606-9c44-f22a5bc79cfc" loopType="None" name="Withdraw &amp;#10;Order">
+      <ns0:incoming>sid-1118CB7A-2EC0-47DD-9515-439BB93021DB</ns0:incoming>
+      <ns0:outgoing>sid-D156068F-EA21-45FA-948F-7DC38A9139F8</ns0:outgoing>
+      <ns0:participantRef>sid-9d2b142c-fe64-4606-9c44-f22a5bc79cfc</ns0:participantRef>
+      <ns0:participantRef>sid-37e6ff60-a2b9-4483-b9d6-31647a979c32</ns0:participantRef>
+      <ns0:messageFlowRef>sid-20101219-2e5d-46a8-a022-277f963a6675</ns0:messageFlowRef>
+    </ns0:choreographyTask>
+    <ns0:choreographyTask id="sid-B528635E-917C-42B8-82F4-889D80CFE8EC" initiatingParticipantRef="sid-ba907c8e-f205-48b8-990a-5a93d3a70c8d" loopType="None" name="Shipment&amp;#10;Delivery&amp;#10;Address">
+      <ns0:incoming>sid-7E6D84AD-449F-4DCB-982C-3F831DAB6940</ns0:incoming>
+      <ns0:outgoing>sid-2622A3BA-3FC2-436F-B36F-3DDEBF93FBF0</ns0:outgoing>
+      <ns0:participantRef>sid-ba907c8e-f205-48b8-990a-5a93d3a70c8d</ns0:participantRef>
+      <ns0:participantRef>sid-458f9527-cebd-4106-bb33-8302d8fe37dc</ns0:participantRef>
+      <ns0:messageFlowRef>sid-5e181094-c615-4aac-aef0-e7901afe0e56</ns0:messageFlowRef>
+    </ns0:choreographyTask>
+    <ns0:choreographyTask id="sid-EB9F3CEF-3A7F-475B-8E49-D6D7A5334DCF" initiatingParticipantRef="sid-da2dd6f1-31e6-433d-81a1-ae8db9d8d647" loopType="None" name="Make&amp;#10;Payment">
+      <ns0:incoming>sid-2622A3BA-3FC2-436F-B36F-3DDEBF93FBF0</ns0:incoming>
+      <ns0:outgoing>sid-125FBBD2-B435-4E37-BAAF-7F691AAB5E8C</ns0:outgoing>
+      <ns0:participantRef>sid-da2dd6f1-31e6-433d-81a1-ae8db9d8d647</ns0:participantRef>
+      <ns0:participantRef>sid-b0303e79-5042-40d6-8f25-8285ec369319</ns0:participantRef>
+      <ns0:messageFlowRef>sid-28dabd10-48a6-4adc-9234-898806ccc063</ns0:messageFlowRef>
+    </ns0:choreographyTask>
+    <ns0:choreographyTask id="sid-9A3D5DF3-D2CA-48BE-A55C-9F145103FC98" initiatingParticipantRef="sid-8c233881-e420-4414-bc8e-b44a4e5bd8bc" loopType="None" name="Ship&amp;#10;Product">
+      <ns0:incoming>sid-2942A703-9C60-46CA-8C19-BC4839F9BFBB</ns0:incoming>
+      <ns0:outgoing>sid-171FD5C9-40C2-4840-8C3A-BC765DF2E55E</ns0:outgoing>
+      <ns0:participantRef>sid-8c233881-e420-4414-bc8e-b44a4e5bd8bc</ns0:participantRef>
+      <ns0:participantRef>sid-40187acc-824a-4a3a-ba92-54e06d9901cd</ns0:participantRef>
+      <ns0:messageFlowRef>sid-6822ce31-cdcd-45f2-b1c1-41054ad25b76</ns0:messageFlowRef>
+    </ns0:choreographyTask>
+    <ns0:choreographyTask id="sid-E29E4FE6-2328-431A-B818-DD64BF03AA99" initiatingParticipantRef="sid-0b7ef39f-6aaa-42a5-8661-d034064cbaad" loopType="None" name="Send&amp;#10;Invoice">
+      <ns0:incoming>sid-B5BC1661-2F62-4616-8C20-CEAF156F4B8B</ns0:incoming>
+      <ns0:outgoing>sid-9B732C99-27D1-4C72-AE92-181B4245FBD5</ns0:outgoing>
+      <ns0:participantRef>sid-0b7ef39f-6aaa-42a5-8661-d034064cbaad</ns0:participantRef>
+      <ns0:participantRef>sid-2d60826f-9d3e-42e1-b37c-7b46446b75a4</ns0:participantRef>
+      <ns0:messageFlowRef>sid-a3161fbb-5ec5-4ec2-9934-cb8607141e1f</ns0:messageFlowRef>
+    </ns0:choreographyTask>
+    <ns0:exclusiveGateway gatewayDirection="Converging" id="sid-C240C6E9-F55F-46A5-B1F6-5FC4A0F30B04" name="" default="sid-8090FED0-B02A-4B2A-A8D9-E3459096F64F">
+      <ns0:incoming>sid-636B8B6F-84E1-40ED-94D3-508D141C77B6</ns0:incoming>
+      <ns0:incoming>sid-41D580FD-2D3C-42DC-96D2-EB1021EF1306</ns0:incoming>
+      <ns0:outgoing>sid-8090FED0-B02A-4B2A-A8D9-E3459096F64F</ns0:outgoing>
+    </ns0:exclusiveGateway>
+    <ns0:exclusiveGateway gatewayDirection="Diverging" id="sid-E2CFD2E8-7869-4F28-AC83-296ED8FA7D6E" name="" default="sid-B713DF69-430C-4342-80C5-F98440869920">
+      <ns0:incoming>sid-B4BC47BA-FB2E-4E2E-97FF-6FC9542AA182</ns0:incoming>
+      <ns0:outgoing>sid-B713DF69-430C-4342-80C5-F98440869920</ns0:outgoing>
+      <ns0:outgoing>sid-D5172F3E-7EC8-4CA4-82B1-27E54197E62B</ns0:outgoing>
+    </ns0:exclusiveGateway>
+    <ns0:exclusiveGateway gatewayDirection="Diverging" id="sid-80A4BF32-23C1-4585-A70C-26A40D63DA7F" name="" default="sid-41D580FD-2D3C-42DC-96D2-EB1021EF1306">
+      <ns0:incoming>sid-D5172F3E-7EC8-4CA4-82B1-27E54197E62B</ns0:incoming>
+      <ns0:outgoing>sid-41D580FD-2D3C-42DC-96D2-EB1021EF1306</ns0:outgoing>
+      <ns0:outgoing>sid-65578510-C3B1-407F-8438-C5F4216F4B0E</ns0:outgoing>
+    </ns0:exclusiveGateway>
+    <ns0:eventBasedGateway eventGatewayType="Exclusive" gatewayDirection="Diverging" id="sid-94C810EF-69BE-4D67-91B8-4A34DF4D1940" instantiate="false" name="">
+      <ns0:incoming>sid-B713DF69-430C-4342-80C5-F98440869920</ns0:incoming>
+      <ns0:outgoing>sid-1118CB7A-2EC0-47DD-9515-439BB93021DB</ns0:outgoing>
+      <ns0:outgoing>sid-7E6D84AD-449F-4DCB-982C-3F831DAB6940</ns0:outgoing>
+    </ns0:eventBasedGateway>
+    <ns0:parallelGateway gatewayDirection="Diverging" id="sid-0663CB4E-D3BF-4E12-8D81-D68E9318355F" name="">
+      <ns0:incoming>sid-125FBBD2-B435-4E37-BAAF-7F691AAB5E8C</ns0:incoming>
+      <ns0:outgoing>sid-2942A703-9C60-46CA-8C19-BC4839F9BFBB</ns0:outgoing>
+      <ns0:outgoing>sid-B5BC1661-2F62-4616-8C20-CEAF156F4B8B</ns0:outgoing>
+    </ns0:parallelGateway>
+    <ns0:parallelGateway gatewayDirection="Converging" id="sid-CCD2A372-D382-426E-B823-05F778D4EA44" name="">
+      <ns0:incoming>sid-171FD5C9-40C2-4840-8C3A-BC765DF2E55E</ns0:incoming>
+      <ns0:incoming>sid-9B732C99-27D1-4C72-AE92-181B4245FBD5</ns0:incoming>
+      <ns0:outgoing>sid-313505D9-092F-4F91-AD6C-B3B6D8CCFDB8</ns0:outgoing>
+    </ns0:parallelGateway>
+    <ns0:endEvent id="sid-859C73C7-F0DD-45ED-AA88-E0DEA0340C91" name="">
+      <ns0:incoming>sid-D156068F-EA21-45FA-948F-7DC38A9139F8</ns0:incoming>
+      <ns0:incoming>sid-313505D9-092F-4F91-AD6C-B3B6D8CCFDB8</ns0:incoming>
+      <ns0:incoming>sid-65578510-C3B1-407F-8438-C5F4216F4B0E</ns0:incoming>
+    </ns0:endEvent>
+    <ns0:sequenceFlow id="sid-6BFD2DBA-69AD-4793-AEF9-7250E705C43D" isImmediate name="" sourceRef="sid-0EC70E7E-A42A-4C9E-B120-16B25BDACE7A" targetRef="sid-7D873213-2244-48EB-B043-2D234DC60BFE"></ns0:sequenceFlow>
+    <ns0:sequenceFlow id="sid-636B8B6F-84E1-40ED-94D3-508D141C77B6" isImmediate name="" sourceRef="sid-7D873213-2244-48EB-B043-2D234DC60BFE" targetRef="sid-C240C6E9-F55F-46A5-B1F6-5FC4A0F30B04"></ns0:sequenceFlow>
+    <ns0:sequenceFlow id="sid-8090FED0-B02A-4B2A-A8D9-E3459096F64F" isImmediate name="" sourceRef="sid-C240C6E9-F55F-46A5-B1F6-5FC4A0F30B04" targetRef="sid-568A1539-A6F2-40B1-83FC-3502C87561C4"></ns0:sequenceFlow>
+    <ns0:sequenceFlow id="sid-B4BC47BA-FB2E-4E2E-97FF-6FC9542AA182" isImmediate name="" sourceRef="sid-568A1539-A6F2-40B1-83FC-3502C87561C4" targetRef="sid-E2CFD2E8-7869-4F28-AC83-296ED8FA7D6E"></ns0:sequenceFlow>
+    <ns0:sequenceFlow id="sid-B713DF69-430C-4342-80C5-F98440869920" isImmediate name="accepted==true" sourceRef="sid-E2CFD2E8-7869-4F28-AC83-296ED8FA7D6E" targetRef="sid-94C810EF-69BE-4D67-91B8-4A34DF4D1940"></ns0:sequenceFlow>
+    <ns0:sequenceFlow id="sid-1118CB7A-2EC0-47DD-9515-439BB93021DB" isImmediate name="" sourceRef="sid-94C810EF-69BE-4D67-91B8-4A34DF4D1940" targetRef="sid-4C0BFF22-299A-4EB1-8102-894FDFC03826"></ns0:sequenceFlow>
+    <ns0:sequenceFlow id="sid-7E6D84AD-449F-4DCB-982C-3F831DAB6940" isImmediate name="" sourceRef="sid-94C810EF-69BE-4D67-91B8-4A34DF4D1940" targetRef="sid-B528635E-917C-42B8-82F4-889D80CFE8EC"></ns0:sequenceFlow>
+    <ns0:sequenceFlow id="sid-2622A3BA-3FC2-436F-B36F-3DDEBF93FBF0" isImmediate name="" sourceRef="sid-B528635E-917C-42B8-82F4-889D80CFE8EC" targetRef="sid-EB9F3CEF-3A7F-475B-8E49-D6D7A5334DCF"></ns0:sequenceFlow>
+    <ns0:sequenceFlow id="sid-125FBBD2-B435-4E37-BAAF-7F691AAB5E8C" isImmediate name="" sourceRef="sid-EB9F3CEF-3A7F-475B-8E49-D6D7A5334DCF" targetRef="sid-0663CB4E-D3BF-4E12-8D81-D68E9318355F"></ns0:sequenceFlow>
+    <ns0:sequenceFlow id="sid-D156068F-EA21-45FA-948F-7DC38A9139F8" isImmediate name="" sourceRef="sid-4C0BFF22-299A-4EB1-8102-894FDFC03826" targetRef="sid-859C73C7-F0DD-45ED-AA88-E0DEA0340C91"></ns0:sequenceFlow>
+    <ns0:sequenceFlow id="sid-2942A703-9C60-46CA-8C19-BC4839F9BFBB" isImmediate name="" sourceRef="sid-0663CB4E-D3BF-4E12-8D81-D68E9318355F" targetRef="sid-9A3D5DF3-D2CA-48BE-A55C-9F145103FC98"></ns0:sequenceFlow>
+    <ns0:sequenceFlow id="sid-B5BC1661-2F62-4616-8C20-CEAF156F4B8B" isImmediate name="" sourceRef="sid-0663CB4E-D3BF-4E12-8D81-D68E9318355F" targetRef="sid-E29E4FE6-2328-431A-B818-DD64BF03AA99"></ns0:sequenceFlow>
+    <ns0:sequenceFlow id="sid-171FD5C9-40C2-4840-8C3A-BC765DF2E55E" isImmediate name="" sourceRef="sid-9A3D5DF3-D2CA-48BE-A55C-9F145103FC98" targetRef="sid-CCD2A372-D382-426E-B823-05F778D4EA44"></ns0:sequenceFlow>
+    <ns0:sequenceFlow id="sid-9B732C99-27D1-4C72-AE92-181B4245FBD5" isImmediate name="" sourceRef="sid-E29E4FE6-2328-431A-B818-DD64BF03AA99" targetRef="sid-CCD2A372-D382-426E-B823-05F778D4EA44"></ns0:sequenceFlow>
+    <ns0:sequenceFlow id="sid-313505D9-092F-4F91-AD6C-B3B6D8CCFDB8" isImmediate name="" sourceRef="sid-CCD2A372-D382-426E-B823-05F778D4EA44" targetRef="sid-859C73C7-F0DD-45ED-AA88-E0DEA0340C91"></ns0:sequenceFlow>
+    <ns0:sequenceFlow id="sid-D5172F3E-7EC8-4CA4-82B1-27E54197E62B" isImmediate name="conditions &amp; 1 == 1" sourceRef="sid-E2CFD2E8-7869-4F28-AC83-296ED8FA7D6E" targetRef="sid-80A4BF32-23C1-4585-A70C-26A40D63DA7F">
+      <conditionExpression xsi:type="ns0:tFormalExpression" language="Solidity">conditions &amp; 1 == 1</conditionExpression>
+    </ns0:sequenceFlow>
+    <ns0:sequenceFlow id="sid-41D580FD-2D3C-42DC-96D2-EB1021EF1306" isImmediate name="reiterate==true&amp;#10;" sourceRef="sid-80A4BF32-23C1-4585-A70C-26A40D63DA7F" targetRef="sid-C240C6E9-F55F-46A5-B1F6-5FC4A0F30B04"></ns0:sequenceFlow>
+    <ns0:sequenceFlow id="sid-65578510-C3B1-407F-8438-C5F4216F4B0E" isImmediate name="conditions &amp; 2 == 2" sourceRef="sid-80A4BF32-23C1-4585-A70C-26A40D63DA7F" targetRef="sid-859C73C7-F0DD-45ED-AA88-E0DEA0340C91">
+      <conditionExpression xsi:type="ns0:tFormalExpression" language="Solidity">conditions &amp; 2 == 2</conditionExpression>
+    </ns0:sequenceFlow>
+  </ns0:choreography>
+  <ns3:BPMNDiagram id="sid-1ad19979-14e9-4027-92d7-74456621c4c0">
+    <ns3:BPMNPlane bpmnElement="sid_992f678d_eae2_427f_a791_b1cde70e5745" id="sid-63d1555c-6983-4919-832d-127189199575">
+      <ns3:BPMNShape bpmnElement="sid-0EC70E7E-A42A-4C9E-B120-16B25BDACE7A" id="sid-0EC70E7E-A42A-4C9E-B120-16B25BDACE7A_gui">
+        <ns4:Bounds height="30.0" width="30.0" x="210.0" y="210.0"></ns4:Bounds>
+      </ns3:BPMNShape>
+      <ns3:BPMNShape bpmnElement="sid-7D873213-2244-48EB-B043-2D234DC60BFE" id="sid-7D873213-2244-48EB-B043-2D234DC60BFE_gui">
+        <ns4:Bounds height="140.0" width="150.0" x="270.0" y="155.0"></ns4:Bounds>
+        <ns3:BPMNLabel labelStyle="sid-a8434be6-c068-456d-b120-bb90dc849650">
+          <ns4:Bounds height="40.0" width="69.42857360839844" x="310.2857131958008" y="202.0"></ns4:Bounds>
+        </ns3:BPMNLabel>
+      </ns3:BPMNShape>
+      <ns3:BPMNShape bpmnElement="sid-91d77630-3cf5-449b-b894-2aa6498b4ca4" choreographyActivityShape="sid-7D873213-2244-48EB-B043-2D234DC60BFE_gui" id="sid-91d77630-3cf5-449b-b894-2aa6498b4ca4_gui" isMessageVisible participantBandKind="top_initiating">
+        <ns4:Bounds height="20.0" width="150.0" x="270.0" y="155.0"></ns4:Bounds>
+        <ns3:BPMNLabel labelStyle="sid-d7e3b2e5-f3f3-495c-b1f0-2067e9b3bc26">
+          <ns4:Bounds height="18.0" width="47.44285583496094" x="321.27857208251953" y="153.0"></ns4:Bounds>
+        </ns3:BPMNLabel>
+      </ns3:BPMNShape>
+      <ns3:BPMNShape bpmnElement="sid-260ebe9c-f089-49f5-a083-42bd9e9bd309" choreographyActivityShape="sid-7D873213-2244-48EB-B043-2D234DC60BFE_gui" id="sid-260ebe9c-f089-49f5-a083-42bd9e9bd309_gui" isMessageVisible="false" participantBandKind="bottom_non_initiating">
+        <ns4:Bounds height="20.0" width="150.0" x="270.0" y="275.0"></ns4:Bounds>
+        <ns3:BPMNLabel labelStyle="sid-d7e3b2e5-f3f3-495c-b1f0-2067e9b3bc26">
+          <ns4:Bounds height="18.0" width="43.97142791748047" x="323.01428604125977" y="273.0"></ns4:Bounds>
+        </ns3:BPMNLabel>
+      </ns3:BPMNShape>
+      <ns3:BPMNShape bpmnElement="sid-C240C6E9-F55F-46A5-B1F6-5FC4A0F30B04" id="sid-C240C6E9-F55F-46A5-B1F6-5FC4A0F30B04_gui" isMarkerVisible>
+        <ns4:Bounds height="40.0" width="40.0" x="445.1875" y="205.0"></ns4:Bounds>
+      </ns3:BPMNShape>
+      <ns3:BPMNShape bpmnElement="sid-568A1539-A6F2-40B1-83FC-3502C87561C4" id="sid-568A1539-A6F2-40B1-83FC-3502C87561C4_gui">
+        <ns4:Bounds height="140.0" width="150.0" x="570.0" y="155.0"></ns4:Bounds>
+        <ns3:BPMNLabel labelStyle="sid-a8434be6-c068-456d-b120-bb90dc849650">
+          <ns4:Bounds height="40.0" width="45.0" x="622.5" y="202.0"></ns4:Bounds>
+        </ns3:BPMNLabel>
+      </ns3:BPMNShape>
+      <ns3:BPMNShape bpmnElement="sid-b7831095-49d6-4384-ab5d-c033ed6d3ad5" choreographyActivityShape="sid-568A1539-A6F2-40B1-83FC-3502C87561C4_gui" id="sid-b7831095-49d6-4384-ab5d-c033ed6d3ad5_gui" isMessageVisible participantBandKind="top_initiating">
+        <ns4:Bounds height="20.0" width="150.0" x="570.0" y="155.0"></ns4:Bounds>
+        <ns3:BPMNLabel labelStyle="sid-d7e3b2e5-f3f3-495c-b1f0-2067e9b3bc26">
+          <ns4:Bounds height="18.0" width="43.97142791748047" x="623.0142860412598" y="153.0"></ns4:Bounds>
+        </ns3:BPMNLabel>
+      </ns3:BPMNShape>
+      <ns3:BPMNShape bpmnElement="sid-0013c0ea-32b1-4b1d-a4c6-dfc98851dd01" choreographyActivityShape="sid-568A1539-A6F2-40B1-83FC-3502C87561C4_gui" id="sid-0013c0ea-32b1-4b1d-a4c6-dfc98851dd01_gui" isMessageVisible participantBandKind="bottom_non_initiating">
+        <ns4:Bounds height="20.0" width="150.0" x="570.0" y="275.0"></ns4:Bounds>
+        <ns3:BPMNLabel labelStyle="sid-d7e3b2e5-f3f3-495c-b1f0-2067e9b3bc26">
+          <ns4:Bounds height="18.0" width="47.44285583496094" x="621.2785720825195" y="273.0"></ns4:Bounds>
+        </ns3:BPMNLabel>
+      </ns3:BPMNShape>
+      <ns3:BPMNShape bpmnElement="sid-E2CFD2E8-7869-4F28-AC83-296ED8FA7D6E" id="sid-E2CFD2E8-7869-4F28-AC83-296ED8FA7D6E_gui" isMarkerVisible>
+        <ns4:Bounds height="40.0" width="40.0" x="825.0" y="205.0"></ns4:Bounds>
+      </ns3:BPMNShape>
+      <ns3:BPMNShape bpmnElement="sid-4C0BFF22-299A-4EB1-8102-894FDFC03826" id="sid-4C0BFF22-299A-4EB1-8102-894FDFC03826_gui">
+        <ns4:Bounds height="140.0" width="150.0" x="1120.0" y="95.0"></ns4:Bounds>
+        <ns3:BPMNLabel labelStyle="sid-a8434be6-c068-456d-b120-bb90dc849650">
+          <ns4:Bounds height="40.0" width="86.14285278320312" x="1151.9285736083984" y="142.0"></ns4:Bounds>
+        </ns3:BPMNLabel>
+      </ns3:BPMNShape>
+      <ns3:BPMNShape bpmnElement="sid-9d2b142c-fe64-4606-9c44-f22a5bc79cfc" choreographyActivityShape="sid-4C0BFF22-299A-4EB1-8102-894FDFC03826_gui" id="sid-9d2b142c-fe64-4606-9c44-f22a5bc79cfc_gui" isMessageVisible participantBandKind="top_initiating">
+        <ns4:Bounds height="20.0" width="150.0" x="1120.0" y="95.0"></ns4:Bounds>
+        <ns3:BPMNLabel labelStyle="sid-d7e3b2e5-f3f3-495c-b1f0-2067e9b3bc26">
+          <ns4:Bounds height="18.0" width="47.44285583496094" x="1171.2785720825195" y="93.0"></ns4:Bounds>
+        </ns3:BPMNLabel>
+      </ns3:BPMNShape>
+      <ns3:BPMNShape bpmnElement="sid-37e6ff60-a2b9-4483-b9d6-31647a979c32" choreographyActivityShape="sid-4C0BFF22-299A-4EB1-8102-894FDFC03826_gui" id="sid-37e6ff60-a2b9-4483-b9d6-31647a979c32_gui" isMessageVisible="false" participantBandKind="bottom_non_initiating">
+        <ns4:Bounds height="20.0" width="150.0" x="1120.0" y="215.0"></ns4:Bounds>
+        <ns3:BPMNLabel labelStyle="sid-d7e3b2e5-f3f3-495c-b1f0-2067e9b3bc26">
+          <ns4:Bounds height="18.0" width="43.97142791748047" x="1173.0142860412598" y="213.0"></ns4:Bounds>
+        </ns3:BPMNLabel>
+      </ns3:BPMNShape>
+      <ns3:BPMNShape bpmnElement="sid-B528635E-917C-42B8-82F4-889D80CFE8EC" id="sid-B528635E-917C-42B8-82F4-889D80CFE8EC_gui">
+        <ns4:Bounds height="140.0" width="150.0" x="1121.0" y="355.0"></ns4:Bounds>
+        <ns3:BPMNLabel labelStyle="sid-a8434be6-c068-456d-b120-bb90dc849650">
+          <ns4:Bounds height="60.0" width="86.14285278320312" x="1152.9285736083984" y="392.0"></ns4:Bounds>
+        </ns3:BPMNLabel>
+      </ns3:BPMNShape>
+      <ns3:BPMNShape bpmnElement="sid-ba907c8e-f205-48b8-990a-5a93d3a70c8d" choreographyActivityShape="sid-B528635E-917C-42B8-82F4-889D80CFE8EC_gui" id="sid-ba907c8e-f205-48b8-990a-5a93d3a70c8d_gui" isMessageVisible participantBandKind="top_initiating">
+        <ns4:Bounds height="20.0" width="150.0" x="1121.0" y="355.0"></ns4:Bounds>
+        <ns3:BPMNLabel labelStyle="sid-d7e3b2e5-f3f3-495c-b1f0-2067e9b3bc26">
+          <ns4:Bounds height="18.0" width="47.44285583496094" x="1172.2785720825195" y="353.0"></ns4:Bounds>
+        </ns3:BPMNLabel>
+      </ns3:BPMNShape>
+      <ns3:BPMNShape bpmnElement="sid-458f9527-cebd-4106-bb33-8302d8fe37dc" choreographyActivityShape="sid-B528635E-917C-42B8-82F4-889D80CFE8EC_gui" id="sid-458f9527-cebd-4106-bb33-8302d8fe37dc_gui" isMessageVisible="false" participantBandKind="bottom_non_initiating">
+        <ns4:Bounds height="20.0" width="150.0" x="1121.0" y="475.0"></ns4:Bounds>
+        <ns3:BPMNLabel labelStyle="sid-d7e3b2e5-f3f3-495c-b1f0-2067e9b3bc26">
+          <ns4:Bounds height="18.0" width="43.97142791748047" x="1174.0142860412598" y="473.0"></ns4:Bounds>
+        </ns3:BPMNLabel>
+      </ns3:BPMNShape>
+      <ns3:BPMNShape bpmnElement="sid-EB9F3CEF-3A7F-475B-8E49-D6D7A5334DCF" id="sid-EB9F3CEF-3A7F-475B-8E49-D6D7A5334DCF_gui">
+        <ns4:Bounds height="140.0" width="150.0" x="1355.0" y="355.0"></ns4:Bounds>
+        <ns3:BPMNLabel labelStyle="sid-a8434be6-c068-456d-b120-bb90dc849650">
+          <ns4:Bounds height="40.0" width="77.14285278320312" x="1391.4285736083984" y="402.0"></ns4:Bounds>
+        </ns3:BPMNLabel>
+      </ns3:BPMNShape>
+      <ns3:BPMNShape bpmnElement="sid-da2dd6f1-31e6-433d-81a1-ae8db9d8d647" choreographyActivityShape="sid-EB9F3CEF-3A7F-475B-8E49-D6D7A5334DCF_gui" id="sid-da2dd6f1-31e6-433d-81a1-ae8db9d8d647_gui" isMessageVisible participantBandKind="top_initiating">
+        <ns4:Bounds height="20.0" width="150.0" x="1355.0" y="355.0"></ns4:Bounds>
+        <ns3:BPMNLabel labelStyle="sid-d7e3b2e5-f3f3-495c-b1f0-2067e9b3bc26">
+          <ns4:Bounds height="18.0" width="47.44285583496094" x="1406.2785720825195" y="353.0"></ns4:Bounds>
+        </ns3:BPMNLabel>
+      </ns3:BPMNShape>
+      <ns3:BPMNShape bpmnElement="sid-b0303e79-5042-40d6-8f25-8285ec369319" choreographyActivityShape="sid-EB9F3CEF-3A7F-475B-8E49-D6D7A5334DCF_gui" id="sid-b0303e79-5042-40d6-8f25-8285ec369319_gui" isMessageVisible="false" participantBandKind="bottom_non_initiating">
+        <ns4:Bounds height="20.0" width="150.0" x="1355.0" y="475.0"></ns4:Bounds>
+        <ns3:BPMNLabel labelStyle="sid-d7e3b2e5-f3f3-495c-b1f0-2067e9b3bc26">
+          <ns4:Bounds height="18.0" width="43.97142791748047" x="1408.0142860412598" y="473.0"></ns4:Bounds>
+        </ns3:BPMNLabel>
+      </ns3:BPMNShape>
+      <ns3:BPMNShape bpmnElement="sid-94C810EF-69BE-4D67-91B8-4A34DF4D1940" id="sid-94C810EF-69BE-4D67-91B8-4A34DF4D1940_gui">
+        <ns4:Bounds height="40.0" width="40.0" x="1035.0" y="205.0"></ns4:Bounds>
+      </ns3:BPMNShape>
+      <ns3:BPMNShape bpmnElement="sid-0663CB4E-D3BF-4E12-8D81-D68E9318355F" id="sid-0663CB4E-D3BF-4E12-8D81-D68E9318355F_gui">
+        <ns4:Bounds height="40.0" width="40.0" x="1550.0" y="404.0"></ns4:Bounds>
+      </ns3:BPMNShape>
+      <ns3:BPMNShape bpmnElement="sid-859C73C7-F0DD-45ED-AA88-E0DEA0340C91" id="sid-859C73C7-F0DD-45ED-AA88-E0DEA0340C91_gui">
+        <ns4:Bounds height="30.0" width="30.0" x="1322.0" y="150.0"></ns4:Bounds>
+      </ns3:BPMNShape>
+      <ns3:BPMNShape bpmnElement="sid-9A3D5DF3-D2CA-48BE-A55C-9F145103FC98" id="sid-9A3D5DF3-D2CA-48BE-A55C-9F145103FC98_gui">
+        <ns4:Bounds height="140.0" width="150.0" x="1665.0" y="235.0"></ns4:Bounds>
+        <ns3:BPMNLabel labelStyle="sid-a8434be6-c068-456d-b120-bb90dc849650">
+          <ns4:Bounds height="40.0" width="69.42857360839844" x="1705.2857131958008" y="282.0"></ns4:Bounds>
+        </ns3:BPMNLabel>
+      </ns3:BPMNShape>
+      <ns3:BPMNShape bpmnElement="sid-8c233881-e420-4414-bc8e-b44a4e5bd8bc" choreographyActivityShape="sid-9A3D5DF3-D2CA-48BE-A55C-9F145103FC98_gui" id="sid-8c233881-e420-4414-bc8e-b44a4e5bd8bc_gui" isMessageVisible participantBandKind="top_initiating">
+        <ns4:Bounds height="20.0" width="150.0" x="1665.0" y="235.0"></ns4:Bounds>
+        <ns3:BPMNLabel labelStyle="sid-d7e3b2e5-f3f3-495c-b1f0-2067e9b3bc26">
+          <ns4:Bounds height="18.0" width="43.97142791748047" x="1718.0142860412598" y="233.0"></ns4:Bounds>
+        </ns3:BPMNLabel>
+      </ns3:BPMNShape>
+      <ns3:BPMNShape bpmnElement="sid-40187acc-824a-4a3a-ba92-54e06d9901cd" choreographyActivityShape="sid-9A3D5DF3-D2CA-48BE-A55C-9F145103FC98_gui" id="sid-40187acc-824a-4a3a-ba92-54e06d9901cd_gui" isMessageVisible="false" participantBandKind="bottom_non_initiating">
+        <ns4:Bounds height="20.0" width="150.0" x="1665.0" y="355.0"></ns4:Bounds>
+        <ns3:BPMNLabel labelStyle="sid-d7e3b2e5-f3f3-495c-b1f0-2067e9b3bc26">
+          <ns4:Bounds height="18.0" width="47.44285583496094" x="1716.2785720825195" y="353.0"></ns4:Bounds>
+        </ns3:BPMNLabel>
+      </ns3:BPMNShape>
+      <ns3:BPMNShape bpmnElement="sid-E29E4FE6-2328-431A-B818-DD64BF03AA99" id="sid-E29E4FE6-2328-431A-B818-DD64BF03AA99_gui">
+        <ns4:Bounds height="140.0" width="150.0" x="1648.625" y="472.5"></ns4:Bounds>
+        <ns3:BPMNLabel labelStyle="sid-a8434be6-c068-456d-b120-bb90dc849650">
+          <ns4:Bounds height="40.0" width="63.0" x="1692.125" y="519.5"></ns4:Bounds>
+        </ns3:BPMNLabel>
+      </ns3:BPMNShape>
+      <ns3:BPMNShape bpmnElement="sid-0b7ef39f-6aaa-42a5-8661-d034064cbaad" choreographyActivityShape="sid-E29E4FE6-2328-431A-B818-DD64BF03AA99_gui" id="sid-0b7ef39f-6aaa-42a5-8661-d034064cbaad_gui" isMessageVisible participantBandKind="top_initiating">
+        <ns4:Bounds height="20.0" width="150.0" x="1648.625" y="472.5"></ns4:Bounds>
+        <ns3:BPMNLabel labelStyle="sid-d7e3b2e5-f3f3-495c-b1f0-2067e9b3bc26">
+          <ns4:Bounds height="18.0" width="43.97142791748047" x="1701.6392860412598" y="470.5"></ns4:Bounds>
+        </ns3:BPMNLabel>
+      </ns3:BPMNShape>
+      <ns3:BPMNShape bpmnElement="sid-2d60826f-9d3e-42e1-b37c-7b46446b75a4" choreographyActivityShape="sid-E29E4FE6-2328-431A-B818-DD64BF03AA99_gui" id="sid-2d60826f-9d3e-42e1-b37c-7b46446b75a4_gui" isMessageVisible="false" participantBandKind="bottom_non_initiating">
+        <ns4:Bounds height="20.0" width="150.0" x="1648.625" y="592.5"></ns4:Bounds>
+        <ns3:BPMNLabel labelStyle="sid-d7e3b2e5-f3f3-495c-b1f0-2067e9b3bc26">
+          <ns4:Bounds height="18.0" width="47.44285583496094" x="1699.9035720825195" y="590.5"></ns4:Bounds>
+        </ns3:BPMNLabel>
+      </ns3:BPMNShape>
+      <ns3:BPMNShape bpmnElement="sid-CCD2A372-D382-426E-B823-05F778D4EA44" id="sid-CCD2A372-D382-426E-B823-05F778D4EA44_gui">
+        <ns4:Bounds height="40.0" width="40.0" x="1860.0" y="405.0"></ns4:Bounds>
+      </ns3:BPMNShape>
+      <ns3:BPMNShape bpmnElement="sid-80A4BF32-23C1-4585-A70C-26A40D63DA7F" id="sid-80A4BF32-23C1-4585-A70C-26A40D63DA7F_gui" isMarkerVisible>
+        <ns4:Bounds height="40.0" width="40.0" x="825.0" y="465.0"></ns4:Bounds>
+      </ns3:BPMNShape>
+      <ns3:BPMNEdge bpmnElement="sid-6BFD2DBA-69AD-4793-AEF9-7250E705C43D" id="sid-6BFD2DBA-69AD-4793-AEF9-7250E705C43D_gui">
+        <ns5:waypoint x="240.0" y="225.0"></ns5:waypoint>
+        <ns5:waypoint x="270.0" y="225.0"></ns5:waypoint>
+      </ns3:BPMNEdge>
+      <ns3:BPMNEdge bpmnElement="sid-636B8B6F-84E1-40ED-94D3-508D141C77B6" id="sid-636B8B6F-84E1-40ED-94D3-508D141C77B6_gui">
+        <ns5:waypoint x="420.0" y="225.31071983428276"></ns5:waypoint>
+        <ns5:waypoint x="445.1875" y="225.1375246846065"></ns5:waypoint>
+      </ns3:BPMNEdge>
+      <ns3:BPMNEdge bpmnElement="sid-8090FED0-B02A-4B2A-A8D9-E3459096F64F" id="sid-8090FED0-B02A-4B2A-A8D9-E3459096F64F_gui">
+        <ns5:waypoint x="485.1875" y="225.03990594667195"></ns5:waypoint>
+        <ns5:waypoint x="570.0" y="225.20913210177764"></ns5:waypoint>
+      </ns3:BPMNEdge>
+      <ns3:BPMNEdge bpmnElement="sid-B4BC47BA-FB2E-4E2E-97FF-6FC9542AA182" id="sid-B4BC47BA-FB2E-4E2E-97FF-6FC9542AA182_gui">
+        <ns5:waypoint x="720.0" y="225.1870324189526"></ns5:waypoint>
+        <ns5:waypoint x="825.0" y="225.0299251870324"></ns5:waypoint>
+      </ns3:BPMNEdge>
+      <ns3:BPMNEdge bpmnElement="sid-B713DF69-430C-4342-80C5-F98440869920" id="sid-B713DF69-430C-4342-80C5-F98440869920_gui">
+        <ns5:waypoint x="865.0" y="225.0"></ns5:waypoint>
+        <ns5:waypoint x="1035.0" y="225.0"></ns5:waypoint>
+        <ns3:BPMNLabel labelStyle="sid-d7e3b2e5-f3f3-495c-b1f0-2067e9b3bc26">
+          <ns4:Bounds height="18.00000000000003" width="130.75714111328125" x="872.5239868164062" y="198.99999999999997"></ns4:Bounds>
+        </ns3:BPMNLabel>
+      </ns3:BPMNEdge>
+      <ns3:BPMNEdge bpmnElement="sid-1118CB7A-2EC0-47DD-9515-439BB93021DB" id="sid-1118CB7A-2EC0-47DD-9515-439BB93021DB_gui">
+        <ns5:waypoint x="1055.1666666666667" y="205.0"></ns5:waypoint>
+        <ns5:waypoint x="1055.5" y="165.0"></ns5:waypoint>
+        <ns5:waypoint x="1120.0" y="165.0"></ns5:waypoint>
+      </ns3:BPMNEdge>
+      <ns3:BPMNEdge bpmnElement="sid-7E6D84AD-449F-4DCB-982C-3F831DAB6940" id="sid-7E6D84AD-449F-4DCB-982C-3F831DAB6940_gui">
+        <ns5:waypoint x="1055.05" y="245.0"></ns5:waypoint>
+        <ns5:waypoint x="1055.5" y="425.0"></ns5:waypoint>
+        <ns5:waypoint x="1121.0" y="425.0"></ns5:waypoint>
+      </ns3:BPMNEdge>
+      <ns3:BPMNEdge bpmnElement="sid-2622A3BA-3FC2-436F-B36F-3DDEBF93FBF0" id="sid-2622A3BA-3FC2-436F-B36F-3DDEBF93FBF0_gui">
+        <ns5:waypoint x="1271.0" y="425.0"></ns5:waypoint>
+        <ns5:waypoint x="1355.0" y="425.0"></ns5:waypoint>
+      </ns3:BPMNEdge>
+      <ns3:BPMNEdge bpmnElement="sid-125FBBD2-B435-4E37-BAAF-7F691AAB5E8C" id="sid-125FBBD2-B435-4E37-BAAF-7F691AAB5E8C_gui">
+        <ns5:waypoint x="1505.0" y="424.7330960854093"></ns5:waypoint>
+        <ns5:waypoint x="1550.0" y="424.2255680262798"></ns5:waypoint>
+      </ns3:BPMNEdge>
+      <ns3:BPMNEdge bpmnElement="sid-D156068F-EA21-45FA-948F-7DC38A9139F8" id="sid-D156068F-EA21-45FA-948F-7DC38A9139F8_gui">
+        <ns5:waypoint x="1270.0" y="165.0"></ns5:waypoint>
+        <ns5:waypoint x="1322.0" y="165.0"></ns5:waypoint>
+      </ns3:BPMNEdge>
+      <ns3:BPMNEdge bpmnElement="sid-2942A703-9C60-46CA-8C19-BC4839F9BFBB" id="sid-2942A703-9C60-46CA-8C19-BC4839F9BFBB_gui">
+        <ns5:waypoint x="1570.0840336134454" y="404.0"></ns5:waypoint>
+        <ns5:waypoint x="1570.5" y="305.0"></ns5:waypoint>
+        <ns5:waypoint x="1665.0" y="305.0"></ns5:waypoint>
+      </ns3:BPMNEdge>
+      <ns3:BPMNEdge bpmnElement="sid-B5BC1661-2F62-4616-8C20-CEAF156F4B8B" id="sid-B5BC1661-2F62-4616-8C20-CEAF156F4B8B_gui">
+        <ns5:waypoint x="1570.084388185654" y="444.0"></ns5:waypoint>
+        <ns5:waypoint x="1570.5" y="542.5"></ns5:waypoint>
+        <ns5:waypoint x="1648.625" y="542.5"></ns5:waypoint>
+      </ns3:BPMNEdge>
+      <ns3:BPMNEdge bpmnElement="sid-171FD5C9-40C2-4840-8C3A-BC765DF2E55E" id="sid-171FD5C9-40C2-4840-8C3A-BC765DF2E55E_gui">
+        <ns5:waypoint x="1815.0" y="305.0"></ns5:waypoint>
+        <ns5:waypoint x="1880.5" y="305.0"></ns5:waypoint>
+        <ns5:waypoint x="1880.0833333333333" y="405.0"></ns5:waypoint>
+      </ns3:BPMNEdge>
+      <ns3:BPMNEdge bpmnElement="sid-9B732C99-27D1-4C72-AE92-181B4245FBD5" id="sid-9B732C99-27D1-4C72-AE92-181B4245FBD5_gui">
+        <ns5:waypoint x="1798.625" y="542.5"></ns5:waypoint>
+        <ns5:waypoint x="1880.5" y="542.5"></ns5:waypoint>
+        <ns5:waypoint x="1880.0851063829787" y="445.0"></ns5:waypoint>
+      </ns3:BPMNEdge>
+      <ns3:BPMNEdge bpmnElement="sid-313505D9-092F-4F91-AD6C-B3B6D8CCFDB8" id="sid-313505D9-092F-4F91-AD6C-B3B6D8CCFDB8_gui">
+        <ns5:waypoint x="1900.0" y="425.0"></ns5:waypoint>
+        <ns5:waypoint x="1944.0" y="425.0"></ns5:waypoint>
+      </ns3:BPMNEdge>
+      <ns3:BPMNEdge bpmnElement="sid-D5172F3E-7EC8-4CA4-82B1-27E54197E62B" id="sid-D5172F3E-7EC8-4CA4-82B1-27E54197E62B_gui">
+        <ns5:waypoint x="845.0" y="245.0"></ns5:waypoint>
+        <ns5:waypoint x="845.0" y="465.0"></ns5:waypoint>
+        <ns3:BPMNLabel labelStyle="sid-d7e3b2e5-f3f3-495c-b1f0-2067e9b3bc26">
+          <ns4:Bounds height="18.0" width="134.22857666015625" x="853.0" y="301.0"></ns4:Bounds>
+        </ns3:BPMNLabel>
+      </ns3:BPMNEdge>
+      <ns3:BPMNEdge bpmnElement="sid-41D580FD-2D3C-42DC-96D2-EB1021EF1306" id="sid-41D580FD-2D3C-42DC-96D2-EB1021EF1306_gui">
+        <ns5:waypoint x="825.0" y="485.0263634865711"></ns5:waypoint>
+        <ns5:waypoint x="465.6875" y="485.5"></ns5:waypoint>
+        <ns5:waypoint x="465.2258877159309" y="245.0"></ns5:waypoint>
+        <ns3:BPMNLabel labelStyle="sid-d7e3b2e5-f3f3-495c-b1f0-2067e9b3bc26">
+          <ns4:Bounds height="18.0" width="127.28570556640625" x="574.31201171875" y="461.0"></ns4:Bounds>
+        </ns3:BPMNLabel>
+      </ns3:BPMNEdge>
+      <ns3:BPMNEdge bpmnElement="sid-65578510-C3B1-407F-8438-C5F4216F4B0E" id="sid-65578510-C3B1-407F-8438-C5F4216F4B0E_gui">
+        <ns5:waypoint x="845.0" y="505.0"></ns5:waypoint>
+        <ns5:waypoint x="845.0" y="549.0"></ns5:waypoint>
+        <ns3:BPMNLabel labelStyle="sid-d7e3b2e5-f3f3-495c-b1f0-2067e9b3bc26">
+          <ns4:Bounds height="18.0" width="130.75714111328125" x="853.0" y="508.95098876953125"></ns4:Bounds>
+        </ns3:BPMNLabel>
+      </ns3:BPMNEdge>
+    </ns3:BPMNPlane>
+    <ns3:BPMNLabelStyle id="sid-a8434be6-c068-456d-b120-bb90dc849650">
+      <ns4:Font isBold="false" isItalic="false" name="" size="20.0"></ns4:Font>
+    </ns3:BPMNLabelStyle>
+    <ns3:BPMNLabelStyle id="sid-d7e3b2e5-f3f3-495c-b1f0-2067e9b3bc26">
+      <ns4:Font isBold="false" isItalic="false" name="" size="18.0"></ns4:Font>
+    </ns3:BPMNLabelStyle>
+  </ns3:BPMNDiagram>
+</ns0:definitions>

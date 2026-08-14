@@ -1,246 +1,484 @@
-import { Guard, Place, PlaceType, TaskLabel, Transition } from "../Parser/Element";
-import { INetFastXMLParser } from "../Parser/FastXMLParser";
-import { INetParser } from "../Parser/Parser";
-import { XESFastXMLParser } from "../util/EventLog/XESFastXMLParser";
-import { IXESParser } from "../util/EventLog/XESParser";
-import { Event, EventLog, InstanceDataChange } from "../util/EventLog/EventLog"
-import fs from 'fs';
-import path from 'path';
+import fs from "fs";
 import Mustache from "mustache";
-import { Trace } from "../util/EventLog/Trace";
-import { TemplateEngine } from "../Generator/TemplateEngine";
-import SolDefaultContractGenerator from "../Generator/target/Sol/DefaultGenerator";
-import { TriggerEncoding } from "../Generator/Encoding/TriggerEncoding";
-import { CaseVariable } from "../Generator/Encoding/Encoding";
+import path from "path";
+import { fileURLToPath } from "url";
 
-export interface ISimulator {
-  generate(): void;
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+import { CaseVariable } from "../Generator/Encoding/Encoding.js";
+import { TriggerEncoding } from "../Generator/Encoding/JSON/TriggerEncoding.js";
+import { GeneratorConstructor } from "../Generator/Generator.js";
+import SolDefaultContractGenerator from "../Generator/target/Sol/DefaultGenerator.js";
+import { TemplateEngine } from "../Generator/TemplateEngine.js";
+import { Transition } from "../Parser/Elements/Transition.js";
+import { Place } from "../Parser/Elements/Place.js";
+import { TaskLabel } from "../Parser/Elements/Label.js";
+import { Guard } from "../Parser/Elements/Guard.js";
+import { INetFastXMLParser } from "../Parser/FastXMLParser.js";
+import { INetParser } from "../Parser/Parser.js";
+import {
+  Event,
+  EventLog,
+  InstanceDataChange,
+} from "../util/EventLog/EventLog.js";
+import { Trace } from "../util/EventLog/Trace.js";
+import { XESFastXMLParser } from "../util/EventLog/XESFastXMLParser.js";
+import { IXESParser } from "../util/EventLog/XESParser.js";
+import { INetEncoder } from "../Generator/Encoding/Encoder.js";
+import { InteractionNet } from "../Parser/InteractionNet.js";
+
+const LOGGING_ENABLED = false; // Toggleable logging
+
+export interface LogGenerationOptions {
+  parseConditions?: boolean;
+  maxTraces?: number;
 }
 
-export class Simulator implements ISimulator {
+export interface ContractGenerationOptions {
+  unfoldSubNets?: boolean;
+  loopProtection?: boolean;
+  parseConditions?: boolean;
+  maxTraces?: number;
+}
 
-  constructor(
-    public workdir: string = ".",
-    public bpmnDir: string = path.join(workdir + "/data/bpmn"),
-    public bpmnParser: INetParser = new INetFastXMLParser(),
-    public xesDir: string = path.join(workdir + "/data/generated"),
-    public xesParser: IXESParser = new XESFastXMLParser(),
-    public contractDir: string = path.join(workdir + "/data/generated")
-  ) {}
+export interface SimulatorConfig {
+  workdir?: string;
+  bpmnDir?: string;
+  bpmnParser?: INetParser;
+  xesDir?: string;
+  xesParser?: IXESParser;
+  contractDir?: string;
+  generatorType?: GeneratorConstructor;
+  fileFilter?: (filename: string) => boolean;
+  outputFormat?: {
+    xes?: boolean;
+    contract?: boolean;
+    encoding?: boolean;
+  };
+  logging?: {
+    enabled?: boolean;
+    level?: "error" | "warn" | "info" | "debug";
+  };
+}
 
-  private static Simulation = class {
-    public traces = new Array<Trace>();
-    public visited = new Array<string[]>();
-    public conditions = new Map<string, number>(); 
-    public contract: null | { target: string, encoding: TriggerEncoding } = null;
+export class Simulator {
+  public readonly workdir: string;
+  public readonly bpmnDir: string;
+  public readonly bpmnParser: INetParser;
+  public readonly xesDir: string;
+  public readonly xesParser: IXESParser;
+  public readonly contractDir: string;
+  public readonly generatorType: GeneratorConstructor;
+  public readonly fileFilter: (filename: string) => boolean;
+  public readonly logging: boolean;
 
-    constructor(public contractGenerator: TemplateEngine) {}
+  constructor(config: SimulatorConfig = {}) {
+    this.workdir = config.workdir ?? ".";
+    this.bpmnDir = config.bpmnDir ?? path.join(this.workdir, "data", "bpmn");
+    this.bpmnParser = config.bpmnParser ?? new INetFastXMLParser();
+    this.xesDir = config.xesDir ?? path.join(this.workdir, "data", "generated");
+    this.xesParser = config.xesParser ?? new XESFastXMLParser();
+    this.contractDir =
+      config.contractDir ?? path.join(this.workdir, "data", "generated");
+    this.generatorType = config.generatorType ?? SolDefaultContractGenerator;
+    this.fileFilter =
+      config.fileFilter ?? ((filename: string) => filename.endsWith(".bpmn"));
+    this.logging = config.logging?.enabled ?? true;
+  }
 
-    async generate(options: { unfoldSubNets: boolean, loopProtection: boolean }) {
-      this.generateLog();
-      await this.generateContract(options);
-    }
+  // The log generator will generate a conditions array,
+  // where each XOR gateway is represented by a binary i = 0 | 1.
+  // This is necessary to generate mock conditions.
+  async generateLog(
+    prePend = "",
+    options: LogGenerationOptions = {},
+  ): Promise<void> {
+    const bpmnFiles = fs.readdirSync(this.bpmnDir).filter(this.fileFilter);
 
-    async generateContract(options: { unfoldSubNets: boolean, loopProtection: boolean }) {
-      if (this.traces.length === 0) return console.warn(`No trace generated for ${this.contractGenerator.iNet.id}`);
-      this.contract = await this.contractGenerator.compile(options.unfoldSubNets, options.loopProtection);
-      return this.contract;
-    }
+    for (const file of bpmnFiles) {
+      if (this.logging) console.log(`Log generation for ${file}`);
+      const filePath = path.join(this.bpmnDir, file);
+      const model = fs.readFileSync(filePath);
 
-    generateLog() {
-      this.replay()
-    }
+      try {
+        const nets = await this.bpmnParser!.fromXML(model);
+        const encoder = new INetEncoder();
 
-    replay() {
-      const initial = this.contractGenerator.iNet.initial!;
-      const end = this.contractGenerator.iNet.end!;
-      const enabled: Place[] = [initial]; // Start with the initial place
-      const candidates: Transition[] = [...initial.target]; // Initial candidates are the transitions from the initial place
-      const executed: Transition[] = [];
-      const toExecute: Transition[] = [...this.contractGenerator.iNet.elements.values()]
-        .filter((t): t is Transition => t instanceof Transition);
-      const maxLogEntries = 100; // Threshold for maximum log entries
-      const log = new EventLog([]); // Initialize the log variable
-      let currentTrace = new Trace([]);
+        for (let i = 0; i < nets.length; i++) {
+          const iNet = encoder.unfoldSubNets(nets[i]);
+          iNet.id = prePend + iNet.id;
 
-      //console.log("To Execute", toExecute.map((t) => t.id))
+          const traces = this.replay(iNet, options);
+          if (traces.length === 0) {
+            console.warn(
+              `No traces generated for ${file} (net ${i}), skipping.`,
+            );
+            continue;
+          }
 
-      //console.log("Starting replay...");
-      //console.log(`Initial place: ${initial.id}, End place: ${end.id}`);
-      //console.log("Initial candidates:", candidates.map((t) => t.id));
+          const baseName = iNet.id;
+          this.writeLogFile(traces, baseName);
 
-      while (log.traces.length < maxLogEntries) {
-        // Stop if all transitions in toExecute are executed
-        if (toExecute.every((t) => executed.includes(t))) {
-          //console.log("All transitions executed. Stopping replay.");
-          break;
+          console.log(`Generated log (${baseName}) written to ${this.xesDir}`);
         }
-
-        // Check for execution candidates
-        const executableCandidates = candidates.filter((t) =>
-          t.source.every((p) => enabled.includes(p))
+      } catch (error) {
+        console.error(
+          `Failed to generate log for ${file}: ${error instanceof Error ? error.message : String(error)}`,
         );
-        if (executableCandidates.length === 0) {
-          console.error("Deadlock detected: No executable transitions.");
-          return;
+        continue;
+      }
+    }
+  }
+
+  async generateContract(
+    prePend = "",
+    options: ContractGenerationOptions = {},
+  ): Promise<void> {
+    const bpmnFiles = fs.readdirSync(this.bpmnDir).filter(this.fileFilter);
+
+    for (const file of bpmnFiles) {
+      if (this.logging) console.log(`Contract generation for ${file}`);
+      const filePath = path.join(this.bpmnDir, file);
+      const model = fs.readFileSync(filePath);
+
+      try {
+        const nets = await this.bpmnParser!.fromXML(model);
+
+        for (let i = 0; i < nets.length; i++) {
+          const iNet = nets[i];
+          iNet.id = prePend + iNet.id;
+          const generator = new this.generatorType(iNet);
+          generator.addCaseVariable(
+            new CaseVariable(
+              "conditions",
+              "uint",
+              "0",
+              true,
+              "public"
+            ),
+          );
+
+          const contract = await this.compileContract(generator, options);
+          if (!contract) {
+            console.warn(
+              `No contract generated for ${file} (net ${i}), skipping.`,
+            );
+            continue;
+          }
+
+          const baseName = iNet.id;
+          this.writeContractFiles(contract, baseName);
+
+          console.log(
+            `Generated contract (${baseName}) written to ${this.contractDir}`,
+          );
         }
+      } catch (error) {
+        console.error(
+          `Failed to generate contract for ${file}: ${error instanceof Error ? error.message : String(error)}`,
+        );
+        continue;
+      }
+    }
+  }
 
-        // Prioritize transitions that are both in toExecute and candidates
-        const prioritizedCandidates = executableCandidates.filter((t) => toExecute.includes(t));
-        const availableCandidates = prioritizedCandidates.length > 0 ? prioritizedCandidates : executableCandidates;
+  private writeLogFile(traces: Trace[], baseName: string): void {
+    const log = new EventLog([...traces.values()]);
+    const template = fs.readFileSync(
+      path.join(__dirname, "./templates/xes", "log.mustache.xes"),
+      "utf-8",
+    );
+    const renderedLog = Mustache.render(template, log.getEncoding());
 
-        // Pick a random candidate
-        const transitionCandidate = availableCandidates[Math.floor(Math.random() * availableCandidates.length)];
-        ////console.log("Selected transition candidate:", transitionCandidate.id);
+    if (!fs.existsSync(this.xesDir)) {
+      fs.mkdirSync(this.xesDir, { recursive: true });
+    }
 
-        // Process the transition
-        this.processTransition(transitionCandidate, currentTrace);
+    fs.writeFileSync(
+      path.join(this.xesDir, `${baseName}.xes`),
+      renderedLog,
+      "utf-8",
+    );
+  }
 
-        // Update enabled places
-        transitionCandidate.source.forEach((p) => {
-          const index = enabled.indexOf(p);
-          if (index !== -1) enabled.splice(index, 1); // Remove source places from enabled
-        });
+  private writeContractFiles(
+    contract: { target: string; encoding: TriggerEncoding },
+    baseName: string,
+  ): void {
+    if (!fs.existsSync(this.contractDir)) {
+      fs.mkdirSync(this.contractDir, { recursive: true });
+    }
 
-        transitionCandidate.target.forEach((p) => {
-          if (!enabled.includes(p)) enabled.push(p); // Add target places to enabled
-        });
-    
-        // Update candidates and executed lists
-        candidates.splice(candidates.indexOf(transitionCandidate), 1); // Remove from candidates
-        executed.push(transitionCandidate); // Add to executed
-      
-        //console.log("Enabled places after execution:", enabled.map((p) => p.id));
-        //console.log("Executed transitions:", executed.map((t) => t.id));
+    // Write contract file
+    fs.writeFileSync(
+      path.join(this.contractDir, `${baseName}.sol`),
+      contract.target,
+      "utf-8",
+    );
 
-        // Check if the end place is reached
-        if (transitionCandidate.target.includes(end)) {
-          //console.log("End place reached. Flushing trace to log.");
-          log.traces.push(currentTrace); // Add the trace to the log
-          //console.log("Trace added to log:", currentTrace.events.map((e) => e.name));
+    // Write encoding file
+    fs.writeFileSync(
+      path.join(this.contractDir, `${baseName}.json`),
+      JSON.stringify(TriggerEncoding.toJSON(contract.encoding)),
+      "utf-8",
+    );
+  }
 
-          // Reset state for the next trace
-          enabled.length = 0;
-          enabled.push(initial); // Start again with the initial place
-          candidates.length = 0;
-          candidates.push(...initial.target); // Start again with initial candidates
-          executed.length = 0;
-          currentTrace = new Trace([]);
-          //console.log("State reset for the next trace.");
-          continue;
-        }
+  private async compileContract(
+    contractGenerator: TemplateEngine,
+    options: ContractGenerationOptions,
+  ): Promise<{ target: string; encoding: TriggerEncoding } | null> {
+    const contract = await contractGenerator.compile({
+      unfoldSubNets: options.unfoldSubNets ?? true
+    });
+    return contract;
+  }
 
-        // Add new transitions to candidates
-        transitionCandidate.target.forEach((p) => {
-          p.target.forEach((t) => {
-            if (!candidates.includes(t)) candidates.push(t);
-          });
-        });
+  private replay(
+    iNet: InteractionNet,
+    options: LogGenerationOptions | ContractGenerationOptions = {},
+  ): Trace[] {
+    const traces: Trace[] = [];
+    const conditions = new Map<string, number>();
 
-        //console.log("Updated candidates:", candidates.map((t) => t.id));
+    // New: Track visited transitions for loop detection and flushing
+    let visited: Transition[] = [];
+
+    const addConditionToLog = (
+      currentTrace: Trace,
+      conditionName: string,
+      conditionID: number,
+      addNext = false,
+    ) => {
+      const lastEvent = currentTrace.events.at(-1);
+      if (lastEvent && !addNext) {
+        lastEvent.dataChange = lastEvent.dataChange || [];
+        lastEvent.dataChange.push(
+          new InstanceDataChange(conditionName, conditionID),
+        );
+      } else {
+        currentTrace.events.push(
+          new Event(
+            "Instance Data Change",
+            "Instance Data Change",
+            [...iNet.participants.values()][0]!.id,
+            [],
+            [new InstanceDataChange(conditionName, conditionID)],
+          ),
+        );
+      }
+    };
+
+    const extractUniqueBitmaskNumbers = (expression: string): number[] => {
+      const regex = /&\s*(\d+)/g;
+      const numbers = new Set<number>();
+      let match;
+
+      while ((match = regex.exec(expression)) !== null) {
+        numbers.add(Number(match[1]));
       }
 
-      
+      return Array.from(numbers);
+    };
 
-      // Remove duplicate traces from the log
-      log.traces = log.traces.filter((trace, index, self) =>
-        index === self.findIndex((t) =>
-          t.events.map((e) => e.name).join(",") === trace.events.map((e) => e.name).join(",")
-        )
-      );
-
-      // Output the log
-      //console.log("Generated log:", log.traces.map((trace) => trace.events.map((e) => e.name)));
-      this.traces = log.traces;
-    }
-
-    private getCondition(transition: Transition) {
-      if (transition.label.guard && transition.label.guard.conditions.size > 0) 
-        return [...transition.label.guard.conditions.values()].join(" && ");
-    }
-
-    private processTransition(
+    const processTransition = (
       transitionCandidate: Transition,
-      currentTrace: Trace
-    ) {
-      //console.log("Executing transition:", transitionCandidate.id);
-    
+      currentTrace: Trace,
+    ) => {
+      // If the transition has been visited before in this trace, flush visited and reset
+      if (visited.includes(transitionCandidate)) {
+        // Flush visited transitions to the log as a special event
+        if (visited.length > 0) {
+          addConditionToLog(currentTrace, "conditions", 0, true);
+          logIfEnabled(
+            `Loop detected: Flushing visited transitions [${visited.map((t) => t.id).join(", ")}] and resetting visited.`,
+          );
+          visited = [];
+        }
+      }
+      visited.push(transitionCandidate);
+
       // Add the transition to the trace if it has a TaskLabel
       if (transitionCandidate.label instanceof TaskLabel) {
         currentTrace.events.push(
           new Event(
             transitionCandidate.label.name,
             transitionCandidate.id,
-            transitionCandidate.label.sender.id
-          )
+            transitionCandidate.label.sender.id,
+            transitionCandidate.calls.flatMap((c) => c.targetID),
+          ),
         );
       }
-    
+
       // Handle conditions for the transition
       const condition = this.getCondition(transitionCandidate);
+
       if (condition) {
-        if (!this.conditions.has(transitionCandidate.id)) {
-          transitionCandidate.label.guard?.conditions.clear();
-          this.conditions.set(transitionCandidate.id, 1 << this.conditions.size);
-        }
-    
-        const conditionID = this.conditions.get(transitionCandidate.id)!;
-    
-        // Add instance data change to the last event or create a new event
-        const lastEvent = currentTrace.events.at(-1);
-        if (lastEvent) {
-          lastEvent.dataChange = lastEvent.dataChange || [];
-          lastEvent.dataChange.push(new InstanceDataChange("conditions", conditionID));
+        if (options.parseConditions) {
+          // parse numbers from the condition, for each add it to the log
+          const conditionIDs = extractUniqueBitmaskNumbers(condition);
+          for (const id of conditionIDs) {
+            addConditionToLog(currentTrace, "conditions", id);
+          }
         } else {
-          currentTrace.events.push(
-            new Event(
-              "Instance Data Change",
-              "Instance Data Change",
-              [...this.contractGenerator.iNet.participants.values()][0]!.id,
-              "",
-              [new InstanceDataChange("conditions", conditionID)]
-            )
+          if (!conditions.has(transitionCandidate.id)) {
+            transitionCandidate.label.guard?.conditions.clear();
+            conditions.set(transitionCandidate.id, 1 << conditions.size);
+          }
+          const conditionID = conditions.get(transitionCandidate.id)!;
+          // Add instance data change to the last event or create a new event
+          addConditionToLog(currentTrace, "conditions", conditionID);
+
+          // Update the guard for the transition
+          const guard = new Guard(`conditions[${conditionID}] == true`);
+          guard.conditions.set(
+            "",
+            `conditions & ${conditionID} == ${conditionID}`,
           );
+          transitionCandidate.label.guard = guard;
         }
-    
-        // Update the guard for the transition
-        const guard = new Guard(`conditions[${conditionID}] == true`);
-        guard.conditions.set("", `conditions & ${conditionID} == ${conditionID}`);
-        transitionCandidate.label.guard = guard;
       }
+    };
+
+    const initial = iNet.initial!;
+    const end = iNet.end!;
+    const enabled: Place[] = [initial]; // Start with the initial place
+    const candidates: Transition[] = [...initial.target]; // Initial candidates are the transitions from the initial place
+    const executed: Transition[] = [];
+    const toExecute: Transition[] = [...iNet.elements.values()].filter(
+      (t): t is Transition => t instanceof Transition,
+    );
+    const maxTraces = options.maxTraces ?? 2500; // Threshold for maximum log entries
+    const log = new EventLog([]); // Initialize the log variable
+    let currentTrace = new Trace([]);
+
+    // Logging helper
+    const logIfEnabled = (...args: any[]) => {
+      if (LOGGING_ENABLED) console.log(...args);
+    };
+
+    logIfEnabled(
+      "To Execute",
+      toExecute.map((t) => t.id),
+    );
+    logIfEnabled("Starting replay...");
+    logIfEnabled(`Initial place: ${initial.id}, End place: ${end.id}`);
+    logIfEnabled(
+      "Initial candidates:",
+      candidates.map((t) => t.id),
+    );
+
+    while (log.traces.length < maxTraces) {
+      if (toExecute.every((t) => executed.includes(t))) {
+        logIfEnabled("All transitions executed. Stopping replay.");
+        break;
+      }
+
+      // Check for execution candidates
+      const executableCandidates = candidates.filter((t) =>
+        t.source.every((p) => enabled.includes(p)),
+      );
+      if (executableCandidates.length === 0) {
+        console.error("Deadlock detected: No executable transitions.");
+        return [];
+      }
+
+      // Prioritize transitions that are both in toExecute and candidates
+      const prioritizedCandidates = executableCandidates.filter((t) =>
+        toExecute.includes(t),
+      );
+      const availableCandidates =
+        prioritizedCandidates.length > 0
+          ? prioritizedCandidates
+          : executableCandidates;
+
+      // Pick a random candidate
+      const transitionCandidate =
+        availableCandidates[
+          Math.floor(Math.random() * availableCandidates.length)
+        ];
+      logIfEnabled("Selected transition candidate:", transitionCandidate.id);
+
+      // Process the transition
+      processTransition(transitionCandidate, currentTrace);
+
+      // Update enabled places
+      transitionCandidate.source.forEach((p) => {
+        const index = enabled.indexOf(p);
+        if (index !== -1) enabled.splice(index, 1); // Remove source places from enabled
+      });
+
+      transitionCandidate.target.forEach((p) => {
+        if (!enabled.includes(p)) enabled.push(p); // Add target places to enabled
+      });
+
+      // Update candidates and executed lists
+      candidates.splice(candidates.indexOf(transitionCandidate), 1); // Remove from candidates
+      executed.push(transitionCandidate); // Add to executed
+
+      logIfEnabled(
+        "Enabled places after execution:",
+        enabled.map((p) => p.id),
+      );
+      logIfEnabled(
+        "Executed transitions:",
+        executed.map((t) => t.id),
+      );
+
+      if (transitionCandidate.target.includes(end)) {
+        logIfEnabled("End place reached. Flushing trace to log.");
+        log.traces.push(currentTrace);
+        logIfEnabled(
+          "Trace added to log:",
+          currentTrace.events.map((e) => e.name),
+        );
+
+        // Reset state for the next trace
+        enabled.length = 0;
+        enabled.push(initial);
+        candidates.length = 0;
+        candidates.push(...initial.target);
+        executed.length = 0;
+        currentTrace = new Trace([]);
+        visited = [];
+        logIfEnabled("State reset for the next trace.");
+        continue;
+      }
+
+      // Add new transitions to candidates
+      transitionCandidate.target.forEach((p) => {
+        p.target.forEach((t) => {
+          if (!candidates.includes(t)) candidates.push(t);
+        });
+      });
+
+      logIfEnabled(
+        "Updated candidates:",
+        candidates.map((t) => t.id),
+      );
     }
+
+    // Remove duplicate traces from the log
+    log.traces = log.traces.filter(
+      (trace, index, self) =>
+        index ===
+        self.findIndex(
+          (t) =>
+            t.events.map((e: any) => e.id).join(",") ===
+            trace.events.map((e: any) => e.id).join(","),
+        ),
+    );
+
+    logIfEnabled(
+      "Generated log:",
+      log.traces.map((trace) => trace.events.map((e: any) => e.name)),
+    );
+    traces.push(...log.traces);
+    return traces;
   }
 
-  async generate(prePend = "", 
-    GeneratorType = SolDefaultContractGenerator, 
-    generationOptions = { unfoldSubNets: true, loopProtection: true }): Promise<void> {
-    const bpmnFiles = fs.readdirSync(this.bpmnDir).filter(file => file.endsWith('.bpmn'));
-
-    for (const file of bpmnFiles) {
-      console.log(`Simulation for ${file}`);
-      const filePath = path.join(this.bpmnDir, file);
-      const model = fs.readFileSync(filePath);
-      const nets = await this.bpmnParser!.fromXML(model);
-      const iNet = nets[0]; // only support one model
-      iNet.id = prePend + iNet.id;
-      const generator = new GeneratorType(iNet);
-      generator.addCaseVariable(new CaseVariable("conditions", "uint", "uint public conditions;", true));
-      const sim = new Simulator.Simulation(generator);
-      await sim.generate(generationOptions);
-
-      if (sim.traces.length === 0) continue;
-
-      const log = new EventLog([...sim.traces.values()]);
-      const template = fs.readFileSync(path.join(__dirname, "./templates/xes", "log.mustache.xes"), "utf-8");
-      const renderedLog = Mustache.render(template, log);
-
-      if (!fs.existsSync(this.contractDir)) fs.mkdirSync(this.contractDir, { recursive: true });
-      if (!fs.existsSync(this.xesDir)) fs.mkdirSync(this.xesDir, { recursive: true });
-
-      fs.writeFileSync(path.join(this.xesDir, `${path.basename(file, '.bpmn')}`) + ".xes", renderedLog, "utf-8");
-      fs.writeFileSync(path.join(this.contractDir, `${path.basename(file, '.bpmn')}`) + ".sol", sim.contract!.target, "utf-8");
-      fs.writeFileSync(path.join(this.contractDir, `${path.basename(file, '.bpmn')}`) + ".json", JSON.stringify(TriggerEncoding.toJSON(sim.contract!.encoding)), "utf-8");
-      console.log(`Generated log and contract written to ${this.xesDir} and ${this.contractDir}`);
-    }
+  private getCondition(transition: Transition) {
+    if (transition.label.guard && transition.label.guard.conditions.size > 0)
+      return [...transition.label.guard.conditions.values()].join(" && ");
   }
 }

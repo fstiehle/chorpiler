@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<log xes.version="1.0">
+	<global scope="event">
+		<string key="concept:name" value="Task Name" />
+		<string key="sourceRef" value="Participant ID" />
+	</global>
+
+  <trace id="0">
+    <event>
+      <string key="concept:name" value="Start Task" />
+      <string key="id" value="ChoreographyTask_0hy9n0g" />
+      <string key="sourceRef" value="Participant_06qakjv" />
+    </event>
+    <event>
+      <string key="concept:name" value="GatewayTask" />
+      <string key="id" value="ChoreographyTask_0agkzua" />
+      <string key="sourceRef" value="Participant_06qakjv" />
+    </event>
+    <event>
+      <string key="concept:name" value="SubTask" />
+      <string key="id" value="ChoreographyTask_0tcvdg0" />
+      <string key="sourceRef" value="Participant_06qakjv" />
+    </event>
+    <event>
+      <string key="concept:name" value="End Task" />
+      <string key="id" value="ChoreographyTask_0yky73k" />
+      <string key="sourceRef" value="Participant_06qakjv" />
+    </event>
+  </trace>
+  <trace id="1">
+    <event>
+      <string key="concept:name" value="Start Task" />
+      <string key="id" value="ChoreographyTask_0hy9n0g" />
+      <string key="sourceRef" value="Participant_06qakjv" />
+    </event>
+    <event>
+      <string key="concept:name" value="SubTask" />
+      <string key="id" value="ChoreographyTask_0tcvdg0" />
+      <string key="sourceRef" value="Participant_06qakjv" />
+    </event>
+    <event>
+      <string key="concept:name" value="GatewayTask" />
+      <string key="id" value="ChoreographyTask_0agkzua" />
+      <string key="sourceRef" value="Participant_06qakjv" />
+    </event>
+    <event>
+      <string key="concept:name" value="End Task" />
+      <string key="id" value="ChoreographyTask_0yky73k" />
+      <string key="sourceRef" value="Participant_06qakjv" />
+    </event>
+  </trace>
+</log>
