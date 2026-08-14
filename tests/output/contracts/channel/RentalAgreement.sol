@@ -57,7 +57,7 @@ interface IChannelResolver {
   function submit(bytes32 id, Step calldata _step) external;
 }
 
-IChannelRoot constant Channel_Root = IChannelRoot(0x5FbDB2315678afecb367f032d93F642f64180aa3);
+IChannelRoot constant Channel_Root = IChannelRoot(0x0000000000000000000000000000000000000000);
 
 contract RentalAgreement is IChannelResolver {
   uint public immutable disputeWindowInUNIX = 86400;

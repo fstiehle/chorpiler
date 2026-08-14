@@ -14,7 +14,7 @@ export default class SolChannelContractGenerator extends TemplateEngine {
   ) {
     super(
       _iNet,
-      path.join(__dirname, "..", "..", "Encoding/Template/templates/ChannelResolver.handlebars.sol"),
+      path.join(__dirname, "..", "..", "Encoding/Template", "ChannelResolver.handlebars.sol"),
       _caseVariables,
       [], // partials will be auto-discovered
       true, // channel always instanced

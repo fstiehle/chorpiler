@@ -17,7 +17,7 @@
     "test/reso": "node --enable-source-maps --import tsx/esm --test tests/channel-reso.test.ts",
     "test/debg": "node --enable-source-maps --import tsx/esm --test --test-only tests/generator.test.ts",
     "test/simu": "node --enable-source-maps --import tsx/esm --test tests/simulator/*.test.ts",
-    "build": "tsc -p tsconfig.build.json && ncp ./src/Generator/templates ./lib/Generator/templates && ncp ./src/Simulator/templates ./lib/Simulator/templates",
+    "build": "tsc -p tsconfig.build.json && mkdir -p lib && rsync -av --prune-empty-dirs --include='*/' --include='*.handlebars.*' --exclude='*' src/ lib/",
     "prepublishOnly": "npm run build",
     "preversion": "npm run build && npm run test/pckg",
     "clean": "rm -rf lib",
@@ -35,7 +35,6 @@
     "@types/node": "^25.5.0",
     "@types/seed-random": "^2.2.4",
     "hardhat": "^3.1.12",
-    "ncp": "^2.0.0",
     "tsx": "^4.21.0",
     "typescript": "^5.9.3",
     "viem": "^2.47.4"
