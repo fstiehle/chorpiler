@@ -11,12 +11,14 @@ import { network } from "hardhat";
 import { strict as assert } from "node:assert";
 import { describe, it, beforeEach, afterEach } from "node:test";
 import { encodeAbiParameters, keccak256, parseAbiParameters, toHex, encodePacked } from "viem";
-import { computeInstanceID, debugLog } from "./helpers/execution-helpers.js";
+import { computeChannelID, computeInstanceID, debugLog } from "./helpers/execution-helpers.js";
 import type { Address, Hex } from "viem";
 
 const { viem, networkHelpers, networkName } = await network.connect();
 const client = await viem.getPublicClient();
 const testClient = await viem.getTestClient();
+
+let CHAIN_ID: Hex;
 
 // Store deployed ChannelRoot address for later use
 export let CHANNEL_ROOT_ADDRESS: Address;
@@ -63,6 +65,9 @@ describe("ChannelRoot Contract Tests", () => {
     for (const wallet of wallets) {
       await networkHelpers.setBalance(wallet.account!.address, 10n ** 18n);
     }
+
+    // Read CHAIN_ID from deployed contract to avoid mismatches
+    CHAIN_ID = await channelRoot.read.CHAIN_ID();
 
     // debugLog(`Connected to network: ${networkName}`);
     // debugLog(`ChannelRoot address: ${channelRootAddress}`);
@@ -237,12 +242,7 @@ describe("ChannelRoot Contract Tests", () => {
       });
       await client.waitForTransactionReceipt({ hash });
 
-      channelID = keccak256(
-        encodeAbiParameters(
-          parseAbiParameters("bytes32, address[], address"),
-          [instanceID, participants, resolveContract]
-        )
-      );
+      channelID = computeChannelID(channel.instanceID, channel.participants, channel.resolveContract)
     });
 
     it("should verify valid signatures from all participants", async () => {
@@ -252,8 +252,8 @@ describe("ChannelRoot Contract Tests", () => {
       // Create payload
       const payload = keccak256(
         encodeAbiParameters(
-          parseAbiParameters("bytes32, bytes32"),
-          [stateHash, opReturn]
+          parseAbiParameters("bytes32, bytes32, bytes32, bytes32"),
+          [CHAIN_ID, channelID, stateHash, opReturn]
         )
       );
 
@@ -267,13 +267,14 @@ describe("ChannelRoot Contract Tests", () => {
       }
 
       const proof = {
+        channelID,
         signatures,
         stateHash,
         OP_RETURN: opReturn,
       };
 
       // Verify
-      const isValid = await channelRoot.read.verify([channelID, proof]);
+      const isValid = await channelRoot.read.verify([proof]);
       assert.strictEqual(isValid, true, "Verification should succeed with valid signatures");
 
       debugLog("✓ Valid signatures verified successfully");
@@ -285,8 +286,8 @@ describe("ChannelRoot Contract Tests", () => {
 
       const payload = keccak256(
         encodeAbiParameters(
-          parseAbiParameters("bytes32, bytes32"),
-          [stateHash, opReturn]
+          parseAbiParameters("bytes32, bytes32, bytes32, bytes32"),
+          [CHAIN_ID, channelID, stateHash, opReturn]
         )
       );
 
@@ -301,13 +302,14 @@ describe("ChannelRoot Contract Tests", () => {
       });
 
       const proof = {
+        channelID,
         signatures: [sig1, sig2],
         stateHash,
         OP_RETURN: opReturn,
       };
 
       // Verify (should fail)
-      const isValid = await channelRoot.read.verify([channelID, proof]);
+      const isValid = await channelRoot.read.verify([proof]);
       assert.strictEqual(isValid, false, "Verification should fail with invalid signature");
 
       debugLog("✓ Invalid signature rejected correctly");
@@ -320,8 +322,8 @@ describe("ChannelRoot Contract Tests", () => {
       // Sign payload with correct state
       const payload = keccak256(
         encodeAbiParameters(
-          parseAbiParameters("bytes32, bytes32"),
-          [stateHash, opReturn]
+          parseAbiParameters("bytes32, bytes32, bytes32, bytes32"),
+          [CHAIN_ID, channelID, stateHash, opReturn]
         )
       );
 
@@ -336,13 +338,14 @@ describe("ChannelRoot Contract Tests", () => {
       // But submit proof with DIFFERENT state hash
       const differentStateHash = keccak256(toHex("different_state"));
       const proof = {
+        channelID,
         signatures,
         stateHash: differentStateHash,
         OP_RETURN: opReturn,
       };
 
       // Verify (should fail because payload won't match)
-      const isValid = await channelRoot.read.verify([channelID, proof]);
+      const isValid = await channelRoot.read.verify([proof]);
       assert.strictEqual(isValid, false, "Verification should fail with mismatched state hash");
 
       debugLog("✓ Mismatched state hash rejected correctly");
@@ -355,8 +358,8 @@ describe("ChannelRoot Contract Tests", () => {
 
       const payload = keccak256(
         encodeAbiParameters(
-          parseAbiParameters("bytes32, bytes32"),
-          [stateHash, opReturn]
+          parseAbiParameters("bytes32, bytes32, bytes32, bytes32"),
+          [CHAIN_ID, channelID, stateHash, opReturn]
         )
       );
 
@@ -369,6 +372,7 @@ describe("ChannelRoot Contract Tests", () => {
       }
 
       const proof = {
+        channelID: fakeChannelID,
         signatures,
         stateHash,
         OP_RETURN: opReturn,
@@ -376,7 +380,7 @@ describe("ChannelRoot Contract Tests", () => {
 
       /// Should revert because channel doesn't exist
       try {
-        await channelRoot.read.verify([fakeChannelID, proof]);
+        await channelRoot.read.verify([proof]);
         assert.fail("Should have thrown an error for non-existent channel");
       } catch (error: any) {
         assert(
@@ -420,8 +424,8 @@ describe("ChannelRoot Contract Tests", () => {
       const opReturn = keccak256(toHex("return_single"));
       const payload = keccak256(
         encodeAbiParameters(
-          parseAbiParameters("bytes32, bytes32"),
-          [stateHash, opReturn]
+          parseAbiParameters("bytes32, bytes32, bytes32, bytes32"),
+          [CHAIN_ID, channelID, stateHash, opReturn]
         )
       );
 
@@ -430,12 +434,13 @@ describe("ChannelRoot Contract Tests", () => {
       });
 
       const proof = {
+        channelID,
         signatures: [signature],
         stateHash,
         OP_RETURN: opReturn,
       };
 
-      const isValid = await channelRoot.read.verify([channelID, proof]);
+      const isValid = await channelRoot.read.verify([proof]);
       assert.strictEqual(isValid, true, "Single participant verification should succeed");
 
       debugLog("✓ Single participant channel works correctly");

@@ -4,9 +4,8 @@ import { fileURLToPath } from "url";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Log extra debug info during testing
-export const DEBUG_MODE = true;
-export const TEST_MODE = "default"; // "channels or default"
+export const DEBUG_MODE = true; // Log extra debug info during testing
+export const TEST_MODE = "channels"; // "channels or default"
 
 export const BPMN_PATH = path.join(__dirname, "input", "bpmn");
 export const XES_PATH = path.join(__dirname, "input", "xes");
