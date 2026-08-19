@@ -24,7 +24,7 @@ interface IChannelRoot {
   Registers a new channel, its resolve contract address, and participating participants.
   */
   function register(Channel calldata _channel) external;
-  function verify(Proof calldata _step) external returns (bool);
+  function verify(Proof calldata _step) external view returns (bool);
 }
 
 interface IProcessInstance {
@@ -58,7 +58,7 @@ interface IChannelResolver {
   function submit(bytes32 _channelID, Step calldata _step) external;
 }
 
-IChannelRoot constant Channel_Root = IChannelRoot(0x5FbDB2315678afecb367f032d93F642f64180aa3);
+IChannelRoot constant Channel_Root = IChannelRoot(0x0000000000000000000000000000000000000000);
 
 contract SubChoreoMessages is IChannelResolver {
   uint public immutable disputeWindowInUNIX = 86400;
@@ -125,7 +125,7 @@ contract SubChoreoMessages is IChannelResolver {
     }
   }
 
-  function checkStep(bytes32 _channelID, Step calldata _step) private returns (bool) {
+  function checkStep(bytes32 _channelID, Step calldata _step) private view returns (bool) {
     // Check that step is higher than previously recorded steps
     if (instanceData[_step.intsanceID].state.index >= _step.newState.index) {
       return false;

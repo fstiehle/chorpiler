@@ -27,7 +27,7 @@ interface IChannelRoot {
 
   function getChannel(bytes32 _id) external view returns (Channel memory);
 
-  function verify(Proof calldata _step) external returns (bool);
+  function verify(Proof calldata _step) external view returns (bool);
 }
 
 import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";

@@ -24,7 +24,7 @@ interface IChannelRoot {
   Registers a new channel, its resolve contract address, and participating participants.
   */
   function register(Channel calldata _channel) external;
-  function verify(Proof calldata _step) external returns (bool);
+  function verify(Proof calldata _step) external view returns (bool);
 }
 
 interface IProcessInstance {
@@ -140,7 +140,7 @@ contract CallChoreoChained is IChannelResolver {
     }
   }
 
-  function checkStep(bytes32 _channelID, Step calldata _step) private returns (bool) {
+  function checkStep(bytes32 _channelID, Step calldata _step) private view returns (bool) {
     // Check that step is higher than previously recorded steps
     if (instanceData[_step.intsanceID].state.index >= _step.newState.index) {
       return false;

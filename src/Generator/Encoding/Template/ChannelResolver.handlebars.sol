@@ -2,9 +2,13 @@
 pragma solidity ^0.8.24;
 
 {{#if options.debug}}
+{{#if (isString options.debug)}}
+import "{{options.debug}}";
+{{else}}
 import "hardhat/console.sol";
 {{/if}}
 
+{{/if}}
 interface IChannelRoot {
   // TODO: Variable Packing
   // Registered State Channels
@@ -26,7 +30,7 @@ interface IChannelRoot {
   Registers a new channel, its resolve contract address, and participating participants.
   */
   function register(Channel calldata _channel) external;
-  function verify(Proof calldata _step) external returns (bool);
+  function verify(Proof calldata _step) external view returns (bool);
 }
 
 interface IProcessInstance {
@@ -71,7 +75,11 @@ interface IChannelResolver {
 {{! ---- // List/declarations of called contracts and their interfaces ---- }}
 {{> calls}}
 
+{{#if options.rootAddress}}
+IChannelRoot constant Channel_Root = IChannelRoot({{options.rootAddress}});
+{{else}}
 IChannelRoot constant Channel_Root = IChannelRoot(0x0000000000000000000000000000000000000000);
+{{/if}}
 
 contract {{{modelID}}} is IChannelResolver {
   uint public immutable disputeWindowInUNIX = 86400;
@@ -117,7 +125,7 @@ contract {{{modelID}}} is IChannelResolver {
     }
   }
 
-  function checkStep(bytes32 _channelID, Step calldata _step) private returns (bool) {
+  function checkStep(bytes32 _channelID, Step calldata _step) private view returns (bool) {
     // Check that step is higher than previously recorded steps
     if (instanceData[_step.intsanceID].state.index >= _step.newState.index) {
       return false;

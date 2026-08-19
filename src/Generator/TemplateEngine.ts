@@ -18,19 +18,17 @@ export interface CompileOptions {
   unfoldSubNets: boolean; // If true, sub choreographies are "folded" into the main choreography, i.e.,
   // they are treated as visual option only with no consequence for the generated contract
   events: boolean; // emit Events on task execution
-  debug: boolean; // add Hardhat's console.log debug info
+  // debug can be null (no debug), or a string identifying the debug runtime (e.g. 'hardhat' or 'foundry')
+  debug: null | "hardhat" | "foundry" | boolean;
+  // allow arbitrary extra options to be passed through by specific generators
+  [key: string]: any;
 }
 
 export interface ITemplateEngine {
   addCaseVariable(variable: CaseVariable): void;
   deleteCaseVariable(variableName: string): boolean;
   getCaseVariable(variableName: string): CaseVariable | undefined;
-  compile(options?: {
-    unfoldSubNets?: boolean;
-    loopProtection?: boolean;
-    events?: boolean;
-    debug?: boolean;
-  }): Promise<{ target: string; encoding: TriggerEncoding }>;
+  compile(options?: Partial<CompileOptions>): Promise<{ target: string; encoding: TriggerEncoding }>;
   setTemplatePath(path: string): void;
   getTemplate(): Promise<string>;
 }
@@ -87,17 +85,14 @@ export abstract class TemplateEngine implements ITemplateEngine {
     return partials;
   }
 
-  async compile(_options?: {
-    unfoldSubNets?: boolean;
-    loopProtection?: boolean;
-    events?: boolean;
-    debug?: boolean;
-  }) {
-    const options = {
+  async compile(_options?: Partial<CompileOptions>): Promise<{ target: string; encoding: TriggerEncoding }> {
+    const options: CompileOptions = {
       unfoldSubNets: _options?.unfoldSubNets ?? false,
       loopProtection: _options?.loopProtection ?? true,
       events: _options?.events ?? false,
-      debug: _options?.debug ?? false,
+      debug: _options?.debug ?? null,
+      // spread any additional keys passed in
+      ...( (_options as any) || {} ),
     };
     if (this.iNet.initial == null || this.iNet.end == null) {
       throw new Error("Invalid InteractionNet");
@@ -151,7 +146,11 @@ export abstract class TemplateEngine implements ITemplateEngine {
 
     // Compile and render template
     const compiledTemplate = Handlebars.compile(template);
-    const encodedData = HandlebarsEncoding.fromEncoding(gen);
+    const encodedData = HandlebarsEncoding.fromEncoding(gen) as any;
+
+    // Expose compile options to templates at render time so templates can
+    // access e.g. options.rootAddress or options.debug
+    encodedData.options = options;
 
     return {
       target: compiledTemplate(encodedData, {
@@ -171,6 +170,11 @@ export abstract class TemplateEngine implements ITemplateEngine {
     // Helper to check if a value is truthy and not empty
     Handlebars.registerHelper("hasValue", function (value) {
       return value && value !== "" && value !== "0";
+    });
+
+    // Helper to detect strings (useful for debug import override)
+    Handlebars.registerHelper("isString", function (value) {
+      return typeof value === "string";
     });
   }
 

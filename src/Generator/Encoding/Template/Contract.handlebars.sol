@@ -2,9 +2,13 @@
 pragma solidity ^0.8.24;
 
 {{#if options.debug}}
+{{#if (isString options.debug)}}
+import "{{options.debug}}";
+{{else}}
 import "hardhat/console.sol";
 {{/if}}
 
+{{/if}}
 {{> interfaces }}
 
 {{! ---- // List/declarations of called contracts and their interfaces ---- }}

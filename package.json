@@ -1,6 +1,6 @@
 {
   "name": "chorpiler",
-  "version": "0.2.0-alpha.39",
+  "version": "0.2.0-alpha.40",
   "description": "",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
@@ -8,6 +8,12 @@
   "files": [
     "lib/**/*"
   ],
+  "exports": {
+    ".": {
+      "import": "./lib/index.js"
+    },
+    "./package.json": "./package.json"
+  },
   "scripts": {
     "test": "npm run test/pckg && npm run test/simu && npm run test/comp && npx hardhat clean && npx hardhat compile && npm run test/root && npm run test/exec",
     "test/pckg": "node --enable-source-maps --import tsx/esm --test tests/index.test.ts",
