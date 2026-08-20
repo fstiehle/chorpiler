@@ -2,8 +2,8 @@ import * as fs from "fs";
 import path from "path";
 import util from "util";
 import { CaseVariable } from "../../src/Generator/Encoding/Encoding.js";
-import SolDefaultContractGenerator from "../../src/Generator/target/Sol/DefaultGenerator.js";
-import SolStateChannelContractGenerator from "../../src/Generator/target/Sol/ChannelGenerator.js";
+import { SolDefaultContractGenerator }  from "../../src/Generator/target/Sol/DefaultGenerator.js";
+import { SolChannelContractGenerator } from "../../src/Generator/target/Sol/ChannelGenerator.js";
 import { BPMN_PATH, CONTRACTS_PATH, CHANNEL_CONTRACTS_PATH } from "../config.js";
 import { TemplateEngine } from "../../src/Generator/TemplateEngine.js";
 import { TriggerEncoding } from "../../src/Generator/Encoding/JSON/TriggerEncoding.js";
@@ -50,7 +50,7 @@ export const parseINet = (
 ) => {
   let generator;
   if (isStateChannel) {
-    generator = new SolStateChannelContractGenerator(iNet);
+    generator = new SolChannelContractGenerator(iNet);
   } else {
     generator = new SolDefaultContractGenerator(iNet, undefined, iNet.isCalled);
   }

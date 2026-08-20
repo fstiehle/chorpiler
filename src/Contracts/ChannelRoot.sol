@@ -14,6 +14,7 @@ interface IChannelRoot {
     address resolveContract;
   }
   struct Proof {
+    bytes32 channelID;
     bytes[] signatures;
     bytes32 stateHash;
     bytes32 OP_RETURN;
@@ -26,19 +27,20 @@ interface IChannelRoot {
 
   function getChannel(bytes32 _id) external view returns (Channel memory);
 
-  function verify(bytes32 _id, Proof calldata _step) external returns (bool);
+  function verify(Proof calldata _step) external view returns (bool);
 }
 
 import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
 import "@openzeppelin/contracts/utils/cryptography/MessageHashUtils.sol";
 
 contract ChannelRoot is IChannelRoot {
+  bytes32 public constant CHAIN_ID = "proto-evm-v1"; // Prevent replay accross different chains or protocol versions
   using ECDSA for bytes32;
   using MessageHashUtils for bytes32;
   mapping(bytes32 => Channel) private _channels;
 
   function register(Channel calldata _channel) external {
-    bytes32 id = keccak256(
+    bytes32 _channelID = keccak256(
       abi.encode(
         _channel.instanceID,
         _channel.participants,
@@ -47,26 +49,25 @@ contract ChannelRoot is IChannelRoot {
     );
     // write to channel if id doesn't exist yet
     require(
-      _channels[id].resolveContract == address(0),
+      _channels[_channelID].resolveContract == address(0),
       "Channel already exists"
     );
-    _channels[id] = _channel;
+    _channels[_channelID] = _channel;
   }
 
-  function verify(
-    bytes32 _id,
-    Proof calldata _step
-  ) external view returns (bool) {
+  function verify(Proof calldata _step) external view returns (bool) {
     require(
-      _channels[_id].resolveContract != address(0),
+      _channels[_step.channelID].resolveContract != address(0),
       "Channel does not exist"
     );
-    bytes32 payload = keccak256(abi.encode(_step.stateHash, _step.OP_RETURN));
+    bytes32 payload = keccak256(
+      abi.encode(CHAIN_ID, _step.channelID, _step.stateHash, _step.OP_RETURN)
+    );
 
-    for (uint i = 0; i < _channels[_id].participants.length; i++) {
+    for (uint i = 0; i < _channels[_step.channelID].participants.length; i++) {
       if (
         payload.toEthSignedMessageHash().recover(_step.signatures[i]) !=
-        _channels[_id].participants[i]
+        _channels[_step.channelID].participants[i]
       ) {
         return false;
       }

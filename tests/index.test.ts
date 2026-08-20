@@ -2,10 +2,17 @@ import { describe, it, after } from "node:test";
 import { strict as assert } from "node:assert";
 // also test some imports
 import chorpiler, {
+  SolDefaultContractGenerator,
+  SolChannelContractGenerator,
+  Parser,
+  Simulator,
+  EventLog,
+  Trace,
   InteractionNet,
   INetParser,
   TemplateEngine,
   TriggerEncoding,
+  XESFastXMLParser,
 } from "../src/index.js";
 import * as fs from "fs";
 import path from "path";
@@ -21,6 +28,29 @@ describe("NPM Package", () => {
     assert.ok("Parser" in chorpiler);
     assert.ok("generators" in chorpiler);
     assert.ok("utils" in chorpiler);
+  });
+
+  it("should expose named exports for core classes", () => {
+    // named exports should be available
+    assert.strictEqual(typeof Parser, "function");
+    assert.strictEqual(typeof SolDefaultContractGenerator, "function");
+    assert.strictEqual(typeof SolChannelContractGenerator, "function");
+    assert.strictEqual(typeof Simulator, "function");
+    assert.strictEqual(typeof EventLog, "function");
+    assert.strictEqual(typeof Trace, "function");
+    assert.strictEqual(typeof XESFastXMLParser, "function");
+  });
+
+  it("default generators should match named exports", () => {
+    // the convenience default should reference the same classes
+    assert.strictEqual(
+      chorpiler.generators.sol.DefaultContractGenerator,
+      SolDefaultContractGenerator,
+    );
+    assert.strictEqual(
+      chorpiler.generators.sol.ChannelContractGenerator,
+      SolChannelContractGenerator,
+    );
   });
 
   it("should allow importing interfaces", () => {
@@ -41,9 +71,14 @@ describe("NPM Package", () => {
 
   describe("Parser", () => {
     it("should conform to parser interface", () => {
+      // test default import usage
       const parser = new chorpiler.Parser();
       assert.strictEqual(typeof parser, "object");
       assert.strictEqual(typeof parser.fromXML, "function");
+
+      // test named import usage
+      const parser2 = new Parser();
+      assert.strictEqual(typeof parser2.fromXML, "function");
     });
   });
 
@@ -52,7 +87,7 @@ describe("NPM Package", () => {
       const gens = chorpiler.generators;
       assert.ok("sol" in gens);
       assert.ok("DefaultContractGenerator" in gens.sol);
-      assert.ok("StateChannelContractGenerator" in gens.sol);
+      assert.ok("ChannelContractGenerator" in gens.sol);
     });
 
     it("should conform to template engine interface", () => {
@@ -62,7 +97,7 @@ describe("NPM Package", () => {
         "function",
       );
       assert.strictEqual(
-        typeof chorpiler.generators.sol.StateChannelContractGenerator.prototype
+        typeof chorpiler.generators.sol.ChannelContractGenerator.prototype
           .compile,
         "function",
       );

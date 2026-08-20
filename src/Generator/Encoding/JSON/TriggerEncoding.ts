@@ -28,6 +28,8 @@ export class TriggerEncoding implements IFromEncoding {
       { id: number; participants: Map<number, string> }
     > = new Map(),
     public subModels: Map<number, SubModel> = new Map(),
+    // optional case name stored for JSON output
+    public caseName: string = "",
   ) {}
 
   static fromEncoding(encoding: MainProcess): TriggerEncoding {
@@ -91,6 +93,8 @@ export class TriggerEncoding implements IFromEncoding {
       }),
     );
 
+    const caseName = (encoding as any).modelID ?? "";
+
     return new TriggerEncoding(
       processID,
       encoding.isCalled,
@@ -126,6 +130,7 @@ export class TriggerEncoding implements IFromEncoding {
         ]),
       ),
       subModels,
+      caseName,
     );
   }
 
@@ -147,6 +152,10 @@ export class TriggerEncoding implements IFromEncoding {
 
   static toJSON(encoding: TriggerEncoding) {
     return {
+      schemaVersion: 1,
+      case: {
+        name: encoding.caseName ?? "",
+      },
       processID: encoding.processID,
       isCalled: encoding.isCalled,
       isInstanced: encoding.isInstanced,
@@ -202,6 +211,8 @@ export class TriggerEncoding implements IFromEncoding {
   }
 
   static fromJSON(object: {
+    schemaVersion?: number;
+    case?: { name?: string };
     processID: number;
     isCalled?: boolean;
     isInstanced?: boolean;
@@ -224,6 +235,8 @@ export class TriggerEncoding implements IFromEncoding {
       };
     };
   }): TriggerEncoding {
+    const caseName = object.case?.name ?? "";
+
     return new TriggerEncoding(
       object.processID,
       object.isCalled ?? false,
@@ -282,6 +295,7 @@ export class TriggerEncoding implements IFromEncoding {
           ),
         ]),
       ),
+      caseName,
     );
   }
 }

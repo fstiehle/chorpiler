@@ -4,7 +4,7 @@ import { beforeEach, describe, it } from "node:test";
 import path from "path";
 import util from "util";
 import { CaseVariable } from "../src/Generator/Encoding/Encoding.js";
-import SolDefaultContractGenerator from "../src/Generator/target/Sol/DefaultGenerator.js";
+import { SolDefaultContractGenerator } from "../src/Generator/target/Sol/DefaultGenerator.js";
 import { INetFastXMLParser } from "../src/Parser/FastXMLParser.js";
 import { INetParser } from "../src/Parser/Parser.js";
 import { BPMN_PATH, CONTRACTS_PATH, CHANNEL_CONTRACTS_PATH, TEST_MODE as CONFIG_TEST_MODE } from "./config.js";

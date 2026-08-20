@@ -20,6 +20,7 @@ import { HardhatViemHelpers } from "@nomicfoundation/hardhat-viem/types";
 import { DEBUG_MODE } from "./../config.js";
 import { NetworkHelpers } from "@nomicfoundation/hardhat-network-helpers/types";
 import { TriggerEncoding } from "../../src/Generator/Encoding/JSON/TriggerEncoding.js";
+import { getFunctionNameForTask } from "../../src/util/encodingUtils.js";
 
 export interface ContractData {
   contractName: string;
@@ -532,50 +533,6 @@ export function hasSubChoreos(encoding: TriggerEncoding) {
   return encoding.subModels && encoding.subModels.size > 0;
 }
 
-/**
- * Determines the function name to call based on the task's process ID.
- * Returns 'enact' for main process tasks, or the sub-choreography model ID for sub-process tasks.
- */
-export function getFunctionNameForTask(
-  task: { processID: number },
-  encoding: TriggerEncoding,
-): string {
-  const processID = task.processID;
-  if (processID === 0) {
-    return "enact";
-  }
-
-  // task is in a subChoreo, call it instead
-  const subModuleName = encoding.subModels.get(Number(processID));
-  if (subModuleName) {
-    return subModuleName.modelID;
-  }
-
-  console.warn(
-    `SubModule with processID ${processID} not found, falling back to 'enact'`,
-  );
-  return "enact";
-}
-
-export async function getEnabled(
-  client: PublicClient,
-  contract: any,
-  encoding: TriggerEncoding,
-  subChoreography: number | null = null,
-) {
-  const state = await getTokenState(client, contract, subChoreography);
-
-  const enabled: string[] = [];
-
-  for (const [modelID, req_state] of encoding.states) {
-    if ((state & req_state) === req_state) {
-      enabled.push(modelID);
-    }
-  }
-
-  return enabled;
-}
-
 export function computeChannelID(
   instanceID: `0x${string}`,
   participants: `0x${string}`[],
@@ -690,3 +647,24 @@ export function buildCaseValues(encoding: TriggerEncoding) {
 
   return caseValues;
 }
+
+
+export async function getEnabled(
+  client: PublicClient,
+  contract: any,
+  encoding: TriggerEncoding,
+  subChoreography: number | null = null,
+) {
+  const state = await getTokenState(client, contract, subChoreography);
+
+  const enabled: string[] = [];
+
+  for (const [modelID, req_state] of encoding.states) {
+    if ((state & req_state) === req_state) {
+      enabled.push(modelID);
+    }
+  }
+
+  return enabled;
+}
+

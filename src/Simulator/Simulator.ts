@@ -8,7 +8,7 @@ const __dirname = path.dirname(__filename);
 import { CaseVariable } from "../Generator/Encoding/Encoding.js";
 import { TriggerEncoding } from "../Generator/Encoding/JSON/TriggerEncoding.js";
 import { GeneratorConstructor } from "../Generator/Generator.js";
-import SolDefaultContractGenerator from "../Generator/target/Sol/DefaultGenerator.js";
+import { SolDefaultContractGenerator } from "../Generator/target/Sol/DefaultGenerator.js";
 import { TemplateEngine } from "../Generator/TemplateEngine.js";
 import { Transition } from "../Parser/Elements/Transition.js";
 import { Place } from "../Parser/Elements/Place.js";

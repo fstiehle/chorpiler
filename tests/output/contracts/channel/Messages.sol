@@ -14,6 +14,7 @@ interface IChannelRoot {
 
   // Submitted Proof
   struct Proof {
+    bytes32 channelID;
     bytes[] signatures;
     bytes32 stateHash;
     bytes32 OP_RETURN;
@@ -23,7 +24,7 @@ interface IChannelRoot {
   Registers a new channel, its resolve contract address, and participating participants.
   */
   function register(Channel calldata _channel) external;
-  function verify(bytes32 _id, Proof calldata _step) external returns (bool);
+  function verify(Proof calldata _step) external view returns (bool);
 }
 
 interface IProcessInstance {
@@ -51,10 +52,10 @@ interface IChannelResolver {
     bytes32 OP_RETURN;
   }
 
-  function enact(bytes32 instanceID, uint id) external;
-  function getTokenState(bytes32 instanceID) external view returns (uint);
+  function enact(bytes32 _instanceID, uint id) external;
+  function getTokenState(bytes32 _instanceID) external view returns (uint);
   function instance(uint _nonce, address[3] memory participants) external returns (bytes32);
-  function submit(bytes32 id, Step calldata _step) external;
+  function submit(bytes32 _channelID, Step calldata _step) external;
 }
 
 IChannelRoot constant Channel_Root = IChannelRoot(0x0000000000000000000000000000000000000000);
@@ -95,15 +96,16 @@ contract Messages is IChannelResolver {
    * Trigger new dispute or submit new state to elapse current dispute state
    * @param _step Last unanimously signed step, or empty step if process is stuck in start event
    */
-   function submit(bytes32 id, Step calldata _step) external {
+   function submit(bytes32 _channelID, Step calldata _step) external {
     uint _disputeMadeAtUNIX = instanceData[_step.intsanceID].disputeMadeAtUNIX;
     if (0 == _step.newState.index && 0 == _disputeMadeAtUNIX) {
       // stuck in start event
       instanceData[_step.intsanceID].disputeMadeAtUNIX = block.timestamp;
-      console.log("Messages: new dispute (stuck in start event) registered with ID (see below)"); console.logBytes32(id);
+      console.log("Messages: new dispute (stuck in start event) registered with channelID");
+      console.logBytes32(_channelID);
     }
     else {
-      if (checkStep(id, _step)) {
+      if (checkStep(_channelID, _step)) {
         if (0 == _disputeMadeAtUNIX) {
           // new dispute or final state
           if (_step.newState.tokenState != 0) {
@@ -115,18 +117,20 @@ contract Messages is IChannelResolver {
           // submission to existing dispute
           instanceData[_step.intsanceID].state = _step.newState;
         }
-        console.log("Messages: new dispute registered with ID (see below)"); console.logBytes32(id);
+        console.log("Messages: new dispute registered with channelID");
+        console.logBytes32(_channelID);
       }
     }
   }
 
-  function checkStep(bytes32 id, Step calldata _step) private returns (bool) {
+  function checkStep(bytes32 _channelID, Step calldata _step) private view returns (bool) {
     // Check that step is higher than previously recorded steps
     if (instanceData[_step.intsanceID].state.index >= _step.newState.index) {
       return false;
     }
 
-    return Channel_Root.verify(id, IChannelRoot.Proof({
+    return Channel_Root.verify(IChannelRoot.Proof({
+      channelID: _channelID,
       signatures: _step.signatures,
       stateHash: keccak256(abi.encode(_step.newState)),
       OP_RETURN: _step.OP_RETURN

@@ -3,7 +3,7 @@ import hardhatViem from "@nomicfoundation/hardhat-viem";
 import hardhatViemAssertions from "@nomicfoundation/hardhat-viem-assertions";
 import hardhatNodeTestRunner from "@nomicfoundation/hardhat-node-test-runner";
 import hardhatNetworkHelpers from "@nomicfoundation/hardhat-network-helpers";
-import { CONTRACTS_PATH,  CHANNEL_CONTRACTS_PATH, OUTPUT_PATH, TEST_MODE as CONFIG_TEST_MODE } from "./tests/config.js";
+import { CONTRACTS_PATH, CHANNEL_CONTRACTS_PATH, OUTPUT_PATH, TEST_MODE as CONFIG_TEST_MODE } from "./tests/config.js";
 
 const config: HardhatUserConfig = {
   solidity: {
