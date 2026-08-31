@@ -11,7 +11,8 @@
     "moduleResolution": "node16",
     "outDir": "lib",
     "sourceMap": true,
-    "inlineSources": true
+    "inlineSources": true,
+    "types": ["node"]
   },
   "include": ["./**/*.ts"],
   "exclude": ["src/Generator/Encoding/templates", "node_modules", "lib"],
