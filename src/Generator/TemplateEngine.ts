@@ -35,14 +35,17 @@ export interface ITemplateEngine {
 
 export abstract class TemplateEngine implements ITemplateEngine {
   private addressList = new Map<string, string>();
+  private caseVariables = new Map<string, CaseVariable>();
 
   constructor(
     public iNet: InteractionNet,
     private templatePath: string,
-    private caseVariables = new Map<string, CaseVariable>(),
     private templatePartials = new Array<{ partial: string; path: string }>(),
     private isInstanced: boolean = false,
     private isChannel: boolean = false,
+    // arbitrary extra options passed through by specific generators, merged
+    // into compile() options (call-time options take precedence)
+    private extraOptions: Partial<CompileOptions> | Record<string, any> = {},
   ) {
     // Discover partials from both directories
     const partialsDir = path.join(path.dirname(this.templatePath), 'partials');
@@ -87,11 +90,13 @@ export abstract class TemplateEngine implements ITemplateEngine {
 
   async compile(_options?: Partial<CompileOptions>): Promise<{ target: string; encoding: TriggerEncoding }> {
     const options: CompileOptions = {
-      unfoldSubNets: _options?.unfoldSubNets ?? false,
-      loopProtection: _options?.loopProtection ?? true,
-      events: _options?.events ?? false,
-      debug: _options?.debug ?? null,
-      // spread any additional keys passed in
+      unfoldSubNets: false,
+      loopProtection: true,
+      events: false,
+      debug: null,
+      // extraOptions (set at construction time) are overridden by options
+      // passed to compile() at call time
+      ...(this.extraOptions as any),
       ...( (_options as any) || {} ),
     };
     if (this.iNet.initial == null || this.iNet.end == null) {

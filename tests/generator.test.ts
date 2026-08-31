@@ -86,7 +86,7 @@ describe("Generation of edge cases", () => {
         const isSubChoreography2 = bpmnFile === "sub-choreography2.bpmn";
 
         for (const iNet of iNets) {
-          const generator = new SolDefaultContractGenerator(iNet, undefined, iNet.isCalled);
+          const generator = new SolDefaultContractGenerator(iNet, iNet.isCalled);
 
           const result = await generator.compile({
             unfoldSubNets: !isSubChoreography2,
