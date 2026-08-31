@@ -3,7 +3,8 @@
  * Used for controlling conditional rendering in templates.
  *
  * Template expressions used throughout various partials:
- * - options.debug: can be null/false, boolean true, or a string with an import path (e.g. 'hardhat/console.sol')
+ * - options.debug: null/false disables debug; "foundry" imports {console} from
+ *   "forge-std/console.sol"; any other truthy value imports "hardhat/console.sol"
  * - options.events: whether to emit Solidity events
  * - additional arbitrary options may be stored in `extras`
  */

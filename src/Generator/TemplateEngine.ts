@@ -181,6 +181,11 @@ export abstract class TemplateEngine implements ITemplateEngine {
     Handlebars.registerHelper("isString", function (value) {
       return typeof value === "string";
     });
+
+    // Helper for strict equality checks in templates
+    Handlebars.registerHelper("eq", function (a, b) {
+      return a === b;
+    });
   }
 
   addCaseVariable(variable: CaseVariable) {
