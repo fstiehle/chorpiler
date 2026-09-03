@@ -129,6 +129,56 @@ describe("readme code", () => {
       .catch((err) => console.error(err));
   });
 
+  it("should enable events and debug when provided options", async () => {
+    const parser = new chorpiler.Parser();
+    const bpmnXML = fs.readFileSync(path.join("./docs/examples/pizza.bpmn"));
+    const iNet = await parser.fromXML(bpmnXML);
+
+    // create channel-based generator with CompileOptions enabling events and debug
+    const channelGen = new chorpiler.generators.sol.DefaultContractGenerator(iNet[0], false, {
+      events: true,
+      debug: "foundry",
+    });
+
+    // compile and print resulting solidity code to stdout as requested
+    const gen = await channelGen.compile();
+    // print to stdout for manual inspection / CI logs
+    // eslint-disable-next-line no-console
+    console.log('\n--- Generated Channel Contract ---\n');
+    // eslint-disable-next-line no-console
+    console.log(gen.target);
+    // basic assertion: target should be a non-empty string
+    assert.strictEqual(typeof gen.target, "string");
+    assert.ok(gen.target.length > 0);
+
+    // verify README claims: forge-std console import and event emission (emit) should appear
+    assert.ok(
+      gen.target.includes('import {console} from "forge-std/console.sol";'),
+      'generated contract should import forge-std console.sol',
+    );
+    assert.ok(
+      gen.target.includes('emit '),
+      'generated contract should contain emit statements for events',
+    );
+  });
+
+  it("should add a case variable to xor-messages and print the generated contract", async () => {
+    const parser = new chorpiler.Parser();
+    const bpmnXML = fs.readFileSync(path.join("./docs/examples/xor-messages.bpmn"));
+    const iNet = await parser.fromXML(bpmnXML);
+
+    const channelGen = new chorpiler.generators.sol.DefaultContractGenerator(iNet[0]);
+
+    // add CaseVariable(name, type, defaultValue, setters, visibility)
+    channelGen.addCaseVariable(new CaseVariable("items", "bool", "false", false, "public"));
+
+    const gen = await channelGen.compile();
+
+    // verify 'items' appears in the generated contract
+    assert.ok(gen.target.includes('items'), 'generated contract should include the case variable name "items"');
+    assert.ok(gen.target.includes('function ChoreographyTask_0hy9n0g(bool _items)'), 'generated contract should include the case variable task for "items"');
+  });
+
   it("should generate Process.sol", () => {
     assert.ok(fs.existsSync("Process.sol"));
   });

@@ -63,7 +63,8 @@ return contractGenerator
   .catch((err) => console.error(err));
 ```
 - Note, you can also import the corresponding types directly.
-- You can enable event emission and debug console.logs by passing a `CompileOptions` object to the generator; e.g., `new SolChannelContractGenerator(iNet[0], { events: true, debug: "foundry"});`.
+- You can enable parallel instance support `new SolChannelContractGenerator(iNet[0], true);`.
+- You can enable event emission and debug console.logs by passing a `CompileOptions` object to the generator; e.g., `new SolChannelContractGenerator(iNet[0], false, { events: true, debug: "foundry" });`.
 
 ### Case Variables & Data-Based Decisions
 
@@ -80,15 +81,30 @@ The default-flow (upper path) is taken, unless the condition `items==true` is sa
 ```
 In code, you can define the corresponding case variable.
 ```ts
-const contractGenerator = new SolChannelContractGenerator((iNet[0]);
+const contractGenerator = new DefaultContractGenerator((iNet[0]);
 contractGenerator.addCaseVariable(
   new CaseVariable("items", "bool", "false", true, "public"),
-  // name of the variable, type of the variable, whether setters should be generated, and visibility.
+  // name of the variable, type of the variable, initial value, whether setters should be generated, and the variable's visibility.
 );
 ```
 #### Enforcement through Messages
 
-> TODO
+Likely, you want to restrict when and who can update case variables. This can be done through explicitly defining messages. For example, to only allow `items` to be written by the customer when she places the order initially, model as follows.
+
+![XOR example](https://github.com/fstiehle/chorpiler/blob/release/v2/docs/figs/xor-messages.bpmn.svg)
+
+Chorpiler will generate a dedicated data task.
+```sol
+function ChoreographyTask_0hy9n0g(bool _items) external {
+    require(tokenState & 1 == 1);
+    require(msg.sender == participants[0], "Invalid initiator");
+
+    items = _items;
+
+    enact(1);
+  }
+```
+- Note, If you want to restrict writting, make sure _to not_ generate public setters for the case variable, e.g., `new CaseVariable("items", "bool", "false", false, "public");`
 
 ### Interacting with Contracts
 
