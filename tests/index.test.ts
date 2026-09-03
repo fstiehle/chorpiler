@@ -62,9 +62,8 @@ describe("NPM Package", () => {
     class test2 extends TemplateEngine {
       constructor(
         _iNet: InteractionNet,
-        _caseVariables?: Map<string, CaseVariable>,
       ) {
-        super(_iNet, "", _caseVariables);
+        super(_iNet, "");
       }
     }
   });

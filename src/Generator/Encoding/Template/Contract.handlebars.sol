@@ -2,8 +2,8 @@
 pragma solidity ^0.8.24;
 
 {{#if options.debug}}
-{{#if (isString options.debug)}}
-import "{{options.debug}}";
+{{#if (eq options.debug "foundry")}}
+import {console} from "forge-std/console.sol";
 {{else}}
 import "hardhat/console.sol";
 {{/if}}
