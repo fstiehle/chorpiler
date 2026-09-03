@@ -62,7 +62,8 @@ return contractGenerator
   })
   .catch((err) => console.error(err));
 ```
-> Note, you can also import the corresponding types directly. E.g., ```import { Parser, TriggerEncoding, SolChannelContractGenerator, CaseVariable } from "chorpiler";```
+- Note, you can also import the corresponding types directly.
+- You can enable event emission and debug console.logs by passing a `CompileOptions` object to the generator; e.g., `new SolChannelContractGenerator(iNet[0], { events: true, debug: "foundry"});`.
 
 ### Case Variables & Data-Based Decisions
 
