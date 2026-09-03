@@ -3,11 +3,11 @@
 
 [![Node.js CI](https://github.com/fstiehle/chorpiler/actions/workflows/node.js.yml/badge.svg)](https://github.com/fstiehle/chorpiler/actions/workflows/node.js.yml)
 - A compiler to transform BPMN 2.0 models to efficient smart contract components, based on petri-net reductions.
-- Current targets supported: Solidity Smart Contracts, [Algorand TEAL Contracts](https://github.com/fstiehle/chorpiler-algorandvm)(v1)
+- Current targets supported: Solidity Smart Contracts, [Algorand TEAL Contracts](https://github.com/fstiehle/chorpiler-algorandvm) (Chorpiler v1)
 
 ## Overview
 
-Chorpiler is a tool to transform a BPMN choreography model into a Solidity smart contract that encodes the process. The contract will enforce the order of task execution, the authorisation (correct participant exeucting the task) based on bound blockchain-addresses, and data-based (XOR) decisions.
+Chorpiler is a tool to transform a BPMN choreography model into a Solidity state-machine  contract that encodes the process. The contract will enforce the order of task execution, including data-based decisions, and the authorisation (correct participant exeucting the task).
 Chorpiler has additional tools that help with testing and interacting with such contracts. Chorpiler supports the following choreography elements.
 
 | Element            | Supported  |
@@ -26,8 +26,9 @@ Chorpiler has additional tools that help with testing and interacting with such 
 
 ## Usage
 
-Install and use through [npm](https://www.npmjs.com/package/chorpiler).
+Install and use through your prefered [package](https://www.npmjs.com/package/chorpiler) manager.
 
+E.g.,
 ```
 npm install chorpiler
 ```
@@ -35,7 +36,7 @@ npm install chorpiler
 See below example.
 
 Complete example usage to parse and generate.
-```js
+```ts
 import * as fs from 'fs';
 import chorpiler, { TriggerEncoding } from 'chorpiler';
 
@@ -61,15 +62,32 @@ return contractGenerator
   })
   .catch((err) => console.error(err));
 ```
+> Note, you can also import the corresponding types directly. E.g., ```import { Parser, TriggerEncoding, SolChannelContractGenerator, CaseVariable } from "chorpiler";```
 
 ### Case Variables & Data-Based Decisions
 
-> TODO:
-XOR Picture example plus corresponding XML code.
+Chorpiler will enforce data-based XOR decisions. Consider the following toy example.
 
-#### Generating Setters
+![XOR example](https://github.com/fstiehle/chorpiler/blob/release/v2/docs/figs/xor.bpmn.svg)
 
+The default-flow (upper path) is taken, unless the condition `items==true` is satisfied. Conditions can be defined as follows. (Also graphically; for example, through the properties panel of [chor-js](https://bpt-lab.org/chor-js-demo/).)
+
+```xml
+<bpmn2:sequenceFlow id="Flow_1uhdzct" sourceRef="Gateway_1td68h3" targetRef="ChoreographyTask_1b2vkz9">
+      <bpmn2:conditionExpression xsi:type="bpmn2:tFormalExpression" language="Solidity">items==true</bpmn2:conditionExpression>
+    </bpmn2:sequenceFlow>
+```
+In code, you can define the corresponding case variable.
+```ts
+const contractGenerator = new SolChannelContractGenerator((iNet[0]);
+contractGenerator.addCaseVariable(
+  new CaseVariable("items", "bool", "false", true, "public"),
+  // name of the variable, type of the variable, whether setters should be generated, and visibility.
+);
+```
 #### Enforcement through Messages
+
+> TODO
 
 ### Interacting with Contracts
 
