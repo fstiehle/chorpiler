@@ -36,7 +36,7 @@ npm install chorpiler
 See below example.
 
 Complete example usage to parse and generate.
-```ts
+```TSX
 import * as fs from 'fs';
 import chorpiler, { TriggerEncoding } from 'chorpiler';
 
@@ -74,14 +74,14 @@ Chorpiler will enforce data-based XOR decisions. Consider the following toy exam
 
 The default-flow (upper path) is taken, unless the condition `items==true` is satisfied. Conditions can be defined as follows. (Also graphically; for example, through the properties panel of [chor-js](https://bpt-lab.org/chor-js-demo/).)
 
-```xml
+```XML
 <bpmn2:sequenceFlow id="Flow_1uhdzct" sourceRef="Gateway_1td68h3" targetRef="ChoreographyTask_1b2vkz9">
       <bpmn2:conditionExpression xsi:type="bpmn2:tFormalExpression" language="Solidity">items==true</bpmn2:conditionExpression>
     </bpmn2:sequenceFlow>
 ```
 In code, you can define the corresponding case variable.
-```ts
-const contractGenerator = new SolDefaultContractGenerator((iNet[0]);
+```TSX
+const contractGenerator = new SolDefaultContractGenerator(iNet[0]);
 contractGenerator.addCaseVariable(
   new CaseVariable("items", "bool", "false", true, "public"),
   // name of the variable, type of the variable, initial value, whether setters should be generated, and the variable's visibility.
@@ -94,7 +94,7 @@ Likely, you want to restrict when and who can update case variables. This can be
 ![XOR example](https://github.com/fstiehle/chorpiler/blob/release/v2/docs/figs/xor-messages.bpmn.svg)
 
 Chorpiler will generate a dedicated data task.
-```sol
+```Solidity
 function ChoreographyTask_0hy9n0g(bool _items) external {
     require(tokenState & 1 == 1);
     require(msg.sender == participants[0], "Invalid initiator");
@@ -102,7 +102,7 @@ function ChoreographyTask_0hy9n0g(bool _items) external {
     items = _items;
 
     enact(1);
-  }
+}
 ```
 - Note, If you want to restrict writting, make sure _to not_ generate public setters for the case variable, e.g., `new CaseVariable("items", "bool", "false", false, "public");`
 
