@@ -135,13 +135,13 @@ describe("readme code", () => {
     const iNet = await parser.fromXML(bpmnXML);
 
     // create channel-based generator with CompileOptions enabling events and debug
-    const channelGen = new chorpiler.generators.sol.DefaultContractGenerator(iNet[0], false, {
+    const generator = new SolDefaultContractGenerator(iNet[0], false, {
       events: true,
       debug: "foundry",
     });
 
     // compile and print resulting solidity code to stdout as requested
-    const gen = await channelGen.compile();
+    const gen = await generator.compile();
     // print to stdout for manual inspection / CI logs
     // eslint-disable-next-line no-console
     console.log('\n--- Generated Channel Contract ---\n');
@@ -167,12 +167,12 @@ describe("readme code", () => {
     const bpmnXML = fs.readFileSync(path.join("./docs/examples/xor-messages.bpmn"));
     const iNet = await parser.fromXML(bpmnXML);
 
-    const channelGen = new chorpiler.generators.sol.DefaultContractGenerator(iNet[0]);
+    const generator = new SolDefaultContractGenerator(iNet[0]);
 
     // add CaseVariable(name, type, defaultValue, setters, visibility)
-    channelGen.addCaseVariable(new CaseVariable("items", "bool", "false", false, "public"));
+    generator.addCaseVariable(new CaseVariable("items", "bool", "false", false, "public"));
 
-    const gen = await channelGen.compile();
+    const gen = await generator.compile();
 
     // verify 'items' appears in the generated contract
     assert.ok(gen.target.includes('items'), 'generated contract should include the case variable name "items"');
