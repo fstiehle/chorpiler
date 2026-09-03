@@ -63,8 +63,8 @@ return contractGenerator
   .catch((err) => console.error(err));
 ```
 - Note, you can also import the corresponding types directly.
-- You can enable parallel instance support `new SolChannelContractGenerator(iNet[0], true);`.
-- You can enable event emission and debug console.logs by passing a `CompileOptions` object to the generator; e.g., `new SolChannelContractGenerator(iNet[0], false, { events: true, debug: "foundry" });`.
+- You can enable parallel instance support `new SolDefaultContractGenerator(iNet[0], true);`.
+- You can enable event emission and debug console.logs by passing a `CompileOptions` object to the generator; e.g., `new SolDefaultContractGenerator(iNet[0], false, { events: true, debug: "foundry" });`.
 
 ### Case Variables & Data-Based Decisions
 
@@ -81,7 +81,7 @@ The default-flow (upper path) is taken, unless the condition `items==true` is sa
 ```
 In code, you can define the corresponding case variable.
 ```ts
-const contractGenerator = new DefaultContractGenerator((iNet[0]);
+const contractGenerator = new SolDefaultContractGenerator((iNet[0]);
 contractGenerator.addCaseVariable(
   new CaseVariable("items", "bool", "false", true, "public"),
   // name of the variable, type of the variable, initial value, whether setters should be generated, and the variable's visibility.
