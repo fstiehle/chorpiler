@@ -8,7 +8,7 @@ event NewInstance(uint id, bytes32 instanceID);
 {{/if}}
 {{!// ---- Instance Support: list of process data ----- }}
 {{#if isInstanced}}
-mapping(bytes32 => IProcessInstance.InstanceData) public instanceData;
+mapping(bytes32 => IProcessInstance.InstanceData) private instanceData;
 {{else}}
 {{!// ---- Non-Instanced Contract ----- }}
 {{!// ---- Sub Process Support ----- }}

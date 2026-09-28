@@ -18,7 +18,7 @@ interface IProcessInstance {
 
 
 contract Choreography_1661x4r is IProcessInstance {
-  mapping(bytes32 => IProcessInstance.InstanceData) public instanceData;
+  mapping(bytes32 => IProcessInstance.InstanceData) private instanceData;
   event Task(uint id);
 
   function instance(uint _nonce, address[2] memory _participants) external returns (bytes32) {

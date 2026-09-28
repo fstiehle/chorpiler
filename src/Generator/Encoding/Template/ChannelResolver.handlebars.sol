@@ -66,10 +66,11 @@ interface IChannelResolver {
     bytes32 OP_RETURN;
   }
 
-  function enact(bytes32 _instanceID, uint id) external;
-  function getTokenState(bytes32 _instanceID) external view returns (uint);
   function instance(uint _nonce, address[{{{numberOfParticipants}}}] memory participants) external returns (bytes32);
   function submit(bytes32 _channelID, Step calldata _step) external;
+  function enact(bytes32 _instanceID, uint id) external;
+  function getInstanceData(bytes32 _instanceID) external view returns (IProcessInstance.InstanceData memory);
+  function getTokenState(bytes32 _instanceID) external view returns (uint);
 }
 {{! ---- No Whitespace ---- }}
 {{! ---- // List/declarations of called contracts and their interfaces ---- }}
@@ -141,6 +142,10 @@ contract {{{modelID}}} is IChannelResolver {
 
   function getTokenState({{#if isInstanced}}bytes32 instanceID{{/if}}) external view returns (uint) {
     return {{> tokenstate id=0 }};
+  }
+
+  function getInstanceData(bytes32 _instanceID) external view returns (IProcessInstance.InstanceData memory) {
+    return instanceData[_instanceID];
   }
 
   {{! ---- // Main Enact Function ---- }}

@@ -19,7 +19,7 @@ interface IProcessInstance {
 
 
 contract Choreography_0betnp1 is IProcessInstance {
-  mapping(bytes32 => IProcessInstance.InstanceData) public instanceData;
+  mapping(bytes32 => IProcessInstance.InstanceData) private instanceData;
   event Task(uint id);
   
 

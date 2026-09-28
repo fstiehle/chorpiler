@@ -51,10 +51,11 @@ interface IChannelResolver {
     bytes32 OP_RETURN;
   }
 
-  function enact(bytes32 _instanceID, uint id) external;
-  function getTokenState(bytes32 _instanceID) external view returns (uint);
   function instance(uint _nonce, address[3] memory participants) external returns (bytes32);
   function submit(bytes32 _channelID, Step calldata _step) external;
+  function enact(bytes32 _instanceID, uint id) external;
+  function getInstanceData(bytes32 _instanceID) external view returns (IProcessInstance.InstanceData memory);
+  function getTokenState(bytes32 _instanceID) external view returns (uint);
 }
 
 interface IInstanceCall {
@@ -83,7 +84,7 @@ contract CallChoreoChained is IChannelResolver {
   bytes32[2] private instanceList; // instanceIDs for calls
   uint private nextID; // nonce list for calls
   event NewInstance(uint id, bytes32 instanceID);
-  mapping(bytes32 => IProcessInstance.InstanceData) public instanceData;
+  mapping(bytes32 => IProcessInstance.InstanceData) private instanceData;
   event Task(uint id);
 
   function instance(uint _nonce, address[3] memory _participants) external returns (bytes32) {
@@ -156,6 +157,10 @@ contract CallChoreoChained is IChannelResolver {
 
   function getTokenState(bytes32 instanceID) external view returns (uint) {
     return instanceData[instanceID].state.tokenState;
+  }
+
+  function getInstanceData(bytes32 _instanceID) external view returns (IProcessInstance.InstanceData memory) {
+    return instanceData[_instanceID];
   }
 
   function enact(bytes32 instanceID, uint id) external {

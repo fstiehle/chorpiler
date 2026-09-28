@@ -52,10 +52,11 @@ interface IChannelResolver {
     bytes32 OP_RETURN;
   }
 
-  function enact(bytes32 _instanceID, uint id) external;
-  function getTokenState(bytes32 _instanceID) external view returns (uint);
   function instance(uint _nonce, address[2] memory participants) external returns (bytes32);
   function submit(bytes32 _channelID, Step calldata _step) external;
+  function enact(bytes32 _instanceID, uint id) external;
+  function getInstanceData(bytes32 _instanceID) external view returns (IProcessInstance.InstanceData memory);
+  function getTokenState(bytes32 _instanceID) external view returns (uint);
 }
 
 IChannelRoot constant Channel_Root = IChannelRoot(0x0000000000000000000000000000000000000000);
@@ -63,7 +64,7 @@ IChannelRoot constant Channel_Root = IChannelRoot(0x0000000000000000000000000000
 contract Choreography_0betnp1 is IChannelResolver {
   uint public immutable disputeWindowInUNIX = 86400;
 
-  mapping(bytes32 => IProcessInstance.InstanceData) public instanceData;
+  mapping(bytes32 => IProcessInstance.InstanceData) private instanceData;
   event Task(uint id);
   
 
@@ -139,6 +140,10 @@ contract Choreography_0betnp1 is IChannelResolver {
 
   function getTokenState(bytes32 instanceID) external view returns (uint) {
     return instanceData[instanceID].state.tokenState;
+  }
+
+  function getInstanceData(bytes32 _instanceID) external view returns (IProcessInstance.InstanceData memory) {
+    return instanceData[_instanceID];
   }
 
   function enact(bytes32 instanceID, uint id) external {
